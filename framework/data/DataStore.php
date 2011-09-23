@@ -10,9 +10,9 @@
  * @link			http://github.com/Pogostick/kisma/ Kisma(tm)
  * @license			http://github.com/Pogostick/kisma/licensing/
  * @author			Jerry Ablan <kisma@pogostick.com>
- * @category		Kisma_Components
- * @package			kisma.components
- * @namespace		\Kisma\Components
+ * @category		Kisma_Data
+ * @package			kisma.data
+ * @namespace		\Kisma\Data
  * @since			v1.0.0
  * @filesource
  */
@@ -22,73 +22,27 @@
 //*************************************************************************
 
 /**
- * @namespace Kisma\Components Kisma components
+ * @namespace Kisma\Data Kisma data handling components
  */
-namespace Kisma\Components;
+namespace Kisma\Data;
+use Kisma\Components\Component;
 
 /**
- * Service
- * The base class for services provided
+ * DataStore
+ * Encapsulates core data storage functionality
  */
-class Service extends Component implements \Kisma\IService
+abstract class DataStore extends Component
 {
-	//********************************************************************************
-	//* Constants
-	//********************************************************************************
-
 	//********************************************************************************
 	//* Properties
 	//********************************************************************************
 
-	/**
-	 * @var \Kisma\ServiceType The type of service provided by this object
-	 */
-	protected $_serviceType = \Kisma\ServiceType::AllPurpose;
-
-	//*************************************************************************
-	//* Event Handlers
-	//*************************************************************************
-
-	/**
-	 * @param \Kisma\Events\Event $event
-	 * @return bool
-	 */
-	public function onBeforeServiceCall( $event )
-	{
-		//	Default implementation
-		return true;
-	}
-
-	/**
-	 * @param \Kisma\Events\Event $event
-	 * @return bool
-	 */
-	public function onAfterServiceCall( $event )
-	{
-		//	Default implementation
-		return true;
-	}
+	//********************************************************************************
+	//* Public Methods
+	//********************************************************************************
 
 	//********************************************************************************
 	//* Property Accessors
 	//********************************************************************************
-
-	/**
-	 * @param \Kisma\ServiceType $serviceType
-	 * @return \Kisma\Components\Service
-	 */
-	public function setServiceType( $serviceType )
-	{
-		$this->_serviceType = $serviceType;
-		return $this;
-	}
-
-	/**
-	 * @return \Kisma\ServiceType
-	 */
-	public function getServiceType()
-	{
-		return $this->_serviceType;
-	}
-
+	
 }

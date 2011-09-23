@@ -1,27 +1,37 @@
 <?php
 /**
- * Kisma(tm) : PHP Microframework (http://github.com/lucifurious/kisma/)
+ * Kisma(tm) : PHP Nanoframework (http://github.com/Pogostick/kisma/)
  * Copyright 2011, Pogostick, LLC. (http://www.pogostick.com/)
  *
  * Dual licensed under the MIT License and the GNU General Public License (GPL) Version 2.
- * See {@link http://github.com/lucifurious/kisma/licensing/} for complete information.
+ * See {@link http://github.com/Pogostick/kisma/licensing/} for complete information.
  *
  * @copyright		Copyright 2011, Pogostick, LLC. (http://www.pogostick.com/)
- * @link			http://github.com/lucifurious/kisma/ Kisma(tm)
- * @license			http://github.com/lucifurious/kisma/licensing/
+ * @link			http://github.com/Pogostick/kisma/ Kisma(tm)
+ * @license			http://github.com/Pogostick/kisma/licensing/
  * @author			Jerry Ablan <kisma@pogostick.com>
- * @package			kisma
- * @namespace		\Kisma\Components
+ * @category		Kisma_Events
+ * @package			kisma.events
+ * @namespace		\Kisma\Events
  * @since			v1.0.0
  * @filesource
  */
+
+//*************************************************************************
+//* Namespace Declarations
+//*************************************************************************
+
+/**
+ * @namespace Kisma\Events Kisma events
+ */
 namespace Kisma\Events;
+use Kisma\Components\Component;
 
 /**
  * Event
- * The base event class
+ * The mother of all events!
  */
-class Event extends \Kisma\Components\Component implements \Kisma\IEvent
+class Event extends Component implements \Kisma\IEvent
 {
 	//*************************************************************************
 	//* Private Members
@@ -36,29 +46,9 @@ class Event extends \Kisma\Components\Component implements \Kisma\IEvent
 	 */
 	protected $_handled = false;
 	/**
-	 * @var \Kisma\IKisma} The source of the event
+	 * @var \Kisma\IKisma The source of the event
 	 */
 	protected $_source = null;
-
-	//*************************************************************************
-	//* Default Methods
-	//*************************************************************************
-
-	/**
-	 * Constructor.
-	 * @param \Kisma\IKisma $source The source of the event
-	 * @param mixed $data Optional event data
-	 */
-	public function __construct( $source = null, $data = null )
-	{
-		parent::__construct(
-			array
-			(
-				'source' => $source,
-				'data' => $data,
-			)
-		);
-	}
 
 	//*************************************************************************
 	//* Properties
@@ -117,4 +107,5 @@ class Event extends \Kisma\Components\Component implements \Kisma\IEvent
 	{
 		return $this->_source;
 	}
+	
 }
