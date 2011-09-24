@@ -1,5 +1,50 @@
 <?php
+/**
+ * Kisma(tm) : PHP Nanoframework (http://github.com/Pogostick/kisma/)
+ * Copyright 2011, Pogostick, LLC. (http://www.pogostick.com/)
+ *
+ * Dual licensed under the MIT License and the GNU General Public License (GPL) Version 2.
+ * See {@link http://github.com/Pogostick/kisma/licensing/} for complete information.
+ *
+ * @copyright		Copyright 2011, Pogostick, LLC. (http://www.pogostick.com/)
+ * @link			http://github.com/Pogostick/kisma/ Kisma(tm)
+ * @license			http://github.com/Pogostick/kisma/licensing/
+ * @author			Jerry Ablan <kisma@pogostick.com>
+ * @category		Kisma_Components
+ * @package			kisma.components
+ * @namespace		\Kisma\Components
+ * @since			v1.0.0
+ * @filesource
+ */
+
+//*************************************************************************
+//* Namespace Declarations
+//*************************************************************************
+
+/**
+ * @namespace Kisma Kisma
+ */
 namespace Kisma;
+
+//*************************************************************************
+//* Requirements
+//*************************************************************************
+
+/**
+ * We want to use SplEnum here, but it's an optional library and not
+ * standard in any PHP distribution. In addition, the current version
+ * available via pecl is not compatible with PHP 5.3.
+ *
+ * If you have it, we use it. Otherwise, we don't
+ */
+if ( class_exists( '\SplEnum' ) )
+{
+	require_once __DIR__ . '/KismaEnum_Spl.php';
+}
+else
+{
+	require_once __DIR__ . '/KismaEnum_NonSpl.php';
+}
 
 //*************************************************************************
 //*	Enums
@@ -8,7 +53,7 @@ namespace Kisma;
 /**
  *
  */
-class AccessLevel extends \SplEnum
+class AccessLevel extends \Kisma\KismaEnum
 {
 	//*************************************************************************
 	//* Constants
@@ -29,7 +74,7 @@ class AccessLevel extends \SplEnum
 
 /**
  */
-class AccessorMode extends \SplEnum
+class AccessorMode extends \Kisma\KismaEnum
 {
 	//*************************************************************************
 	//* Constants
@@ -55,7 +100,7 @@ class AccessorMode extends \SplEnum
 /**
  * The various predefined actions that can be used on an xlForm
  */
-class ActionButton extends \SplEnum
+class ActionButton extends \Kisma\KismaEnum
 {
 	//*************************************************************************
 	//* Constants 
@@ -83,7 +128,7 @@ class ActionButton extends \SplEnum
 /**
  *
  */
-class OperationMode extends \SplEnum
+class OperationMode extends \Kisma\KismaEnum
 {
 	//*************************************************************************
 	//* Constants
@@ -102,7 +147,7 @@ class OperationMode extends \SplEnum
 
 /**
  */
-class PagerLocation extends \SplEnum
+class PagerLocation extends \Kisma\KismaEnum
 {
 	//*************************************************************************
 	//* Constants 
@@ -121,7 +166,7 @@ class PagerLocation extends \SplEnum
 
 /**
  */
-class Seconds extends \SplEnum
+class Seconds extends \Kisma\KismaEnum
 {
 	//*************************************************************************
 	//* Constants
@@ -143,7 +188,7 @@ class Seconds extends \SplEnum
 
 /**
  */
-class QueueStatus extends \SplEnum
+class QueueStatus extends \Kisma\KismaEnum
 {
 	//*************************************************************************
 	//* Constants
@@ -167,7 +212,7 @@ class QueueStatus extends \SplEnum
 
 /**
  */
-class LogLevel extends \SplEnum
+class LogLevel extends \Kisma\KismaEnum
 {
 	//*************************************************************************
 	//* Constants
@@ -199,7 +244,7 @@ class LogLevel extends \SplEnum
 /**
  * Defines the available output formats for objects that return or display output.
  */
-class OutputFormat extends \SplEnum
+class OutputFormat extends \Kisma\KismaEnum
 {
 	//*************************************************************************
 	//* Constants
@@ -225,7 +270,7 @@ class OutputFormat extends \SplEnum
 /**
  * Defines the available output formats for objects that return or display output.
  */
-class ServiceType extends \SplEnum
+class ServiceType extends \Kisma\KismaEnum
 {
 	//*************************************************************************
 	//* Constants
@@ -245,7 +290,7 @@ class ServiceType extends \SplEnum
 /**
  * Defines the available validation modes.
  */
-class ValidationMode extends \SplEnum
+class ValidationMode extends \Kisma\KismaEnum
 {
 	//*************************************************************************
 	//* Constants
@@ -263,7 +308,7 @@ class ValidationMode extends \SplEnum
 /**
  * Validation types and modifiers
  */
-class ValidationType extends \SplEnum
+class ValidationType extends \Kisma\KismaEnum
 {
 	//*************************************************************************
 	//* Constants
