@@ -42,10 +42,6 @@ class ComponentTest extends \PHPUnit_Framework_TestCase
      */
     public function test__call()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
     }
 
     /**
@@ -53,10 +49,6 @@ class ComponentTest extends \PHPUnit_Framework_TestCase
      */
     public function testBindEvents()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
     }
 
     /**
@@ -64,10 +56,6 @@ class ComponentTest extends \PHPUnit_Framework_TestCase
      */
     public function testBind()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
     }
 
     /**
@@ -75,10 +63,6 @@ class ComponentTest extends \PHPUnit_Framework_TestCase
      */
     public function testUnbind()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
     }
 
     /**
@@ -86,10 +70,6 @@ class ComponentTest extends \PHPUnit_Framework_TestCase
      */
     public function testTrigger()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
     }
 
     /**
@@ -97,10 +77,6 @@ class ComponentTest extends \PHPUnit_Framework_TestCase
      */
     public function testLinkAspect()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
     }
 
     /**
@@ -108,10 +84,6 @@ class ComponentTest extends \PHPUnit_Framework_TestCase
      */
     public function testLinkAspects()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
     }
 
     /**
@@ -119,10 +91,6 @@ class ComponentTest extends \PHPUnit_Framework_TestCase
      */
     public function testUnlinkAspects()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
     }
 
     /**
@@ -130,32 +98,6 @@ class ComponentTest extends \PHPUnit_Framework_TestCase
      */
     public function testUnlinkAspect()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
-    }
-
-    /**
-     * @todo Implement testEnableAspects().
-     */
-    public function testEnableAspects()
-    {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
-    }
-
-    /**
-     * @todo Implement testEnableAspect().
-     */
-    public function testEnableAspect()
-    {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
     }
 
     /**
@@ -163,10 +105,6 @@ class ComponentTest extends \PHPUnit_Framework_TestCase
      */
     public function testLinkHelpers()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
     }
 
     /**
@@ -174,10 +112,6 @@ class ComponentTest extends \PHPUnit_Framework_TestCase
      */
     public function testLinkHelper()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
     }
 
     /**
@@ -185,10 +119,6 @@ class ComponentTest extends \PHPUnit_Framework_TestCase
      */
     public function testUnlinkHelpers()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
     }
 
     /**
@@ -196,10 +126,6 @@ class ComponentTest extends \PHPUnit_Framework_TestCase
      */
     public function testUnlinkHelper()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
     }
 
     /**
@@ -207,10 +133,6 @@ class ComponentTest extends \PHPUnit_Framework_TestCase
      */
     public function testCount()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
     }
 
     /**
@@ -218,10 +140,6 @@ class ComponentTest extends \PHPUnit_Framework_TestCase
      */
     public function testCurrent()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
     }
 
     /**
@@ -229,10 +147,6 @@ class ComponentTest extends \PHPUnit_Framework_TestCase
      */
     public function testKey()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
     }
 
     /**
@@ -240,10 +154,6 @@ class ComponentTest extends \PHPUnit_Framework_TestCase
      */
     public function testNext()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
     }
 
     /**
@@ -251,10 +161,6 @@ class ComponentTest extends \PHPUnit_Framework_TestCase
      */
     public function testRewind()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
     }
 
     /**
@@ -262,10 +168,6 @@ class ComponentTest extends \PHPUnit_Framework_TestCase
      */
     public function testValid()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
     }
 
     /**
@@ -273,10 +175,6 @@ class ComponentTest extends \PHPUnit_Framework_TestCase
      */
     public function testSetAspects()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
     }
 
     /**
@@ -284,10 +182,6 @@ class ComponentTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetAspects()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
     }
 
     /**
@@ -295,10 +189,6 @@ class ComponentTest extends \PHPUnit_Framework_TestCase
      */
     public function testSetErrors()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
     }
 
     /**
@@ -306,10 +196,6 @@ class ComponentTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetErrors()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
     }
 
     /**
@@ -317,10 +203,6 @@ class ComponentTest extends \PHPUnit_Framework_TestCase
      */
     public function testSetEvents()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
     }
 
     /**
@@ -328,10 +210,6 @@ class ComponentTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetEvents()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
     }
 
     /**
@@ -339,10 +217,6 @@ class ComponentTest extends \PHPUnit_Framework_TestCase
      */
     public function testSetIndex()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
     }
 
     /**
@@ -350,10 +224,6 @@ class ComponentTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetIndex()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
     }
 
     /**
@@ -361,10 +231,6 @@ class ComponentTest extends \PHPUnit_Framework_TestCase
      */
     public function testSetLogging()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
     }
 
     /**
@@ -372,10 +238,6 @@ class ComponentTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetLogging()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
     }
 
     /**
@@ -383,10 +245,6 @@ class ComponentTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetCount()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
     }
 
     /**
@@ -394,10 +252,6 @@ class ComponentTest extends \PHPUnit_Framework_TestCase
      */
     public function testSetOptions()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
     }
 
     /**
@@ -405,10 +259,6 @@ class ComponentTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetOptions()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
     }
 
     /**
@@ -416,10 +266,6 @@ class ComponentTest extends \PHPUnit_Framework_TestCase
      */
     public function testSetReadOnly()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
     }
 
     /**
@@ -427,10 +273,6 @@ class ComponentTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetReadOnly()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
     }
 
     /**
@@ -438,10 +280,6 @@ class ComponentTest extends \PHPUnit_Framework_TestCase
      */
     public function testSetSkipNext()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
     }
 
     /**
@@ -449,10 +287,6 @@ class ComponentTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetSkipNext()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
     }
 
     /**
@@ -460,10 +294,6 @@ class ComponentTest extends \PHPUnit_Framework_TestCase
      */
     public function testSetEventHandlerSignature()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
     }
 
     /**
@@ -471,10 +301,6 @@ class ComponentTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetEventHandlerSignature()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
     }
 }
 ?>

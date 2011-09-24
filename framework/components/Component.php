@@ -25,6 +25,7 @@
  * @namespace Kisma\Components Kisma components
  */
 namespace Kisma\Components;
+
 /**
  * Convenience alias for the Kisma helpers
  * @see \Kisma\Kisma
@@ -107,11 +108,6 @@ class Component implements \Kisma\IKisma, \Kisma\IAspectable, \Kisma\IOptions, \
 		//	Configure our properties
 		$this->_loadConfiguration( $options, true );
 
-		//	Create our arrays
-		$this->_errors = array();
-		$this->_events = array();
-		$this->_aspects = array();
-
 		//	Auto-bind events, remove from $options
 		if ( false !== $this->getOption( 'auto_bind', true ) )
 		{
@@ -126,12 +122,10 @@ class Component implements \Kisma\IKisma, \Kisma\IAspectable, \Kisma\IOptions, \
 	}
 
 	/**
-	 * Calls the named method which is not a class method.
-	 */
-	/**
+	 * Allow calling Aspect methods from the object
 	 * @throws \BadMethodCallException
 	 * @param string $method
-	 * @param array  $arguments
+	 * @param array $arguments
 	 * @return mixed
 	 */
 	public function __call( $method, $arguments )
@@ -178,8 +172,9 @@ class Component implements \Kisma\IKisma, \Kisma\IAspectable, \Kisma\IOptions, \
 		{
 			/** @noinspection PhpUndefinedFieldInspection */
 			$_realMethodName = $_method->name;
+			$_stub = strtolower( substr( $_realMethodName, 0, strlen( $this->_eventHandlerSignature ) ) );
 
-			if ( $this->_eventHandlerSignature == strtolower( substr( $_realMethodName, 0, strlen( $this->_eventHandlerSignature ) ) ) )
+			if ( $_stub == $this->_eventHandlerSignature )
 			{
 				//	Standardize the event name and, if not ignored, bind it
 				$_eventName = K::standardizeName( substr( $_realMethodName, strlen( $this->_eventHandlerSignature ) ) );
