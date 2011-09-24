@@ -19,74 +19,67 @@ require_once __DIR__ . '/interfaces.php';
  *
  * Contains a few core functions implemented statically to
  * be lightweight and single instance.
+ *
+ * @property App $app
+ * @property Request $request
+ * @property Response $response
+ * @property User $user
+ * @property AppController $appController
+ * @property int $uniqueIdCounter
+ * @property array $appParameters
  */
-class Kisma implements IKisma, IBroadcaster, IObservable
+class Kisma
 {
 	//********************************************************************************
 	//* Private Members
 	//********************************************************************************
 
 	/**
-	 * Cache the current app for speed
+	 * @var App The current application
 	 * @static
-	 * @var CWebApplication
 	 */
 	protected static $_app = null;
 	/**
-	 * Cache the current request
+	 * @var AppController The current controller
 	 * @static
-	 * @var CHttpRequest
 	 */
-	protected static $_request = null;
+	protected static $_appController = null;
 	/**
-	 * Cache the client script object for speed
+	 * @var array The current application parameters
 	 * @static
-	 * @var CClientScript
-	 */
-	protected static $_clientScript = null;
-	/**
-	 * Cache the user object for speed
-	 * @static
-	 * @var CWebUser
-	 */
-	protected static $_user = null;
-	/**
-	 * Cache the current controller for speed
-	 * @static
-	 * @var CController
-	 */
-	protected static $_controller = null;
-	/**
-	 * Our valid log levels based on interface definition
-	 * @static
-	 * @var array
-	 */
-	protected static $_validLogLevels;
-	/**
-	 * A static ID counter for generating unique names
-	 * @static
-	 * @var integer
-	 */
-	protected static $_uniqueIdCounter = 1000;
-	/**
-	 * Cache the application parameters for speed
-	 * @static
-	 * @var CAttributeCollection
 	 */
 	protected static $_appParameters = null;
 	/**
-	 * An array of class names to search in for missing static methods.
-	 * This is a quick an dirty little polymorpher.
-	 * @var array
+	 * @var AppUser The current user
 	 * @static
 	 */
-	protected static $_classPath = array(
-		'CHtml',
-	);
+	protected static $_user = null;
+	/**
+	 * @var int A static ID counter for generating unique names
+	 * @static
+	 */
+	protected static $_uniqueIdCounter = 1000;
 
 	//*************************************************************************
 	//* Public Methods
 	//*************************************************************************
+
+	/**
+	 * Initialize our private statics
+	 * @param array $options
+	 * @return bool
+	 */
+	public static function initialize( $options = array() )
+	{
+		//	Namespace aliases do not work in CLI mode, so create "K" for all components
+		if ( self::isCli() )
+		{
+			//	Make an alias of Kisma if this is CLI
+			class_alias( '\Kisma\Kisma', '\Kisma\Components\K' );
+		}
+
+		return true;
+	}
 
 	/**
 	 * Given a property name, clean it up to a standard, camel-cased, format.
@@ -98,15 +91,9 @@ class Kisma implements IKisma, IBroadcaster, IObservable
 		return str_replace( ' ', null, ucwords( trim( str_replace( '_', ' ', $name ) ) ) );
 	}
 
-	/**
-	 * Initialize our private statics
-	 * @param array $options
-	 * @return bool
-	 */
-	public static function initialize( $options = array() )
-	{
-		return true;
-	}
+	//*************************************************************************
+	//* The FauxFactory
+	//*************************************************************************
 
 	/**
 	 * Constructs a unique name based on component, hashes by default
@@ -119,6 +106,44 @@ class Kisma implements IKisma, IBroadcaster, IObservable
 		$_name = get_class( $component ) . '.' . self::$_uniqueIdCounter++;
 		return 'kisma.' . ( $humanReadable ? $_name : \Kisma\Helpers\Hash::hash( $_name ) );
 	}
+
+	/**
+	 * @static
+	 * @param \Kisma\Components\Component $component
+	 * @param string $aspectClass
+	 * @param array $options
+	 * @return \Kisma\Components\Aspect
+	 */
+	public static function createAspect( $component, $aspectClass, $options = array() )
+	{
+		/** @var \Kisma\Components\Aspect $_aspect */
+		$_aspect = new $aspectClass( $options );
+		$_aspect->link( $component );
+
+		return $_aspect;
+	}
+
+	/**
+	 * Takes a list of things and returns them in an array as the values. Keys are maintained.
+	 * @param mixed $_ [optional]
+	 * @return array
+	 */
+	public static function createArray( &$_ = null )
+	{
+		$_array = array();
+
+		foreach ( func_get_args() as $_key => $_argument )
+		{
+			$_array[$_key] = $_argument;
+		}
+
+		//	Return the fresh array...
+		return $_array;
+	}
+
+	//*************************************************************************
+	//* Utility Methods
+	//*************************************************************************
 
 	/**
 	 * NVL = Null VaLue. Copycat function from PL/SQL. Pass in a list of arguments and the first non-null
@@ -181,16 +206,38 @@ class Kisma implements IKisma, IBroadcaster, IObservable
 	}
 
 	/**
-	 * Alias for {@link xlHelperBase::o)
+	 * Takes the arguments and makes a file path out of them. No leading or trailing
+	 * separator is added.
+	 * @param mixed $_ [optional]
+	 * @return string
+	 */
+	public static function makePath( &$_ = null )
+	{
+		return implode( DIRECTORY_SEPARATOR, func_get_args() );
+	}
+
+	/**
+	 * Determine if PHP is running CLI mode or not
+	 * @return boolean True if currently running in CLI
+	 */
+	public static function isCli()
+	{
+		return ( 'cli' == php_sapi_name() && empty( $_SERVER['REMOTE_ADDR'] ) );
+	}
+
+	//*************************************************************************
+	//* Array/Option Methods
+	//*************************************************************************
+
+	/**
+	 * Alias for {@link \Kisma\Kisma::o)
 	 * @param array $options
-	 * @param $key
-	 * @param mixed $defaultValue
+	 * @param string $key
+	 * @param mixed|null $defaultValue
 	 * @param boolean $unsetValue
-	 *
-	 * @internal param string $_key
 	 * @return mixed
 	 */
-	public static function getOption( &$options = array(), $key, $defaultValue = null, $unsetValue = false )
+	public static function getOption( array &$options = array(), $key, $defaultValue = null, $unsetValue = false )
 	{
 		return self::o( $options, $key, $defaultValue, $unsetValue );
 	}
@@ -200,15 +247,13 @@ class Kisma implements IKisma, IBroadcaster, IObservable
 	 * Optionally will unset option in array.
 	 *
 	 * @param array $options
-	 * @param $key
-	 * @param mixed $defaultValue
+	 * @param string $key
+	 * @param mixed|null $defaultValue
 	 * @param boolean $unsetValue
-	 *
-	 * @internal param int|string $_key
 	 * @return mixed
-	 * @see xlHelperBase::getOption
+	 * @see \Kisma\Kisma::getOption
 	 */
-	public static function o( &$options = array(), $key, $defaultValue = null, $unsetValue = false )
+	public static function o( array &$options = array(), $key, $defaultValue = null, $unsetValue = false )
 	{
 		$_newValue = $defaultValue;
 
@@ -272,17 +317,16 @@ class Kisma implements IKisma, IBroadcaster, IObservable
 	}
 
 	/**
-	 * Similar to {@link YiiXLBase::o} except it will pull a value from a nested array.
+	 * Similar to {@link \Kisma\Kisma::o} except it will pull a value from a nested array.
 	 * @param array $options
-	 * @param $key
-	 * @param integer|string $subKey
-	 * @param mixed $defaultValue Only applies to target value
+	 * @param string $key
+	 * @param string $subKey
+	 * @param mixed|null $defaultValue
 	 * @param boolean $unsetValue Only applies to target value
-	 *
-	 * @internal param int|string $_key
+	 * @param mixed $defaultValue Only applies to target value
 	 * @return mixed
 	 */
-	public static function oo( &$options = array(), $key, $subKey, $defaultValue = null, $unsetValue = false )
+	public static function oo( array &$options = array(), $key, $subKey, $defaultValue = null, $unsetValue = false )
 	{
 		return self::o(
 			self::o(
@@ -297,15 +341,13 @@ class Kisma implements IKisma, IBroadcaster, IObservable
 	}
 
 	/**
-	 * Alias for {@link xlHelperBase::so}
+	 * Alias for {@link \Kisma\Kisma::so}
 	 * @param array $options
-	 * @param $key
+	 * @param string $key
 	 * @param mixed $value
-	 *
-	 * @internal param string $_key
 	 * @return mixed The new value of the key
 	 */
-	public static function setOption( array &$options, $key, $value = null )
+	public static function setOption( array &$options = array(), $key, $value = null )
 	{
 		return self::so( $options, $key, $value );
 	}
@@ -313,26 +355,23 @@ class Kisma implements IKisma, IBroadcaster, IObservable
 	/**
 	 * Sets an option in the given array.
 	 * @param array $options
-	 * @param $key
-	 * @param mixed $value Defaults to null
-	 *
+	 * @param string $key
+	 * @param mixed $defaultValue Defaults to null
 	 * @internal param string $_key
 	 * @return mixed The new value of the key
 	 */
-	public static function so( array &$options, $key, $value = null )
+	public static function so( array &$options = array(), $key, $defaultValue = null )
 	{
-		return $options[$key] = $value;
+		return $options[$key] = $defaultValue;
 	}
 
 	/**
-	 * Alias of {@link xlHelperBase::unsetOption}
+	 * Alias of {@link \Kisma\Kisma::unsetOption}
 	 * @param array $options
-	 * @param $key
-	 *
-	 * @internal param string $_key
+	 * @param string $key
 	 * @return mixed The last value of the key
 	 */
-	public static function unsetOption( array &$options, $key )
+	public static function unsetOption( array &$options = array(), $key )
 	{
 		return self::uo( $options, $key );
 	}
@@ -341,43 +380,12 @@ class Kisma implements IKisma, IBroadcaster, IObservable
 	 * Unsets an option in the given array
 	 *
 	 * @param array $options
-	 * @param $key
-	 *
-	 * @internal param string $_key
-	 * @return mixed The last value of the key
+	 * @param string $key
+	 * @return mixed The new value of the key
 	 */
 	public static function uo( array &$options, $key )
 	{
 		return self::o( $options, $key, null, true );
-	}
-
-	/**
-	 * Takes a list of things and returns them in an array as the values. Keys are maintained.
-	 * @param mixed $_ [optional]
-	 * @return array
-	 */
-	public static function makeArray( &$_ = null )
-	{
-		$_newArray = array();
-
-		foreach ( func_get_args() as $_key => $_argument )
-		{
-			$_newArray[$_key] = $_argument;
-		}
-
-		//	Return the fresh array...
-		return $_newArray;
-	}
-
-	/**
-	 * Takes the arguments and makes a file path out of them. No leading or trailing
-	 * separator is added.
-	 * @param mixed $_ [optional]
-	 * @return string
-	 */
-	public static function makePath( &$_ = null )
-	{
-		return implode( DIRECTORY_SEPARATOR, func_get_args() );
 	}
 
 	/**
@@ -408,15 +416,6 @@ class Kisma implements IKisma, IBroadcaster, IObservable
 	}
 
 	/**
-	 * Determine if PHP is running CLI mode or not
-	 * @return boolean True if currently running in CLI
-	 */
-	public static function isCli()
-	{
-		return ( 'cli' == php_sapi_name() && empty( $_SERVER['REMOTE_ADDR'] ) );
-	}
-
-	/**
 	 * Create a path alias.
 	 * Note, this method neither checks the existence of the path nor normalizes the path.
 	 * @param string $alias alias to the path
@@ -425,7 +424,6 @@ class Kisma implements IKisma, IBroadcaster, IObservable
 	 */
 	public static function alias( $alias, $path )
 	{
-		Yii::setPathOfAlias( $alias, $path );
 	}
 
 	/**
@@ -436,24 +434,8 @@ class Kisma implements IKisma, IBroadcaster, IObservable
 	 * @param string $url Additional url combine with alias
 	 * @return string|false file path corresponding to the alias, false if the alias is invalid.
 	 */
-	public static function unalias( $alias, $url = null )
+	public static function unalias( $alias )
 	{
-		$_path = Yii::getPathOfAlias( $alias );
-
-		if ( false !== $_path && null !== $url )
-		{
-			$_path = str_replace( $_SERVER['DOCUMENT_ROOT'], '', $_path ) . $url;
-		}
-
-		//	Append
-		if ( !file_exists( $_path ) && file_exists( $_path . '.php' ) )
-		{
-			$_path .= '.php';
-		}
-
-		xlLog::trace( 'Unalias in: ' . $alias . ' out: ' . $_path );
-
-		return $_path;
 	}
 
 	/**
@@ -524,12 +506,12 @@ class Kisma implements IKisma, IBroadcaster, IObservable
 
 	/**
 	 * An all-purpose property accessor.
-	 *
 	 * @static
 	 * @throws PropertyException
+
 	 * @param \Kisma\Components\Component $object
 	 * @param string $propertyName
-	 * @param int|\Kisma\AccessorMode $access
+	 * @param \Kisma\AccessorMode $access
 	 * @param mixed|null $valueOrDefault The "Set" value or default value for "Get"
 	 * @return \Kisma\Components\Component|bool|mixed
 	 */
@@ -587,9 +569,16 @@ class Kisma implements IKisma, IBroadcaster, IObservable
 	 * A generic property error handler
 	 *
 	 * @throws \Kisma\UndefinedPropertyException|\Kisma\ReadOnlyPropertyException|\Kisma\WriteOnlyPropertyException
+
 	 * @param string $name
-	 * @param int|\Kisma\AccessorMode $type
+	 * @param \Kisma\AccessorMode|int $type
 	 * @return void
+	 */
+
+	/**
+	 * @static
+	 * @param string $name
+	 * @param \Kisma\AccessorMode $type
 	 */
 	public static function __propertyError( $name, $type = \Kisma\AccessorMode::Undefined )
 	{
@@ -621,6 +610,22 @@ class Kisma implements IKisma, IBroadcaster, IObservable
 	//*************************************************************************
 
 	/**
+	 * @return \Controller
+	 */
+	public static function getAppController()
+	{
+		return self::$_appController;
+	}
+
+	/**
+	 * @return \CWebUser
+	 */
+	public static function getUser()
+	{
+		return self::$_user;
+	}
+
+	/**
 	 * @return \Application
 	 */
 	public static function getApp()
@@ -647,109 +652,81 @@ class Kisma implements IKisma, IBroadcaster, IObservable
 	}
 
 	/**
-	 * @return \Controller
-	 */
-	public static function getController()
-	{
-		return self::$_controller;
-	}
-
-	/**
-	/**
-	 * @param $uniqueIdCounter
 	 * @param int $uniqueIdCounter
+	 * @return int
 	 */
 	public static function setUniqueIdCounter( $uniqueIdCounter )
 	{
-		self::$_uniqueIdCounter = $uniqueIdCounter;
+		return self::$_uniqueIdCounter = $uniqueIdCounter;
 	}
 
 	/**
-
 	 * @return int
-	 *
-	 * @internal param int $
 	 */
 	public static function getUniqueIdCounter()
 	{
 		return self::$_uniqueIdCounter;
 	}
 
-	/**
-	 * @return \CWebUser
-	 */
-	public static function getUser()
-	{
-		return self::$_user;
-	}
+//	/**
+//	 * @param $validLogLevels
+//	 * @param array $validLogLevels
+//	 */
+//	public static function setValidLogLevels( $validLogLevels )
+//	{
+//		self::$_validLogLevels = $validLogLevels;
+//	}
+//
+//	/**
+//	 * @return array
+//	 */
+//	public static function getValidLogLevels()
+//	{
+//		return self::$_validLogLevels;
+//	}
 
-	/**
-	 * @param $validLogLevels
-	 * @param array $validLogLevels
-	 */
-	public static function setValidLogLevels( $validLogLevels )
-	{
-		self::$_validLogLevels = $validLogLevels;
-	}
+//	/**
+//	 * Bind a callback to an event
+//	 * @param string $eventName
+//	 * @param callback|null $callback
+//	 * @return boolean
+//	 */
+//	public function bind( $eventName, $callback = null )
+//	{
+//		// TODO: Implement bind() method.
+//		return false;
+//	}
+//
+//	/**
+//	 * Unbind from an event
+//	 * @param string $eventName
+//	 * @return boolean
+//	 */
+//	public function unbind( $eventName )
+//	{
+//		// TODO: Implement unbind() method.
+//		return false;
+//	}
 
-	/**
-	 * @return array
-	 */
-	public static function getValidLogLevels()
-	{
-		return self::$_validLogLevels;
-	}
-
-	/**
-	 * Bind a callback to an event
-	 * @param string $eventName
-	 * @param callback|null $callback
-	 * @return boolean
-	 */
-	public function bind( $eventName, $callback = null )
-	{
-		// TODO: Implement bind() method.
-		return false;
-	}
-
-	/**
-	 * Unbind from an event
-	 * @param string $eventName
-	 * @return boolean
-	 */
-	public function unbind( $eventName )
-	{
-		// TODO: Implement unbind() method.
-		return false;
-	}
-
-	/**
-	 * Gets the debug level
-	 * @return \Kisma\LogLevel
-	 */
-	public function getLogging()
-	{
-		// TODO: Implement getLogging() method.
-	}
-
-	/**
-	 * Sets the debug level
-	 * @param \Kisma\LogLevel $logging
-	 * @return integer The previous value
-	 */
-	public function setLogging( $logging )
-	{
-		// TODO: Implement setLogging() method.
-	}
+//	/**
+//	 * Gets the debug level
+//	 * @return \Kisma\LogLevel
+//	 */
+//	public function getLogging()
+//	{
+//		// TODO: Implement getLogging() method.
+//	}
+//
+//	/**
+//	 * Sets the debug level
+//	 * @param \Kisma\LogLevel $logging
+//	 * @return integer The previous value
+//	 */
+//	public function setLogging( $logging )
+//	{
+//		// TODO: Implement setLogging() method.
+//	}
 }
 
 //	Initialize our base...
 Kisma::initialize();
-
-//	Namespace aliases do not work in CLI mode, so create "K" for all components
-if ( 'cli' == php_sapi_name() )
-{
-	//	Make an alias of Kisma if this is CLI
-	class_alias( '\Kisma\Kisma', '\Kisma\Components\K' );
-}
-

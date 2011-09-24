@@ -49,6 +49,77 @@ class Event extends Component implements \Kisma\IEvent
 	 * @var \Kisma\IKisma The source of the event
 	 */
 	protected $_source = null;
+	/**
+	 * @var array The list of event handlers for this event.
+	 */
+	protected $_handlers = array();
+
+	//*************************************************************************
+	//* Public Methods
+	//*************************************************************************
+
+	/**
+	 * Trigger the event
+	 * @return bool
+	 */
+	public function trigger()
+	{
+		//	Loop through the handlers for this event, passing data
+		foreach ( $this->_handlers as $_handler )
+		{
+			//	Call each handler
+			$_result = call_user_func( $_handler, $this );
+
+			//	If an event returns false, stop propagation unsuccessfully
+			if ( false === $_result )
+			{
+				return false;
+			}
+
+			//	Stop propagation successfully
+			if ( true === $this->_handled )
+			{
+				break;
+			}
+		}
+
+		//	We made it through, so return true
+		return true;
+	}
+
+	/**
+	 * @param callback $callback
+	 * @return \Kisma\Events\Event
+	 */
+	public function addHandler( $callback )
+	{
+		if ( !is_callable( $callback ) )
+		{
+			throw new InvalidEventHandler( 'The event handler specified is not callable.' );
+		}
+
+		$this->_handlers[] = $callback;
+		return $this;
+	}
+
+	/**
+	 * Remove the specified handler from this event
+	 * @param callback $callback
+	 * @return bool
+	 */
+	public function removeHandler( $callback )
+	{
+		foreach ( $this->_handlers as $_index => $_handler )
+		{
+			if ( $callback == $_handler )
+			{
+				unset( $this->_handlers[$_index] );
+				return true;
+			}
+		}
+
+		return false;
+	}
 
 	//*************************************************************************
 	//* Properties
@@ -107,5 +178,23 @@ class Event extends Component implements \Kisma\IEvent
 	{
 		return $this->_source;
 	}
-	
+
+	/**
+	 * @param array $handlers
+	 * @return $this
+	 */
+	public function setHandlers( $handlers = array() )
+	{
+		$this->_handlers = $handlers;
+		return $this;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getHandlers()
+	{
+		return $this->_handlers;
+	}
+
 }

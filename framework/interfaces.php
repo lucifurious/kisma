@@ -87,10 +87,10 @@ interface IBroadcaster extends IKisma
 	/**
 	 * Bind a callback to an event
 	 * @param string $eventName
-	 * @param callback|null $callback
+	 * @param callback $callback
 	 * @return boolean
 	 */
-	public function bind( $eventName, $callback = null );
+	public function bind( $eventName, $callback );
 
 	/**
 	 * Unbind from an event
@@ -98,6 +98,40 @@ interface IBroadcaster extends IKisma
 	 * @return boolean
 	 */
 	public function unbind( $eventName );
+
+	public function trigger( $data = array() );
+}
+
+/**
+ * Defines an interface for objects that listen for events
+ */
+interface IListener extends IKisma
+{
+	//*************************************************************************
+	//* Requirements
+	//*************************************************************************
+
+	/**
+	 * Bind a callback to an event
+	 * @param string $eventName
+	 * @param callback $callback
+	 * @return boolean
+	 */
+	public function bind( $eventName, $callback );
+
+	/**
+	 * Unbind from an event
+	 * @param string $eventName
+	 * @return boolean
+	 */
+	public function unbind( $eventName );
+}
+
+/**
+ * Defines a data model class
+ */
+interface IDataModel extends IKisma
+{
 }
 
 /**

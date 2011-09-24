@@ -38,7 +38,7 @@ namespace Kisma\Components;
  * @event beforeValidate
  * @event afterValidate
  */
-abstract class Model extends \Kisma\Components\Component implements \Kisma\IModel
+abstract class DataModel extends \Kisma\Components\Component implements \Kisma\IDataModel
 {
 	//*************************************************************************
 	//* Private Members
@@ -72,14 +72,7 @@ abstract class Model extends \Kisma\Components\Component implements \Kisma\IMode
 		}
 
 		//	Upstream validation failed
-		$_event = new \Kisma\Events\ModelEvent(
-			$this,
-			array(
-				'fields' => $fields
-			)
-		);
-
-		if ( !$this->trigger( 'before_validate', $_event ) )
+		if ( !K::triggerEvent( $this, 'before_validate' ) )
 		{
 			return false;
 		}
@@ -94,8 +87,8 @@ abstract class Model extends \Kisma\Components\Component implements \Kisma\IMode
 			}
 		}
 
-		//	Failed after validate
-		if ( !$this->trigger( 'after_validate', $_event ) )
+		//	Upstream validation failed
+		if ( !K::triggerEvent( $this, 'after_validate' ) )
 		{
 			return false;
 		}

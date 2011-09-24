@@ -32,6 +32,19 @@ namespace Kisma;
  */
 class KismaException extends \Exception
 {
+	//*************************************************************************
+	//* Default/Magic Methods
+	//*************************************************************************
+
+	/**
+	 * Return a code/message combo when printed.
+	 * @return string
+	 */
+	public function __toString()
+	{
+		return '[' . $this->getCode() . '] ' . $this->getMessage();
+	}
+
 }
 
 //*************************************************************************
@@ -70,6 +83,13 @@ class AutoPropertyException extends PropertyException
 {
 }
 
+/**
+ * Thrown when an event handler is given a bogus handler
+ */
+class InvalidEventHandlerException extends \InvalidArgumentException
+{
+}
+
 //*************************************************************************
 //* Database 
 //*************************************************************************
@@ -84,5 +104,4 @@ class DatabaseException extends KismaException
 
 class ComponentException extends KismaException
 {
-	
 }

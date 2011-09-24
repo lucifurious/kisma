@@ -31,7 +31,7 @@ namespace Kisma\Components;
  * Aspects allow objects to take on functionality defined in another class.
  * @TODO Replace with traits once PHP 5.4 is released
  */
-class Aspect extends \Kisma\Components\Component implements IAspect
+class Aspect extends \Kisma\Components\Component implements \Kisma\IAspect
 {
 	//********************************************************************************
 	//* Properties
@@ -59,6 +59,7 @@ class Aspect extends \Kisma\Components\Component implements IAspect
 	{
 		$this->_parent = $parent;
 
+		//	Bind all my events at once
 		foreach ( $this->_events as $_eventName => $_callback )
 		{
 			$this->_parent->bind( $_eventName, $_callback );
@@ -74,13 +75,12 @@ class Aspect extends \Kisma\Components\Component implements IAspect
 	 */
 	public function unlink( Component $parent )
 	{
+		//	Unbind all my events at once
 		foreach ( $this->_events as $_eventName => $_callback )
 		{
 			$parent->unbind( $_eventName, $_callback );
 		}
 
-		$this->_parent = null;
-		
 		return $this;
 	}
 
@@ -103,7 +103,7 @@ class Aspect extends \Kisma\Components\Component implements IAspect
 	 * @param boolean $enabled
 	 * @return \Kisma\Components\Aspect $this
 	 */
-	public function setEnabled( $enabled )
+	public function setEnabled( $enabled = true )
 	{
 		$this->_enabled = $enabled;
 		return $this;
@@ -121,7 +121,7 @@ class Aspect extends \Kisma\Components\Component implements IAspect
 	 * @param \Kisma\Components\Component $parent
 	 * @return \Kisma\Components\Aspect $this
 	 */
-	public function setParent( $parent )
+	public function setParent( $parent = null )
 	{
 		$this->_parent = $parent;
 		return $this;
