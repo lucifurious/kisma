@@ -1,0 +1,17 @@
+2011/03/12 00:35:31 [trace] [system.CModule] Loading "log" application component
+in /media/storage/assets/lib/php/framework/yiixl/examples/tests/index.php (9)
+2011/03/12 00:35:31 [trace] [system.CModule] Loading "request" application component
+in /media/storage/assets/lib/php/framework/yiixl/examples/tests/index.php (9)
+2011/03/12 00:35:31 [trace] [system.CModule] Loading "urlManager" application component
+in /media/storage/assets/lib/php/framework/yiixl/examples/tests/index.php (9)
+2011/03/12 00:35:31 [trace] [system.CModule] Loading "coreMessages" application component
+in /media/storage/assets/lib/php/framework/yiixl/examples/tests/index.php (9)
+2011/03/12 00:35:31 [error] [exception.CException] exception 'CException' with message 'CHttpRequest is unable to determine the request URI.' in /media/storage/assets/lib/php/framework/yii-1.1.6/framework/web/CHttpRequest.php:382
+Stack trace:
+#0 /media/storage/assets/lib/php/framework/yii-1.1.6/framework/web/CHttpRequest.php(326): CHttpRequest->getRequestUri()
+#1 /media/storage/assets/lib/php/framework/yii-1.1.6/framework/web/CUrlManager.php(315): CHttpRequest->getPathInfo()
+#2 /media/storage/assets/lib/php/framework/yii-1.1.6/framework/web/CWebApplication.php(120): CUrlManager->parseUrl(Object(CHttpRequest))
+#3 /media/storage/assets/lib/php/framework/yii-1.1.6/framework/base/CApplication.php(155): CWebApplication->processRequest()
+#4 /media/storage/assets/lib/php/framework/yiixl/examples/tests/index.php(9): CApplication->run()
+#5 {main}
+2011/03/12 00:35:31 [trace] [system.CModule] Loading "errorHandler" application component
