@@ -37,6 +37,7 @@ Requirements
 PHPLOC Metrics
 ==============
 
+<pre>
 Directories:									6
 Files:											22
 
@@ -67,3 +68,4 @@ Functions:										'''0'''
 Constants:										121
 	Global constants:							0
 	Class constants:							121
+</pre>
