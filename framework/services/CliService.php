@@ -48,6 +48,14 @@ abstract class CliService extends \Kisma\Components\Service
 	//* Public Methods 
 	//*************************************************************************
 
+	public function __construct( $options = array() )
+	{
+		parent::__construct( $options );
+
+		//	Add the process lock aspect to this service
+		$this->linkAspect( '\Kisma\Aspects\ProcessLock' );
+	}
+
 	/**
 	 * Executes the command.
 	 * @param array $arguments command-line parameters for this command.

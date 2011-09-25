@@ -25,7 +25,7 @@
  * @namespace Kisma\Data Kisma data handling components
  */
 namespace Kisma\Data;
-use Kisma\Components\Component;
+
 /**
  * Database
  * Dishes out database connectivity
@@ -33,7 +33,7 @@ use Kisma\Components\Component;
  * @property DataStore[] $dataStores;
  *
  */
-class Database extends Component
+class Database extends \Kisma\Components\Component
 {
 	//********************************************************************************
 	//* Properties
@@ -57,17 +57,17 @@ class Database extends Component
 	//********************************************************************************
 
 	/**
-	 * @param $dataStores
+	 * @param DataStore[] $dataStores
 	 * @return \Kisma\Data\Database
 	 */
-	public function setDataStores( $dataStores )
+	public function setDataStores( $dataStores = array() )
 	{
 		$this->_dataStores = $dataStores;
 		return $this;
 	}
 
 	/**
-	 * @return array|\Kisma\Data\DataStore[]
+	 * @return DataStore[]
 	 */
 	public function getDataStores()
 	{

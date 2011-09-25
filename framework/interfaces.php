@@ -456,13 +456,6 @@ interface ILog extends IConstantProvider
 }
 
 /**
- * This interface defines the base transformation formats
- */
-interface ITransform extends IConstantProvider
-{
-}
-
-/**
  * This interface defines the output transformations
  */
 interface IOutputFormat extends ITransform
@@ -478,6 +471,19 @@ interface IOutputFormat extends ITransform
 		CSV				= 4,		//	Comma-separated values
 		PSV				= 5			//	Pipe-separated values
 	;
+}
+
+/**
+ * This interface defines the base transformation formats
+ */
+interface ITransform extends IConstantProvider
+{
+	/**
+	 * @param mixed|object|array $input
+	 * @param mixed|null $options
+	 * @return mixed
+	 */
+	public function transform( $input, $options = null );
 }
 
 /**

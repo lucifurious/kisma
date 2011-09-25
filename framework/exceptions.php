@@ -37,6 +37,27 @@ class KismaException extends \Exception
 	//*************************************************************************
 
 	/**
+	 * Constructs an exception.
+	 * @param \Exception|string|null $message
+	 * @param int|null $code
+	 * @param null $previous
+	 */
+	public function __construct( $message = null, $code = null, $previous = null )
+	{
+		//	If an exception is passed in, translate...
+		if ( null === $code && $message instanceof \Exception )
+		{
+			/** @var $_exception \Exception */
+			$_exception = $message;
+			$message = $_exception->getMessage();
+			$code = $_exception->getCode();
+			$previous = $_exception->getPrevious();
+		}
+
+		parent::__construct( $message, $code, $previous );
+	}
+
+	/**
 	 * Return a code/message combo when printed.
 	 * @return string
 	 */
@@ -45,6 +66,34 @@ class KismaException extends \Exception
 		return '[' . $this->getCode() . '] ' . $this->getMessage();
 	}
 
+}
+
+/**
+ * Base class for lock file exceptions
+ */
+class ProcessLockException extends KismaException
+{
+}
+
+/**
+ *
+ */
+class ProcessLockExistsException extends KismaException
+{
+}
+
+/**
+ *
+ */
+class ProcessLockAgeException extends KismaException
+{
+}
+
+/**
+ *
+ */
+class ProcessLockFileException extends KismaException
+{
 }
 
 //*************************************************************************
@@ -101,7 +150,9 @@ class DatabaseException extends KismaException
 {
 }
 
-
+/**
+ *
+ */
 class ComponentException extends KismaException
 {
 }
