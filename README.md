@@ -37,6 +37,12 @@ Requirements
 PHPLOC Metrics
 ==============
 
+ * Cyclomatic Complexity Score means:
+  * < 4 = Low Complexity
+  * 5 - 7 = Medium Complexity
+  * 6 - 10 = Highly Complex
+  * > 10 = Very Complex
+
 <pre>
 Directories:									6
 Files:											22
