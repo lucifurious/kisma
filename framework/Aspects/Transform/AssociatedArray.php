@@ -32,32 +32,41 @@ use Kisma\Aspects\Aspect;
 //*************************************************************************
 
 /**
- * Json.php
+ * Array
  * Class description
  */
-class Json extends \Kisma\Aspects\Aspect implements \Kisma\ITransform
+class AssociatedArray extends \Kisma\Aspects\Aspect implements \Kisma\ITransform
 {
 	//*************************************************************************
 	//* Constants
 	//*************************************************************************
 
 	//*************************************************************************
-	//* Private Members 
+	//* Private Members
 	//*************************************************************************
 
 	//*************************************************************************
-	//* Public Methods 
+	//* Public Methods
 	//*************************************************************************
 
 	/**
-	 * Returns the JSON representation of a value
+	 * Returns an associated array of data representing the value.
 	 * @param mixed|object|array $value The value being encoded
 	 * @param int $options [optional] Bitmask consisting of JSON_HEX_QUOT, JSON_HEX_TAG, JSON_HEX_AMP, JSON_HEX_APOS, JSON_NUMERIC_CHECK, JSON_PRETTY_PRINT, JSON_UNESCAPED_SLASHES, JSON_FORCE_OBJECT.
 	 * @return string a JSON encoded string on success.
 	 */
-	public function transform( $value, $options )
+	public function toArray( $value, $options )
 	{
-		return json_encode( $value, $options );
+		$_newValue = $value;
+
+		//	Already an array
+		if ( is_array( $_newValue ) )
+		{
+			return $_newValue;
+		}
+
+		//	Convert to common format
+		return $value->toArray();
 	}
 
 	//*************************************************************************
