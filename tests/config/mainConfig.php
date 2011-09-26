@@ -8,8 +8,7 @@ Yii::setPathOfAlias( 'kisma', $_frameworkPath );
 
 //	Our configuration array
 return array(
-	//	/tests/config => /framework/core
-	'basePath' => $_frameworkPath . '/core',
+	'basePath' => $_frameworkPath,
 	'runtimePath' => '/var/log/kisma',
 	'name' => 'Kisma Test Suite',
 
@@ -23,8 +22,8 @@ return array(
 		'application.components.*',
 		'application.controllers.*',
 		//	Kisma
-		'kisma.core.*',
-		'kisma.core.components.*',
+		'kisma.*',
+		'kisma.Components.*',
 	),
 
 	//	application components

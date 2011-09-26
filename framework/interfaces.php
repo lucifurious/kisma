@@ -34,18 +34,6 @@ interface IKisma
 }
 
 /**
- * Designed to contain the prefix for AutoProperty
- */
-interface IAutoProperty extends IKisma
-{
-	//*************************************************************************
-	//* Constants
-	//*************************************************************************
-
-	const PREFIX = '.auto.prop.';
-}
-
-/**
  * This interface defines constants for, and identifies an object as, a YiiXL component
  */
 interface IOptions extends IKisma
@@ -85,21 +73,13 @@ interface IBroadcaster extends IKisma
 	//*************************************************************************
 
 	/**
-	 * Bind a callback to an event
+	 * Trigger an event
+	 * @abstract
 	 * @param string $eventName
+	 * @param mixed $data
 	 * @param callback $callback
-	 * @return boolean
 	 */
-	public function bind( $eventName, $callback );
-
-	/**
-	 * Unbind from an event
-	 * @param string $eventName
-	 * @return boolean
-	 */
-	public function unbind( $eventName );
-
-	public function trigger( $data = array() );
+	public function trigger( $eventName = null, $data = null, callback $callback = null );
 }
 
 /**
@@ -124,7 +104,7 @@ interface IListener extends IKisma
 	 * @param string $eventName
 	 * @return boolean
 	 */
-	public function unbind( $eventName );
+	public function unbind( $eventName, $callback );
 }
 
 /**
@@ -237,6 +217,13 @@ interface IStreamable extends IComponent, IObservable
  * This interface defines an object as a provider of constant values
  */
 interface IConstantProvider  extends IComponent
+{
+}
+
+/**
+ * An interface for event classes
+ */
+interface IEvent extends IListener
 {
 }
 
@@ -456,6 +443,19 @@ interface ILog extends IConstantProvider
 }
 
 /**
+ * This interface defines the base transformation formats
+ */
+interface ITransform extends IConstantProvider
+{
+	/**
+	 * @param mixed|object|array $input
+	 * @param mixed|null $options
+	 * @return mixed
+	 */
+//	public function transform( $input, $options = null );
+}
+
+/**
  * This interface defines the output transformations
  */
 interface IOutputFormat extends ITransform
@@ -471,19 +471,6 @@ interface IOutputFormat extends ITransform
 		CSV				= 4,		//	Comma-separated values
 		PSV				= 5			//	Pipe-separated values
 	;
-}
-
-/**
- * This interface defines the base transformation formats
- */
-interface ITransform extends IConstantProvider
-{
-	/**
-	 * @param mixed|object|array $input
-	 * @param mixed|null $options
-	 * @return mixed
-	 */
-	public function transform( $input, $options = null );
 }
 
 /**
@@ -514,13 +501,6 @@ interface IConfigurable extends IObservable
 	 * @return IConfigurable
 	 */
 	public function setOptions( $options = array() );
-}
-
-/**
- * An interface for event classes
- */
-interface IEvent extends IComponent, ILog
-{
 }
 
 //*************************************************************************

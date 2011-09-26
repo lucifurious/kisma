@@ -15,10 +15,12 @@ The SPL exceptions are:
  @exception OutOfBoundsException thrown if a value is not a valid key. This represents errors that cannot be detected at compile time.
  @exception OutOfRangeException thrown when an illegal index was requested. This represents errors that should be detected at compile time.
  @exception OverflowException thrown when you add an element into a full container.
- @exception RangeException thrown to indicate range errors during program execution. Normally this means there was an arithmetic error other than under/overflow. This is the runtime version of DomainException.
+ @exception RangeException thrown to indicate range errors during program execution. Normally this means there was an arithmetic error other than under/overflow. This is the
+runtime version of DomainException.
  @exception RuntimeException thrown if an error which can only be found on runtime occurs.
  @exception UnderflowException thrown when you try to remove an element of an empty container.
- @exception UnexpectedValueException thrown if a value does not match with a set of values. Typically this happens when a function calls another function and expects the return value to be of a certain type or value not including arithmetic or buffer related errors.
+ @exception UnexpectedValueException thrown if a value does not match with a set of values. Typically this happens when a function calls another function and expects the return
+value to be of a certain type or value not including arithmetic or buffer related errors.
 
 */
 namespace Kisma;
@@ -38,9 +40,9 @@ class KismaException extends \Exception
 
 	/**
 	 * Constructs an exception.
-	 * @param \Exception|string|null $message
+	 * @param mixed $message
 	 * @param int|null $code
-	 * @param null $previous
+	 * @param mixed $previous
 	 */
 	public function __construct( $message = null, $code = null, $previous = null )
 	{
@@ -65,8 +67,11 @@ class KismaException extends \Exception
 	{
 		return '[' . $this->getCode() . '] ' . $this->getMessage();
 	}
-
 }
+
+/**************************************************************************
+ ** Process Lock
+ **************************************************************************/
 
 /**
  * Base class for lock file exceptions
@@ -132,13 +137,6 @@ class AutoPropertyException extends PropertyException
 {
 }
 
-/**
- * Thrown when an event handler is given a bogus handler
- */
-class InvalidEventHandlerException extends \InvalidArgumentException
-{
-}
-
 //*************************************************************************
 //* Database 
 //*************************************************************************
@@ -154,5 +152,23 @@ class DatabaseException extends KismaException
  *
  */
 class ComponentException extends KismaException
+{
+}
+
+/**************************************************************************
+ ** Events
+ **************************************************************************/
+
+/**
+ * The base event exception
+ */
+class EventException extends KismaException
+{
+}
+
+/**
+ * Thrown when an event handler is given a bogus handler
+ */
+class InvalidEventHandlerException extends EventException
 {
 }

@@ -22,9 +22,15 @@
 //*************************************************************************
 
 /**
- * @namespace Kisma\Components Kisma components
+ * @namespace Kisma\Aspects Kisma components
  */
-namespace Kisma\Components;
+namespace Kisma\Aspects;
+
+/**
+ * Convenience alias for the Kisma helpers
+ * @see \Kisma\Kisma
+ */
+use \Kisma\Kisma as K;
 
 /**
  * Aspect
@@ -55,7 +61,7 @@ class Aspect extends \Kisma\Components\Component implements \Kisma\IAspect
 	 * @param \Kisma\Components\Component $parent
 	 * @return \Aspect
 	 */
-	public function link( Component $parent )
+	public function link( \Kisma\Components\Component $parent )
 	{
 		$this->_parent = $parent;
 
@@ -91,7 +97,7 @@ class Aspect extends \Kisma\Components\Component implements \Kisma\IAspect
 	/**
 	 * Enable/disable aspect
 	 * @param bool $disable
-	 * @return \Kisma\Components\Aspect
+	 * @return \Kisma\Aspects\Aspect
 	 */
 	public function enable( $disable = false )
 	{
@@ -101,7 +107,7 @@ class Aspect extends \Kisma\Components\Component implements \Kisma\IAspect
 
 	/**
 	 * @param boolean $enabled
-	 * @return \Kisma\Components\Aspect $this
+	 * @return \Kisma\Aspects\Aspect $this
 	 */
 	public function setEnabled( $enabled = true )
 	{
@@ -119,7 +125,7 @@ class Aspect extends \Kisma\Components\Component implements \Kisma\IAspect
 
 	/**
 	 * @param \Kisma\Components\Component $parent
-	 * @return \Kisma\Components\Aspect $this
+	 * @return \Kisma\Aspects\Aspect $this
 	 */
 	public function setParent( $parent = null )
 	{

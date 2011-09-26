@@ -22,11 +22,12 @@
  **************************************************************************/
 
 /**
- * @namespace Kisma Kisma
+ * @namespace Kisma\Aspects\Transform
  */
 namespace Kisma\Aspects\Transform;
+use Kisma\Aspects\Aspect;
 
-	/**************************************************************************
+/**************************************************************************
 	 ** Requirements
 	 **************************************************************************/
 
@@ -34,7 +35,7 @@ namespace Kisma\Aspects\Transform;
  * Xml
  * Transforms data to XML
  */
-class Xml extends \Kisma\Components\Aspect implements \Kisma\ITransform
+class Xml extends \Kisma\Aspects\Aspect implements \Kisma\ITransform
 {
 	//*************************************************************************
 	//* Private Members 
@@ -69,9 +70,9 @@ class Xml extends \Kisma\Components\Aspect implements \Kisma\ITransform
 	 * Returns the XML representation of an array
 	 * @param array $value The value being transformed
 	 * @param mixed $options
-	 * @return SimpleXMLElement
+	 * @return string
 	 */
-	public function transform( $value, $options = null )
+	public function toXml( $value, $options = null )
 	{
 		//	Load options
 		$this->_loadConfiguration( $options, true );
@@ -79,9 +80,12 @@ class Xml extends \Kisma\Components\Aspect implements \Kisma\ITransform
 		//	Build a DOM and return it
 		$this->_xml = new \DOMDocument( $this->_version, $this->_encoding );
 		$this->_xml->formatOutput = $this->_formatOutput;
-		$this->_xml->appendChild( $this->_toXml( $value ) );
+		$this->_xml->appendChild( $this->_toXml( $this->_rootElement, $value ) );
 
-		return $this->_xml->saveXML();
+		$_output = $this->_xml->saveXML();
+		\Kisma\Kisma::logDebug( 'Xml Transform: ' . $_output );
+		
+		return $_output;
 	}
 
 	//*************************************************************************

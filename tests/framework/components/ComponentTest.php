@@ -1,6 +1,14 @@
 <?php
-require_once '/media/storage/mounts/projects/php/kisma/framework/Kisma.php';
-require_once '/media/storage/mounts/projects/php/kisma/framework/components/Component.php';
+require_once __DIR__ . '/../../../framework/Kisma.php';
+use Kisma\Components as KC;
+
+class TestComponent extends \Kisma\Components\Component
+{
+	public function onAfterConstructor( $source, $data = null )
+	{
+		\Kisma\Kisma::logDebug( '"after_constructor" event fired.' );
+	}
+}
 
 /**
  * Test class for Component.
@@ -22,11 +30,10 @@ class ComponentTest extends \PHPUnit_Framework_TestCase
 		$_options = array(
 			'readOnly' => false,
 			'logging' => false,
-			'eventHandlerSignature' => 'onTest',
 			'bogusProperty' => 'sadness',
 		);
 
-        $this->object = new \Kisma\Components\Component( $_options );
+        $this->object = new TestComponent( $_options );
     }
 
     /**
@@ -303,4 +310,3 @@ class ComponentTest extends \PHPUnit_Framework_TestCase
     {
     }
 }
-?>

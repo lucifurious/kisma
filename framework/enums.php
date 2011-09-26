@@ -31,6 +31,11 @@ namespace Kisma;
 //*************************************************************************
 
 /**
+ * Interfaces are required now.
+ */
+require_once __DIR__ . '/interfaces.php';
+
+/**
  * We want to use SplEnum here, but it's an optional library and not
  * standard in any PHP distribution. In addition, the current version
  * available via pecl is not compatible with PHP 5.3.

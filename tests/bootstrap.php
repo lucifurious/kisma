@@ -1,8 +1,6 @@
 <?php
-$_yii = '/opt/yii/framework/yiit.php';
-$_config = __DIR__ . '/config/testConfig.php';
-
-require_once( $_yii );
+require_once( __DIR__ . '/../framework/Kisma.php' );
+require_once( '/opt/yii/framework/yiit.php' );
 require_once( 'WebTestCase.php' );
-
-Yii::createWebApplication( $_config );
+require_once( __DIR__ . '/../framework/Kisma.php' );
+Yii::createWebApplication( __DIR__ . '/config/testConfig.php' );

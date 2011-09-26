@@ -26,14 +26,9 @@
  */
 namespace Kisma;
 
-//*************************************************************************
-//* Requirements
-//*************************************************************************
-
-require_once __DIR__ . '/interfaces.php';
-
 /**
- *
+ * KismaEnum
+ * This is the SplEnum version
  */
 class KismaEnum extends \SplEnum implements \Kisma\IKisma
 {

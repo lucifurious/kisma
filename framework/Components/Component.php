@@ -62,7 +62,7 @@ class Component implements \Kisma\IKisma, \Kisma\IAspectable, \Kisma\IOptions, \
 	 */
 	protected $_events = array();
 	/**
-	 * @var \Kisma\Components\Aspect[] This object's aspects
+	 * @var \Kisma\Aspects\Aspect[] This object's aspects
 	 */
 	protected $_aspects = array();
 	/**
@@ -177,13 +177,13 @@ class Component implements \Kisma\IKisma, \Kisma\IAspectable, \Kisma\IOptions, \
 			if ( $_stub == $this->_eventHandlerSignature )
 			{
 				//	Standardize the event name and, if not ignored, bind it
-				$_eventName = K::standardizeName( substr( $_realMethodName, strlen( $this->_eventHandlerSignature ) ) );
+				$_eventId = K::standardizeName( substr( $_realMethodName, strlen( $this->_eventHandlerSignature ) ) );
 
-				if ( !in_array( $_eventName, $_ignores ) )
+				if ( !in_array( $_eventId, $_ignores ) )
 				{
 					//	Bind it like a binder!
 					$this->bind(
-						$_eventName,
+						$_eventId,
 						array(
 							$this,
 							$_realMethodName,
@@ -199,22 +199,21 @@ class Component implements \Kisma\IKisma, \Kisma\IAspectable, \Kisma\IOptions, \
 	 * @param callback $callback
 	 * @return \Kisma\Events\Event
 	 */
-	public function bind( $name, callback $callback )
+	public function bind( $name, $callback )
 	{
 		$name = K::standardizeName( $name );
 
-		foreach ( $this->_events as $_eventName => $_handler )
+		if ( !isset( $this->_events[$name] ) )
 		{
-			if ( $name == $_eventName )
-			{
-				return $this->_events[$name]->addHandler( $callback );
-			}
+			//	Create a new event
+			$this->_events[$name] = new \Kisma\Events\Event(
+				array(
+					'source' => $this,
+				)
+			);
 		}
 
-		//	Create a new event and bind
-		$_event = new \Kisma\Events\Event( array( 'source' => $this, ) );
-		$_event->addHandler( $callback );
-		$this->_events[$name] = $_event;
+		return $this->_events[$name]->addHandler( $callback );
 	}
 
 	/**
@@ -222,13 +221,13 @@ class Component implements \Kisma\IKisma, \Kisma\IAspectable, \Kisma\IOptions, \
 	 * @param callback $callback
 	 * @return \Kisma\Components\Component
 	 */
-	public function unbind( $name, callback $callback )
+	public function unbind( $name, $callback )
 	{
 		$name = K::standardizeName( $name );
 
-		foreach ( $this->_events as $_eventName => $_handler )
+		foreach ( $this->_events as $_eventId => $_handler )
 		{
-			if ( $name == $_eventName )
+			if ( $name == $_eventId )
 			{
 				return $this->_events[$name]->removeHandler( $callback );
 			}
@@ -238,18 +237,47 @@ class Component implements \Kisma\IKisma, \Kisma\IAspectable, \Kisma\IOptions, \
 	}
 
 	/**
-	 * @param string $name
-	 * @param array $options
+	 * @param string $eventId
+	 * @param mixed $data
+	 * @param callback $callback
 	 * @return bool
 	 */
-	public function trigger( $name, $options = array() )
+	public function trigger( $eventId, $data = null, $callback = null )
 	{
-		$name = K::standardizeName( $name );
-
-		if ( isset( $this->_events, $this->_events[$name] ) )
+		//	Now, see what's what
+		if ( !is_string( $eventId ) )
 		{
+			throw new EventException( 'Event name specified is not a string, and therefore does not exist.' );
+		}
+		
+		$_eventId = K::standardizeName( $eventId );
+		
+		if ( isset( $this->_events, $this->_events[$_eventId] ) )
+		{
+			$_callback = ( $callback ?: null );
+			$_data = ( $data ?: null );
+			
+			//	Do we have a callback?
+			if ( null === $_callback )
+			{
+				if ( null !== $data )
+				{
+					if ( is_callable( $_data ) )
+					{
+						//	This is a callback...
+						$_callback = $_data;
+						$_data = null;
+					}
+					else
+					{
+						//	Data is data, no callback...
+						$_callback = null;
+					}
+				}
+			}
+			
 			//	Return the result of the event propagation
-			return $this->_events[$name]->trigger( $options );
+			return $this->_events[$_eventId]->fireEvent( $_data, $_callback );
 		}
 
 		//	We don't have that event, return false.
@@ -264,14 +292,17 @@ class Component implements \Kisma\IKisma, \Kisma\IAspectable, \Kisma\IOptions, \
 	 * Link an aspect to this component
 	 * @param string $aspectClass
 	 * @param array $options
-	 * @return \Kisma\Components\Aspect
+	 * @return \Kisma\Aspects\Aspect
 	 */
 	public function linkAspect( $aspectClass, $options = array() )
 	{
-		$aspectClass = K::standardizeName( $aspectClass );
+		$_aspectClass = K::standardizeName( $aspectClass );
 
-		/** @var $_aspect \Kisma\Components\Aspect */
-		return $this->_aspects[$aspectClass] = K::createAspect( $this, $aspectClass, $options );
+		/** @var $_aspect \Kisma\Aspects\Aspect */
+		if ( null !== ( $this->_aspects[$_aspectClass] = K::createComponent( $_aspectClass, $options ) ) )
+		{
+			$this->_aspects[$_aspectClass]->link( $this );
+		}
 	}
 
 	/**
@@ -341,6 +372,12 @@ class Component implements \Kisma\IKisma, \Kisma\IAspectable, \Kisma\IOptions, \
 	protected function _loadConfiguration( $options = array(), $noMerge = false )
 	{
 		$_options = array();
+
+		//	Catch null input...
+		if ( null === $options || !is_array( $options ) || empty( $options ) )
+		{
+			$options = array();
+		}
 
 		//	Loop through, set...
 		foreach ( $options as $_key => $_value )
@@ -453,7 +490,7 @@ class Component implements \Kisma\IKisma, \Kisma\IAspectable, \Kisma\IOptions, \
 	}
 
 	/**
-	 * @return \Kisma\Components\Aspect[]
+	 * @return \Kisma\Aspects\Aspect[]
 	 */
 	public function getAspects()
 	{
@@ -489,19 +526,19 @@ class Component implements \Kisma\IKisma, \Kisma\IAspectable, \Kisma\IOptions, \
 	}
 
 	/**
-	 * @param string|null $eventName
+	 * @param string|null $eventId
 	 * @return \Kisma\Components\Event[]
 	 */
-	public function getEvents( $eventName = null )
+	public function getEvents( $eventId = null )
 	{
-		if ( null !== $eventName )
+		if ( null !== $eventId )
 		{
 			$_filteredEvents = array();
-			$_eventName = K::standardizeName( $eventName );
+			$_eventId = K::standardizeName( $eventId );
 
 			foreach ( $this->_events as $_name => $_handler )
 			{
-				if ( $_name == $_eventName )
+				if ( $_name == $_eventId )
 				{
 					$_filteredEvents[$_name][] = $_handler;
 				}

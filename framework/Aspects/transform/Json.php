@@ -25,6 +25,7 @@
  * @namespace Kisma Kisma
  */
 namespace Kisma\Aspects\Transform;
+use Kisma\Aspects\Aspect;
 
 //*************************************************************************
 //* Requirements
@@ -34,7 +35,7 @@ namespace Kisma\Aspects\Transform;
  * Json
  * Transforms an array into a JSON string
  */
-class Json extends \Kisma\Components\Aspect implements \Kisma\ITransform
+class Json extends \Kisma\Aspects\Aspect implements \Kisma\ITransform
 {
 	//*************************************************************************
 	//* Constants
@@ -56,7 +57,7 @@ class Json extends \Kisma\Components\Aspect implements \Kisma\ITransform
 	 * JSON_PRETTY_PRINT, JSON_UNESCAPED_SLASHES, JSON_FORCE_OBJECT.
 	 * @return string a JSON encoded string on success.
 	 */
-	public function transform( $value, $options )
+	public function toJson( $value, $options )
 	{
 		return json_encode( $value, $options );
 	}

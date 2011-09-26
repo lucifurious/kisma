@@ -25,6 +25,7 @@
  * @namespace Kisma Kisma
  */
 namespace Kisma\Aspects\Transform;
+use Kisma\Aspects\Aspect;
 
 //*************************************************************************
 //* Requirements
@@ -34,7 +35,7 @@ namespace Kisma\Aspects\Transform;
  * Json.php
  * Class description
  */
-class Json extends \Kisma\Components\Aspect implements \Kisma\ITransform
+class Json extends \Kisma\Aspects\Aspect implements \Kisma\ITransform
 {
 	//*************************************************************************
 	//* Constants

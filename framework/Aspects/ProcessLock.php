@@ -42,7 +42,7 @@ namespace Kisma\Aspects;
  * @property string $tag
  * @property array $waitList
  */
-class ProcessLock extends \Kisma\Components\Aspect
+class ProcessLock extends \Kisma\Aspects\Aspect
 {
 	//*************************************************************************
 	//* Constants
