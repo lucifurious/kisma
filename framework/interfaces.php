@@ -1,24 +1,26 @@
 <?php
 /**
- * YiiXL(tm) : The Yii Extension Library of Doom! (http://github.com/Pogostick/yiixl/)
- * Copyright 2009-2011, Pogostick, LLC. (http://www.pogostick.com/)
+ * Kisma(tm) : PHP Nanoframework (http://github.com/Pogostick/kisma/)
+ * Copyright 2011, Pogostick, LLC. (http://www.pogostick.com/)
  *
  * Dual licensed under the MIT License and the GNU General Public License (GPL) Version 2.
- * See {@link http://www.pogostick.com/licensing/} for complete information.
+ * See {@link http://github.com/Pogostick/kisma/licensing/} for complete information.
  *
- * @copyright		Copyright 2009-2011, Pogostick, LLC. (http://www.pogostick.com/)
- * @link			https://github.com/Pogostick/yiixl/ The Yii Extension Library of Doom!
- * @license			http://www.pogostick.com/licensing
- * @author			Jerry Ablan <yiixl@pogostick.com>
- *
- * @package			yiixl
- * @category		yiixl
+ * @copyright		Copyright 2011, Pogostick, LLC. (http://www.pogostick.com/)
+ * @link			http://github.com/Pogostick/kisma/ Kisma(tm)
+ * @license			http://github.com/Pogostick/kisma/licensing/
+ * @author			Jerry Ablan <kisma@pogostick.com>
+ * @category		Kisma_Interfaces
+ * @package			kisma
+ * @namespace		\Kisma
  * @since			v1.0.0
- *
- * @brief 			This file contains all the YiiXL interfaces
- *
  * @filesource
  */
+
+//*************************************************************************
+//* Namespace Declarations
+//*************************************************************************
+
 namespace Kisma;
 
 //*************************************************************************
@@ -75,11 +77,12 @@ interface IBroadcaster extends IKisma
 	/**
 	 * Trigger an event
 	 * @abstract
-	 * @param string $eventName
-	 * @param mixed $data
-	 * @param callback $callback
+	 * @param string $eventId
+	 * @param mixed|null $data
+	 * @param callback|null $callback
+	 * @return mixed
 	 */
-	public function trigger( $eventName = null, $data = null, callback $callback = null );
+	public function triggerEvent( $eventId, $data = null, $callback = null );
 }
 
 /**
@@ -97,14 +100,14 @@ interface IListener extends IKisma
 	 * @param callback $callback
 	 * @return boolean
 	 */
-	public function bind( $eventName, $callback );
+	public function bindEvent( $eventName, $callback );
 
 	/**
 	 * Unbind from an event
 	 * @param string $eventName
 	 * @return boolean
 	 */
-	public function unbind( $eventName, $callback );
+	public function unbindEvent( $eventName, $callback );
 }
 
 /**
@@ -117,7 +120,7 @@ interface IDataModel extends IKisma
 /**
  * Defines the interface for components
  */
-interface IComponent extends IOptions, IAspectable, IBroadcaster
+interface IComponent extends IOptions, IAspectable
 {
 	//*************************************************************************
 	//* Constants
@@ -223,7 +226,7 @@ interface IConstantProvider  extends IComponent
 /**
  * An interface for event classes
  */
-interface IEvent extends IListener
+interface IEvent extends IComponent
 {
 }
 

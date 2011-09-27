@@ -22,11 +22,9 @@
 //*************************************************************************
 
 /**
- * @namespace Kisma\Events Kisma events
+ * @namespace Kisma\Components
  */
-namespace Kisma\Events;
-use Kisma\Components\Component;
-use Kisma\Kisma as K;
+namespace Kisma\Components;
 
 /**
  * Event
@@ -39,22 +37,22 @@ class Event extends Component implements \Kisma\IEvent
 	//*************************************************************************
 	
 	/**
-	 * @var \SplObjectStorage The store of event handlers for this event.
-	 */
-	protected $_handlers = array();
-	/**
 	 * @var string The event ID
 	 */
 	protected $_eventId = null;
+	/**
+	 * @var string Any extra event data
+	 */
+	protected $_eventData = null;
 	/**
 	 * @var boolean While true, propagation of events will continue. Set to false
 	 * in an event handler then return true to successfully halt propagation.
 	 */
 	protected $_continuePropagation = true;
 	/**
-	 * @var mixed Data pertinent to the event
+	 * @var array The store of event handlers for this event.
 	 */
-	protected $_eventData = null;
+	protected $_handlers = array();
 	/**
 	 * @var \Kisma\IKisma The source of the event
 	 */
@@ -63,15 +61,6 @@ class Event extends Component implements \Kisma\IEvent
 	//*************************************************************************
 	//* Public Methods
 	//*************************************************************************
-
-	/**
-	 * @param array $options
-	 */
-	public function __construct( $options = array() )
-	{
-		parent::__construct( $options );
-		$this->_handlers = new \SplObjectStorage();
-	}
 
 	/**
 	 * Walks the event handler chain calling the optional callback upon completion.
@@ -96,17 +85,15 @@ class Event extends Component implements \Kisma\IEvent
 
 		//	Reset the event
 		$this->_continuePropagation = true;
-		$this->_eventData = $eventData;
 
 		//	Loop through the handlers for this event, passing data
-		/** @var $_handler callback */
-		foreach ( $this->_handlers as $_index => $_handler )
+		foreach ( $this->_handlers as $_handler )
 		{
 			//	Call each handler
 			/** @var $_callback callback */
-			/** @noinspection PhpUndefinedMethodInspection */
-			$_callback = $_handler->getInfo();
-			$_result = $_callback( $this );
+			$_callback = $_handler[0];
+			$_callbackEventData = $_handler[1];
+			$_result = call_user_func_array( $_callback, array( $this, $_callbackEventData ) );
 
 			//	If an event returns false, or wants to stop, break...
 			if ( false === $this->_continuePropagation || false === $_result )
@@ -119,41 +106,11 @@ class Event extends Component implements \Kisma\IEvent
 		if ( null !== $callback )
 		{
 			//	Sending some info to the callback...
-			$callback(
-				$this,
-				$_result
-			);
+			call_user_func_array( $callback, array( $this, $_result ) );
 		}
 
 		//	We made it through, so return true
 		return $_result;
-	}
-
-	/**************************************************************************
-	 ** Helpers
-	 **************************************************************************/
-
-	/**
-	 * Helper to create a new event.
-	 * @static
-	 * @param string $eventId
-	 * @param Component $source
-	 * @param mixed|null $eventData
-	 * @return \Kisma\Events\Event
-	 */
-	public static function create( $eventId, $source, $eventData = null )
-	{
-		$_class = get_called_class();
-
-		$_eventOptions = array(
-			'eventId' => $eventId,
-			'eventData' => $eventData,
-			'source' => $source,
-		);
-
-		K::logDebug( 'Event "' . $eventId . '" created for source "' . K::standardizeName( get_class( $source ) ) );
-
-		return new $_class( $_eventOptions );
 	}
 
 	/**************************************************************************
@@ -162,9 +119,10 @@ class Event extends Component implements \Kisma\IEvent
 
 	/**
 	 * @param callback $callback
-	 * @return \Kisma\Events\Event
+	 * @param mixed|null $callbackData
+	 * @return \Kisma\Components\Event
 	 */
-	public function addHandler( $callback )
+	public function addHandler( $callback, $callbackData = null )
 	{
 		if ( !is_callable( $callback ) )
 		{
@@ -172,9 +130,12 @@ class Event extends Component implements \Kisma\IEvent
 		}
 
 		//	Add to our handler store
-		$_result = $this->_handlers->attach( $this, $callback );
+		$this->_handlers[] = array(
+			$callback,
+			$callbackData,
+		);
 
-		K::logDebug( 'Added event handler for "' . get_class( $this->_source ) . '"."' . $this->_eventId . '"' );
+		\Kisma\Kisma::logDebug( 'Added event handler for "' . get_class( $this->_source ) . '"."' . $this->_eventId . '"' );
 
 		return $this;
 	}
@@ -186,7 +147,22 @@ class Event extends Component implements \Kisma\IEvent
 	 */
 	public function removeHandler( $callback )
 	{
-		$this->_handlers->detach( $callback );
+		if ( !is_callable( $callback ) )
+		{
+			throw new InvalidEventHandlerException( 'Callback must actually be callable. Check out Closures. Try again...' );
+		}
+
+		foreach ( $this->_handlers as $_index => $_handler )
+		{
+			if ( $callback == $_handler[0] )
+			{
+				unset( $this->_handlers[$_index]);
+				return true;
+			}
+		}
+
+		//	Not found :(
+		return false;
 	}
 
 	//*************************************************************************
@@ -196,7 +172,7 @@ class Event extends Component implements \Kisma\IEvent
 	/**
 	 * @param $continuePropagation
 	 * @param boolean $continuePropagation
-	 * @return \Kisma\Events\Event
+	 * @return \Kisma\Components\Event
 	 */
 	public function setContinuePropagation( $continuePropagation )
 	{
@@ -215,7 +191,7 @@ class Event extends Component implements \Kisma\IEvent
 	/**
 	 * @param $eventData
 	 * @param mixed $eventData
-	 * @return \Kisma\Events\Event
+	 * @return \Kisma\Components\Event
 	 */
 	public function setEventData( $eventData )
 	{
@@ -234,7 +210,7 @@ class Event extends Component implements \Kisma\IEvent
 	/**
 	 * @param $handlers
 	 * @param \SplObjectStorage $handlers
-	 * @return \Kisma\Events\Event
+	 * @return \Kisma\Components\Event
 	 */
 	protected function _setHandlers( $handlers )
 	{
@@ -252,7 +228,7 @@ class Event extends Component implements \Kisma\IEvent
 
 	/**
 	 * @param string $eventId
-	 * @return \Kisma\Events\Event
+	 * @return \Kisma\Components\Event
 	 */
 	public function setEventId( $eventId )
 	{
@@ -271,7 +247,7 @@ class Event extends Component implements \Kisma\IEvent
 	/**
 	 * @param $source
 	 * @param \Kisma\IKisma $source
-	 * @return \Kisma\Events\Event
+	 * @return \Kisma\Components\Event
 	 */
 	public function setSource( $source )
 	{

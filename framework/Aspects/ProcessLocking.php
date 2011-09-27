@@ -31,7 +31,7 @@ namespace Kisma\Aspects;
 //*************************************************************************
 
 /**
- * ProcessLock
+ * ProcessLocking
  * Class description
  * 
  * @property-read string $lockFile
@@ -42,7 +42,7 @@ namespace Kisma\Aspects;
  * @property string $tag
  * @property array $waitList
  */
-class ProcessLock extends \Kisma\Aspects\Aspect
+class ProcessLocking extends \Kisma\Aspects\Aspect
 {
 	//*************************************************************************
 	//* Constants
@@ -275,7 +275,7 @@ class ProcessLock extends \Kisma\Aspects\Aspect
 	/**
 	 * @param string $tag
 	 * @param array $options
-	 * @return \Kisma\Aspects\ProcessLock
+	 * @return \Kisma\Aspects\ProcessLocking
 	 */
 	public function addWaitListProcess( $tag, $options = array() )
 	{
@@ -289,7 +289,7 @@ class ProcessLock extends \Kisma\Aspects\Aspect
 
 	/**
 	 * @param string $lockFilePath
-	 * @return \Kisma\ProcessLock
+	 * @return \Kisma\ProcessLocking
 	 */
 	public function setLockFilePath( $lockFilePath )
 	{
@@ -307,7 +307,7 @@ class ProcessLock extends \Kisma\Aspects\Aspect
 
 	/**
 	 * @param string $lockFileTemplate
-	 * @return \Kisma\ProcessLock
+	 * @return \Kisma\ProcessLocking
 	 */
 	public function setLockFileTemplate( $lockFileTemplate )
 	{
@@ -325,7 +325,7 @@ class ProcessLock extends \Kisma\Aspects\Aspect
 
 	/**
 	 * @param int $pid
-	 * @return \Kisma\ProcessLock
+	 * @return \Kisma\ProcessLocking
 	 */
 	public function setPid( $pid )
 	{
@@ -343,7 +343,7 @@ class ProcessLock extends \Kisma\Aspects\Aspect
 
 	/**
 	 * @param string $tag
-	 * @return \Kisma\ProcessLock
+	 * @return \Kisma\ProcessLocking
 	 */
 	public function setTag( $tag )
 	{
@@ -361,7 +361,7 @@ class ProcessLock extends \Kisma\Aspects\Aspect
 
 	/**
 	 * @param string $lockFile
-	 * @return \Kisma\Aspects\ProcessLock
+	 * @return \Kisma\Aspects\ProcessLocking
 	 */
 	protected function _setLockFile( $lockFile )
 	{
@@ -379,7 +379,7 @@ class ProcessLock extends \Kisma\Aspects\Aspect
 
 	/**
 	 * @param array $waitList
-	 * @return \Kisma\Aspects\ProcessLock
+	 * @return \Kisma\Aspects\ProcessLocking
 	 */
 	public function setWaitList( $waitList )
 	{
@@ -397,7 +397,7 @@ class ProcessLock extends \Kisma\Aspects\Aspect
 
 	/**
 	 * @param int $processId
-	 * @return \Kisma\Aspects\ProcessLock
+	 * @return \Kisma\Aspects\ProcessLocking
 	 */
 	public function setProcessId( $processId )
 	{
@@ -415,7 +415,7 @@ class ProcessLock extends \Kisma\Aspects\Aspect
 
 	/**
 	 * @param string $hostName
-	 * @return \Kisma\Aspects\ProcessLock
+	 * @return \Kisma\Aspects\ProcessLocking
 	 */
 	public function setHostName( $hostName )
 	{

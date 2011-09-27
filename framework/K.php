@@ -10,9 +10,9 @@
  * @link			http://github.com/Pogostick/kisma/ Kisma(tm)
  * @license			http://github.com/Pogostick/kisma/licensing/
  * @author			Jerry Ablan <kisma@pogostick.com>
- * @category		Kisma_Components
- * @package			kisma.components
- * @namespace		\Kisma\Components
+ * @category		Kisma
+ * @package			kisma
+ * @namespace		\Kisma
  * @since			v1.0.0
  * @filesource
  */
@@ -22,13 +22,40 @@
 //*************************************************************************
 
 /**
- * @namespace Kisma\Components Kisma components
+ * @namespace Kisma
+ */
+namespace Kisma;
+
+/**
+ * A shortcut to \Kisma\Kisma
+ */
+class K extends \Kisma\Kisma
+{
+	//	Nothing here, move along
+}
+
+/**
+ * @namespace Kisma\Components
  */
 namespace Kisma\Components;
 
 /**
- *
+ * A shortcut to \Kisma\Kisma
  */
-class ServiceEvent extends \Kisma\Components\Event
+class K extends \Kisma\Kisma
 {
+	//	Nothing here, move along
+}
+
+/**
+ * @namespace Kisma\Aspects
+ */
+namespace Kisma\Aspects;
+
+/**
+ * A shortcut to \Kisma\Kisma
+ */
+class K extends \Kisma\Kisma
+{
+	//	Nothing here, move along
 }

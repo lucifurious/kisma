@@ -27,12 +27,6 @@
 namespace Kisma\Components;
 
 /**
- * Convenience alias for the Kisma helpers
- * @see \Kisma\Kisma
- */
-use \Kisma\Kisma as K;
-
-/**
  * Component
  * The womb within...
  *
@@ -58,11 +52,7 @@ class Component implements \Kisma\IKisma, \Kisma\IAspectable, \Kisma\IOptions, \
 	 */
 	protected $_options = array();
 	/**
-	 * @var \Kisma\Events\Event[] This component's events
-	 */
-	protected $_events = array();
-	/**
-	 * @var \Kisma\Aspects\Aspect[] This object's aspects
+	 * @var \Kisma\Components\Event[] This component's events
 	 */
 	protected $_aspects = array();
 	/**
@@ -108,17 +98,20 @@ class Component implements \Kisma\IKisma, \Kisma\IAspectable, \Kisma\IOptions, \
 		//	Configure our properties
 		$this->_loadConfiguration( $options, true );
 
-		//	Auto-bind events, remove from $options
+		//	#1! Enable event handling only if we're not an event handler...
+		if ( !( $this instanceof \Kisma\Aspects\EventHandling ) )
+		{
+			$this->linkAspect( 'kisma.aspects.event_handling' );
+		}
+
+		//	#2! Auto-bind events, remove from $options
 		if ( false !== $this->getOption( 'auto_bind', true ) )
 		{
 			$this->autoBindEvents( $this->getOption( 'auto_bind_options', array(), true ) );
 		}
 
-		//	Set our count...
-		$this->_count = count( $this->_options );
-
-		//	Trigger our afterConstruct event
-		$this->trigger( 'after_constructor' );
+		//	#3! Now trigger our after_constructor event
+		$this->triggerEvent( 'after_constructor' );
 	}
 
 	/**
@@ -182,106 +175,10 @@ class Component implements \Kisma\IKisma, \Kisma\IAspectable, \Kisma\IOptions, \
 				if ( !in_array( $_eventId, $_ignores ) )
 				{
 					//	Bind it like a binder!
-					$this->bind(
-						$_eventId,
-						array(
-							$this,
-							$_realMethodName,
-						)
-					);
+					$this->bindEvent( $_eventId, array( $this, $_realMethodName ) );
 				}
 			}
 		}
-	}
-
-	/**
-	 * @param string $name
-	 * @param callback $callback
-	 * @return \Kisma\Events\Event
-	 */
-	public function bind( $name, $callback )
-	{
-		$name = K::standardizeName( $name );
-
-		if ( !isset( $this->_events[$name] ) )
-		{
-			//	Create a new event
-			$this->_events[$name] = new \Kisma\Events\Event(
-				array(
-					'source' => $this,
-				)
-			);
-		}
-
-		return $this->_events[$name]->addHandler( $callback );
-	}
-
-	/**
-	 * @param string $name
-	 * @param callback $callback
-	 * @return \Kisma\Components\Component
-	 */
-	public function unbind( $name, $callback )
-	{
-		$name = K::standardizeName( $name );
-
-		foreach ( $this->_events as $_eventId => $_handler )
-		{
-			if ( $name == $_eventId )
-			{
-				return $this->_events[$name]->removeHandler( $callback );
-			}
-		}
-
-		return false;
-	}
-
-	/**
-	 * @param string $eventId
-	 * @param mixed $data
-	 * @param callback $callback
-	 * @return bool
-	 */
-	public function trigger( $eventId, $data = null, $callback = null )
-	{
-		//	Now, see what's what
-		if ( !is_string( $eventId ) )
-		{
-			throw new EventException( 'Event name specified is not a string, and therefore does not exist.' );
-		}
-		
-		$_eventId = K::standardizeName( $eventId );
-		
-		if ( isset( $this->_events, $this->_events[$_eventId] ) )
-		{
-			$_callback = ( $callback ?: null );
-			$_data = ( $data ?: null );
-			
-			//	Do we have a callback?
-			if ( null === $_callback )
-			{
-				if ( null !== $data )
-				{
-					if ( is_callable( $_data ) )
-					{
-						//	This is a callback...
-						$_callback = $_data;
-						$_data = null;
-					}
-					else
-					{
-						//	Data is data, no callback...
-						$_callback = null;
-					}
-				}
-			}
-			
-			//	Return the result of the event propagation
-			return $this->_events[$_eventId]->fireEvent( $_data, $_callback );
-		}
-
-		//	We don't have that event, return false.
-		return false;
 	}
 
 	//*************************************************************************
@@ -299,9 +196,10 @@ class Component implements \Kisma\IKisma, \Kisma\IAspectable, \Kisma\IOptions, \
 		$_aspectClass = K::standardizeName( $aspectClass );
 
 		/** @var $_aspect \Kisma\Aspects\Aspect */
-		if ( null !== ( $this->_aspects[$_aspectClass] = K::createComponent( $_aspectClass, $options ) ) )
+		if ( null !== ( $_aspect = new $_aspectClass( $options ) ) )
 		{
-			$this->_aspects[$_aspectClass]->link( $this );
+			$_aspect->link( $this );
+			$this->_aspects[$_aspectClass] = $_aspect;
 		}
 	}
 
@@ -331,7 +229,6 @@ class Component implements \Kisma\IKisma, \Kisma\IAspectable, \Kisma\IOptions, \
 		foreach ( $this->_aspects as $_aspectClass => $_aspect )
 		{
 			$this->unlinkAspect( $_aspectClass );
-			unset( $this->_aspects[$_aspectClass] );
 		}
 
 		//	Make a fresh array
@@ -347,12 +244,12 @@ class Component implements \Kisma\IKisma, \Kisma\IAspectable, \Kisma\IOptions, \
 	 */
 	public function unlinkAspect( $aspectClass )
 	{
-		$aspectClass = K::standardizeName( $aspectClass );
+		$_aspectClass = K::standardizeName( $aspectClass );
 
-		if ( isset( $this->_aspects[$aspectClass] ) )
+		if ( isset( $this->_aspects[$_aspectClass] ) )
 		{
-			$this->_aspects[$aspectClass]->unlink( $this );
-			unset( $this->_aspects[$aspectClass] );
+			$this->_aspects[$_aspectClass]->unlink( $this );
+			unset( $this->_aspects[$_aspectClass] );
 			return true;
 		}
 
@@ -406,6 +303,9 @@ class Component implements \Kisma\IKisma, \Kisma\IAspectable, \Kisma\IOptions, \
 				$_options
 			);
 		}
+
+		//	Set our count...
+		$this->_count = count( $this->_options );
 	}
 
 	//*************************************************************************
@@ -513,41 +413,6 @@ class Component implements \Kisma\IKisma, \Kisma\IAspectable, \Kisma\IOptions, \
 	public function getErrors()
 	{
 		return $this->_errors;
-	}
-
-	/**
-	 * @param \Kisma\Events\Event[] $events
-	 * @return \Kisma\Components\Component
-	 */
-	public function setEvents( $events = array() )
-	{
-		$this->_events = $events;
-		return $this;
-	}
-
-	/**
-	 * @param string|null $eventId
-	 * @return \Kisma\Components\Event[]
-	 */
-	public function getEvents( $eventId = null )
-	{
-		if ( null !== $eventId )
-		{
-			$_filteredEvents = array();
-			$_eventId = K::standardizeName( $eventId );
-
-			foreach ( $this->_events as $_name => $_handler )
-			{
-				if ( $_name == $_eventId )
-				{
-					$_filteredEvents[$_name][] = $_handler;
-				}
-			}
-
-			return $_filteredEvents;
-		}
-
-		return $this->_events;
 	}
 
 	/**

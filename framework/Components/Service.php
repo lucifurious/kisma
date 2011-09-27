@@ -50,7 +50,7 @@ class Service extends Component implements \Kisma\IService
 	//*************************************************************************
 
 	/**
-	 * @param \Kisma\Events\Event $event
+	 * @param \Kisma\Components\Event $event
 	 * @return bool
 	 */
 	public function onBeforeServiceCall( $event )
@@ -60,7 +60,7 @@ class Service extends Component implements \Kisma\IService
 	}
 
 	/**
-	 * @param \Kisma\Events\Event $event
+	 * @param \Kisma\Components\Event $event
 	 * @return bool
 	 */
 	public function onAfterServiceCall( $event )

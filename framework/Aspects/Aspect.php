@@ -27,12 +27,6 @@
 namespace Kisma\Aspects;
 
 /**
- * Convenience alias for the Kisma helpers
- * @see \Kisma\Kisma
- */
-use \Kisma\Kisma as K;
-
-/**
  * Aspect
  * Aspects allow objects to take on functionality defined in another class.
  * @TODO Replace with traits once PHP 5.4 is released
