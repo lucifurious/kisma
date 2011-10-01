@@ -131,6 +131,28 @@ class ActionButton extends \Kisma\KismaEnum
 }
 
 /**
+ */
+class DebugLevel extends \Kisma\KismaEnum
+{
+	//*************************************************************************
+	//* Constants
+	//*************************************************************************
+
+	const __default = self::Normal;
+
+	/**
+	 * @const int Debug logging level, they're fairly descriptive ;)
+	 */
+	const Normal = 0;
+	const Verbose = 1;
+	const VeryChatty = 2;
+	const WillNotShutUp = 3;
+	const Nutty = 4;
+	const Satanic = 666;
+	
+}
+
+/**
  *
  */
 class OperationMode extends \Kisma\KismaEnum
@@ -281,15 +303,15 @@ class ServiceType extends \Kisma\KismaEnum
 	//* Constants
 	//*************************************************************************
 
-	const __default = self::AllPurpose;
+	const __default = self::Generic;
 
 	/**
 	 * @const int service types
 	 */
-	const Sapi = 0x0000;
-	const Cli = 0x0001;
-	const AllPurpose = 0x0003;
-	const Ajax = 0x0004;
+	const Generic = 1;
+	const Sapi = 2;
+	const Cli = 3;
+	const Ajax = 4;
 }
 
 /**

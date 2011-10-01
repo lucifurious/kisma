@@ -99,7 +99,7 @@ namespace Kisma\Aspects;
  * framework event.
  * 
  */
-class EventHandling extends Aspect implements \Kisma\IEvent
+class EventHandling extends \Kisma\Components\Aspect
 {
 	//*************************************************************************
 	//* Private Members
@@ -115,59 +115,65 @@ class EventHandling extends Aspect implements \Kisma\IEvent
 	//*************************************************************************
 
 	/**
+	 * Returns a standardized event name if this component has the requested
+	 * event, otherwise false
+	 *
+	 * @param string $eventName The name of the event
+	 * @param bool $returnEvent If true, the event object will be returned instead of the name
+	 * @return false|string|\Kisma\Components\Event
+	 */
+	public function hasEvent( $eventName, $returnEvent = false )
+	{
+		return K::hasComponent( $this->_events, $eventName, $returnEvent );
+	}
+
+	/**
 	 * Helper to create a new event.
-	 * @param string $eventId
+	 * @param string $eventName
 	 * @param mixed|null $eventData
 	 * @param string $eventClass
 	 * @return \Kisma\Components\Event
 	 */
-	public function createEvent( $eventId, $eventData = null, $eventClass = 'Kisma\Components\Event' )
+	public function create( $eventName, $eventData = null, $eventClass = 'kisma.components.Event' )
 	{
-		$_eventClass = K::standardizeName( $eventClass );
+		if ( false !== ( $_event = $this->hasEvent( $eventName, true ) ) )
+		{
+			return $_event;
+		}
+
+		$_eventKey = K::kismaTag( $eventName, true );
 
 		$_eventOptions = array(
-			'eventId' => $eventId,
+			'eventId' => $eventName,
 			'eventData' => $eventData,
-			'source' => $this->_parent,
-			'eventClass' => $_eventClass,
+			'source' => $this->_linker,
+			'eventKey' => $_eventKey,
 		);
 
-		$_event = new $_eventClass( $_eventOptions );
+		$_event = K::createComponent( $eventClass, $_eventOptions );
 
-		K::logDebug( 'Event "' . $eventId . '" created for source "' . get_class( $this->_parent ) );
+		if ( K::getDebugLevel( \Kisma\DebugLevel::Nutty ) )
+		{
+			K::logDebug( 'Event "' . $_eventKey . '" created for source "' . get_class( $this->_linker ) );
+		}
 
-		return $_event;
-	}
-
-	/**
-	 * Returns the standardized event name or false if we do not have that event.
-	 * @param string $eventName
-	 * @return string|false
-	 */
-	public function hasEvent( $eventName )
-	{
-		$_eventName = K::standardizeName( $eventName );
-		return ( isset( $this->_events, $this->_events[$_eventName] ) ? $_eventName : false );
+		return $this->_events[$_eventKey] = $_event;
 	}
 
 	/**
 	 * @param string $eventName
 	 * @param callback $callback
 	 * @param mixed|null $eventData
+	 * @param string $eventClass
 	 * @return bool
 	 */
-	public function bindEvent( $eventName, $callback, $eventData = null )
+	public function bind( $eventName, $callback, $eventData = null, $eventClass = 'kisma.components.Event' )
 	{
-		//	If we don't have the event, create one...
-		if ( false === ( $_eventName = $this->hasEvent( $eventName ) ) )
-		{
-			//	Create a new event
-			$_eventName = K::standardizeName( $eventName );
-			$this->_events[$_eventName] = $this->createEvent( $_eventName, $eventData );
-		}
+		//	Get or Create a new event
+		$_event = $this->create( $eventName, $eventData, $eventClass );
 
 		//	Add the handler
-		return $this->_events[$_eventName]->addHandler( $callback, $eventData );
+		return $_event->addHandler( $callback, $eventData );
 	}
 
 	/**
@@ -175,16 +181,31 @@ class EventHandling extends Aspect implements \Kisma\IEvent
 	 * @param callback $callback
 	 * @return bool
 	 */
-	public function unbindEvent( $eventName, $callback )
+	public function unbind( $eventName, $callback )
 	{
-		//	If we don't have the event, create one...
-		if ( false !== ( $_eventName = $this->hasEvent( $eventName ) ) )
+		//	If we don't have the event, fail & bail
+		if ( false === ( $_event = $this->hasEvent( $eventName, true ) ) )
 		{
-			return $this->_events[$_eventName]->removeHandler( $callback );
+			return false;
 		}
 
-		//	Event doesn't exist.
-		return false;
+		return $_event->removeHandler( $callback );
+	}
+
+	/**
+	 * Automatically binds any events in the event map
+	 *
+	 * @param array $options
+	 * @return bool
+	 */
+	public function autoBind( $options = array() )
+	{
+		//	Check each method for the event handler signature
+		foreach ( $this->_eventMap as $_eventName => $_callback )
+		{
+			//	Bind it like a binder!
+			$this->bind( $_eventName, $_callback );
+		}
 	}
 
 	/**
@@ -193,12 +214,12 @@ class EventHandling extends Aspect implements \Kisma\IEvent
 	 * @param callback|null $callback
 	 * @return bool Returns true if the $eventName has no handlers.
 	 */
-	public function triggerEvent( $eventName, $eventData = null, $callback = null )
+	public function trigger( $eventName, $eventData = null, $callback = null )
 	{
 		//	If we don't have the event, create one...
-		if ( false !== ( $_eventName = $this->hasEvent( $eventName ) ) )
+		if ( false !== ( $_event = $this->hasEvent( $eventName, true ) ) )
 		{
-			return $this->_events[$_eventName]->fireEvent( $eventData, $callback );
+			return $_event->fire( $eventData, $callback );
 		}
 
 		//	It's all good!
@@ -226,4 +247,24 @@ class EventHandling extends Aspect implements \Kisma\IEvent
 	{
 		return $this->_events;
 	}
+
+
+	/**
+	 * @param string $eventHandlerSignature
+	 * @return \Kisma\Aspects\EventHandling
+	 */
+	public function setEventHandlerSignature( $eventHandlerSignature = 'on' )
+	{
+		$this->_eventHandlerSignature = $eventHandlerSignature;
+		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getEventHandlerSignature()
+	{
+		return $this->_eventHandlerSignature;
+	}
+
 }

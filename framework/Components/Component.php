@@ -6,14 +6,14 @@
  * Dual licensed under the MIT License and the GNU General Public License (GPL) Version 2.
  * See {@link http://github.com/Pogostick/kisma/licensing/} for complete information.
  *
- * @copyright		Copyright 2011, Pogostick, LLC. (http://www.pogostick.com/)
- * @link			http://github.com/Pogostick/kisma/ Kisma(tm)
- * @license			http://github.com/Pogostick/kisma/licensing/
- * @author			Jerry Ablan <kisma@pogostick.com>
- * @category		Kisma_Components
- * @package			kisma.components
- * @namespace		\Kisma\Components
- * @since			v1.0.0
+ * @copyright Copyright 2011, Pogostick, LLC. (http://www.pogostick.com/)
+ * @link      http://github.com/Pogostick/kisma/ Kisma(tm)
+ * @license   http://github.com/Pogostick/kisma/licensing/
+ * @author    Jerry Ablan <kisma@pogostick.com>
+ * @category  Kisma_Components
+ * @package   kisma.components
+ * @namespace \Kisma\Components
+ * @since     v1.0.0
  * @filesource
  */
 
@@ -28,97 +28,55 @@ namespace Kisma\Components;
 
 /**
  * Component
- * The womb within...
+ * A basic building block of Kisma. Aspectable and included event handling and an optional object store
  *
- * @property array $options
- * @property Event[] $events
+ * Basics
+ * ======
+ *
+ * Features
+ * ========
+ *   o Virtualized Aspects
+ *
+ * Properties: Always exist, and always have a default value.
+ * ===========================================================================
  * @property Aspect[] $aspects
- * @property \Exception[] $errors
- * @property int $index
- * @property-read int $count
- * @property bool $skipNext
- * @property bool $readOnly
- * @property bool $logging
- * @property string $eventHandlerSignature
+ * @property boolean $enableObjectStorage
+ * @property \Kisma\Aspects\EventHandling $eventHandling
+ *
+ * Options: May or may not be set, use as you'd like
+ * ===========================================================================
+ * @property string $eventHandlingClass
+ * @property string $objectStorageClass
+ *
+ * Optional Aspects
+ * ================
+ * @property \Kisma\Aspects\ObjectStorage $objectStorage
  */
-class Component implements \Kisma\IKisma, \Kisma\IAspectable, \Kisma\IOptions, \Countable, \Iterator
+abstract class Component extends \Kisma\Components\SubComponent implements \Kisma\IAspectable
 {
 	//*************************************************************************
 	//* Private Members
 	//*************************************************************************
 
-	/***
-	 * @var array This object's options
-	 */
-	protected $_options = array();
 	/**
-	 * @var \Kisma\Components\Event[] This component's events
+	 * @var \Kisma\Components\Aspect[] This component's aspects
 	 */
 	protected $_aspects = array();
 	/**
-	 * @var \Exception[]
+	 * @var bool If true, this component will automatically link the EventHandling aspect.
 	 */
-	protected $_errors = array();
-	/**
-	 * @var integer Iteration index
-	 */
-	protected $_index = 0;
-	/**
-	 * @var integer Holds the number of settings we have
-	 */
-	protected $_count = 0;
-	/**
-	 * @var boolean Used when un-setting values during iteration to ensure we do not skip the next element
-	 */
-	protected $_skipNext = false;
-	/**
-	 * @var boolean If true, configuration settings cannot be changed once loaded
-	 */
-	protected $_readOnly = true;
-	/**
-	 * @var bool|int The logging flags for this object
-	 */
-	protected $_logging = true;
-	/**
-	 * @var string The prefix of a method indicating it is an event handler
-	 */
-	protected $_eventHandlerSignature = 'on';
+	protected $_enableObjectStorage = true;
 
 	//*************************************************************************
 	//* Default/Magic Methods
 	//*************************************************************************
 
 	/**
-	 * The base component constructor
-	 * @param array $options
-	 * @return \Kisma\Components\Component
-	 */
-	public function __construct( $options = array() )
-	{
-		//	Configure our properties
-		$this->_loadConfiguration( $options, true );
-
-		//	#1! Enable event handling only if we're not an event handler...
-		if ( !( $this instanceof \Kisma\Aspects\EventHandling ) )
-		{
-			$this->linkAspect( 'kisma.aspects.event_handling' );
-		}
-
-		//	#2! Auto-bind events, remove from $options
-		if ( false !== $this->getOption( 'auto_bind', true ) )
-		{
-			$this->autoBindEvents( $this->getOption( 'auto_bind_options', array(), true ) );
-		}
-
-		//	#3! Now trigger our after_constructor event
-		$this->triggerEvent( 'after_constructor' );
-	}
-
-	/**
 	 * Allow calling Aspect methods from the object
+	 *
 	 * @throws \BadMethodCallException
 	 * @param string $method
-	 * @param array $arguments
+	 * @param array  $arguments
 	 * @return mixed
 	 */
 	public function __call( $method, $arguments )
@@ -129,7 +87,13 @@ class Component implements \Kisma\IKisma, \Kisma\IAspectable, \Kisma\IOptions, \
 			//	Call aspect methods if they exist
 			if ( method_exists( $_aspect, $method ) )
 			{
-				return call_user_func_array( array( $_aspect, $method ), $arguments );
+				return call_user_func_array(
+					array(
+						$_aspect,
+						$method
+					),
+					$arguments
+				);
 			}
 		}
 
@@ -137,47 +101,18 @@ class Component implements \Kisma\IKisma, \Kisma\IAspectable, \Kisma\IOptions, \
 		throw new \BadMethodCallException( __CLASS__ . '::' . $method . ' is undefined.' );
 	}
 
-	//*************************************************************************
-	//* Event Handling Methods
-	//*************************************************************************
-
 	/**
-	 * Looks for event handler signatures and auto-binds the events.
-	 * Event handler signatures start with the word 'on'.
+	 * Magic getter. Used to provide aspects as virtual properties
 	 *
-	 * @param array $options
-	 * @return bool
+	 * @param string $name
+	 * @return Aspect|mixed
 	 */
-	public function autoBindEvents( $options = array() )
+	public function __get( $name )
 	{
-		$_mirror = new \ReflectionClass( $this );
-
-		//	See if there are any events that should be ignored
-		$_ignores = K::o( $options, 'ignore_events', array() );
-
-		//	Clean up the ignore list
-		array_walk( $_ignores, function( &$ignore ) {
-			$ignore = K::standardizeName( $ignore );
-		});
-
-		//	Check each method for the event handler signature
-		foreach ( $_mirror->getMethods() as $_method )
+		//	We are ONLY virtualizing aspects as properties to avoid namespace collision
+		if ( false !== ( $_aspect = $this->hasAspect( $name, true ) ) )
 		{
-			/** @noinspection PhpUndefinedFieldInspection */
-			$_realMethodName = $_method->name;
-			$_stub = strtolower( substr( $_realMethodName, 0, strlen( $this->_eventHandlerSignature ) ) );
-
-			if ( $_stub == $this->_eventHandlerSignature )
-			{
-				//	Standardize the event name and, if not ignored, bind it
-				$_eventId = K::standardizeName( substr( $_realMethodName, strlen( $this->_eventHandlerSignature ) ) );
-
-				if ( !in_array( $_eventId, $_ignores ) )
-				{
-					//	Bind it like a binder!
-					$this->bindEvent( $_eventId, array( $this, $_realMethodName ) );
-				}
-			}
+			return $_aspect;
 		}
 	}
 
@@ -186,21 +121,41 @@ class Component implements \Kisma\IKisma, \Kisma\IAspectable, \Kisma\IOptions, \
 	//*************************************************************************
 
 	/**
-	 * Link an aspect to this component
-	 * @param string $aspectClass
-	 * @param array $options
-	 * @return \Kisma\Aspects\Aspect
+	 * Determines if this component has the requested aspect linked. If not, the return value is false.
+	 * If the aspect is linked, the return value is the key name of the aspect.
+	 * If $returnAspect is set to true, the aspect instance will be returned
+	 *
+	 * @param string $aspectName
+	 * @param bool $returnAspect If true, instead of the standardized name being returned, you get the aspect object.
+	 * @return false|string|\Kisma\Components\Aspect
 	 */
-	public function linkAspect( $aspectClass, $options = array() )
+	public function hasAspect( $aspectName, $returnAspect = false )
 	{
-		$_aspectClass = K::standardizeName( $aspectClass );
+		return K::hasComponent( $this->_aspects, $aspectName, $returnAspect );
+	}
 
-		/** @var $_aspect \Kisma\Aspects\Aspect */
-		if ( null !== ( $_aspect = new $_aspectClass( $options ) ) )
+	/**
+	 * Link an aspect to this component
+	 * @param string $aspectName
+	 * @param array  $options
+	 * @return \Kisma\Components\Aspect
+	 */
+	public function linkAspect( $aspectName, $options = array() )
+	{
+		if ( false === ( $_aspect = $this->hasAspect( $aspectName, true ) ) )
 		{
-			$_aspect->link( $this );
-			$this->_aspects[$_aspectClass] = $_aspect;
+			K::logDebug( 'Linking Aspect: ' . $aspectName );
+
+			if ( !isset( $options['linker'] ) )
+			{
+				$options['linker'] = $this;
+			}
+
+			$_aspectKey = K::kismaTag( $aspectName, true );
+			$this->_aspects[$_aspectKey] = $_aspect = K::createComponent( $aspectName, $options );
 		}
+
+		return $_aspect;
 	}
 
 	/**
@@ -238,18 +193,16 @@ class Component implements \Kisma\IKisma, \Kisma\IAspectable, \Kisma\IOptions, \
 
 	/**
 	 * Unlinks an aspect from this component
-	 * @param string $aspectClass
+	 * @param string $aspectName
 	 * @return bool
 	 * @see Aspect
 	 */
-	public function unlinkAspect( $aspectClass )
+	public function unlinkAspect( $aspectName )
 	{
-		$_aspectClass = K::standardizeName( $aspectClass );
-
-		if ( isset( $this->_aspects[$_aspectClass] ) )
+		if ( false !== ( $_aspectKey = $this->hasAspect( $aspectName ) ) )
 		{
-			$this->_aspects[$_aspectClass]->unlink( $this );
-			unset( $this->_aspects[$_aspectClass] );
+			$this->_aspects[$_aspectKey]->unlink( $this );
+			unset( $this->_aspects[$_aspectKey] );
 			return true;
 		}
 
@@ -261,118 +214,59 @@ class Component implements \Kisma\IKisma, \Kisma\IAspectable, \Kisma\IOptions, \
 	//*************************************************************************
 
 	/**
-	 * Loads an array into properties if they exist.
+	 * Extends the base by adding aspect loading
 	 * @param array $options
-	 * @param bool $noMerge If true, this object's options will be cleared first
-	 * @return $this
+	 * @param bool  $noMerge If true, this object's options will be cleared first
+	 * @return void
 	 */
 	protected function _loadConfiguration( $options = array(), $noMerge = false )
 	{
-		$_options = array();
+		parent::_loadConfiguration( $options, $noMerge );
 
-		//	Catch null input...
-		if ( null === $options || !is_array( $options ) || empty( $options ) )
+		//	And load our aspects
+		if ( $this->_loadAspects( $this->getOption( 'aspect_options', array(), true ) ) )
 		{
-			$options = array();
-		}
-
-		//	Loop through, set...
-		foreach ( $options as $_key => $_value )
-		{
-			try
+			//	Auto-bind events, remove from $options
+			if ( false !== $this->getOption( 'auto_bind_events', true ) )
 			{
-				K::__property( $this, $_key, \Kisma\AccessorMode::Set, $_value );
-			}
-			catch ( \Kisma\UndefinedPropertyException $_ex )
-			{
-				//	Undefined, add to options...
-				$_options[$_key] = $_value;
+				$this->{'kisma.aspects.event_handling'}->autoBind(
+					$this->getOption( 'auto_bind_options', array(), true )
+				);
 			}
 		}
+	}
 
-		if ( $noMerge )
+	/**
+	 * Loads the standard component aspects (EventHandling and ObjectStorage)
+	 * avoiding recursion.
+	 *
+	 * @param array $options
+	 * @return bool
+	 */
+	protected function _loadAspects( $options = array() )
+	{
+		$_classes = K::o(
+			$options,
+			'classes',
+			array(
+				'kisma.aspects.event_handling' => true,
+				'kisma.aspects.object_storage' => $this->_enableObjectStorage,
+			)
+		);
+
+		foreach ( $_classes as $_aspectClass => $_enabled )
 		{
-			//	Overwrite the options...
-			$this->_options = $_options;
-		}
-		else
-		{
-			//	Merge the options...
-			$this->_options = array_merge(
-				$this->_options,
-				$_options
-			);
-		}
-
-		//	Set our count...
-		$this->_count = count( $this->_options );
-	}
-
-	//*************************************************************************
-	//* Interface Methods
-	//*************************************************************************
-
-	/**
-	 * Required by Countable interface
-	 * @return int
-	 */
-	public function count()
-	{
-		return $this->_count;
-	}
-
-	/**
-	 * Required by Iterator interface
-	 * @return mixed
-	 */
-	public function current()
-	{
-		$this->_skipNext = false;
-		return current( $this->_options );
-	}
-
-	/**
-	 * Required by Iterator interface
-	 * @return mixed
-	 */
-	public function key()
-	{
-		return key( $this->_options );
-	}
-
-	/**
-	 * Required by Iterator interface
-	 */
-	public function next()
-	{
-		if ( $this->_skipNext )
-		{
-			$this->_skipNext = false;
-			return;
+			if ( true === $_enabled )
+			{
+				//	If we don't have this aspect, load it.
+				if ( false === $this->hasAspect( $_aspectClass ) )
+				{
+					$this->linkAspect( $_aspectClass );
+				}
+			}
 		}
 
-		next( $this->_options );
-
-		$this->_index++;
-	}
-
-	/**
-	 * Required by Iterator interface
-	 */
-	public function rewind()
-	{
-		$this->_skipNext = false;
-		reset( $this->_options );
-		$this->_index = 0;
-	}
-
-	/**
-	 * Required by Iterator interface
-	 * @return boolean
-	 */
-	public function valid()
-	{
-		return ( $this->_index < $this->_count );
+		return true;
 	}
 
 	//*************************************************************************
@@ -390,7 +284,7 @@ class Component implements \Kisma\IKisma, \Kisma\IAspectable, \Kisma\IOptions, \
 	}
 
 	/**
-	 * @return \Kisma\Aspects\Aspect[]
+	 * @return \Kisma\Components\Aspect[]
 	 */
 	public function getAspects()
 	{
@@ -398,175 +292,21 @@ class Component implements \Kisma\IKisma, \Kisma\IAspectable, \Kisma\IOptions, \
 	}
 
 	/**
-	 * @param array $errors
+	 * @param boolean $enableObjectStorage
 	 * @return \Kisma\Components\Component
 	 */
-	public function setErrors( $errors = array() )
+	public function setEnableObjectStorage( $enableObjectStorage = true )
 	{
-		$this->_errors = $errors;
-		return $this;
-	}
-
-	/**
-	 * @return \Kisma\Components\Exception[]
-	 */
-	public function getErrors()
-	{
-		return $this->_errors;
-	}
-
-	/**
-	 * @param int $index
-	 * @return \Kisma\Components\Component $this
-	 */
-	public function setIndex( $index )
-	{
-		$this->_index = $index;
-		return $this;
-	}
-
-	/**
-	 * @return int
-	 */
-	public function getIndex()
-	{
-		return $this->_index;
-	}
-
-	/**
-	 * @param bool $logging
-	 * @return \Kisma\Components\Component
-	 */
-	public function setLogging( $logging = false )
-	{
-		$this->_logging = $logging;
-		return $this;
-	}
-
-	/**
-	 * @return bool|int
-	 */
-	public function getLogging()
-	{
-		return $this->_logging;
-	}
-
-	/**
-	 * @param int $count
-	 * @return \Kisma\Components\Component $this
-	 */
-	protected function _setCount( $count )
-	{
-		$this->_count = $count;
-		return $this;
-	}
-
-	/**
-	 * @return int
-	 */
-	public function getCount()
-	{
-		return $this->_count;
-	}
-
-	/**
-	 * sets all options at once
-	 * @param array $options
-	 * @return \Kisma\Components\Component $this
-	 */
-	public function setOptions( $options = array() )
-	{
-		//	Bulk set all options
-		foreach ( $options as $_key => $_value )
-		{
-			$this->_options[$_key] = $_value;
-		}
-
-		return $this;
-	}
-
-	/**
-	 * @param string $name
-	 * @param mixed|null $value
-	 * @return mixed
-	 */
-	public function setOption( $name, $value = null )
-	{
-		$this->_options[$name] = $value;
-		return $this;
-	}
-
-	/**
-	 * @return array
-	 */
-	public function getOptions()
-	{
-		return $this->_options;
-	}
-
-	/**
-	 * @param string $name
-	 * @param mixed|null $defaultValue
-	 * @param bool $deleteAfter If true, key is removed from the option list after it is read.
-	 * @return mixed
-	 */
-	public function getOption( $name, $defaultValue = null, $deleteAfter = false )
-	{
-		return K::o( $this->_options, $name, $defaultValue, $deleteAfter );
-	}
-
-	/**
-	 * @param boolean $readOnly
-	 * @return \Kisma\Components\Component $this
-	 */
-	public function setReadOnly( $readOnly = true )
-	{
-		$this->_readOnly = $readOnly;
+		$this->_enableObjectStorage = $enableObjectStorage;
 		return $this;
 	}
 
 	/**
 	 * @return boolean
 	 */
-	public function getReadOnly()
+	public function getEnableObjectStorage()
 	{
-		return $this->_readOnly;
-	}
-
-	/**
-	 * @param boolean $skipNext
-	 * @return \Kisma\Components\Component $this
-	 */
-	public function setSkipNext( $skipNext )
-	{
-		$this->_skipNext = $skipNext;
-		return $this;
-	}
-
-	/**
-	 * @return boolean
-	 */
-	public function getSkipNext()
-	{
-		return $this->_skipNext;
-	}
-
-	/**
-	 * @param string $eventHandlerSignature
-	 * @return \Kisma\Components\Component $this
-	 */
-	public function setEventHandlerSignature( $eventHandlerSignature = 'on' )
-	{
-		$this->_eventHandlerSignature = $eventHandlerSignature;
-		return $this;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getEventHandlerSignature()
-	{
-		return $this->_eventHandlerSignature;
+		return $this->_enableObjectStorage;
 	}
 
 }

@@ -33,17 +33,13 @@ namespace Kisma\Components;
 class Service extends Component implements \Kisma\IService
 {
 	//********************************************************************************
-	//* Constants
-	//********************************************************************************
-
-	//********************************************************************************
-	//* Properties
+	//* Private Members
 	//********************************************************************************
 
 	/**
 	 * @var \Kisma\ServiceType The type of service provided by this object
 	 */
-	protected $_serviceType = \Kisma\ServiceType::AllPurpose;
+	protected $_serviceType = \Kisma\ServiceType::Generic;
 
 	//*************************************************************************
 	//* Event Handlers
@@ -77,7 +73,7 @@ class Service extends Component implements \Kisma\IService
 	 * @param \Kisma\ServiceType $serviceType
 	 * @return \Kisma\Components\Service
 	 */
-	public function setServiceType( $serviceType )
+	protected function _setServiceType( $serviceType )
 	{
 		$this->_serviceType = $serviceType;
 		return $this;

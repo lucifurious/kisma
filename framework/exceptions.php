@@ -101,6 +101,22 @@ class ProcessLockFileException extends KismaException
 {
 }
 
+/**
+ * AspectException
+ * Base exception for aspects
+ */
+class AspectException extends KismaException
+{
+}
+
+/**
+ * AspectNotFoundException
+ * Thrown when you cough up a bogus aspect name.
+ */
+class AspectNotFoundException extends AspectException
+{
+}
+
 //*************************************************************************
 //* Property 
 //*************************************************************************

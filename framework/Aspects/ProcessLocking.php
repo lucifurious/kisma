@@ -42,7 +42,7 @@ namespace Kisma\Aspects;
  * @property string $tag
  * @property array $waitList
  */
-class ProcessLocking extends \Kisma\Aspects\Aspect
+class ProcessLocking extends \Kisma\Components\Aspect
 {
 	//*************************************************************************
 	//* Constants
@@ -99,7 +99,7 @@ class ProcessLocking extends \Kisma\Aspects\Aspect
 		//	Some quick system info
 		$this->_processId = getmypid();
 		$this->_hostName = php_uname( 'n' );
-		$this->_tag = K::standardizeName( get_class( $this ) );
+		$this->_tag = K::kismaTag( get_class( $this ), true );
 
 		//	Pass on to base...
 		parent::__construct( $options );
@@ -209,7 +209,7 @@ class ProcessLocking extends \Kisma\Aspects\Aspect
 					$this->_hostName,
 					$this->_processId,
 					$this->_tag,
-					K::standardizeName( get_class( $this ) ),
+					K::kismaTag( get_class( $this ) ),
 				),
 				$this->_lockFileTemplate
 			)
@@ -228,7 +228,6 @@ class ProcessLocking extends \Kisma\Aspects\Aspect
 		{
 			//	If time is greater than age asked, let someone know...
 			$_age = time() - filemtime( $this->_lockFile );
-//LOG::trace( 'Lock-file exists and is ' . number_format( $_age / 60, 2 ) . ' minute(s) old: ' . $lockFileName );
 
 			return ( $_age <= $lockAge );
 		}

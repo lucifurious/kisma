@@ -34,29 +34,37 @@ namespace Kisma\Aspects\Transform;
  * Array
  * Class description
  */
-class AssociatedArray extends \Kisma\Components\Aspect implements \Kisma\ITransform
+class Html extends \Kisma\Components\Aspect implements \Kisma\ITransform
 {
+	//*************************************************************************
+	//* Constants
+	//*************************************************************************
+
+	//*************************************************************************
+	//* Private Members
+	//*************************************************************************
+
 	//*************************************************************************
 	//* Public Methods
 	//*************************************************************************
 
 	/**
-	 * Returns an associated array of data representing the value.
-	 * @param mixed|object|array $value The value being encoded
-	 * @param int $options [optional] Bitmask consisting of JSON_HEX_QUOT, JSON_HEX_TAG, JSON_HEX_AMP, JSON_HEX_APOS, JSON_NUMERIC_CHECK, JSON_PRETTY_PRINT, JSON_UNESCAPED_SLASHES, JSON_FORCE_OBJECT.
-	 * @return string a JSON encoded string on success.
+	 * Returns an HTML representation of the value.
+	 * @param mixed|object|array $value The value being transformed
+	 * @param array $options
+	 * @return string
 	 */
-	public function associatedArrayTransform( $value, $options )
+	public function htmlTransform( $value, $options = array() )
 	{
-		$_newValue = $value;
-
-		//	Already an array
-		if ( is_array( $_newValue ) )
-		{
-			return $_newValue;
-		}
-
-		//	Convert to common format
-		return $value->toArray();
+		return $value;
 	}
+
+	//*************************************************************************
+	//* Private Methods
+	//*************************************************************************
+
+	//*************************************************************************
+	//* Properties
+	//*************************************************************************
+
 }

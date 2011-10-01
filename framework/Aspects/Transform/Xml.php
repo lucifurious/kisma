@@ -25,17 +25,12 @@
  * @namespace Kisma\Aspects\Transform
  */
 namespace Kisma\Aspects\Transform;
-use Kisma\Aspects\Aspect;
-
-/**************************************************************************
-	 ** Requirements
-	 **************************************************************************/
 
 /**
  * Xml
  * Transforms data to XML
  */
-class Xml extends \Kisma\Aspects\Aspect implements \Kisma\ITransform
+class Xml extends \Kisma\Components\Aspect implements \Kisma\ITransform
 {
 	//*************************************************************************
 	//* Private Members 
@@ -72,7 +67,7 @@ class Xml extends \Kisma\Aspects\Aspect implements \Kisma\ITransform
 	 * @param mixed $options
 	 * @return string
 	 */
-	public function toXml( $value, $options = null )
+	public function xmlTransform( $value, $options = null )
 	{
 		//	Load options
 		$this->_loadConfiguration( $options, true );

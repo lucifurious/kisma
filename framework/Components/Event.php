@@ -54,7 +54,7 @@ class Event extends Component implements \Kisma\IEvent
 	 */
 	protected $_handlers = array();
 	/**
-	 * @var \Kisma\IKisma The source of the event
+	 * @var \Kisma\Components\Component The source of the event
 	 */
 	protected $_source = null;
 	
@@ -72,7 +72,7 @@ class Event extends Component implements \Kisma\IEvent
 	 * @param callback $callback
 	 * @return bool
 	 */
-	public function fireEvent( $eventData = null, $callback = null )
+	public function fire( $eventData = null, $callback = null )
 	{
 		$_result = true;
 

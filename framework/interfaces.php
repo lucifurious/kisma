@@ -28,114 +28,11 @@ namespace Kisma;
 //*************************************************************************
 
 /**
- * This interface defines constants for, and identifies an object as, a YiiXL component
+ *
  */
 interface IKisma
 {
 	//	Nothing here, move along.
-}
-
-/**
- * This interface defines constants for, and identifies an object as, a YiiXL component
- */
-interface IOptions extends IKisma
-{
-}
-
-/**
- *
- */
-interface IAspectable extends IKisma
-{
-	//*************************************************************************
-	//* Requirements
-	//*************************************************************************
-
-	/**
-	 * @abstract
-	 * @return \Kisma\IAspect[]|array
-	 */
-	public function getAspects();
-
-	/**
-	 * @abstract
-	 * @param \Kisma\IAspect[]|array $value
-	 * @return \Kisma\IAspect[]|array
-	 */
-	public function setAspects( $value );
-}
-
-/**
- * Defines an interface for objects that broadcast events
- */
-interface IBroadcaster extends IKisma
-{
-	//*************************************************************************
-	//* Requirements
-	//*************************************************************************
-
-	/**
-	 * Trigger an event
-	 * @abstract
-	 * @param string $eventId
-	 * @param mixed|null $data
-	 * @param callback|null $callback
-	 * @return mixed
-	 */
-	public function triggerEvent( $eventId, $data = null, $callback = null );
-}
-
-/**
- * Defines an interface for objects that listen for events
- */
-interface IListener extends IKisma
-{
-	//*************************************************************************
-	//* Requirements
-	//*************************************************************************
-
-	/**
-	 * Bind a callback to an event
-	 * @param string $eventName
-	 * @param callback $callback
-	 * @return boolean
-	 */
-	public function bindEvent( $eventName, $callback );
-
-	/**
-	 * Unbind from an event
-	 * @param string $eventName
-	 * @return boolean
-	 */
-	public function unbindEvent( $eventName, $callback );
-}
-
-/**
- * Defines a data model class
- */
-interface IDataModel extends IKisma
-{
-}
-
-/**
- * Defines the interface for components
- */
-interface IComponent extends IOptions, IAspectable
-{
-	//*************************************************************************
-	//* Constants
-	//*************************************************************************
-}
-
-/**
- * Defines an object that is an Aspect
- */
-interface IAspect extends IComponent
-{
-}
-
-interface IModel extends IComponent
-{
 }
 
 /**
@@ -164,9 +61,176 @@ interface IObservable extends IKisma
 }
 
 /**
+ *
+ */
+interface IAspectable extends IObservable
+{
+	//*************************************************************************
+	//* Requirements
+	//*************************************************************************
+
+	/**
+	 * @abstract
+	 * @param string $aspectName
+	 * @param bool $returnAspect
+	 * @return false|string
+	 */
+	public function hasAspect( $aspectName, $returnAspect = false );
+
+	/**
+	 * @abstract
+	 * @return \Kisma\IAspect[]|array
+	 */
+	public function getAspects();
+
+	/**
+	 * @abstract
+	 * @param \Kisma\IAspect[]|array $value
+	 * @return \Kisma\IAspect[]|array
+	 */
+	public function setAspects( $value );
+}
+
+/**
+ *
+ */
+interface IOptions extends IKisma
+{
+	//	Nothing here, move along.
+}
+
+/**
+ * This interface defines a configurable object
+ */
+interface IConfigurable extends IOptions
+{
+
+	/**
+	 * Gets all options
+	 * @return array
+	 */
+	public function getOptions();
+
+	/**
+	 * Sets an array of options at once
+	 * @param array $options
+	 * @return \Kisma\IConfigurable $this
+	 */
+	public function setOptions( $options = array() );
+
+	/**
+	 * Gets a configuration option
+	 *
+	 * @param string $name
+	 * @param null $defaultValue
+	 * @return array
+	 */
+	public function getOption( $name, $defaultValue = null );
+
+	/**
+	 * Sets a single option
+	 *
+	 * @param string $name
+	 * @param mixed|null $value
+	 * @return mixed
+	 */
+	public function setOption( $name, $value = null );
+
+}
+
+/**
+ * Defines an object that is an Aspect
+ */
+interface IAspect extends IConfigurable, IObservable
+{
+	/**
+	 * Returns the currently linked parent
+	 *
+	 * @param \Kisma\IAspectable $linker
+	 * @return \Kisma\IAspect
+	 */
+	public function setLinker( IAspectable $linker );
+	
+	/**
+	 * Returns the currently linked parent
+	 * @return Components\Component
+	 */
+	public function getLinker();
+}
+
+/**
+ * Defines an interface for objects that listen for events
+ */
+interface IEventHandling extends IAspect
+{
+	//*************************************************************************
+	//* Requirements
+	//*************************************************************************
+
+	/**
+	 * Bind a callback to an event
+	 * @param string $eventName
+	 * @param callback $callback
+	 * @return boolean
+	 */
+	public function bind( $eventName, $callback );
+
+	/**
+	 * Unbind from an event
+	 *
+	 * @param string $eventName
+	 * @param callback $callback
+	 * @return boolean
+	 */
+	public function unbind( $eventName, $callback );
+
+	/**
+	 * Returns a standardized event name if this component has the requested
+	 * aspect, otherwise false
+	 *
+	 * @param string	  $eventName
+	 * @param string|null $eventNameStandardized
+	 * @param bool		$returnObject If true, instead of the standardized name being returned, you get the event object.
+	 * @return false|string
+	 */
+	public function hasEvent( $eventName, &$eventNameStandardized = null, $returnObject = false );
+
+	/**
+	 * Triggers an event
+	 * 
+	 * @param string $eventName
+	 * @param mixed|null $eventData
+	 * @param callback|null $callback
+	 * @return bool Returns true if the $eventName has no handlers.
+	 */
+	public function trigger( $eventName, $eventData = null, $callback = null );
+}
+
+/**
+ * Defines a data model class
+ */
+interface IDataModel extends IKisma
+{
+}
+
+/**
+ * Defines the interface for components
+ */
+interface IComponent extends IConfigurable, IAspectable
+{
+}
+
+/**
+ *
+ */
+interface IModel extends IComponent
+{
+}
+
+/**
  * This interface is for components that support debugging levels
  */
-interface IGlobalDebuggable extends IComponent
+interface IGlobalDebuggable extends IKisma
 {
 	//*************************************************************************
 	//* Requirements
@@ -212,14 +276,14 @@ interface IService extends IComponent
 /**
  * This identifies an object as a streamable object
  */
-interface IStreamable extends IComponent, IObservable
+interface IStreamable extends IComponent
 {
 }
 
 /**
  * This interface defines an object as a provider of constant values
  */
-interface IConstantProvider  extends IComponent
+interface IConstantProvider  extends IKisma
 {
 }
 
@@ -484,60 +548,20 @@ interface IUtility extends IConstantProvider
 }
 
 //*************************************************************************
-//* Meaty Interfaces
-//*************************************************************************
-
-/**
- * This interface defines a configurable object
- */
-interface IConfigurable extends IObservable
-{
-	/**
-	 * Gets the configuration options
-	 * @return array
-	 */
-	public function getOptions();
-
-	/**
-	 * Gets the configuration options
-	 * @param array $options
-	 * @return IConfigurable
-	 */
-	public function setOptions( $options = array() );
-}
-
-//*************************************************************************
 //*	Aspects
 //*************************************************************************
 
 /**
- * This identifies a class as an object shifter.
  *
- * Object shifters are typical static function providers (helpers) that
- * shift the first argument off the parameter stack and use it as the target
- * object of the method called.
- *
- * Obviously, the sender must unshift itself onto the stack. The {@link YiiXL}
- * class provides methods to do this.
- *
- * @see YiiXL
  */
-interface IShifter extends IAspect
-{
-}
-
-/**
- * This interface defines a static UI helper class that can be mixed into the main
- * YiiXL system. It extends most constant providers
- */
-interface IUIHelper extends IAspect, IForm
+interface IRouter extends IAspect
 {
 }
 
 /**
  * Provides constants for controller classes
  */
-interface IController extends IAspect, IObservable, IForm
+interface IController extends IRouter
 {
 }
 
