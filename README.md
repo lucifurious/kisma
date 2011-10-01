@@ -44,34 +44,34 @@ PHPLOC Metrics
   * > 10 = Very Complex
 
 <pre>
-Directories:									6
-Files:											22
+Directories:                                          4
+Files:                                               24
 
-Lines of Code (LOC):							4734
-	Cyclomatic Complexity / Lines of Code:		<b>0.07</b>
-Comment Lines of Code (CLOC):					2921
-Non-Comment Lines of Code (NCLOC):				1813
+Lines of Code (LOC):                               5420
+  Cyclomatic Complexity / Lines of Code:           0.07
+Comment Lines of Code (CLOC):                      3266
+Non-Comment Lines of Code (NCLOC):                 2154
 
-Namespaces:										7
-Interfaces:										33
-Classes:										44
-	Abstract:									4 (9.09%)
-	Concrete:									40 (90.91%)
-	Average Class Length (NCLOC):				53
-Methods:										188
-	Scope:
-		Non-Static:								155 (82.45%)
-		Static:									33 (17.55%)
-	Visibility:
-		Public:									160 (85.11%)
-		Non-Public:								28 (14.89%)
-	Average Method Length (NCLOC):				12
-	Cyclomatic Complexity / Number of Methods:	<b>1.67</b>
+Namespaces:                                           5
+Interfaces:                                          30
+Classes:                                             52
+  Abstract:                                           6 (11.54%)
+  Concrete:                                          46 (88.46%)
+  Average Class Length (NCLOC):                      50
+Methods:                                            213
+  Scope:
+    Non-Static:                                     172 (80.75%)
+    Static:                                          41 (19.25%)
+  Visibility:
+    Public:                                         182 (85.45%)
+    Non-Public:                                      31 (14.55%)
+  Average Method Length (NCLOC):                     12
+  Cyclomatic Complexity / Number of Methods:       1.66
 
-Anonymous Functions:							1
-Functions:										<b>0</b>
+Anonymous Functions:                                  1
+Functions:                                            1
 
-Constants:										121
-	Global constants:							0
-	Class constants:							121
+Constants:                                          127
+  Global constants:                                   0
+  Class constants:                                  127
 </pre>
