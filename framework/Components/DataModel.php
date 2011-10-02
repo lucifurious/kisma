@@ -72,7 +72,7 @@ abstract class DataModel extends \Kisma\Components\Component implements \Kisma\I
 		}
 
 		//	Upstream validation failed
-		if ( !K::triggerEvent( $this, 'before_validate' ) )
+		if ( ! \K::triggerEvent( $this, 'before_validate' ) )
 		{
 			return false;
 		}
@@ -88,7 +88,7 @@ abstract class DataModel extends \Kisma\Components\Component implements \Kisma\I
 		}
 
 		//	Upstream validation failed
-		if ( !K::triggerEvent( $this, 'after_validate' ) )
+		if ( !\K::triggerEvent( $this, 'after_validate' ) )
 		{
 			return false;
 		}

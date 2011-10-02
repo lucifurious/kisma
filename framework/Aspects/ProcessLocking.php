@@ -99,7 +99,7 @@ class ProcessLocking extends \Kisma\Components\Aspect
 		//	Some quick system info
 		$this->_processId = getmypid();
 		$this->_hostName = php_uname( 'n' );
-		$this->_tag = K::kismaTag( get_class( $this ), true );
+		$this->_tag = \K::kismaTag( get_class( $this ), true );
 
 		//	Pass on to base...
 		parent::__construct( $options );
@@ -209,7 +209,7 @@ class ProcessLocking extends \Kisma\Components\Aspect
 					$this->_hostName,
 					$this->_processId,
 					$this->_tag,
-					K::kismaTag( get_class( $this ) ),
+					\K::kismaTag( get_class( $this ) ),
 				),
 				$this->_lockFileTemplate
 			)

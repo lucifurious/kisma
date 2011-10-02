@@ -26,7 +26,6 @@
  */
 namespace Kisma\Components
 {
-
 	/**
 	 * SubComponent
 	 * The seed within...
@@ -121,13 +120,18 @@ namespace Kisma\Components
 			{
 				$options = array();
 			}
+			else
+			{
+				//	Clean up the keys
+				$options = \K::cleanOptions( $options );
+			}
 
 			//	Loop through, set...
 			foreach ( $options as $_key => $_value )
 			{
 				try
 				{
-					K::__property( $this, $_key, \Kisma\AccessorMode::Set, $_value );
+					\K::__property( $this, $_key, \Kisma\AccessorMode::Set, $_value );
 				}
 				catch ( \Kisma\UndefinedPropertyException $_ex )
 				{
@@ -333,14 +337,14 @@ namespace Kisma\Components
 		}
 
 		/**
-		 * @param string	 $name
+		 * @param string $name
 		 * @param mixed|null $defaultValue
 		 * @param bool	   $deleteAfter If true, key is removed from the option list after it is read.
 		 * @return mixed
 		 */
 		public function getOption( $name, $defaultValue = null, $deleteAfter = false )
 		{
-			return K::o( $this->_options, $name, $defaultValue, $deleteAfter );
+			return \K::o( $this->_options, $name, $defaultValue, $deleteAfter );
 		}
 
 		/**

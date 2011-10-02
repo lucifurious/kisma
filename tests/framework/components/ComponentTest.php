@@ -1,13 +1,12 @@
 <?php
 require_once __DIR__ . '/../../../framework/Kisma.php';
-use Kisma\Components as KC;
+use Kisma\Components as Components;
 
+/**
+ *
+ */
 class TestComponent extends \Kisma\Components\Component
 {
-	public function onAfterConstructor( $source, $data = null )
-	{
-		\Kisma\Kisma::logDebug( '"after_constructor" event fired.' );
-	}
 }
 
 /**
@@ -31,11 +30,36 @@ class ComponentTest extends \PHPUnit_Framework_TestCase
 			'readOnly' => false,
 			'logging' => false,
 			'bogusProperty' => 'sadness',
+			'aspect.options' => array(
+				'classes' => array(
+					'kisma.aspects.storage.couch_db',
+				),
+			),
 		);
 
         $this->object = new TestComponent( $_options );
     }
 
+    /**
+     * @todo Implement test__call().
+     */
+    public function test__call()
+    {
+		/** @var $_couch \Kisma\Aspects\Storage\CouchDb */
+		$_couch = $this->object->{'kisma.aspects.storage.couch_db'};
+
+		try
+		{
+			$_couch->createDatabase( 'gha-test' );
+		}
+		catch ( \SagCouchException $_ex )
+		{
+			//	Already there...
+		}
+
+		$_o->
+    }
+	
     /**
      * Tears down the fixture, for example, closes a network connection.
      * This method is called after a test is executed.
@@ -44,269 +68,4 @@ class ComponentTest extends \PHPUnit_Framework_TestCase
     {
     }
 
-    /**
-     * @todo Implement test__call().
-     */
-    public function test__call()
-    {
-    }
-
-    /**
-     * @todo Implement testBindEvents().
-     */
-    public function testBindEvents()
-    {
-    }
-
-    /**
-     * @todo Implement testBind().
-     */
-    public function testBind()
-    {
-    }
-
-    /**
-     * @todo Implement testUnbind().
-     */
-    public function testUnbind()
-    {
-    }
-
-    /**
-     * @todo Implement testTrigger().
-     */
-    public function testTrigger()
-    {
-    }
-
-    /**
-     * @todo Implement testLinkAspect().
-     */
-    public function testLinkAspect()
-    {
-    }
-
-    /**
-     * @todo Implement testLinkAspects().
-     */
-    public function testLinkAspects()
-    {
-    }
-
-    /**
-     * @todo Implement testUnlinkAspects().
-     */
-    public function testUnlinkAspects()
-    {
-    }
-
-    /**
-     * @todo Implement testUnlinkAspect().
-     */
-    public function testUnlinkAspect()
-    {
-    }
-
-    /**
-     * @todo Implement testLinkHelpers().
-     */
-    public function testLinkHelpers()
-    {
-    }
-
-    /**
-     * @todo Implement testLinkHelper().
-     */
-    public function testLinkHelper()
-    {
-    }
-
-    /**
-     * @todo Implement testUnlinkHelpers().
-     */
-    public function testUnlinkHelpers()
-    {
-    }
-
-    /**
-     * @todo Implement testUnlinkHelper().
-     */
-    public function testUnlinkHelper()
-    {
-    }
-
-    /**
-     * @todo Implement testCount().
-     */
-    public function testCount()
-    {
-    }
-
-    /**
-     * @todo Implement testCurrent().
-     */
-    public function testCurrent()
-    {
-    }
-
-    /**
-     * @todo Implement testKey().
-     */
-    public function testKey()
-    {
-    }
-
-    /**
-     * @todo Implement testNext().
-     */
-    public function testNext()
-    {
-    }
-
-    /**
-     * @todo Implement testRewind().
-     */
-    public function testRewind()
-    {
-    }
-
-    /**
-     * @todo Implement testValid().
-     */
-    public function testValid()
-    {
-    }
-
-    /**
-     * @todo Implement testSetAspects().
-     */
-    public function testSetAspects()
-    {
-    }
-
-    /**
-     * @todo Implement testGetAspects().
-     */
-    public function testGetAspects()
-    {
-    }
-
-    /**
-     * @todo Implement testSetErrors().
-     */
-    public function testSetErrors()
-    {
-    }
-
-    /**
-     * @todo Implement testGetErrors().
-     */
-    public function testGetErrors()
-    {
-    }
-
-    /**
-     * @todo Implement testSetEvents().
-     */
-    public function testSetEvents()
-    {
-    }
-
-    /**
-     * @todo Implement testGetEvents().
-     */
-    public function testGetEvents()
-    {
-    }
-
-    /**
-     * @todo Implement testSetIndex().
-     */
-    public function testSetIndex()
-    {
-    }
-
-    /**
-     * @todo Implement testGetIndex().
-     */
-    public function testGetIndex()
-    {
-    }
-
-    /**
-     * @todo Implement testSetLogging().
-     */
-    public function testSetLogging()
-    {
-    }
-
-    /**
-     * @todo Implement testGetLogging().
-     */
-    public function testGetLogging()
-    {
-    }
-
-    /**
-     * @todo Implement testGetCount().
-     */
-    public function testGetCount()
-    {
-    }
-
-    /**
-     * @todo Implement testSetOptions().
-     */
-    public function testSetOptions()
-    {
-    }
-
-    /**
-     * @todo Implement testGetOptions().
-     */
-    public function testGetOptions()
-    {
-    }
-
-    /**
-     * @todo Implement testSetReadOnly().
-     */
-    public function testSetReadOnly()
-    {
-    }
-
-    /**
-     * @todo Implement testGetReadOnly().
-     */
-    public function testGetReadOnly()
-    {
-    }
-
-    /**
-     * @todo Implement testSetSkipNext().
-     */
-    public function testSetSkipNext()
-    {
-    }
-
-    /**
-     * @todo Implement testGetSkipNext().
-     */
-    public function testGetSkipNext()
-    {
-    }
-
-    /**
-     * @todo Implement testSetEventHandlerSignature().
-     */
-    public function testSetEventHandlerSignature()
-    {
-    }
-
-    /**
-     * @todo Implement testGetEventHandlerSignature().
-     */
-    public function testGetEventHandlerSignature()
-    {
-    }
 }

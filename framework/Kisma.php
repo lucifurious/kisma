@@ -8,7 +8,7 @@
  */
 
 //*************************************************************************
-//* Namespace
+//* The Kisma Namespace
 //*************************************************************************
 
 /**
@@ -30,6 +30,7 @@ namespace Kisma
 	 */
 	require_once 'exceptions.php';
 
+
 	/**
 	 * Kisma
 	 * The mother of all Kisma classes
@@ -45,32 +46,12 @@ namespace Kisma
 	 * @property int $uniqueIdCounter
 	 * @property array $appParameters
 	 */
-	class Kisma implements IGlobalDebuggable
+	class Kisma implements IGlobalDebuggable, ISettings
 	{
 		//********************************************************************************
 		//* Private Members
 		//********************************************************************************
 
-		/**
-		 * @var App The current application
-		 * @static
-		 */
-		protected static $_app = null;
-		/**
-		 * @var AppController The current controller
-		 * @static
-		 */
-		protected static $_appController = null;
-		/**
-		 * @var array The current application parameters
-		 * @static
-		 */
-		protected static $_appParameters = null;
-		/**
-		 * @var AppUser The current user
-		 * @static
-		 */
-		protected static $_user = null;
 		/**
 		 * @var int A static ID counter for generating unique names
 		 * @static
@@ -81,6 +62,8 @@ namespace Kisma
 		 * @static
 		 */
 		protected static $_debugLevel = DebugLevel::Normal;
+		/** @var array Any settings you may want to store for later */
+		protected static $_settings = array();
 
 		//*************************************************************************
 		//* Public Methods
@@ -91,11 +74,22 @@ namespace Kisma
 		 * you, my humble geeks, to extend this class and have a built-in
 		 * constructor of sorts.
 		 *
-		 * @param array $options
+		 * @param array $settings
 		 * @return bool
 		 */
-		public static function initialize( $options = array() )
+		public static function initialize( $settings = array() )
 		{
+			//	Save passed in options...
+			self::$_settings = self::cleanOptions( $settings );
+
+			//	Get our base path and save...
+			self::so( self::$_settings, \KismaSettings::BasePath, __DIR__ );
+
+			if ( self::getDebugLevel( \Kisma\DebugLevel::Verbose ) )
+			{
+				self::logDebug( '\Kisma\Kisma object initialized.' );
+			}
+
 			return true;
 		}
 
@@ -111,9 +105,10 @@ namespace Kisma
 		 *
 		 * @param string $tag
 		 * @param bool $isKey If true, the $tag will be converted to a format suitable for use as an array key
+		 * @param bool $baseNameOnly If true, only the final, base of the tag will be returned.
 		 * @return string
 		 */
-		public static function kismaTag( $tag, $isKey = false )
+		public static function kismaTag( $tag, $isKey = false, $baseNameOnly = false )
 		{
 			if ( false !== strpos( $tag, '.' ) )
 			{
@@ -125,6 +120,13 @@ namespace Kisma
 			$_tag = str_replace( ' ', null, ucwords( trim( str_replace( '_', ' ', $tag ) ) ) );
 
 			if ( false !== $isKey )
+			{
+				//	Convert namespace separators to dots
+				$_tag = str_replace( '\\', '.', $_tag );
+			}
+
+			//	Only the base?
+			if ( false !== $baseNameOnly )
 			{
 				//	If this is a key, just get the last part
 				$_tag = end( explode( '\\', $_tag ) );
@@ -156,7 +158,7 @@ namespace Kisma
 			$level++;
 
 			$_backTrace = debug_backtrace();
-			$_function = self::o( $_backTrace[$level], 'function' );
+			$_function = self::o( $_backTrace[$level], 'method', self::o( $_backTrace[$level], 'function', '__unknown__' ) );
 			$_class = self::o( $_backTrace[$level], 'class' );
 
 			return ( null !== $_class ? $_class . self::o( $_backTrace[$level], 'type' ) : null ) . $_function;
@@ -239,10 +241,10 @@ namespace Kisma
 
 		/**
 		 * Takes a list of things and returns them in an array as the values. Keys are maintained.
-		 * @param mixed $_ [optional]
+		 * @param mixed [optional]
 		 * @return array
 		 */
-		public static function createArray( &$_ = null )
+		public static function createArray()
 		{
 			$_array = array();
 
@@ -264,10 +266,10 @@ namespace Kisma
 		 * item is returned. Good for setting default values, etc. Last non-null value in list becomes the
 		 * new "default value".
 		 * NOTE: Since PHP evaluates the arguments before calling a function, this is NOT a short-circuit method.
-		 * @param mixed $_ [optional]
+		 * @param mixed [optional]
 		 * @return mixed
 		 */
-		public static function nvl( &$_ = null )
+		public static function nvl()
 		{
 			$_defaultValue = null;
 
@@ -289,10 +291,10 @@ namespace Kisma
 		 * The first argument is the needle, the rest are considered in the haystack. For example:
 		 * Kisma::in( 'x', 'x', 'y', 'z' ) returns true
 		 * Kisma::in( 'a', 'x', 'y', 'z' ) returns false
-		 * @param mixed $_ [optional]
+		 * @param mixed [optional]
 		 * @return boolean
 		 */
-		public static function in( &$_ = null )
+		public static function in()
 		{
 			//	Clever or dumb? Dunno...
 			return in_array( array_shift( func_get_args() ), func_get_args() );
@@ -320,14 +322,13 @@ namespace Kisma
 		}
 
 		/**
-		 * Takes the arguments and makes a file path out of them. No leading or trailing
-		 * separator is added.
-		 * @param mixed $_ [optional]
+		 * Takes the arguments and concatenates them with $separator in between.
+		 * @param string $separator
 		 * @return string
 		 */
-		public static function makePath( &$_ = null )
+		public static function glue( $separator )
 		{
-			return implode( DIRECTORY_SEPARATOR, func_get_args() );
+			return implode( $separator, func_get_args() );
 		}
 
 		/**
@@ -379,6 +380,42 @@ namespace Kisma
 		//*************************************************************************
 
 		/**
+		 * Takes a non-standardized array of options and cleans them up
+		 *
+		 * @param array $options
+		 * @param bool $recursive If true, and an array value is an array, it too will be cleaned.
+		 * @return array The rebuilt array
+		 */
+		public static function cleanOptions( array $options = array(), $recursive = true )
+		{
+			$_options = array();
+
+			foreach ( $options as $_key => $_value )
+			{
+				if ( false !== $recursive && is_array( $_value ) )
+				{
+					$_value = self::cleanOptions( $_value, $recursive );
+				}
+
+				$_options[self::kismaTag( $_key, true, false )] = $_value;
+			}
+
+			return $_options;
+		}
+
+		/**
+		 * Retrieves an value from the system settings
+		 *
+		 * @param string $key
+		 * @param mixed|null $defaultValue
+		 * @return mixed
+		 */
+		public static function getSetting( $key, $defaultValue = null )
+		{
+			return self::o( self::$_settings, $key, $defaultValue );
+		}
+
+		/**
 		 * Alias for {@link \Kisma\Kisma::o)
 		 * @param array $options
 		 * @param string $key
@@ -386,7 +423,7 @@ namespace Kisma
 		 * @param boolean $unsetValue
 		 * @return mixed
 		 */
-		public static function getOption( array &$options = array(), $key, $defaultValue = null, $unsetValue = false )
+		public static function getOption( array $options = array(), $key, $defaultValue = null, $unsetValue = false )
 		{
 			return self::o( $options, $key, $defaultValue, $unsetValue );
 		}
@@ -402,10 +439,10 @@ namespace Kisma
 		 * @return mixed
 		 * @see \Kisma\Kisma::getOption
 		 */
-		public static function o( array &$options = array(), $key, $defaultValue = null, $unsetValue = false )
+		public static function o( array $options = array(), $key, $defaultValue = null, $unsetValue = false )
 		{
 			//	Standardize the key
-			$key = self::kismaTag( $key, true );
+			$key = self::kismaTag( $key, true, false );
 
 			//	Set the default value
 			$_newValue = $defaultValue;
@@ -462,7 +499,7 @@ namespace Kisma
 		 * @param mixed $defaultValue Only applies to target value
 		 * @return mixed
 		 */
-		public static function oo( array &$options = array(), $key, $subKey, $defaultValue = null, $unsetValue = false )
+		public static function oo( array $options = array(), $key, $subKey, $defaultValue = null, $unsetValue = false )
 		{
 			return self::o(
 				self::o(
@@ -500,7 +537,7 @@ namespace Kisma
 		{
 			if ( is_array( $options ) )
 			{
-				return $options[self::kismaTag( $key, true )] = $value;
+				return $options[self::kismaTag( $key, true, false )] = $value;
 			}
 			else if ( is_object( $options ) )
 			{
@@ -528,7 +565,7 @@ namespace Kisma
 		 * @param string $key
 		 * @return mixed The new value of the key
 		 */
-		public static function uo( array &$options, $key )
+		public static function uo( array &$options = array(), $key )
 		{
 			return self::o( $options, $key, null, true );
 		}
@@ -600,6 +637,7 @@ namespace Kisma
 			{
 				$_aspectCheck = true;
 
+				/** @var $object \Kisma\IAspectable */
 				foreach ( $object->getAspects() as $_aspect )
 				{
 					try
@@ -723,7 +761,7 @@ namespace Kisma
 		 */
 		public static function hasComponent( $map, $name, $returnObject = false )
 		{
-			$_key = K::kismaTag( $name, true );
+			$_key = self::kismaTag( $name, true );
 
 			return
 				is_array( $map ) && isset( $map[$_key] )
@@ -745,48 +783,6 @@ namespace Kisma
 		//*************************************************************************
 		//* Properties
 		//*************************************************************************
-
-		/**
-		 * @return \Controller
-		 */
-		public static function getAppController()
-		{
-			return self::$_appController;
-		}
-
-		/**
-		 * @return \CWebUser
-		 */
-		public static function getUser()
-		{
-			return self::$_user;
-		}
-
-		/**
-		 * @return \Application
-		 */
-		public static function getApp()
-		{
-			return self::$_app;
-		}
-
-		/**
-		 * @return array
-		 */
-		public static function getAppParameters()
-		{
-			return self::$_appParameters;
-		}
-
-		/**
-		 * @param string $parameter
-		 * @param mixed|null $defaultValue
-		 * @return mixed
-		 */
-		public static function getParameter( $parameter, $defaultValue = null )
-		{
-			return self::o( self::$_appParameters, $parameter, $defaultValue );
-		}
 
 		/**
 		 * @param int $uniqueIdCounter
@@ -828,6 +824,22 @@ namespace Kisma
 			return ( self::$_debugLevel === $debugLevel );
 		}
 
+		/**
+		 * @param array $settings
+		 */
+		public static function setSettings( $settings = array() )
+		{
+			self::$_settings = $settings;
+		}
+
+		/**
+		 * @return array
+		 */
+		public static function getSettings()
+		{
+			return self::$_settings;
+		}
+
 	};
 
 	/**************************************************************************
@@ -844,7 +856,7 @@ namespace Kisma
 	function gestate( $className )
 	{
 		//	Get the namespace out of the way
-		$_root = str_replace( 'Kisma\\', null, Kisma::kismaTag( $className ) );
+		$_root = str_replace( __NAMESPACE__ . '\\', null, Kisma::kismaTag( $className ) );
 
 		//	Build the class name
 		$_class = __DIR__ .
@@ -859,12 +871,29 @@ namespace Kisma
 	 * Throw our autoloader into the mix
 	 */
 	spl_autoload_extensions( '.php' );
-	spl_autoload_register( __NAMESPACE__ . '\gestate' );
+	spl_autoload_register( __NAMESPACE__ . '\\gestate' );
 
 	//	Now start the engine!
 	Kisma::initialize();
-
-	//	And our shortcuts
-	require_once __DIR__ . DIRECTORY_SEPARATOR . 'K.php';
 } /** Ends Namespace \Kisma */
+
+/**
+ * A global alias of Kisma called "K"
+ */
+namespace
+{
+	//*************************************************************************
+	//* Classes
+	//*************************************************************************
+
+	/**
+	 * K
+	 * An alias to the Kisma base
+	 */
+	class K extends \Kisma\Kisma implements \KismaSettings
+	{
+		//	Nothing to see here, move along...
+	}
+
+}
 

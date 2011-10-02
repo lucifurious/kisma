@@ -75,7 +75,7 @@ namespace Kisma\Components
 				if ( in_array( $_eventName, array_keys( $this->_eventMap ) ) )
 				{
 					//	Bind our handler to the linker, pass self as $eventData
-					$linker->eventHandling->bind(
+					$linker->{$this->getOption( \KismaOptions::AppEventClass, \KismaSettings::DefaultAppEventClass )}->bind(
 						$_eventName,
 						array(
 							$this,
@@ -93,7 +93,7 @@ namespace Kisma\Components
 		 * Unlinks the aspect from a $linker
 		 *
 		 * @param \Kisma\Components\Component $linker
-		 * @return Components\Aspect
+		 * @return \Kisma\Components\Aspect
 		 */
 		public function unlink( Component $linker )
 		{
@@ -102,7 +102,7 @@ namespace Kisma\Components
 			{
 				if ( in_array( $_eventName, array_keys( $this->_eventMap ) ) )
 				{
-					$linker->eventHandling->unbind(
+					$linker->{$this->getOption( \KismaOptions::AppEventClass, \KismaSettings::DefaultAppEventClass )}->unbind(
 						$_eventName,
 						array(
 							$this,
@@ -135,14 +135,14 @@ namespace Kisma\Components
 				$_mirror = new \ReflectionClass( $this->_linker );
 
 				//	See if there are any events that should be ignored
-				$_ignores = $this->getOption( 'ignore_events', array() );
+				$_ignores = $this->getOption( \KismaOptions::IgnoreEvents, array() );
 
 				//	Clean up the ignore list
 				array_walk(
 					$_ignores,
 					function( &$ignore )
 					{
-						$ignore = K::kismaTag( $ignore );
+						$ignore = \K::kismaTag( $ignore );
 					}
 				);
 
@@ -161,7 +161,7 @@ namespace Kisma\Components
 
 					if ( 0 == strcasecmp( $_stub, $this->_eventHandlerSignature ) )
 					{
-						$_eventKey = K::kismaTag( substr( $_realMethodName, $_length ), true );
+						$_eventKey = \K::kismaTag( substr( $_realMethodName, $_length ), true );
 
 						//	Map the callback to the key
 						$this->_eventMap[$_eventKey] = array(
@@ -186,14 +186,14 @@ namespace Kisma\Components
 		 * @param \Kisma\IAspectable $linker
 		 * @return \Kisma\Components\Aspect
 		 */
-		public function setLinker( \Kisma\IAspectable $linker )
+		public function setLinker( \Kisma\IAspectable $linker = null )
 		{
 			$this->_linker = $linker;
 			$this->_findEventHandlers( true );
 			return $this;
 		}
 		/**
-		 * @return Components\Component
+		 * @return \Kisma\Components\Component
 		 */
 		public function getLinker()
 		{
@@ -204,7 +204,7 @@ namespace Kisma\Components
 		 * @param string $eventHandlerSignature
 		 * @return \Kisma\Components\Aspect
 		 */
-		public function setEventHandlerSignature( $eventHandlerSignature )
+		public function setEventHandlerSignature( $eventHandlerSignature = 'on' )
 		{
 			$this->_eventHandlerSignature = $eventHandlerSignature;
 			return $this;
@@ -222,7 +222,7 @@ namespace Kisma\Components
 		 * @param array $eventMap
 		 * @return \Kisma\Components\Aspect
 		 */
-		public function setEventMap( $eventMap )
+		public function setEventMap( $eventMap = array() )
 		{
 			$this->_eventMap = $eventMap;
 			return $this;
