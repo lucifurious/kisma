@@ -1,0 +1,5 @@
+*.swp
+/docs
+/tests/coverage
+*.tar.gz
+*.tar.gz.sig

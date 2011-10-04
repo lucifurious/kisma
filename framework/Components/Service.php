@@ -29,8 +29,15 @@ namespace Kisma\Components;
 /**
  * Service
  * The base class for services provided
+ *
+ * Provides two events:
+ *
+ * onBeforeServiceCall and onAfterServiceCall which are called before and after
+ * the service is run, respectively.
+ *
+ * @property int $serviceType
  */
-class Service extends Component implements \Kisma\IService
+abstract class Service extends Component implements \Kisma\IService
 {
 	//********************************************************************************
 	//* Private Members

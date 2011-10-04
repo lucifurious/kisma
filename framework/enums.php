@@ -155,6 +155,42 @@ class DebugLevel extends \Kisma\KismaEnum
 /**
  *
  */
+class HashSeed extends \Kisma\KismaEnum
+{
+	const __default = self::All;
+
+	/**
+	 * @const int The various supported hash types for Utilities\Hash
+	 */
+	const All = 0;
+	const AlphaLower = 1;
+	const AlphaUpper = 2;
+	const Alpha = 3;
+	const AlphaNumeric = 4;
+	const AlphaLowerNumeric = 5;
+	const Numeric = 6;
+	const AlphaLowerNumericIdiotProof = 7;
+
+}
+
+/**
+ *
+ */
+class HashType extends \Kisma\KismaEnum
+{
+	const __default = self::SHA1;
+
+	/**
+	 * @const int Supported hash algorithms
+	 */
+	const MD5 = 1;
+	const SHA1 = 2;
+	const CRC32 = 18;
+}
+
+/**
+ *
+ */
 class OperationMode extends \Kisma\KismaEnum
 {
 	//*************************************************************************
@@ -311,7 +347,7 @@ class ServiceType extends \Kisma\KismaEnum
 	const Generic = 1;
 	const Sapi = 2;
 	const Cli = 3;
-	const Ajax = 4;
+	const Remote = 4;
 }
 
 /**

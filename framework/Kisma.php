@@ -30,7 +30,6 @@ namespace Kisma
 	 */
 	require_once 'exceptions.php';
 
-
 	/**
 	 * Kisma
 	 * The mother of all Kisma classes
@@ -172,8 +171,8 @@ namespace Kisma
 		 */
 		public static function logDebug( $logEntry, $tag = null )
 		{
-			$_caller = self::getCaller();
-			return self::log( $logEntry, $_caller, 'DEBUG' );
+			$_tag = $tag ?: self::getCaller();
+			return Utilities\Log::log( $logEntry, $_tag, 'DEBUG' );
 		}
 
 		/**
@@ -184,8 +183,8 @@ namespace Kisma
 		 */
 		public static function logError( $logEntry, $tag = null )
 		{
-			$_caller = self::getCaller();
-			return self::log( $logEntry, $_caller, 'ERROR' );
+			$_tag = $tag ?: self::getCaller();
+			return Utilities\Log::log( $logEntry, $_tag, 'ERROR' );
 		}
 
 		/**
@@ -373,6 +372,75 @@ namespace Kisma
 		{
 			$_result = @unserialize( $value );
 			return !( false === $_result && $value != serialize( false ) );
+		}
+
+		/**
+		 * Sets a value within an array only if the value is not set (SetIfNotSet=SINS)
+		 *
+		 * @param array $options
+		 * @param string $key
+		 * @param mixed $value
+		 * @return bool
+		 */
+		public static function sins( &$options = array(), $key, $value )
+		{
+			//	If the key is set, we bail...
+			if ( !is_array( $options ) || isset( $options, $options[$key] ) )
+			{
+				return false;
+			}
+
+			//	Set the value.
+			$options[$key] = $value;
+			return true;
+		}
+
+		/**
+		 * Given a tag, make the namespace available to the app but don't trigger auto loading
+		 *
+		 * @param string $kismaTag
+		 * @param bool $loadClass
+		 * @return bool
+		 */
+		public static function uses( $kismaTag, $loadClass = false )
+		{
+			//	Get the namespace out of the way
+			$_root = str_replace( __NAMESPACE__ . '\\', null, self::kismaTag( $kismaTag ) );
+
+			//	Do we have it already?
+			if ( !class_exists( $_root, false ) && !interface_exists( $_root, false ) )
+			{
+				//	Already loaded!
+				return true;
+			}
+
+			//	Is it a wildcard?
+			if ( '*' == end( explode( '\\', $_root ) ) )
+			{
+				//	Strip off the star and the slashes
+				$_root = rtrim( rtrim( $_root, '\\' ), '*' );
+
+				return true;
+			}
+			else if ( is_dir( $_root ) )
+			{
+				//	Add to include path
+				ini_set( 'include_path', ini_get( 'include_path' ) . ':' . $_root );
+				eval( 'use ' . $_root );
+				return true;
+			}
+			//	Does it exist?
+			else if ( file_exists( $_root ) )
+			{
+				//	Do they want it loaded?
+				if ( false !== $loadClass )
+				{
+					return include_once( $_root );
+				}
+			}
+
+			//	No go
+			return false;
 		}
 
 		//*************************************************************************
@@ -864,6 +932,7 @@ namespace Kisma
 			trim( str_replace( '\\', DIRECTORY_SEPARATOR, Kisma::kismaTag( $_root ) ),  DIRECTORY_SEPARATOR ) .
 			'.php';
 
+		/** @noinspection PhpIncludeInspection */
 		return require_once( $_class );
 	}
 

@@ -83,6 +83,39 @@ namespace
 
 		const CreateIfNotFound = 'create_if_not_found';
 	}
+
+	/**
+	 * A special global interface for use with our K alias
+	 * Provides HTTP method names
+	 */
+	interface HttpMethods
+	{
+		//*************************************************************************
+		//* Constants
+		//*************************************************************************
+
+		/**
+		 * @const string
+		 */
+		const Get = 'GET';
+		/**
+		 * @const string
+		 */
+		const Post = 'POST';
+		/**
+		 * @const string
+		 */
+		const Put = 'PUT';
+		/**
+		 * @const string
+		 */
+		const Delete = 'DELETE';
+		/**
+		 * @const string
+		 */
+		const Head = 'HEAD';
+	}
+
 }
 
 /**
