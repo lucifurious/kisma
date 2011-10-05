@@ -938,7 +938,7 @@ class Sag {
      * Checking this again because $headers['Cookie'] could be set in two
      * different logic paths above.
      */
-    if(isset($headers,$headers['Cookie'])&&$headers['Cookie']) {
+    if($headers['Cookie']) {
       $buff = '';
 
       foreach($headers['Cookie'] as $k => $v) {

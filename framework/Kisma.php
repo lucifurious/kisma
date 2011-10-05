@@ -212,7 +212,8 @@ namespace Kisma
 		public static function createUniqueName( \Kisma\IComponent $component, $humanReadable = false )
 		{
 			$_name = get_class( $component ) . '.' . self::$_uniqueIdCounter++;
-			return 'kisma.' . ( $humanReadable ? $_name : \Kisma\Helpers\Hash::hash( $_name ) );
+			$_hash = \Kisma\Utilities\Hash( $_name );
+			return 'kisma.' . ( $humanReadable ? $_name : $_hash );
 		}
 
 		/**
@@ -407,30 +408,39 @@ namespace Kisma
 			//	Get the namespace out of the way
 			$_root = str_replace( __NAMESPACE__ . '\\', null, self::kismaTag( $kismaTag ) );
 
+			//	Is it a wildcard?
+			if ( '*' == end( explode( '\\', $_root ) ) )
+			{
+				//	Strip off the star and the slashes
+				$_root = rtrim( rtrim( $_root, DIRECTORY_SEPARATOR ), '*' );
+
+				//	Should be a directory now
+				if ( is_dir( $_root ) )
+				{
+					//	Add to include path
+					ini_set( 'include_path', ini_get( 'include_path' ) . ':' . $_root );
+					eval( 'use ' . $_root );
+					return true;
+				}
+			}
+
+			$_class =
+				__DIR__ .
+				DIRECTORY_SEPARATOR .
+				trim(
+					str_replace( '\\', DIRECTORY_SEPARATOR, Kisma::kismaTag( $_root ) ),
+					DIRECTORY_SEPARATOR
+				);
+
 			//	Do we have it already?
-			if ( !class_exists( $_root, false ) && !interface_exists( $_root, false ) )
+			if ( class_exists( $_class . '.php', false ) || interface_exists( $_class . '.php', false ) )
 			{
 				//	Already loaded!
 				return true;
 			}
 
-			//	Is it a wildcard?
-			if ( '*' == end( explode( '\\', $_root ) ) )
-			{
-				//	Strip off the star and the slashes
-				$_root = rtrim( rtrim( $_root, '\\' ), '*' );
-
-				return true;
-			}
-			else if ( is_dir( $_root ) )
-			{
-				//	Add to include path
-				ini_set( 'include_path', ini_get( 'include_path' ) . ':' . $_root );
-				eval( 'use ' . $_root );
-				return true;
-			}
 			//	Does it exist?
-			else if ( file_exists( $_root ) )
+			if ( file_exists( $_class . '.php' ) )
 			{
 				//	Do they want it loaded?
 				if ( false !== $loadClass )
@@ -438,6 +448,12 @@ namespace Kisma
 					return include_once( $_root );
 				}
 			}
+			else
+			{
+				//	Sorry charlie...
+				return false;
+			}
+
 
 			//	No go
 			return false;

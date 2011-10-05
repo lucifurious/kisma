@@ -6,14 +6,14 @@
  * Dual licensed under the MIT License and the GNU General Public License (GPL) Version 2.
  * See {@link http://github.com/Pogostick/kisma/licensing/} for complete information.
  *
- * @copyright     Copyright 2011, Pogostick, LLC. (http://www.pogostick.com/)
- * @link          http://github.com/Pogostick/kisma/ Kisma(tm)
- * @license       http://github.com/Pogostick/kisma/licensing/
- * @author        Jerry Ablan <kisma@pogostick.com>
- * @category      Kisma_Aspects_Storage_CouchDb
- * @package       kisma.aspects.storage
- * @namespace     \Kisma\Aspects\Storage
- * @since         v1.0.0
+ * @copyright	 Copyright 2011, Pogostick, LLC. (http://www.pogostick.com/)
+ * @link		  http://github.com/Pogostick/kisma/ Kisma(tm)
+ * @license	   http://github.com/Pogostick/kisma/licensing/
+ * @author		Jerry Ablan <kisma@pogostick.com>
+ * @category	  Kisma_Aspects_Storage_CouchDb
+ * @package	   kisma.aspects.storage
+ * @namespace	 \Kisma\Aspects\Storage
+ * @since		 v1.0.0
  * @filesource
  */
 
@@ -36,6 +36,7 @@ namespace
 		'..',
 		'vendors',
 		'sag',
+		'src',
 		'Sag.php'
 	);
 }
@@ -69,7 +70,37 @@ namespace Kisma\Aspects\Storage
 	 * @property string $password
 	 * @property string $database
 	 * @property \Sag $sag
-	 * 
+	 *
+	 * Sag Methods
+	 * ===========
+	 * @method mixed login( $user, $pass, $type = null )
+	 * @method stdClass getSession()
+	 * @method \Sag decode( $decode )
+	 * @method mixed get( $url )
+	 * @method mixed head( $url )
+	 * @method mixed delete( $id, $rev )
+	 * @method mixed put( $id, $data )
+	 * @method mixed post( $data, $path = null )
+	 * @method mixed bulk( $docs, $allOrNothing = false )
+	 * @method mixed copy( $sourceId, $destinationId, $destinationRev )
+	 * @method \Sag setDatabase( $databaseName, $createIfNotFound = false )
+	 * @method mixed getAllDocs( $incDocs = false, $limit = null, $startKey = null, $endKey = null, $keys = null )
+	 * @method mixed getAllDatabases()
+	 * @method mixed generateIDs()
+	 * @method mixed createDatabase( $databaseName )
+	 * @method mixed deleteDatabase( $datbaseName )
+	 * @method mixed replicate( $src, $target, $continuous = false, $createTarget = null, $filter = null, $filterQueryParams = null )
+	 * @method mixed compact( $viewName = null )
+	 * @method mixed setAttachment( $name, $data, $contentType, $docID, $rev = null )
+	 * @method \Sag setOpenTimeout( $seconds )
+	 * @method \Sag setRWTimeout( $seconds, $microSeconds = 0 )
+	 * @method \Sag setCache( &$cacheImplementer )
+	 * @method \SagCache getCache()
+	 * @method string currentDatabase()
+	 * @method stdClass getStats()
+	 * @method \Sag setStaleDefault( $stale )
+	 * @method \Sag setCookie( $key, $value )
+	 * @method string getCookie( $key )
 	 */
 	class CouchDb extends Components\Aspect implements \Kisma\IStorage
 	{
@@ -101,6 +132,11 @@ namespace Kisma\Aspects\Storage
 		 * @var \Sag
 		 */
 		protected $_sag = null;
+		/**
+		 * @var string When opening a database, you have the option of having a design document created for you. If you do so,
+		 * it will be called this
+		 */
+		protected $_designDocumentName = '_design/document';
 
 		//*************************************************************************
 		//* Public Methods
@@ -246,17 +282,78 @@ namespace Kisma\Aspects\Storage
 		/**
 		 * @param string $database
 		 * @param bool $createIfNotFound
+		 * @param bool $createDesignIfNotFound
 		 * @return \Kisma\Aspects\Storage\CouchDb
 		 */
-		public function setDatabase( $database = null, $createIfNotFound = false )
+		public function setDatabase( $database = null, $createIfNotFound = false, $createDesignIfNotFound = true )
 		{
 			$this->_database = $database;
 
 			if ( null !== $this->_sag )
 			{
 				$this->_sag->setDatabase( $database, $createIfNotFound );
+
+				//	Create a design document if desired, and not created already
+				if ( false !== $createDesignIfNotFound )
+				{
+					try
+					{
+						if ( $this->_sag->head( $this->_designDocumentName )->headers->_HTTP->status != '404' )
+						{
+							return true;
+						}
+					}
+					catch ( \Exception $_ex )
+					{
+						//	Some kinda hot tub database issue
+						if ( 409 == $_ex->getCode() )
+						{
+							return $this;
+						}
+					}
+
+					//	Build the design document
+					$_doc = new \stdClass();
+					$_doc->_id = $this->_designDocumentName;
+					$_doc->views = new \stdClass();
+					$_doc->views->createDate = new \stdClass();
+					$_doc->views->createDate->map = 'function(doc) { emit(doc.create_date, null); }';
+
+					try
+					{
+						//	Store it
+						$this->_sag->put( $this->_designDocumentName, $_doc );
+					}
+					catch ( \Exception $_ex )
+					{
+						/**
+						 * A 409 status code means there was a conflict, so another client already created the design doc for us. This is fine. */
+						if ( 409 == $_ex->getCode() )
+						{
+							return $this;
+						}
+					}
+				}
 			}
 
+			return $this;
+		}
+
+		/**
+		 * @return string
+		 */
+		public function getDesignDocumentName()
+		{
+			return $this->_designDocumentName;
+		}
+
+		/**
+		 * @param string $designDocumentName
+		 * @return $this
+		 */
+		public function setDesignDocumentName( $designDocumentName )
+		{
+			$this->_designDocumentName = $designDocumentName;
 			return $this;
 		}
 

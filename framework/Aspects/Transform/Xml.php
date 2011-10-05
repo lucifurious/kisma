@@ -67,7 +67,7 @@ class Xml extends \Kisma\Components\Aspect implements \Kisma\ITransform
 	 * @param mixed $options
 	 * @return string
 	 */
-	public function xmlTransform( $value, $options = null )
+	public function transform( $value, $options = null )
 	{
 		//	Load options
 		$this->_loadConfiguration( $options, true );
@@ -79,7 +79,7 @@ class Xml extends \Kisma\Components\Aspect implements \Kisma\ITransform
 
 		$_output = $this->_xml->saveXML();
 		\Kisma\Kisma::logDebug( 'Xml Transform: ' . $_output );
-		
+
 		return $_output;
 	}
 

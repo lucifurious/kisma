@@ -55,6 +55,16 @@ namespace Kisma\Utilities
 		//********************************************************************************
 
 		/**
+		 * Our default function
+		 * @static
+		 * @return mixed
+		 */
+		public static function __invoke()
+		{
+			return call_user_func_array( array( '\Kisma\Utilties\Hash::hash' ), func_get_args() );
+		}
+
+		/**
 		 * Generates a unique hash code
 		 *
 		 * @param int $hashLength
