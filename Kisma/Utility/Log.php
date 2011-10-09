@@ -84,7 +84,7 @@ namespace Kisma\Utility
 		{
 			if ( null === $tag )
 			{
-				$tag = self::_getCallingMethod();
+				$tag = self::_getCallingMethod( self::$_baseLevel );
 			}
 
 			//	Get the indent, if any
@@ -208,7 +208,7 @@ namespace Kisma\Utility
 		 * @param integer $level The level of the call
 		 * @return string
 		 */
-		protected static function _getCallingMethod( $level = 1 )
+		protected static function _getCallingMethod( $level = 2 )
 		{
 			$_className = null;
 
