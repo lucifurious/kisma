@@ -7,16 +7,11 @@
  * @property boolean $handled
  */
 
-//*************************************************************************
-//* The Kisma Namespace
-//*************************************************************************
-
 /**
- * @namespace \Kisma
+ * Pull our enums, interfaces, and exceptions into the GNS.
  */
-namespace Kisma
-{	/** Starts Namespace \Kisma */
-
+namespace
+{
 	/**************************************************************************
 	 ** Requirements
 	 **************************************************************************/
@@ -29,6 +24,19 @@ namespace Kisma
 	 * Exceptions
 	 */
 	require_once 'exceptions.php';
+}
+
+//*************************************************************************
+//* The Kisma Namespace
+//*************************************************************************
+
+/**
+ * @namespace \Kisma
+ */
+namespace Kisma
+{	/** Starts Namespace \Kisma */
+
+	use \Kisma\Utility as Utility;
 
 	/**
 	 * Kisma
@@ -109,6 +117,7 @@ namespace Kisma
 		 */
 		public static function kismaTag( $tag, $isKey = false, $baseNameOnly = false )
 		{
+			//	If we're dotted, clean up
 			if ( false !== strpos( $tag, '.' ) )
 			{
 				//	Convert dots to spaces, then spaces to namespace separators.
@@ -121,7 +130,7 @@ namespace Kisma
 			if ( false !== $isKey )
 			{
 				//	Convert namespace separators to dots
-				$_tag = str_replace( '\\', '.', $_tag );
+				$_tag = lcfirst( str_replace( '\\', '.', $_tag ) );
 			}
 
 			//	Only the base?
@@ -172,7 +181,7 @@ namespace Kisma
 		public static function logDebug( $logEntry, $tag = null )
 		{
 			$_tag = $tag ?: self::getCaller();
-			return Utilities\Log::log( $logEntry, $_tag, 'DEBUG' );
+			return Utility\Log::log( $logEntry, $_tag, 'DEBUG' );
 		}
 
 		/**
@@ -184,7 +193,7 @@ namespace Kisma
 		public static function logError( $logEntry, $tag = null )
 		{
 			$_tag = $tag ?: self::getCaller();
-			return Utilities\Log::log( $logEntry, $_tag, 'ERROR' );
+			return Utility\Log::log( $logEntry, $_tag, 'ERROR' );
 		}
 
 		/**
@@ -212,7 +221,7 @@ namespace Kisma
 		public static function createUniqueName( \Kisma\IComponent $component, $humanReadable = false )
 		{
 			$_name = get_class( $component ) . '.' . self::$_uniqueIdCounter++;
-			$_hash = \Kisma\Utilities\Hash( $_name );
+			$_hash = Utility\Hash( $_name );
 			return 'kisma.' . ( $humanReadable ? $_name : $_hash );
 		}
 
@@ -864,6 +873,62 @@ namespace Kisma
 					false;
 		}
 
+		/**
+		 * Prepares and births your objects...
+		 * (read: smart namespace autoloader)
+		 *
+		 * @param string $className
+		 * @return mixed
+		 */
+		public static function gestate( $className )
+		{
+			static $_extensions, $_paths;
+
+			if ( null === $_extensions )
+			{
+				$_extensions = array_map(
+					'trim',
+					explode( ',', spl_autoload_extensions() )
+				);
+			}
+
+			if ( null === $_paths )
+			{
+				$_paths = explode( PATH_SEPARATOR, get_include_path() );
+			}
+
+			//	Build the class name
+			$_class = trim(
+				str_replace( '\\', DIRECTORY_SEPARATOR, self::kismaTag( $className ) ),
+				DIRECTORY_SEPARATOR
+			);
+
+			//	Are we aware of this class?
+			if ( class_exists( $_class, false ) || interface_exists( $_class, false ) )
+			{
+				return true;
+			}
+
+			//	Look for the class
+			foreach ( $_paths as $_path )
+			{
+				$_path .= str_replace( '//', null, ( DIRECTORY_SEPARATOR !== $_path[strlen( $_path ) - 1] ) ? DIRECTORY_SEPARATOR : '' );
+
+				foreach ( $_extensions as $_extension )
+				{
+					$_file = $_path . $_class . $_extension;
+
+					if ( file_exists( $_file ) )
+					{
+						/** @noinspection PhpIncludeInspection */
+						return require_once $_file;
+					}
+				}
+			}
+
+			throw new \Exception( 'Class "' . $_class . '" not found.' );
+		}
+
 		//*************************************************************************
 		//* Properties
 		//*************************************************************************
@@ -926,40 +991,6 @@ namespace Kisma
 
 	};
 
-	/**************************************************************************
-	 ** Kisma Autoloader
-	 **************************************************************************/
-
-	/**
-	 * Prepares and births your objects...
-	 * (read: autoloader)
-	 *
-	 * @param string $className
-	 * @return mixed
-	 */
-	function gestate( $className )
-	{
-		//	Get the namespace out of the way
-		$_root = str_replace( __NAMESPACE__ . '\\', null, Kisma::kismaTag( $className ) );
-
-		//	Build the class name
-		$_class = __DIR__ .
-			DIRECTORY_SEPARATOR .
-			trim( str_replace( '\\', DIRECTORY_SEPARATOR, Kisma::kismaTag( $_root ) ),  DIRECTORY_SEPARATOR ) .
-			'.php';
-
-		/** @noinspection PhpIncludeInspection */
-		return require_once( $_class );
-	}
-
-	/**
-	 * Throw our autoloader into the mix
-	 */
-	spl_autoload_extensions( '.php' );
-	spl_autoload_register( __NAMESPACE__ . '\\gestate' );
-
-	//	Now start the engine!
-	Kisma::initialize();
 } /** Ends Namespace \Kisma */
 
 /**
@@ -980,5 +1011,19 @@ namespace
 		//	Nothing to see here, move along...
 	}
 
+	//*************************************************************************
+	//* Initialize the framework
+	//*************************************************************************
+
+	/**
+	 * Set up the autoloader
+	 */
+	\set_include_path( __DIR__ . PATH_SEPARATOR . get_include_path() );
+	\spl_autoload_extensions( '.php' );
+	\spl_autoload_register();
+	\spl_autoload_register( '\\Kisma\\Kisma::gestate', true, true );
+
+	//	Now start the engine!
+	\Kisma\Kisma::initialize();
 }
 

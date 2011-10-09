@@ -46,7 +46,11 @@ namespace
 		/**
 		 * @const string The default application event class
 		 */
-		const DefaultAppEventClass = 'kisma.aspects.reactors.app_event';
+		const DefaultComponentEventClass = 'kisma.aspects.reactors.component_event';
+		/**
+		 * @const string The default service event class
+		 */
+		const DefaultServiceEventClass = 'kisma.aspects.reactors.service_event';
 		/**
 		 * @const string The default object storage class
 		 */
@@ -74,7 +78,7 @@ namespace
 
 		const IgnoreEvents = 'ignore_events';
 
-		const AppEventClass = 'app_event_class';
+		const ComponentEventClass = 'component_event_class';
 		const ObjectStorageClass = 'object_storage_class';
 
 		const AspectOptions = 'aspect.options';
@@ -82,38 +86,6 @@ namespace
 		const Options = 'options';
 
 		const CreateIfNotFound = 'create_if_not_found';
-	}
-
-	/**
-	 * A special global interface for use with our K alias
-	 * Provides HTTP method names
-	 */
-	interface HttpMethods
-	{
-		//*************************************************************************
-		//* Constants
-		//*************************************************************************
-
-		/**
-		 * @const string
-		 */
-		const Get = 'GET';
-		/**
-		 * @const string
-		 */
-		const Post = 'POST';
-		/**
-		 * @const string
-		 */
-		const Put = 'PUT';
-		/**
-		 * @const string
-		 */
-		const Delete = 'DELETE';
-		/**
-		 * @const string
-		 */
-		const Head = 'HEAD';
 	}
 
 }
@@ -270,12 +242,20 @@ namespace Kisma
 	interface IAspect extends IConfigurable, IObservable
 	{
 		/**
-		 * Returns the currently linked parent
+		 * Link to a parent component
 		 *
-		 * @param \Kisma\IAspectable $linker
-		 * @return \Kisma\IAspect
+		 * @param \Kisma\Components\Component $linker
+		 * @return \Kisma\Components\Aspect
 		 */
-		public function setLinker( IAspectable $linker );
+		public function link( \Kisma\Components\Component $linker );
+
+		/**
+		 * Unlinks the aspect from a $linker
+		 *
+		 * @param \Kisma\Components\Component $linker
+		 * @return \Kisma\Components\Aspect
+		 */
+		public function unlink( \Kisma\Components\Component $linker );
 
 		/**
 		 * Returns the currently linked parent
@@ -408,7 +388,7 @@ namespace Kisma
 	/**
 	 * An interface for event classes
 	 */
-	interface IEvent extends IComponent
+	interface IEvent extends IKisma
 	{
 	}
 
@@ -688,5 +668,112 @@ HTML;
 	 */
 	interface IController extends IRouter
 	{
+	}
+
+	/**
+	 * An interface defining all of the currently known HTTP v1.1 response codes
+	 */
+	interface IHttpResponse extends IConstantProvider
+	{
+		//*************************************************************************
+		//* Constants
+		//*************************************************************************
+
+		/**
+		 * Success/Status (2xx)
+		 */
+		const Ok = 200;
+		const Created = 201;
+		const Accepted = 202;
+		const NonAuthoritativeInformation = 203;
+		const NoContent = 204;
+		const ResetContent = 205;
+		const PartialContent = 206;
+
+		/**
+		 * Redirection (3xx)
+		 */
+		const MultipleChoices = 300;
+		const MovedPermanently = 301;
+		const Found = 302;
+		const SeeOther = 303;
+		const NotModified = 304;
+		const UseProxy = 305;
+		const TemporaryRedirect = 307;
+
+		/**
+		 * Client Errors (4xx)
+		 */
+		const BadRequest = 400;
+		const Unauthorized = 401;
+		const PaymentRequired = 402;
+		const Forbidden = 403;
+		const NotFound = 404;
+		const MethodNotAllowed = 405;
+		const NotAcceptable = 406;
+		const ProxyAuthenticationRequired = 407;
+		const RequestTimeout = 408;
+		const Conflict = 409;
+		const Gone = 410;
+		const LengthRequired = 411;
+		const PreconditionFailed = 412;
+		const RequestEntityTooLarge = 413;
+		const RequestUriTooLong = 414;
+		const UnsupportedMediaType = 415;
+		const RequestedRangeNotSatisfiable = 416;
+		const ExpectationFailed = 417;
+
+		/**
+		 * Server Errors (5xx)
+		 */
+		const InternalServerError = 500;
+		const NotImplemented = 501;
+		const BadGateway = 502;
+		const ServiceUnavailable = 503;
+		const GatewayTimeout = 504;
+		const HttpVersionNotSupported = 505;
+	}
+
+	/**
+	 * Provides HTTP method names
+	 */
+	interface IHttpMethod extends IConstantProvider
+	{
+		//*************************************************************************
+		//* Constants
+		//*************************************************************************
+
+		/**
+		 * @const string
+		 */
+		const Options = 'OPTIONS';
+		/**
+		 * @const string
+		 */
+		const Get = 'GET';
+		/**
+		 * @const string
+		 */
+		const Head = 'HEAD';
+		/**
+		 * @const string
+		 */
+		const Post = 'POST';
+		/**
+		 * @const string
+		 */
+		const Put = 'PUT';
+		/**
+		 * @const string
+		 */
+		const Delete = 'DELETE';
+		/**
+		 * @const string
+		 */
+		const Trace = 'TRACE';
+		/**
+		 * @const string
+		 */
+		const Connect = 'CONNECT';
 	}
 }

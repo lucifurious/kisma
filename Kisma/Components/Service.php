@@ -47,6 +47,10 @@ abstract class Service extends Component implements \Kisma\IService
 	 * @var \Kisma\ServiceType The type of service provided by this object
 	 */
 	protected $_serviceType = \Kisma\ServiceType::Generic;
+	/**
+	 * @var string The name of this service
+	 */
+	protected $_serviceName = null;
 
 	//*************************************************************************
 	//* Event Handlers
@@ -92,6 +96,24 @@ abstract class Service extends Component implements \Kisma\IService
 	public function getServiceType()
 	{
 		return $this->_serviceType;
+	}
+
+	/**
+	 * @param string $serviceName
+	 * @return \Kisma\Components\Service
+	 */
+	public function setServiceName( $serviceName )
+	{
+		$this->_serviceName = $serviceName;
+		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getServiceName()
+	{
+		return $this->_serviceName;
 	}
 
 }

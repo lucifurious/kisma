@@ -69,6 +69,13 @@ class KismaException extends \Exception
 	}
 }
 
+/**
+ *
+ */
+class ComponentException extends KismaException
+{
+}
+
 /**************************************************************************
  ** Process Lock
  **************************************************************************/
@@ -152,7 +159,6 @@ class WriteOnlyPropertyException extends PropertyException
 class AutoPropertyException extends PropertyException
 {
 }
-
 //*************************************************************************
 //* Database 
 //*************************************************************************
@@ -160,16 +166,10 @@ class AutoPropertyException extends PropertyException
 /**
  *
  */
-class DatabaseException extends KismaException
-{
-}
-
-/**
- *
- */
-class ComponentException extends KismaException
-{
-}
+class StorageException extends KismaException {}
+class DatabaseException extends StorageException {}
+class ObjectStorageException extends StorageException {}
+class CouchDbException extends StorageException {}
 
 /**************************************************************************
  ** Events
@@ -186,5 +186,12 @@ class EventException extends KismaException
  * Thrown when an event handler is given a bogus handler
  */
 class InvalidEventHandlerException extends EventException
+{
+}
+
+/**
+ * Services
+ */
+class ServiceException extends ComponentException
 {
 }

@@ -38,12 +38,14 @@ namespace Kisma\Services\Remote
 	use Kisma\Aspects as Aspects;
 	use Kisma\Components as Components;
 	use Kisma\Services as Services;
+	use Kisma\IHttpMethod as Method;
+	use Kisma\IHttpResponse as Response;
 
 	/**
 	 * Http
 	 * A base service to provide communication to an HTTP-based service
 	 */
-	class Http extends Services\Remote
+	class Http extends Services\Remote  implements \Kisma\IHttpMethod, \Kisma\IHttpResponse
 	{
 		//*************************************************************************
 		//* Private Members
@@ -66,7 +68,7 @@ namespace Kisma\Services\Remote
 		{
 			if ( !function_exists( 'curl_init' ) )
 			{
-				throw new ServiceException( 'The Http service requires the installation of cURL.' );
+				throw new \Kisma\ServiceException( 'The Http service requires the installation of cURL.' );
 			}
 
 			parent::__construct( $options );
@@ -81,12 +83,12 @@ namespace Kisma\Services\Remote
 		 * @param array $curlOptions
 		 * @return mixed|null|false
 		 */
-		public function call( $method = \HttpMethods::Get, $url, $payload = array(), $curlOptions = array() )
+		public function call( $method = Method::Get, $url, $payload = array(), $curlOptions = array() )
 		{
 			//	Not an array of payload?
 			if ( !empty( $payload ) && !is_array( $payload ) )
 			{
-				throw new ServiceException( '"$payload" must be an array of key => value pairs.' );
+				throw new \Kisma\ServiceException( '"$payload" must be an array of key => value pairs.' );
 			}
 
 			//	Our return results
@@ -101,17 +103,17 @@ namespace Kisma\Services\Remote
 
 			$_curl = curl_init();
 
-			K::sins( $curlOptions, CURLOPT_RETURNTRANSFER, true );
-			K::sins( $curlOptions, CURLOPT_FAILONERROR, true );
-			K::sins( $curlOptions, CURLOPT_TIMEOUT, 30 );
-			K::sins( $curlOptions, CURLOPT_SSL_VERIFYPEER, false );
-			K::sins( $curlOptions, CURLOPT_FOLLOWLOCATION, true );
+			\K::sins( $curlOptions, CURLOPT_RETURNTRANSFER, true );
+			\K::sins( $curlOptions, CURLOPT_FAILONERROR, true );
+			\K::sins( $curlOptions, CURLOPT_TIMEOUT, 30 );
+			\K::sins( $curlOptions, CURLOPT_SSL_VERIFYPEER, false );
+			\K::sins( $curlOptions, CURLOPT_FOLLOWLOCATION, true );
 
 			//	Now set all the options at once!
 			curl_setopt_array( $_curl, $curlOptions );
 
 			//	If this is a post, we have to put the post data in another field...
-			if ( \HttpMethods::Post == $_method )
+			if ( Method::Post == $_method )
 			{
 				curl_setopt( $_curl, CURLOPT_URL, $url );
 				curl_setopt( $_curl, CURLOPT_POST, true );
@@ -119,14 +121,20 @@ namespace Kisma\Services\Remote
 			}
 			else
 			{
-				curl_setopt( $_curl, CURLOPT_URL, $url . ( \HttpMethods::Get == $_method ? ( !empty( $_payload ) ? '?' . trim( $_payload, '&' ) : '' ) : '' ) );
+				curl_setopt( $_curl, CURLOPT_URL, $url . ( Method::Get == $_method ? ( !empty( $_payload ) ? '?' . trim( $_payload, '&' ) : '' ) : '' ) );
 			}
 
 			$this->_callInfo = null;
+
+			$this->trigger( 'before_service_call', $curlOptions );
+
 			$_result = curl_exec( $_curl );
+
 			$this->_callInfo = curl_getinfo( $_curl );
 			$this->_callInfo['curl.error'] = curl_error( $_curl );
 			$this->_callInfo['curl.errno'] = curl_errno( $_curl );
+
+			$this->trigger( 'after_service_call', $this->_callInfo );
 
 			return $_result;
 		}

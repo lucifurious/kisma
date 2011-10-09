@@ -14,8 +14,8 @@
  * @author Jerry Ablan <yiixl@pogostick.com>
  */
 
-//	YiiXL bootstrap
-require_once '/opt/kisma/framework/Kisma.php';
+//	Kisma bootstrap
+require_once '/opt/kisma/Kisma.php';
 
 /**
  * Set some basic values to properly configure the return array

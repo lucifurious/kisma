@@ -2,7 +2,7 @@
 //	Include the common stuff...
 require_once __DIR__ . '/common.php';
 
-$_frameworkPath = __DIR__ . '/../../framework';
+$_frameworkPath = __DIR__ . '/../../src';
 
 Yii::setPathOfAlias( 'kisma', $_frameworkPath );
 

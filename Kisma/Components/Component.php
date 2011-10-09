@@ -49,7 +49,11 @@ namespace Kisma\Components
 	 * Properties: Always exist, and always have a default value.
 	 * ===========================================================================
 	 * @property Aspect[] $aspects
-	 * @property Aspects\Reactors\AppEvent $eventHandling
+	 * @property Aspects\Reactors\ComponentEvent $eventHandling
+	 *
+	 * Methods
+	 * =======
+	 * @method \boolean trigger( $eventName, $eventData = array(), $callback = null )
 	 *
 	 * Options: May or may not be set, use as you'd like
 	 * ===========================================================================
@@ -106,7 +110,28 @@ namespace Kisma\Components
 		}
 
 		/**
+		 * Destructor
+		 */
+		public function __destruct()
+		{
+			//	Fire an event
+			$this->trigger( 'before_destruct' );
+		}
+
+		/**
 		 * Magic getter. Used to provide aspects as virtual properties
+		 *
+		 * Example:
+		 *
+		 *	$_serializedObject = $this->{\KismaOptions::ObjectStorageClass}->serialize();
+		 *
+		 * 	or
+		 *
+		 *	$_objectStorage= $this->{\KismaOptions::ObjectStorageClass};
+		 *	if ( $_objectStorage->offsetExists( $object ) )
+		 *	{
+		 * 		//	Etc...
+		 *	}
 		 *
 		 * @param string $name
 		 * @return Aspect|mixed
@@ -120,7 +145,7 @@ namespace Kisma\Components
 				return $_aspect;
 			}
 
-			throw new \UndefinedPropertyException( 'The property "' . $name . '" is undefined.' );
+			throw new \Kisma\UndefinedPropertyException( 'The property "' . $name . '" is undefined.' );
 		}
 
 		//*************************************************************************
@@ -138,6 +163,11 @@ namespace Kisma\Components
 		 */
 		public function hasAspect( $aspectName, $returnAspect = false )
 		{
+			if ( !\K::gestate( $aspectName ) )
+			{
+				throw new \Kisma\AspectNotFoundException( 'Unknown aspect "' . $aspectName . '".' );
+			}
+			
 			return \K::hasComponent( $this->_aspects, $aspectName, $returnAspect );
 		}
 
@@ -149,20 +179,14 @@ namespace Kisma\Components
 		 */
 		public function linkAspect( $aspectName, $options = array() )
 		{
-			if ( false === ( $_aspect = $this->hasAspect( $aspectName, true ) ) )
+			$_aspectKey = \K::kismaTag( $aspectName, true );
+
+			if ( false === ( $this->_aspects[$_aspectKey] = $this->hasAspect( $aspectName, true ) ) )
 			{
-				\K::logDebug( 'Linking Aspect: ' . $aspectName );
-
-				if ( !isset( $options['linker'] ) )
-				{
-					$options['linker'] = $this;
-				}
-
-				$_aspectKey = \K::kismaTag( $aspectName, true );
-				$this->_aspects[$_aspectKey] = $_aspect = \K::createComponent( $aspectName, $options );
+				$this->_aspects[$_aspectKey] = \K::createComponent( $aspectName, $options );
 			}
 
-			return $_aspect;
+			return $this->_aspects[$_aspectKey]->link( $this );
 		}
 
 		/**
@@ -228,15 +252,20 @@ namespace Kisma\Components
 		 */
 		protected function _loadConfiguration( $options = array(), $noMerge = false )
 		{
+			//	No object storact by default
+			$this->setOption( \KismaOptions::ObjectStorageClass, false );
+
 			parent::_loadConfiguration( $options, $noMerge );
 
 			//	And load our aspects
-			if ( $this->_loadAspects( $this->getOption( \KismaOptions::AspectOptions, array(), true ) ) )
+			$_aspectOptions = $this->getOption( \KismaOptions::AspectOptions, array(), true );
+
+			if ( $this->_loadAspects( $_aspectOptions ) )
 			{
 				//	Auto-bind events, remove from $options
 				if ( false !== $this->getOption( \KismaOptions::AutoBindEvents, true ) )
 				{
-					$this->{\KismaSettings::DefaultAppEventClass}->autoBind(
+					$this->{\KismaSettings::DefaultComponentEventClass}->autoBind(
 						$this->getOption( \KismaOptions::AutoBindOptions, array(), true )
 					);
 				}
@@ -244,20 +273,23 @@ namespace Kisma\Components
 		}
 
 		/**
-		 * Loads the standard component aspects (Aspects\Reactors\AppEvent and Aspects\Storage\ObjectStorage)
+		 * Loads the standard component aspects (Aspects\Reactors\ComponentEvent and Aspects\Storage\ObjectStorage)
 		 * avoiding recursion.
+		 *
+		 * $options is expected to be a hash of "aspect class" => "aspect options" values.
 		 *
 		 * @param array $options
 		 * @return bool
 		 */
 		protected function _loadAspects( $options = array() )
 		{
-			$_classes = array_merge(
-				\K::o( $options, 'classes', array() ),
+			$_options = array_merge(
+				//	We require event handling
 				array(
-					//	We require event handling
-					\KismaSettings::DefaultAppEventClass,
-				)
+					\KismaSettings::DefaultComponentEventClass => array(),
+				),
+				//	Unless an alternate is provided...
+				\K::o( $options, 'classes', array() )
 			);
 
 			//	Add in object storage if it's not disabled
@@ -268,13 +300,13 @@ namespace Kisma\Components
 
 			if ( false !== $_objectStorageClass )
 			{
-				$_classes[] = $_objectStorageClass;
+				$_options[$_objectStorageClass] = array();
 			}
 
-			foreach ( $_classes as $_aspectClass )
+			foreach ( $_options as $_aspectClass => $_aspectOptions )
 			{
-				//	The linker will see if we have it already...
-				$this->linkAspect( $_aspectClass );
+				//	The linker will take care of the rest
+				$this->linkAspect( $_aspectClass, $_aspectOptions );
 			}
 
 			return true;

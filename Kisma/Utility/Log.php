@@ -11,9 +11,9 @@
  * @link		  http://github.com/Pogostick/kisma/ Kisma(tm)
  * @license	   http://github.com/Pogostick/kisma/licensing/
  * @author		Jerry Ablan <kisma@pogostick.com>
- * @category	  Kisma_Utilities
- * @package	   kisma.utilities
- * @namespace	 \Kisma\Utilities
+ * @category	  Kisma_Utility
+ * @package	   kisma.utility
+ * @namespace	 \Kisma\Utility
  * @since		 v1.0.0
  * @filesource
  */
@@ -23,9 +23,9 @@
 //*************************************************************************
 
 /**
- * @namespace Kisma\Utilities
+ * @namespace Kisma\Utility
  */
-namespace Kisma\Utilities
+namespace Kisma\Utility
 {
 	/**
 	 * Log

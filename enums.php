@@ -31,9 +31,10 @@ namespace Kisma;
 //*************************************************************************
 
 /**
- * Interfaces are required now.
+ * Interfaces and exceptions are required here
  */
 require_once __DIR__ . '/interfaces.php';
+require_once __DIR__ . '/exceptions.php';
 
 /**
  * We want to use SplEnum here, but it's an optional library and not
@@ -160,7 +161,7 @@ class HashSeed extends \Kisma\KismaEnum
 	const __default = self::All;
 
 	/**
-	 * @const int The various supported hash types for Utilities\Hash
+	 * @const int The various supported hash types for Utility\Hash
 	 */
 	const All = 0;
 	const AlphaLower = 1;

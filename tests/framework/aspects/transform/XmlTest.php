@@ -1,8 +1,5 @@
 <?php
-require_once '/media/storage/mounts/projects/php/kisma/framework/Kisma.php';
-require_once '/media/storage/mounts/projects/php/kisma/framework/Components/Component.php';
-require_once '/media/storage/mounts/projects/php/kisma/framework/Aspects/Aspect.php';
-require_once '/media/storage/mounts/projects/php/kisma/framework/Aspects/Transform/Xml.php';
+require_once '/opt/kisma/Kisma.php';
 
 /*
  * @method SimpleXMLElement transform( $value, $options = array() )

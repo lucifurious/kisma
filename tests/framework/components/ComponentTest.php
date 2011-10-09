@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/../../../framework/Kisma.php';
+require_once __DIR__ . '/../../../src/Kisma.php';
 use Kisma\Components as Components;
 
 /**
