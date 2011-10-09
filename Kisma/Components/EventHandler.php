@@ -58,15 +58,17 @@ namespace Kisma\Components
 
 		/**
 		 * Encapsulate calling an event handler
-		 * @param \Kisma\Components\Component $caller
+		 * @param \Kisma\Components\Event $event
 		 * @return mixed
 		 */
-		public function handle( $caller )
+		public function handle( $event )
 		{
+			Utility\Log::debug( 'Handling "' . $event->getEventName() . '" with handler ID: ' . $this->_handlerId );
+
 			return call_user_func_array(
 				$this->_callback,
 				array(
-					$caller,
+					$event,
 					$this->_callbackData,
 				)
 			);

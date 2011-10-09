@@ -95,10 +95,8 @@ namespace Kisma\Components
 			//	Loop through the handlers for this event, passing data
 			foreach ( $this->_handlers as $_handler )
 			{
-				Utility\Log::debug( 'Firing "' . $this->_eventName . '". Handler ID: ' . $_handler->getHandlerId() );
-
 				//	Call each handler
-				$_handler->handle( $this );
+				$_result = $_handler->handle( $this );
 
 				//	If an event returns false, or wants to stop, break...
 				if ( false === $this->_continuePropagation || false === $_result )
@@ -111,10 +109,12 @@ namespace Kisma\Components
 			if ( null !== $callback )
 			{
 				//	Sending some info to the callback...
-				call_user_func_array( $callback, array(
-					$this,
-					$_result
-				) );
+				$_result = call_user_func_array(
+					$callback,
+					array(
+						$this,
+					)
+				);
 			}
 
 			//	We made it through, so return true
@@ -137,25 +137,16 @@ namespace Kisma\Components
 				throw new \Kisma\InvalidEventHandlerException( 'Callback must actually be callable. Check out Closures. Try again...' );
 			}
 
-			//	Add to our handler store
-			$_handlerId = spl_object_hash( (object)$callback );
+			$_handler = new EventHandler(
+				array(
+					'callback' => $callback,
+					'callbackData' => $callbackData,
+				)
+			);
 
-			if ( !is_array( $this->_handlers ) )
-			{
-				$this->_handlers = array();
-			}
+			$this->_handlers[$_handler->getHandlerId()] = $_handler;
+			Utility\Log::trace( 'ComponentEvent "' . $this->_eventName . '" bound with handler ID: ' . $_handler->getHandlerId() );
 			
-			$this->_handlers[$_handlerId] = array(
-				$callback,
-				$callbackData,
-			);
-
-			Utility\Log::trace(
-				'ComponentEvent "' . $this->_eventName . '" bound: ' .
-					get_class( $this->_source ) . '::' .
-					$_handlerId
-			);
-
 			return $this;
 		}
 
@@ -166,11 +157,6 @@ namespace Kisma\Components
 		 */
 		public function removeHandler( $callback )
 		{
-			if ( !is_callable( $callback ) )
-			{
-				throw new \Kisma\InvalidEventHandlerException( 'Callback must actually be callable. Check out Closures. Try again...' );
-			}
-
 			//	Add to our handler store
 			$_handlerId = spl_object_hash( (object)$callback );
 
