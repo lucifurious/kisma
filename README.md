@@ -76,3 +76,52 @@ Constants:                                          203
   Global constants:                                   1
   Class constants:                                  202
 </pre>
+
+Namespace Diagram
+=================
+%TOC%
+
+---+ Kisma
+
+
+---++ Aspects
+
+   * Reactors
+      * ComponentEvent
+         * AspectEvent
+         * ProcessEvent
+            * JobEvent
+         * ServiceEvent
+   * Storage
+      * Document
+         * CouchDb
+         * SplObjectStorage
+         * Riak
+         * MongoDb
+      * Relational
+         * Pdo
+            * RedBean
+            * MySql
+            * PgSql
+            * MsSql
+   * Transformers
+      * AssociatedArray
+      * Html
+         * Smarty
+         * Twig
+      * Json
+         * Jsonp
+      * Xml
+      * Genshi
+      * Csv
+
+---++ Components
+
+   * SubComponent
+      * Component
+         * Event
+         * Process
+            * Job
+         * Service
+      * Aspect
+      * EventHandler
