@@ -80,4 +80,4 @@ Constants:                                          203
 Namespace Diagram
 =================
 
-![](http://github.com/Pogostick/kisma/raw/master/Kisma.png) 
+![](http://github.com/pogostick/kisma/raw/master/Kisma.png) 
