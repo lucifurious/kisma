@@ -9,10 +9,11 @@ These are the design goals of Kisma. My main design goal is consistency. Too man
 
 This framework is NOT designed for ultra-fast performance. While the code is, for the most part, stream-lined and fast, I'm sure there are areas where it could be improved to make it faster. However, I've focused on readability and consistency over speed. Can you use this framework for your web site? Absolutely. Will it handle thousands of requests per second? No clue.
 
-* Small footprint
+* Fully leverage PHP namespaces
 * Consistent interface to all objects
-* Completely extensible
-* Distribute in a Phar archive
+* Completely extensible from the base up
+* Usable from any other framework
+* Use built-in PHP library calls whenever possible for speed
 
 Features
 ========
@@ -44,34 +45,34 @@ PHPLOC Metrics
   * > 10 = Very Complex
 
 <pre>
-Directories:                                          4
-Files:                                               24
+Directories:                                         14
+Files:                                               39
 
-Lines of Code (LOC):                               5420
+Lines of Code (LOC):                               8394
   Cyclomatic Complexity / Lines of Code:           0.07
-Comment Lines of Code (CLOC):                      3266
-Non-Comment Lines of Code (NCLOC):                 2154
+Comment Lines of Code (CLOC):                      4649
+Non-Comment Lines of Code (NCLOC):                 3745
 
-Namespaces:                                           5
-Interfaces:                                          30
-Classes:                                             52
-  Abstract:                                           6 (11.54%)
-  Concrete:                                          46 (88.46%)
-  Average Class Length (NCLOC):                      50
-Methods:                                            213
+Namespaces:                                          11
+Interfaces:                                          37
+Classes:                                             72
+  Abstract:                                           8 (11.11%)
+  Concrete:                                          64 (88.89%)
+  Average Class Length (NCLOC):                      60
+Methods:                                            343
   Scope:
-    Non-Static:                                     172 (80.75%)
-    Static:                                          41 (19.25%)
+    Non-Static:                                     266 (77.55%)
+    Static:                                          77 (22.45%)
   Visibility:
-    Public:                                         182 (85.45%)
-    Non-Public:                                      31 (14.55%)
+    Public:                                         285 (83.09%)
+    Non-Public:                                      58 (16.91%)
   Average Method Length (NCLOC):                     12
-  Cyclomatic Complexity / Number of Methods:       1.66
+  Cyclomatic Complexity / Number of Methods:       1.72
 
 Anonymous Functions:                                  1
-Functions:                                            1
+Functions:                                            0
 
-Constants:                                          127
-  Global constants:                                   0
-  Class constants:                                  127
+Constants:                                          203
+  Global constants:                                   1
+  Class constants:                                  202
 </pre>
