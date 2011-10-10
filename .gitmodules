@@ -3,4 +3,4 @@
 	url = https://github.com/gabordemooij/redbean
 [submodule "vendors/sag"]
 	path = vendors/sag
-    url = https://github.com/sbisbee/sag
+	url = https://github.com/sbisbee/sag.git
