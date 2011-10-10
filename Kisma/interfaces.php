@@ -485,10 +485,7 @@ namespace Kisma
 		 * @const string Standard search text for rendering
 		 */
 		const
-			SEARCH_HELP_TEXT =<<<HTML
-You may optionally enter a comparison operator (<strong>&lt;</strong>, <strong>&lt;=</strong>, <strong>&gt;</strong>, <strong>&gt;=</strong>, <strong>&lt;&gt;</strong>or <strong>=</strong>) at the beginning of each
-search value to specify how the comparison should be done.
-HTML;
+			SEARCH_HELP_TEXT = 'You may optionally enter a comparison operator (<strong>&lt;</strong>, <strong>&lt;=</strong>, <strong>&gt;</strong>, <strong>&gt;=</strong>, <strong>&lt;&gt;</strong>or <strong>=</strong>) at the beginning of each search value to specify how the comparison should be done.';
 	}
 
 	/**
