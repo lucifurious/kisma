@@ -79,49 +79,5 @@ Constants:                                          203
 
 Namespace Diagram
 =================
-%TOC%
 
----+ Kisma
-
-
----++ Aspects
-
-   * Reactors
-      * ComponentEvent
-         * AspectEvent
-         * ProcessEvent
-            * JobEvent
-         * ServiceEvent
-   * Storage
-      * Document
-         * CouchDb
-         * SplObjectStorage
-         * Riak
-         * MongoDb
-      * Relational
-         * Pdo
-            * RedBean
-            * MySql
-            * PgSql
-            * MsSql
-   * Transformers
-      * AssociatedArray
-      * Html
-         * Smarty
-         * Twig
-      * Json
-         * Jsonp
-      * Xml
-      * Genshi
-      * Csv
-
----++ Components
-
-   * SubComponent
-      * Component
-         * Event
-         * Process
-            * Job
-         * Service
-      * Aspect
-      * EventHandler
+![](http://github.com/Pogostick/kisma/raw/master/Kisma.png) 
