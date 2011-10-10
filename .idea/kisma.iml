@@ -5,8 +5,6 @@
       <excludeFolder url="file://$MODULE_DIR$/doc" />
       <excludeFolder url="file://$MODULE_DIR$/examples" />
     </content>
-    <content url="file://$MODULE_DIR$/../teledini" />
-    <content url="file:///opt/ZendGdata-1.11.10" />
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module-library">
