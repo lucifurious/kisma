@@ -16,158 +16,151 @@
  * @since			v1.0.0
  * @filesource
  */
-
-//*************************************************************************
-//* Namespace Declarations
-//*************************************************************************
-
-/**
- * @namespace Kisma\Components Kisma components
- */
-namespace Kisma\Services;
-
-/**
- *
- */
-abstract class CliService extends \Kisma\Components\Service
+namespace Kisma\Services
 {
-	//********************************************************************************
-	//* Member Variables
-	//********************************************************************************
-
 	/**
-	 * @var string The command name
-	 */
-	protected $_serviceName;
-	/**
-	 * @var string
-	 */
-	protected $_basePath = null;
-
-	//*************************************************************************
-	//* Public Methods 
-	//*************************************************************************
-
-	public function __construct( $options = array() )
-	{
-		parent::__construct( $options );
-
-		//	Add the process lock aspect to this service
-		$this->linkAspect( '\Kisma\Aspects\ProcessLock' );
-	}
-
-	/**
-	 * Executes the command.
-	 * @param array $arguments command-line parameters for this command.
-	 */
-	public abstract function run( $arguments = array() );
-
-	/**
-	 * Processes the command line arguments
-	 * @param array $arguments
-	 * @return array
-	 */
-	public function getArguments( $arguments = array() )
-	{
-		$_results = array(
-			'original' => $arguments,
-			'rebuilt' => array(),
-			'options' => array(),
-		);
-
-		//	Our return options array...
-		$_options = array();
-
-		//	Rebuild args...
-		for ( $_i = 0, $_count = count( $arguments ); $_i < $_count; $_i++ )
-		{
-			$_argument = $arguments[$_i];
-			$_value = trim( substr( $_argument, 0, strpos( $_argument, '=' ) ) );
-
-			if ( $_value && $_value[0] == '-' && $_value[1] == '-' )
-			{
-				$_options[substr( $_value, 2 )] = str_replace( $_value . '=', '', $_argument );
-			}
-			elseif ( $_value && $_value[0] == '-' )
-			{
-				$_options[substr( $_value, 1 )] = str_replace( $_value . '=', '', $_argument );
-			}
-			else
-			{
-				$_results['rebuilt'][] = $arguments[$_i];
-			}
-		}
-
-		$_results['options'] = $_options;
-
-		//	Return the processed results...
-		return $_results;
-	}
-
-	/**
-	 * Process arguments passed in
 	 *
-	 * @param array $arguments
-	 * @return array
 	 */
-	protected function _processArguments( $arguments )
+	abstract class CliService extends \Kisma\Components\Service
 	{
-		//	Process command line arguments
-		$_className = array_shift( $arguments );
-		$_options = $this->getArguments( $arguments );
-		$arguments = array_merge( array( $_className ), $_options['rebuilt'] );
+		//********************************************************************************
+		//* Member Variables
+		//********************************************************************************
 
-		//	Set our values based on options...
-		foreach ( $_options['options'] as $_key => $_value )
+		/**
+		 * @var string The command name
+		 */
+		protected $_serviceName;
+		/**
+		 * @var string
+		 */
+		protected $_basePath = null;
+
+		//*************************************************************************
+		//* Public Methods
+		//*************************************************************************
+
+		public function __construct( $options = array() )
 		{
-			switch ( strtolower( trim( $_key ) ) )
-			{
-				default:
-					$this->__set( $_key, $_value );
-					break;
-			}
+			parent::__construct( $options );
+
+			//	Add the process lock aspect to this service
+			$this->linkAspect( '\Kisma\Aspects\ProcessLock' );
 		}
 
-		return $arguments;
-	}
+		/**
+		 * Executes the command.
+		 * @param array $arguments command-line parameters for this command.
+		 */
+		public abstract function run( $arguments = array() );
 
-	//*************************************************************************
-	//* Properties
-	//*************************************************************************
+		/**
+		 * Processes the command line arguments
+		 * @param array $arguments
+		 * @return array
+		 */
+		public function getArguments( $arguments = array() )
+		{
+			$_results = array(
+				'original' => $arguments,
+				'rebuilt' => array(),
+				'options' => array(),
+			);
 
-	/**
-	 * @param string $basePath
-	 * @return \CliService
-	 */
-	public function setBasePath( $basePath = null )
-	{
-		$this->_basePath = $basePath;
-		return $this;
-	}
+			//	Our return options array...
+			$_options = array();
 
-	/**
-	 * @return string
-	 */
-	public function getBasePath()
-	{
-		return $this->_basePath;
-	}
+			//	Rebuild args...
+			for ( $_i = 0, $_count = count( $arguments ); $_i < $_count; $_i++ )
+			{
+				$_argument = $arguments[$_i];
+				$_value = trim( substr( $_argument, 0, strpos( $_argument, '=' ) ) );
 
-	/**
-	 * @param string $serviceName
-	 * @return \CliService
-	 */
-	public function setServiceName( $serviceName = __CLASS__ )
-	{
-		$this->_serviceName = $serviceName;
-		return $this;
-	}
+				if ( $_value && $_value[0] == '-' && $_value[1] == '-' )
+				{
+					$_options[substr( $_value, 2 )] = str_replace( $_value . '=', '', $_argument );
+				}
+				elseif ( $_value && $_value[0] == '-' )
+				{
+					$_options[substr( $_value, 1 )] = str_replace( $_value . '=', '', $_argument );
+				}
+				else
+				{
+					$_results['rebuilt'][] = $arguments[$_i];
+				}
+			}
 
-	/**
-	 * @return string
-	 */
-	public function getServiceName()
-	{
-		return $this->_serviceName;
+			$_results['options'] = $_options;
+
+			//	Return the processed results...
+			return $_results;
+		}
+
+		/**
+		 * Process arguments passed in
+		 *
+		 * @param array $arguments
+		 * @return array
+		 */
+		protected function _processArguments( $arguments )
+		{
+			//	Process command line arguments
+			$_className = array_shift( $arguments );
+			$_options = $this->getArguments( $arguments );
+			$arguments = array_merge( array( $_className ), $_options['rebuilt'] );
+
+			//	Set our values based on options...
+			foreach ( $_options['options'] as $_key => $_value )
+			{
+				switch ( strtolower( trim( $_key ) ) )
+				{
+					default:
+						$this->__set( $_key, $_value );
+						break;
+				}
+			}
+
+			return $arguments;
+		}
+
+		//*************************************************************************
+		//* Properties
+		//*************************************************************************
+
+		/**
+		 * @param string $basePath
+		 * @return \CliService
+		 */
+		public function setBasePath( $basePath = null )
+		{
+			$this->_basePath = $basePath;
+			return $this;
+		}
+
+		/**
+		 * @return string
+		 */
+		public function getBasePath()
+		{
+			return $this->_basePath;
+		}
+
+		/**
+		 * @param string $serviceName
+		 * @return \CliService
+		 */
+		public function setServiceName( $serviceName = __CLASS__ )
+		{
+			$this->_serviceName = $serviceName;
+			return $this;
+		}
+
+		/**
+		 * @return string
+		 */
+		public function getServiceName()
+		{
+			return $this->_serviceName;
+		}
 	}
 }

@@ -1,6 +1,6 @@
 <?php
 /**
- * HttpService.php
+ * OAuth.php
  *
  * Kisma(tm) : PHP Nanoframework (http://github.com/Pogostick/kisma/)
  * Copyright 2011, Pogostick, LLC. (http://www.pogostick.com/)
@@ -14,17 +14,8 @@
  * @author        Jerry Ablan <kisma@pogostick.com>
  * @category      Kisma_Services_Authentication
  * @package       kisma.services.authentication
- * @namespace     \Kisma\Services\Authentication
  * @since         v1.0.0
  * @filesource
- */
-
-//*************************************************************************
-//* Namespace Declarations
-//*************************************************************************
-
-/**
- * @namespace Kisma\Services\Authentication
  */
 namespace Kisma\Services\Authentication
 {
@@ -55,7 +46,7 @@ namespace Kisma\Services\Authentication
 		 */
 		protected $_consumerSecret = null;
 		/**
-		 * @var string The uri to which you will be redirecto to auth
+		 * @var string The uri to which you will be redirected for auth&auth
 		 */
 		protected $_authenticationUri = null;
 		/**
@@ -267,4 +258,5 @@ namespace Kisma\Services\Authentication
 			return $this->_refreshToken;
 		}
 	}
+	
 }

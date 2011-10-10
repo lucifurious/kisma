@@ -1,14 +1,25 @@
 <?php
 /**
- * Kisma
- * The mother of all Kisma(tm) objects
- * @property IKisma $creator
- * @property array|object $eventData
- * @property boolean $handled
+ * Kisma.php
+ * The Kisma(tm) Framework bootstrap loader
+ *
+ * Kisma(tm) : PHP Nanoframework (http://github.com/Pogostick/kisma/)
+ * Copyright 2011, Pogostick, LLC. (http://www.pogostick.com/)
+ *
+ * Dual licensed under the MIT License and the GNU General Public License (GPL) Version 2.
+ * See {@link http://github.com/Pogostick/kisma/licensing/} for complete information.
+ *
+ * @copyright		Copyright 2011, Pogostick, LLC. (http://www.pogostick.com/)
+ * @link			http://github.com/Pogostick/kisma/ Kisma(tm)
+ * @license			http://github.com/Pogostick/kisma/licensing/
+ * @author			Jerry Ablan <kisma@pogostick.com>
+ * @category		Kisma
+ * @package			kisma
+ * @since			v1.0.0
+ * @filesource
  */
-
 /**
- * Pull our enums, interfaces, and exceptions into the GNS.
+ * The global namespace
  */
 namespace
 {
@@ -19,22 +30,21 @@ namespace
 	/**
 	 * Enums
 	 */
-	require_once 'enums.php';
+	require_once 'Kisma/enums.php';
 	/**
 	 * Exceptions
 	 */
-	require_once 'exceptions.php';
+	require_once 'Kisma/exceptions.php';
 }
-
-//*************************************************************************
-//* The Kisma Namespace
-//*************************************************************************
-
 /**
- * @namespace \Kisma
+ * The Kisma namespace
  */
 namespace Kisma
 {	/** Starts Namespace \Kisma */
+
+	//*************************************************************************
+	//* Aliases
+	//*************************************************************************
 
 	use \Kisma\Utility as Utility;
 
@@ -45,13 +55,9 @@ namespace Kisma
 	 * Contains a few core functions implemented statically to
 	 * be lightweight and single instance.
 	 *
-	 * @property App $app
-	 * @property Request $request
-	 * @property Response $response
-	 * @property User $user
-	 * @property AppController $appController
 	 * @property int $uniqueIdCounter
-	 * @property array $appParameters
+	 * @property int $debugLevel
+	 * @proeprty array $settings
 	 */
 	class Kisma implements IGlobalDebuggable, ISettings
 	{
@@ -220,20 +226,8 @@ namespace Kisma
 		 */
 		public static function createUniqueName( \Kisma\IComponent $component, $humanReadable = false )
 		{
-			$_name = get_class( $component ) . '.' . self::$_uniqueIdCounter++;
-			$_hash = Utility\Hash( $_name );
-			return 'kisma.' . ( $humanReadable ? $_name : $_hash );
-		}
-
-		/**
-		 * @static
-		 * @param string $aspectClass
-		 * @param array $options
-		 * @return \Kisma\Aspects\Aspect
-		 */
-		public static function createAspect( $aspectClass, $options = array() )
-		{
-			return self::createComponent( $aspectClass, $options );
+			$_tag = self::kismaTag( get_class( $component ) . '.' . self::$_uniqueIdCounter++ );
+			return 'kisma.' . ( $humanReadable ? $_tag : Utility\Hash::hash( $_tag ) );
 		}
 
 		/**
@@ -286,7 +280,7 @@ namespace Kisma
 			{
 				if ( null === $_argument )
 				{
-					return $_argument;
+					continue;
 				}
 
 				$_defaultValue = $_argument;
@@ -318,7 +312,7 @@ namespace Kisma
 		 * @param int $offset
 		 * @return bool
 		 */
-		public static function within( $haystack, $needle, $caseSensitive = false, $offset = 0 )
+		public static function within( $haystack, $needle, $offset = 0, $caseSensitive = false )
 		{
 			if ( false === $caseSensitive )
 			{
@@ -454,6 +448,7 @@ namespace Kisma
 				//	Do they want it loaded?
 				if ( false !== $loadClass )
 				{
+					/** @noinspection PhpIncludeInspection */
 					return include_once( $_root );
 				}
 			}

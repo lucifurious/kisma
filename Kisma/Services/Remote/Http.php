@@ -14,17 +14,8 @@
  * @author        Jerry Ablan <kisma@pogostick.com>
  * @category      Kisma_Services
  * @package       kisma.services
- * @namespace     \Kisma\Services
  * @since         v1.0.0
  * @filesource
- */
-
-//*************************************************************************
-//* Namespace Declarations
-//*************************************************************************
-
-/**
- * @namespace Kisma\Services\Remote
  */
 namespace Kisma\Services\Remote
 {
@@ -32,20 +23,14 @@ namespace Kisma\Services\Remote
 	//* Aliases
 	//*************************************************************************
 
-	/**
-	 * Kisma Aliases
-	 */
-	use Kisma\Aspects as Aspects;
-	use Kisma\Components as Components;
 	use Kisma\Services as Services;
 	use Kisma\IHttpMethod as Method;
-	use Kisma\IHttpResponse as Response;
 
 	/**
 	 * Http
 	 * A base service to provide communication to an HTTP-based service
 	 */
-	class Http extends Services\Remote  implements \Kisma\IHttpMethod, \Kisma\IHttpResponse
+	class Http extends Services\Remote implements \Kisma\IHttpMethod, \Kisma\IHttpResponse
 	{
 		//*************************************************************************
 		//* Private Members
@@ -56,6 +41,14 @@ namespace Kisma\Services\Remote
 		 * @var array|null
 		 */
 		protected $_callInfo = null;
+		/**
+		 * @var resource The current cURL instance
+		 */
+		protected $_curl = null;
+		/**
+		 * @var mixed The last result from curl_exec()
+		 */
+		protected $_lastResult = null;
 
 		//*************************************************************************
 		//* Public Methods
@@ -68,7 +61,7 @@ namespace Kisma\Services\Remote
 		{
 			if ( !function_exists( 'curl_init' ) )
 			{
-				throw new \Kisma\ServiceException( 'The Http service requires the installation of cURL.' );
+				throw new \Kisma\ServiceException( 'The Http service requires the cURL extension.' );
 			}
 
 			parent::__construct( $options );
@@ -79,16 +72,16 @@ namespace Kisma\Services\Remote
 		 *
 		 * @param string $method
 		 * @param $url The URL of the resource
-		 * @param array|\Kisma\Services\Remote\An $payload An array of key/value pairs to send with the request. Values are assumed to be URL encoded.
+		 * @param array $payload
 		 * @param array $curlOptions
-		 * @return mixed|null|false
+		 * @return mixed|false
 		 */
 		public function call( $method = Method::Get, $url, $payload = array(), $curlOptions = array() )
 		{
 			//	Not an array of payload?
 			if ( !empty( $payload ) && !is_array( $payload ) )
 			{
-				throw new \Kisma\ServiceException( '"$payload" must be an array of key => value pairs.' );
+				throw new \Kisma\ServiceException( '"$payload" must be an empty or an array of key/value pairs.' );
 			}
 
 			//	Our return results
@@ -101,7 +94,7 @@ namespace Kisma\Services\Remote
 				$curlOptions = array();
 			}
 
-			$_curl = curl_init();
+			$this->_curl = curl_init();
 
 			\K::sins( $curlOptions, CURLOPT_RETURNTRANSFER, true );
 			\K::sins( $curlOptions, CURLOPT_FAILONERROR, true );
@@ -110,33 +103,36 @@ namespace Kisma\Services\Remote
 			\K::sins( $curlOptions, CURLOPT_FOLLOWLOCATION, true );
 
 			//	Now set all the options at once!
-			curl_setopt_array( $_curl, $curlOptions );
+			curl_setopt_array( $this->_curl, $curlOptions );
 
 			//	If this is a post, we have to put the post data in another field...
 			if ( Method::Post == $_method )
 			{
-				curl_setopt( $_curl, CURLOPT_URL, $url );
-				curl_setopt( $_curl, CURLOPT_POST, true );
-				curl_setopt( $_curl, CURLOPT_POSTFIELDS, $_payload );
+				curl_setopt( $this->_curl, CURLOPT_URL, $url );
+				curl_setopt( $this->_curl, CURLOPT_POST, true );
+				curl_setopt( $this->_curl, CURLOPT_POSTFIELDS, $_payload );
 			}
 			else
 			{
-				curl_setopt( $_curl, CURLOPT_URL, $url . ( Method::Get == $_method ? ( !empty( $_payload ) ? '?' . trim( $_payload, '&' ) : '' ) : '' ) );
+				curl_setopt( $this->_curl, CURLOPT_URL, $url . ( Method::Get == $_method ? ( !empty( $_payload ) ? '?' . trim( $_payload, '&' ) : '' ) : '' ) );
 			}
 
-			$this->_callInfo = null;
+			$this->_callInfo = $this->_lastResult = null;
 
-			$this->trigger( 'before_service_call', $curlOptions );
+			$this->trigger( 'before_service_call', $this );
+			$this->_lastResult = curl_exec( $this->_curl );
 
-			$_result = curl_exec( $_curl );
+			//	Fill up the info array
+			$this->_callInfo = curl_getinfo( $this->_curl );
+			$this->_callInfo['curl.error'] = curl_error( $this->_curl );
+			$this->_callInfo['curl.errno'] = curl_errno( $this->_curl );
 
-			$this->_callInfo = curl_getinfo( $_curl );
-			$this->_callInfo['curl.error'] = curl_error( $_curl );
-			$this->_callInfo['curl.errno'] = curl_errno( $_curl );
+			$this->trigger( 'after_service_call', $this );
 
-			$this->trigger( 'after_service_call', $this->_callInfo );
+			curl_close( $this->_curl );
+			$this->_curl = null;
 
-			return $_result;
+			return $this->_lastResult;
 		}
 
 		//*************************************************************************
@@ -159,6 +155,42 @@ namespace Kisma\Services\Remote
 		public function getCallInfo()
 		{
 			return $this->_callInfo;
+		}
+
+		/**
+		 * @param \Kisma\Services\Remote\resource $curl
+		 * @return \Kisma\Services\Remote\Http
+		 */
+		public function setCurl( $curl )
+		{
+			$this->_curl = $curl;
+			return $this;
+		}
+
+		/**
+		 * @return \Kisma\Services\Remote\resource
+		 */
+		public function getCurl()
+		{
+			return $this->_curl;
+		}
+
+		/**
+		 * @param mixed $lastResult
+		 * @return \Kisma\Services\Remote\Http
+		 */
+		public function setLastResult( $lastResult )
+		{
+			$this->_lastResult = $lastResult;
+			return $this;
+		}
+
+		/**
+		 * @return mixed
+		 */
+		public function getLastResult()
+		{
+			return $this->_lastResult;
 		}
 
 	}

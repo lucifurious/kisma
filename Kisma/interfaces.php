@@ -59,6 +59,10 @@ namespace
 		 * @const string The default CouchDb aspect class
 		 */
 		const CouchDbClass = 'kisma.aspects.storage.couch_db';
+		/**
+		 * @const string The default XML transformer
+		 */
+		const XmlTransformerClass = 'kisma.aspects.transformers.xml';
 	}
 
 	/**
@@ -610,20 +614,20 @@ HTML;
 	/**
 	 * This interface defines the base transformation formats
 	 */
-	interface ITransform extends IConstantProvider
+	interface ITransformer extends IConstantProvider
 	{
 		/**
 		 * @param mixed|object|array $input
 		 * @param mixed|null $options
 		 * @return mixed
 		 */
-	//	public function transform( $input, $options = null );
+		public function transform( $input, $options = null );
 	}
 
 	/**
 	 * This interface defines the output transformations
 	 */
-	interface IOutputFormat extends ITransform
+	interface IOutputFormat extends ITransformer
 	{
 		/**
 		* @const int output formats

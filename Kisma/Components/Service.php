@@ -12,108 +12,102 @@
  * @author			Jerry Ablan <kisma@pogostick.com>
  * @category		Kisma_Components
  * @package			kisma.components
- * @namespace		\Kisma\Components
  * @since			v1.0.0
  * @filesource
  */
-
-//*************************************************************************
-//* Namespace Declarations
-//*************************************************************************
-
-/**
- * @namespace Kisma\Components Kisma components
- */
-namespace Kisma\Components;
-
-/**
- * Service
- * The base class for services provided
- *
- * Provides two events:
- *
- * onBeforeServiceCall and onAfterServiceCall which are called before and after
- * the service is run, respectively.
- *
- * @property int $serviceType
- */
-abstract class Service extends Component implements \Kisma\IService
+namespace Kisma\Components
 {
-	//********************************************************************************
-	//* Private Members
-	//********************************************************************************
 
 	/**
-	 * @var \Kisma\ServiceType The type of service provided by this object
+	 * Service
+	 * The base class for services provided
+	 *
+	 * Provides two events:
+	 *
+	 * onBeforeServiceCall and onAfterServiceCall which are called before and after
+	 * the service is run, respectively.
+	 *
+	 * @property int $serviceType The type of service provided by this object
+	 * @property string $serviceName The name of this service
 	 */
-	protected $_serviceType = \Kisma\ServiceType::Generic;
-	/**
-	 * @var string The name of this service
-	 */
-	protected $_serviceName = null;
-
-	//*************************************************************************
-	//* Event Handlers
-	//*************************************************************************
-
-	/**
-	 * @param \Kisma\Components\Event $event
-	 * @return bool
-	 */
-	public function onBeforeServiceCall( $event )
+	abstract class Service extends Component implements \Kisma\IService
 	{
-		//	Default implementation
-		return true;
+		//********************************************************************************
+		//* Private Members
+		//********************************************************************************
+
+		/**
+		 * @var \Kisma\ServiceType The type of service provided by this object
+		 */
+		protected $_serviceType = \Kisma\ServiceType::Generic;
+		/**
+		 * @var string The name of this service
+		 */
+		protected $_serviceName = null;
+
+		//*************************************************************************
+		//* Event Handlers
+		//*************************************************************************
+
+		/**
+		 * @param \Kisma\Components\Event $event
+		 * @return bool
+		 */
+		public function onBeforeServiceCall( $event )
+		{
+			//	Default implementation
+			return true;
+		}
+
+		/**
+		 * @param \Kisma\Components\Event $event
+		 * @return bool
+		 */
+		public function onAfterServiceCall( $event )
+		{
+			//	Default implementation
+			return true;
+		}
+
+		//********************************************************************************
+		//* Property Accessors
+		//********************************************************************************
+
+		/**
+		 * @param \Kisma\ServiceType $serviceType
+		 * @return \Kisma\Components\Service
+		 */
+		protected function _setServiceType( $serviceType )
+		{
+			$this->_serviceType = $serviceType;
+			return $this;
+		}
+
+		/**
+		 * @return \Kisma\ServiceType
+		 */
+		public function getServiceType()
+		{
+			return $this->_serviceType;
+		}
+
+		/**
+		 * @param string $serviceName
+		 * @return \Kisma\Components\Service
+		 */
+		public function setServiceName( $serviceName )
+		{
+			$this->_serviceName = $serviceName;
+			return $this;
+		}
+
+		/**
+		 * @return string
+		 */
+		public function getServiceName()
+		{
+			return $this->_serviceName;
+		}
+
 	}
-
-	/**
-	 * @param \Kisma\Components\Event $event
-	 * @return bool
-	 */
-	public function onAfterServiceCall( $event )
-	{
-		//	Default implementation
-		return true;
-	}
-
-	//********************************************************************************
-	//* Property Accessors
-	//********************************************************************************
-
-	/**
-	 * @param \Kisma\ServiceType $serviceType
-	 * @return \Kisma\Components\Service
-	 */
-	protected function _setServiceType( $serviceType )
-	{
-		$this->_serviceType = $serviceType;
-		return $this;
-	}
-
-	/**
-	 * @return \Kisma\ServiceType
-	 */
-	public function getServiceType()
-	{
-		return $this->_serviceType;
-	}
-
-	/**
-	 * @param string $serviceName
-	 * @return \Kisma\Components\Service
-	 */
-	public function setServiceName( $serviceName )
-	{
-		$this->_serviceName = $serviceName;
-		return $this;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getServiceName()
-	{
-		return $this->_serviceName;
-	}
-
 }

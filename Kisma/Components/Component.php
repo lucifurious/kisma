@@ -153,6 +153,16 @@ namespace Kisma\Components
 		//*************************************************************************
 
 		/**
+		 * If this component has an aspect, it will be returned, otherwise false;
+		 * @param string $aspectName
+		 * @return false|\Kisma\Components\Aspect
+		 */
+		public function getAspect( $aspectName )
+		{
+			return $this->hasAspect( $aspectName, true );
+		}
+
+		/**
 		 * Determines if this component has the requested aspect linked. If not, the return value is false.
 		 * If the aspect is linked, the return value is the key name of the aspect.
 		 * If $returnAspect is set to true, the aspect instance will be returned
@@ -167,7 +177,7 @@ namespace Kisma\Components
 			{
 				throw new \Kisma\AspectNotFoundException( 'Unknown aspect "' . $aspectName . '".' );
 			}
-			
+
 			return \K::hasComponent( $this->_aspects, $aspectName, $returnAspect );
 		}
 

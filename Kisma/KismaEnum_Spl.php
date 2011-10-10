@@ -10,26 +10,19 @@
  * @link			http://github.com/Pogostick/kisma/ Kisma(tm)
  * @license			http://github.com/Pogostick/kisma/licensing/
  * @author			Jerry Ablan <kisma@pogostick.com>
- * @category		Kisma
- * @package			kisma
- * @namespace		Kisma
+ * @category		Kisma_Enums
+ * @package			kisma.enums
  * @since			v1.0.0
  * @filesource
  */
-
-//*************************************************************************
-//* Namespace Declarations
-//*************************************************************************
-
-/**
- * @namespace Kisma Kisma
- */
-namespace Kisma;
-
-/**
- * KismaEnum
- * This is the SplEnum version
- */
-class KismaEnum extends \SplEnum implements \Kisma\IKisma
+namespace Kisma
 {
+	/**
+	 * KismaEnum
+	 * This is the SplEnum version
+	 */
+	class KismaEnum extends \SplEnum implements \Kisma\IKisma
+	{
+	}
+	
 }

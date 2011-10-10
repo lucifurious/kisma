@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="ComponentTest.php" type="PHPUnitRunConfigurationType" factoryName="PHPUnit" scope="File" path="$PROJECT_DIR$/tests/framework/components/ComponentTest.php" workingDirectory="$PROJECT_DIR$/framework">
+    <CommandLine workingDirectory="$PROJECT_DIR$/framework" />
+    <RunnerSettings RunnerId="PhpRunner" />
+    <RunnerSettings RunnerId="PhpUnitDebugRunner" />
+    <ConfigurationWrapper RunnerId="PhpRunner" />
+    <ConfigurationWrapper RunnerId="PhpUnitDebugRunner" />
+    <method />
+  </configuration>
+</component>

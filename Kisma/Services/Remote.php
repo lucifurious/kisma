@@ -1,6 +1,6 @@
 <?php
 /**
- * RemoteService.php
+ * Remote.php
  *
  * Kisma(tm) : PHP Nanoframework (http://github.com/Pogostick/kisma/)
  * Copyright 2011, Pogostick, LLC. (http://www.pogostick.com/)
@@ -14,30 +14,11 @@
  * @author        Jerry Ablan <kisma@pogostick.com>
  * @category      Kisma_Services
  * @package       kisma.services
- * @namespace     \Kisma\Services
  * @since         v1.0.0
  * @filesource
  */
-
-//*************************************************************************
-//* Namespace Declarations
-//*************************************************************************
-
-/**
- * @namespace Kisma\Services
- */
 namespace Kisma\Services
 {
-	//*************************************************************************
-	//* Aliases
-	//*************************************************************************
-
-	/**
-	 * Kisma Aliases
-	 */
-	use Kisma\Aspects as Aspects;
-	use Kisma\Components as Components;
-
 	/**
 	 * RemoteService
 	 * A base service class that is intended to be used by to access remote
@@ -50,7 +31,7 @@ namespace Kisma\Services
 	 * @property string $userName
 	 * @property string $password
 	 */
-	abstract class Remote extends Components\Service
+	abstract class Remote extends \Kisma\Components\Service
 	{
 		//*************************************************************************
 		//* Private Members

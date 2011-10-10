@@ -61,7 +61,7 @@ namespace Kisma\Utility
 		 */
 		public static function __invoke()
 		{
-			return call_user_func_array( array( '\Kisma\Utilties\Hash::hash' ), func_get_args() );
+			return call_user_func_array( array( '\Kisma\Utility\Hash::hash' ), func_get_args() );
 		}
 
 		/**

@@ -1,0 +1,9 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="XmlTest.php" type="PHPUnitRunConfigurationType" factoryName="PHPUnit" scope="File" path="$PROJECT_DIR$/tests/framework/aspects/transform/XmlTest.php">
+    <RunnerSettings RunnerId="PhpRunner" />
+    <RunnerSettings RunnerId="PhpUnitDebugRunner" />
+    <ConfigurationWrapper RunnerId="PhpRunner" />
+    <ConfigurationWrapper RunnerId="PhpUnitDebugRunner" />
+    <method />
+  </configuration>
+</component>

@@ -144,8 +144,11 @@ namespace Kisma\Components
 				)
 			);
 
-			$this->_handlers[$_handler->getHandlerId()] = $_handler;
-			Utility\Log::trace( 'ComponentEvent "' . $this->_eventName . '" bound with handler ID: ' . $_handler->getHandlerId() );
+			$_id = $_handler->getHandlerId();
+
+			$this->_handlers[$_id] = $_handler;
+
+			Utility\Log::trace( '"' . get_class( $this->_source ) . '"."' . $this->_eventName . '" bound with handler ID: ' . $_id );
 			
 			return $this;
 		}
