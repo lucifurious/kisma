@@ -77,9 +77,9 @@ Constants:                                          203
   Class constants:                                  202
 </pre>
 
-![](http://github.com/pogostick/kisma/raw/master/jdepend.png) 
+![](http://github.com/pogostick/kisma/raw/master/jdepend.svg) 
 
-![](http://github.com/pogostick/kisma/raw/master/pyramid.png) 
+![](http://github.com/pogostick/kisma/raw/master/pyramid.svg) 
 
 Namespace Diagram
 =================
