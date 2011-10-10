@@ -35,14 +35,10 @@ Requirements
 * PHP v5.3+
  Kisma requires PHP v5.3.0+.
 
-PHPLOC Metrics
+Metrics
 ==============
 
- * Cyclomatic Complexity Score means:
-  * < 4 = Low Complexity
-  * 5 - 7 = Medium Complexity
-  * 6 - 10 = Highly Complex
-  * > 10 = Very Complex
+![](http://github.com/pogostick/kisma/raw/master/jdepend.png) 
 
 <pre>
 Directories:                                         14
@@ -76,8 +72,6 @@ Constants:                                          203
   Global constants:                                   1
   Class constants:                                  202
 </pre>
-
-![](http://github.com/pogostick/kisma/raw/master/jdepend.png) 
 
 ![](http://github.com/pogostick/kisma/raw/master/pyramid.png) 
 
