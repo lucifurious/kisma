@@ -511,7 +511,7 @@ namespace Kisma
 		 * @param boolean $unsetValue
 		 * @return mixed
 		 */
-		public static function getOption( array $options = array(), $key, $defaultValue = null, $unsetValue = false )
+		public static function getOption( $options = array(), $key, $defaultValue = null, $unsetValue = false )
 		{
 			return self::o( $options, $key, $defaultValue, $unsetValue );
 		}
@@ -527,7 +527,7 @@ namespace Kisma
 		 * @return mixed
 		 * @see \Kisma\Kisma::getOption
 		 */
-		public static function o( array $options = array(), $key, $defaultValue = null, $unsetValue = false )
+		public static function o( $options = array(), $key, $defaultValue = null, $unsetValue = false )
 		{
 			//	Standardize the key
 			$key = self::kismaTag( $key, true, false );
@@ -587,7 +587,7 @@ namespace Kisma
 		 * @param mixed $defaultValue Only applies to target value
 		 * @return mixed
 		 */
-		public static function oo( array $options = array(), $key, $subKey, $defaultValue = null, $unsetValue = false )
+		public static function oo( $options = array(), $key, $subKey, $defaultValue = null, $unsetValue = false )
 		{
 			return self::o(
 				self::o(
@@ -608,7 +608,7 @@ namespace Kisma
 		 * @param mixed $value
 		 * @return mixed The new value of the key
 		 */
-		public static function setOption( array &$options = array(), $key, $value = null )
+		public static function setOption( &$options = array(), $key, $value = null )
 		{
 			return self::so( $options, $key, $value );
 		}
@@ -621,7 +621,7 @@ namespace Kisma
 		 * @param mixed|null $value
 		 * @return mixed The new value of the key
 		 */
-		public static function so( array &$options = array(), $key, $value = null )
+		public static function so( &$options = array(), $key, $value = null )
 		{
 			if ( is_array( $options ) )
 			{
@@ -641,7 +641,7 @@ namespace Kisma
 		 * @param string $key
 		 * @return mixed The last value of the key
 		 */
-		public static function unsetOption( array &$options = array(), $key )
+		public static function unsetOption( &$options = array(), $key )
 		{
 			return self::uo( $options, $key );
 		}
@@ -653,7 +653,7 @@ namespace Kisma
 		 * @param string $key
 		 * @return mixed The new value of the key
 		 */
-		public static function uo( array &$options = array(), $key )
+		public static function uo( &$options = array(), $key )
 		{
 			return self::o( $options, $key, null, true );
 		}

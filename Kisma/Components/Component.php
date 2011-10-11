@@ -173,10 +173,10 @@ namespace Kisma\Components
 		 */
 		public function hasAspect( $aspectName, $returnAspect = false )
 		{
-			if ( !\K::gestate( $aspectName ) )
-			{
-				throw new \Kisma\AspectNotFoundException( 'Unknown aspect "' . $aspectName . '".' );
-			}
+//			if ( !\K::gestate( $aspectName ) )
+//			{
+//				throw new \Kisma\AspectNotFoundException( 'Unknown aspect "' . $aspectName . '".' );
+//			}
 
 			return \K::hasComponent( $this->_aspects, $aspectName, $returnAspect );
 		}
@@ -194,6 +194,7 @@ namespace Kisma\Components
 			if ( false === ( $this->_aspects[$_aspectKey] = $this->hasAspect( $aspectName, true ) ) )
 			{
 				$this->_aspects[$_aspectKey] = \K::createComponent( $aspectName, $options );
+				$this->trigger( 'aspect_created', $this->_aspects[$_aspectKey] );
 			}
 
 			return $this->_aspects[$_aspectKey]->link( $this );

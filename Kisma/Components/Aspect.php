@@ -35,6 +35,7 @@ namespace Kisma\Components
 	 * @property string $eventHandlerSignature The prefix of a method indicating it is an event handler
 	 * @property array $eventMap A map of event names to handlers provided by this aspect.
 	 * @property-read \Kisma\Components\Component $linker
+	 * @property-read string $aspectName
 	 */
 	abstract class Aspect extends SubComponent implements \Kisma\IAspect
 	{
@@ -54,10 +55,27 @@ namespace Kisma\Components
 		 * @var \Kisma\Components\Component
 		 */
 		protected $_linker = null;
+		/**
+		 * @var string The name of this Aspect
+		 */
+		protected $_aspectName = null;
 
 		//********************************************************************************
 		//* Public Methods
 		//********************************************************************************
+
+		/**
+		 * @param array $options
+		 */
+		public function __construct( $options = array() )
+		{
+			parent::__construct( $options );
+
+			if ( null === $this->_aspectName )
+			{
+				$this->_aspectName = \K::kismaTag( get_class( $this ), true );
+			}
+		}
 
 		/**
 		 * Link to a parent component
@@ -70,6 +88,9 @@ namespace Kisma\Components
 			//	Assign my linker and find his handlers
 			$this->_linker = $linker;
 			$this->_findEventHandlers( true );
+
+			//	trigger an event
+			$this->_linker->trigger( 'aspect_linked', $this );
 
 			return $this;
 		}
@@ -196,6 +217,14 @@ namespace Kisma\Components
 		public function getEventMap()
 		{
 			return $this->_eventMap;
+		}
+
+		/**
+		 * @return string
+		 */
+		public function getAspectName()
+		{
+			return $this->_aspectName;
 		}
 
 	}
