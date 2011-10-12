@@ -77,6 +77,10 @@ namespace Kisma
 		protected static $_debugLevel = DebugLevel::Normal;
 		/** @var array Any settings you may want to store for later */
 		protected static $_settings = array();
+		/**
+		 * @var array Our modules
+		 */
+		protected static $_modules = array();
 
 		//*************************************************************************
 		//* Public Methods
@@ -87,11 +91,17 @@ namespace Kisma
 		 * you, my humble geeks, to extend this class and have a built-in
 		 * constructor of sorts.
 		 *
-		 * @param array $settings
+		 * @param array|null $settings
 		 * @return bool
 		 */
 		public static function initialize( $settings = array() )
 		{
+			if ( null === $settings )
+			{
+				\Kisma\Utility\Log::debug( 'cwd: ' . getcwd() );
+				\Kisma\Utility\Log::debug( '__DIR__: ' . __DIR__ );
+			}
+
 			//	Save passed in options...
 			self::$_settings = self::cleanOptions( $settings );
 
@@ -119,9 +129,10 @@ namespace Kisma
 		 * @param string $tag
 		 * @param bool $isKey If true, the $tag will be converted to a format suitable for use as an array key
 		 * @param bool $baseNameOnly If true, only the final, base of the tag will be returned.
+		 * @param array $keyParts
 		 * @return string
 		 */
-		public static function kismaTag( $tag, $isKey = false, $baseNameOnly = false )
+		public static function kismaTag( $tag, $isKey = false, $baseNameOnly = false, &$keyParts = array() )
 		{
 			//	If we're dotted, clean up
 			if ( false !== strpos( $tag, '.' ) )
@@ -137,6 +148,7 @@ namespace Kisma
 			{
 				//	Convert namespace separators to dots
 				$_tag = lcfirst( str_replace( '\\', '.', $_tag ) );
+				$keyParts = explode( '.', $_tag );
 			}
 
 			//	Only the base?
@@ -211,7 +223,26 @@ namespace Kisma
 		 */
 		public static function log( $logEntry, $tag, $level = 'DEBUG' )
 		{
-			return error_log( date( 'm-d H:i:s' ) . ' [' . $tag . '] [' . $level . '] ' . $logEntry . PHP_EOL, 3, '/tmp/kisma.log' );
+			static $_logFile = null;
+
+			if ( null === $_logFile )
+			{
+				$_path = self::getSetting( 'log.path' );
+				$_name =self::getSetting( 'log.file_name' );
+
+				//	Make sure the directory is writable
+				if ( false === @mkdir( $_path, 0777, true ) )
+				{
+					if ( !is_dir( $_path ) || !is_writable( $_path ) )
+					{
+						throw new \RuntimeException( 'The configured log path "' . $_path . '" is not writable.' );
+					}
+				}
+				
+				$_logFile = rtrim( $_path, DIRECTORY_SEPARATOR ) . DIRECTORY_SEPARATOR . trim( self::getSetting( 'log.file_name' ), DIRECTORY_SEPARATOR );
+			}
+
+			return error_log( date( 'm-d H:i:s' ) . ' [' . $tag . '] [' . $level . '] ' . $logEntry . PHP_EOL, 3, $_logFile );
 		}
 
 		//*************************************************************************
@@ -240,6 +271,40 @@ namespace Kisma
 		{
 			$_className = self::kismaTag( $className );
 			return new $_className( $options );
+		}
+
+		/**
+		 * @static
+		 * @param string $moduleName
+		 * @param array $options
+		 * @return string
+		 */
+		public static function createModule( $moduleName, $options = array() )
+		{
+			$_modulePath = self::getSetting( 'module_path', getcwd() . DIRECTORY_SEPARATOR . 'modules' );
+			$_class = self::kismaTag( $moduleName, false, false, $_parts );
+
+			try
+			{
+				/** @noinspection PhpIncludeInspection */
+				require_once $_modulePath . DIRECTORY_SEPARATOR . $_class . '.php';
+			}
+			catch ( \Exception $_ex )
+			{
+				\Kisma\Utility\Log::error( 'Module "' . $_moduleName . '" not found. Check your paths.' );
+			}
+//			return self::$_modules[self::kismaTag( $moduleName, true )] = new $_class( $options );
+		}
+
+		/**
+		 * Retrieve a module
+		 * @static
+		 * @param string $moduleName
+		 * @return Components\Component|false
+		 */
+		public static function getModule( $moduleName )
+		{
+			return self::hasComponent( self::$_modules, $moduleName, true );
 		}
 
 		/**
@@ -500,7 +565,31 @@ namespace Kisma
 		 */
 		public static function getSetting( $key, $defaultValue = null )
 		{
-			return self::o( self::$_settings, $key, $defaultValue );
+			$_key = self::kismaTag( $key, true, false, $_parts );
+
+			if ( isset( self::$_settings[$_key] ) )
+			{
+				return self::$_settings[$_key];
+			}
+
+			$_base = self::$_settings;
+			$_count = count( $_parts );
+
+			foreach ( $_parts as $_part )
+			{
+				$_part = self::kismaTag( $_part, true );
+
+				//	Is this leaf there?
+				if ( !isset( $_base[$_part] ) )
+				{
+					$_base = null;
+					break;
+				}
+
+				$_base = $_base[$_part];
+			}
+
+			return $_base ?: $defaultValue;
 		}
 
 		/**
@@ -606,7 +695,7 @@ namespace Kisma
 		 * @param array $options
 		 * @param string $key
 		 * @param mixed $value
-		 * @return mixed The new value of the key
+		 * @return mixed
 		 */
 		public static function setOption( &$options = array(), $key, $value = null )
 		{
@@ -1003,7 +1092,30 @@ namespace
 	 */
 	class K extends \Kisma\Kisma implements \KismaSettings
 	{
-		//	Nothing to see here, move along...
+	}
+
+	/**
+	 * KismaBootstrap
+	 * The bootstrap class!
+	 */
+	class KismaBootstrap
+	{
+		/**
+		 * @static
+		 * @param array $configuration
+		 */
+		public static function loadModules( $configuration = array() )
+		{
+			//	Initialize Kisma
+			\K::initialize( $configuration );
+
+			$_modules = \K::o( $configuration, 'modules' );
+
+			foreach ( $_modules as $_moduleName => $_config )
+			{
+				\K::createModule( $_moduleName, $_config );
+			}
+		}
 	}
 
 	//*************************************************************************
@@ -1017,8 +1129,4 @@ namespace
 	\spl_autoload_extensions( '.php' );
 	\spl_autoload_register();
 	\spl_autoload_register( '\\Kisma\\Kisma::gestate', true, true );
-
-	//	Now start the engine!
-	\Kisma\Kisma::initialize();
 }
-
