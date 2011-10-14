@@ -117,7 +117,28 @@ namespace Kisma
 		}
 
 		/**
-		 * Given a Kisma identifier, clean it up to a Kisma standard, camel-cased, format.
+		 * Given a Kisma identifier, return it to neutral format (lowercase, period and underscores)
+		 *
+		 * Examples:
+		 *	 Class Name:		\Kisma\Components\ComponentEvent becomes "kisma.components.component_event"
+		 *
+		 * @param string $tag
+		 * @return string
+		 */
+		public static function untag( $tag )
+		{
+			$_parts = explode( '\\', $tag );
+
+			array_walk( $_parts, function( &$part ) {
+				//	Replace
+				$part = strtolower( preg_replace( '/(?<=\\w)([A-Z])/', '_\\1', $part ) );
+			});
+
+			return implode( '.', $_parts );
+		}
+
+		/**
+		 * Given a simple name, clean it up to a Kisma standard, camel-cased, format.
 		 *
 		 * Periods should be used to separate namespaces.
 		 * Underscores should be used to separate identifier words
@@ -132,7 +153,7 @@ namespace Kisma
 		 * @param array $keyParts
 		 * @return string
 		 */
-		public static function kismaTag( $tag, $isKey = false, $baseNameOnly = false, &$keyParts = array() )
+		public static function tag( $tag, $isKey = false, $baseNameOnly = false, &$keyParts = array() )
 		{
 			//	If we're dotted, clean up
 			if ( false !== strpos( $tag, '.' ) )
@@ -160,7 +181,7 @@ namespace Kisma
 
 			if ( self::getDebugLevel( \Kisma\DebugLevel::Nutty ) )
 			{
-				self::logDebug( 'kismaTag: ' . $tag . ' => ' . $_tag . ( false !== $isKey ? ' (as key)' : null ) );
+				self::logDebug( 'tag: ' . $tag . ' => ' . $_tag . ( false !== $isKey ? ' (as key)' : null ) );
 			}
 
 			return $_tag;
@@ -171,26 +192,6 @@ namespace Kisma
 		//*************************************************************************
 
 		/**
-		 * Determines the name of the object/function that called us
-		 * @static
-		 * @param int $level
-		 * @return string
-		 */
-		public static function getCaller( $level = 1 )
-		{
-			$_className = null;
-
-			//	Increment by one to account for myself
-			$level++;
-
-			$_backTrace = debug_backtrace();
-			$_function = self::o( $_backTrace[$level], 'method', self::o( $_backTrace[$level], 'function', '__unknown__' ) );
-			$_class = self::o( $_backTrace[$level], 'class' );
-
-			return ( null !== $_class ? $_class . self::o( $_backTrace[$level], 'type' ) : null ) . $_function;
-		}
-
-		/**
 		 * @static
 		 * @param $logEntry
 		 * @param string $tag
@@ -198,8 +199,7 @@ namespace Kisma
 		 */
 		public static function logDebug( $logEntry, $tag = null )
 		{
-			$_tag = $tag ?: self::getCaller();
-			return Utility\Log::log( $logEntry, $_tag, 'DEBUG' );
+			return Utility\Log::debug( $logEntry, $tag );
 		}
 
 		/**
@@ -210,28 +210,30 @@ namespace Kisma
 		 */
 		public static function logError( $logEntry, $tag = null )
 		{
-			$_tag = $tag ?: self::getCaller();
-			return Utility\Log::log( $logEntry, $_tag, 'ERROR' );
+			return Utility\Log::error( $logEntry, $tag );
 		}
 
 		/**
 		 * @static
 		 * @param string $logEntry
 		 * @param string $tag
-		 * @param string $level
-		 * @return bool
+		 * @param int|\Kisma\LogLevel $level
+		 * @param bool $returnEntry
+		 * @return bool|string
 		 */
-		public static function log( $logEntry, $tag, $level = 'DEBUG' )
+		public static function log( $logEntry, $tag, $level = LogLevel::Debug, $returnEntry = false )
 		{
 			static $_logFile = null;
+
+			$_name = null;
 
 			if ( null === $_logFile )
 			{
 				$_path = self::getSetting( 'log.path' );
-				$_name =self::getSetting( 'log.file_name' );
+				$_name = self::getSetting( 'log.file_name' );
 
 				//	Make sure the directory is writable
-				if ( false === @mkdir( $_path, 0777, true ) )
+				if ( false === @mkdir( $_path, 0750, true ) )
 				{
 					if ( !is_dir( $_path ) || !is_writable( $_path ) )
 					{
@@ -239,10 +241,31 @@ namespace Kisma
 					}
 				}
 				
-				$_logFile = rtrim( $_path, DIRECTORY_SEPARATOR ) . DIRECTORY_SEPARATOR . trim( self::getSetting( 'log.file_name' ), DIRECTORY_SEPARATOR );
+				$_logFile = rtrim( $_path, DIRECTORY_SEPARATOR ) . DIRECTORY_SEPARATOR . trim( $_name, DIRECTORY_SEPARATOR );
 			}
 
-			return error_log( date( 'm-d H:i:s' ) . ' [' . $tag . '] [' . $level . '] ' . $logEntry . PHP_EOL, 3, $_logFile );
+			if ( empty( $_logFile ) )
+			{
+				echo 'no log name!';
+				//	No logging configured, just bail...
+				return false;
+			}
+
+			$_entry =  sprintf( '%s %d:[%-30.30s] %s',
+				date( 'M d H:i:s' ),
+				$level,
+				$tag,
+				$logEntry
+			);
+
+			if ( false !== $returnEntry )
+			{
+				//	Return string if requested
+				return $_entry;
+			}
+
+			//	Otherwise write to log
+			return error_log( $_entry . PHP_EOL, 3, $_logFile );
 		}
 
 		//*************************************************************************
@@ -257,7 +280,7 @@ namespace Kisma
 		 */
 		public static function createUniqueName( \Kisma\IComponent $component, $humanReadable = false )
 		{
-			$_tag = self::kismaTag( get_class( $component ) . '.' . self::$_uniqueIdCounter++ );
+			$_tag = self::tag( get_class( $component ) . '.' . self::$_uniqueIdCounter++ );
 			return 'kisma.' . ( $humanReadable ? $_tag : Utility\Hash::hash( $_tag ) );
 		}
 
@@ -269,7 +292,7 @@ namespace Kisma
 		 */
 		public static function createComponent( $className, $options = array() )
 		{
-			$_className = self::kismaTag( $className );
+			$_className = self::tag( $className );
 			return new $_className( $options );
 		}
 
@@ -282,7 +305,7 @@ namespace Kisma
 		public static function createModule( $moduleName, $options = array() )
 		{
 			$_modulePath = self::getSetting( 'module_path', getcwd() . DIRECTORY_SEPARATOR . 'modules' );
-			$_class = self::kismaTag( $moduleName, false, false, $_parts );
+			$_class = self::tag( $moduleName, false, false, $_parts );
 
 			try
 			{
@@ -293,7 +316,7 @@ namespace Kisma
 			{
 				\Kisma\Utility\Log::error( 'Module "' . $_moduleName . '" not found. Check your paths.' );
 			}
-//			return self::$_modules[self::kismaTag( $moduleName, true )] = new $_class( $options );
+//			return self::$_modules[self::tag( $moduleName, true )] = new $_class( $options );
 		}
 
 		/**
@@ -433,6 +456,27 @@ namespace Kisma
 		}
 
 		/**
+		 * @static
+		 * @param string|array $libraryPath Relative path under library_path
+		 */
+		public static function importLibrary( $libraryPath )
+		{
+			$_libraries = !is_array( $libraryPath ) ? array( $libraryPath ) : $libraryPath;
+
+			foreach ( $_libraries as $_libraryPath )
+			{
+				$_realPath = str_replace(
+					'\\',
+					DIRECTORY_SEPARATOR,
+					self::tag( rtrim( \K::getSetting( 'library_path' ), DIRECTORY_SEPARATOR ) )
+				);
+
+				$_realPath .= DIRECTORY_SEPARATOR . rtrim( $_libraryPath, DIRECTORY_SEPARATOR );
+				\set_include_path( \get_include_path() . PATH_SEPARATOR . $_realPath );
+			}
+		}
+
+		/**
 		 * Tests if a value needs unserialization
 		 * @param string $value
 		 * @return boolean
@@ -474,7 +518,7 @@ namespace Kisma
 		public static function uses( $kismaTag, $loadClass = false )
 		{
 			//	Get the namespace out of the way
-			$_root = str_replace( __NAMESPACE__ . '\\', null, self::kismaTag( $kismaTag ) );
+			$_root = str_replace( __NAMESPACE__ . '\\', null, self::tag( $kismaTag ) );
 
 			//	Is it a wildcard?
 			if ( '*' == end( explode( '\\', $_root ) ) )
@@ -496,7 +540,7 @@ namespace Kisma
 				__DIR__ .
 				DIRECTORY_SEPARATOR .
 				trim(
-					str_replace( '\\', DIRECTORY_SEPARATOR, Kisma::kismaTag( $_root ) ),
+					str_replace( '\\', DIRECTORY_SEPARATOR, Kisma::tag( $_root ) ),
 					DIRECTORY_SEPARATOR
 				);
 
@@ -550,7 +594,7 @@ namespace Kisma
 					$_value = self::cleanOptions( $_value, $recursive );
 				}
 
-				$_options[self::kismaTag( $_key, true, false )] = $_value;
+				$_options[self::tag( $_key, true, false )] = $_value;
 			}
 
 			return $_options;
@@ -565,7 +609,7 @@ namespace Kisma
 		 */
 		public static function getSetting( $key, $defaultValue = null )
 		{
-			$_key = self::kismaTag( $key, true, false, $_parts );
+			$_key = self::tag( $key, true, false, $_parts );
 
 			if ( isset( self::$_settings[$_key] ) )
 			{
@@ -577,7 +621,7 @@ namespace Kisma
 
 			foreach ( $_parts as $_part )
 			{
-				$_part = self::kismaTag( $_part, true );
+				$_part = self::tag( $_part, true );
 
 				//	Is this leaf there?
 				if ( !isset( $_base[$_part] ) )
@@ -619,7 +663,7 @@ namespace Kisma
 		public static function o( $options = array(), $key, $defaultValue = null, $unsetValue = false )
 		{
 			//	Standardize the key
-			$key = self::kismaTag( $key, true, false );
+			$key = self::tag( $key, true, false );
 
 			//	Set the default value
 			$_newValue = $defaultValue;
@@ -714,7 +758,7 @@ namespace Kisma
 		{
 			if ( is_array( $options ) )
 			{
-				return $options[self::kismaTag( $key, true, false )] = $value;
+				return $options[self::tag( $key, true, false )] = $value;
 			}
 			else if ( is_object( $options ) )
 			{
@@ -846,7 +890,7 @@ namespace Kisma
 		 */
 		public static function __property( &$object, $propertyName, $access = \Kisma\AccessorMode::Get, $valueOrDefault = null )
 		{
-			$_propertyName = self::kismaTag( $propertyName );
+			$_propertyName = self::tag( $propertyName );
 
 			$_getter = 'get' . $_propertyName;
 			$_setter = 'set' . $_propertyName;
@@ -902,7 +946,7 @@ namespace Kisma
 		 */
 		public static function __propertyError( $name, $type = \Kisma\AccessorMode::Undefined )
 		{
-			$_name = self::kismaTag( $name );
+			$_name = self::tag( $name );
 
 			switch ( $type )
 			{
@@ -938,7 +982,7 @@ namespace Kisma
 		 */
 		public static function hasComponent( $map, $name, $returnObject = false )
 		{
-			$_key = self::kismaTag( $name, true );
+			$_key = self::tag( $name, true );
 
 			return
 				is_array( $map ) && isset( $map[$_key] )
@@ -983,7 +1027,7 @@ namespace Kisma
 
 			//	Build the class name
 			$_class = trim(
-				str_replace( '\\', DIRECTORY_SEPARATOR, self::kismaTag( $className ) ),
+				str_replace( '\\', DIRECTORY_SEPARATOR, self::tag( $className ) ),
 				DIRECTORY_SEPARATOR
 			);
 
@@ -1109,6 +1153,12 @@ namespace
 			//	Initialize Kisma
 			\K::initialize( $configuration );
 
+			//	Add the library path to the includes
+			if ( null !== ( $_libPath = \K::getSetting( 'library_path' ) ) )
+			{
+				\set_include_path( get_include_path() . PATH_SEPARATOR . $_libPath );
+			}
+
 			$_modules = \K::o( $configuration, 'modules' );
 
 			foreach ( $_modules as $_moduleName => $_config )
@@ -1125,7 +1175,7 @@ namespace
 	/**
 	 * Set up the autoloader
 	 */
-	\set_include_path( __DIR__ . PATH_SEPARATOR . get_include_path() );
+	\set_include_path( get_include_path() . PATH_SEPARATOR . __DIR__ );
 	\spl_autoload_extensions( '.php' );
 	\spl_autoload_register();
 	\spl_autoload_register( '\\Kisma\\Kisma::gestate', true, true );

@@ -152,7 +152,7 @@ namespace Kisma\Aspects\Reactors
 		 */
 		public function create( $eventName, $linker, $eventData = null, $eventClass = \KismaSettings::DefaultEventClass )
 		{
-			$_eventKey = \K::kismaTag( $eventName, true );
+			$_eventKey = \K::tag( $eventName, true );
 
 			$_eventOptions = array(
 				'source' => $linker,
@@ -180,7 +180,7 @@ namespace Kisma\Aspects\Reactors
 		 */
 		public function bind( $eventName, $callback, $eventData = null, $eventClass = \KismaSettings::DefaultEventClass )
 		{
-			$_eventKey = \K::kismaTag( $eventName, true );
+			$_eventKey = \K::tag( $eventName, true );
 
 			if ( false === ( $_event = $this->hasEvent( $eventName, true ) ) )
 			{
@@ -202,7 +202,7 @@ namespace Kisma\Aspects\Reactors
 		public function unbind( $eventName, $callback )
 		{
 			//	If we don't have the event, fail & bail
-			$_eventKey = \K::kismaTag( $eventName, true );
+			$_eventKey = \K::tag( $eventName, true );
 
 			if ( null !== \K::o( $this->_events, $_eventKey ) )
 			{
@@ -239,7 +239,7 @@ namespace Kisma\Aspects\Reactors
 		public function trigger( $eventName, $eventData = null, $callback = null )
 		{
 			//	If we don't have the event, fail & bail
-			$_eventKey = \K::kismaTag( $eventName, true );
+			$_eventKey = \K::tag( $eventName, true );
 
 			if ( null !== \K::o( $this->_events, $_eventKey ) )
 			{

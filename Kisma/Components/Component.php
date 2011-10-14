@@ -189,7 +189,7 @@ namespace Kisma\Components
 		 */
 		public function linkAspect( $aspectName, $options = array() )
 		{
-			$_aspectKey = \K::kismaTag( $aspectName, true );
+			$_aspectKey = \K::tag( $aspectName, true );
 
 			if ( false === ( $this->_aspects[$_aspectKey] = $this->hasAspect( $aspectName, true ) ) )
 			{

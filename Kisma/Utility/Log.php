@@ -7,14 +7,14 @@
  * Dual licensed under the MIT License and the GNU General Public License (GPL) Version 2.
  * See {@link http://github.com/Pogostick/kisma/licensing/} for complete information.
  *
- * @copyright	 Copyright 2011, Pogostick, LLC. (http://www.pogostick.com/)
- * @link		  http://github.com/Pogostick/kisma/ Kisma(tm)
- * @license	   http://github.com/Pogostick/kisma/licensing/
- * @author		Jerry Ablan <kisma@pogostick.com>
- * @category	  Kisma_Utility
- * @package	   kisma.utility
- * @namespace	 \Kisma\Utility
- * @since		 v1.0.0
+ * @copyright Copyright 2011, Pogostick, LLC. (http://www.pogostick.com/)
+ * @link http://github.com/Pogostick/kisma/ Kisma(tm)
+ * @license http://github.com/Pogostick/kisma/licensing/
+ * @author Jerry Ablan <kisma@pogostick.com>
+ * @category Kisma_Utility
+ * @package kisma.utility
+ * @namespace \Kisma\Utility
+ * @since v1.0.0
  * @filesource
  */
 
@@ -27,11 +27,14 @@
  */
 namespace Kisma\Utility
 {
+	//	Aliases
+	use \Kisma\Components as Components;
+
 	/**
 	 * Log
 	 * It's better than bad! It's GOOD! All kids love Log!
 	 */
-	class Log extends \Kisma\Components\SubComponent implements \Kisma\IUtility
+	class Log extends Components\SubComponent implements \Kisma\IUtility
 	{
 		//********************************************************************************
 		//* Private Members
@@ -46,25 +49,28 @@ namespace Kisma\Utility
 		 */
 		protected static $_prefix = null;
 		/**
-		 * @var integer The base level for getting source of log entry
-		 */
-		protected static $_baseLevel = 2;
-		/**
 		 * @var integer The current indent level
 		 */
 		protected static $_currentIndent = 0;
 		/**
+		 * @var array The strings to watch for at the beginning of a log line to control the indenting
+		 */
+		protected static $_indentTokens = array(
+			true => '>>',
+			false => '<<',
+		);
+		/**
 		 * @var string
 		 */
-		protected static $_defaultLevelIndicator = '.';
+		protected static $_defaultLevelIndicator = ' ';
 		/**
 		 * @var array
 		 */
 		protected static $_levelIndicators = array(
-			'info'    => '*',
-			'notice'  => '?',
-			'warning' => '-',
-			'error'   => '!',
+			\Kisma\LogLevel::Info => '*',
+			\Kisma\LogLevel::Notice => '?',
+			\Kisma\LogLevel::Warning => '-',
+			\Kisma\LogLevel::Error => '!',
 		);
 
 		//********************************************************************************
@@ -72,154 +78,120 @@ namespace Kisma\Utility
 		//********************************************************************************
 
 		/**
-		 * Creates an 'info' log entry
+		 * Creates any log entry
 		 *
-		 * @param string $message The message to log
-		 * @param string $tag The message category. Please use only word letters. Note, category 'yii' is reserved for Yii framework core
-		 * code use. See {@link CPhpMessageSource} for more interpretation about message category.
-		 * @param string $level The message level
+		 * @param string $message The message to send to the log
+		 * @param string $tag|null A string that represents the object logging the message. If null,
+		 * the calling method will be used.
+		 * @param int $logLevel The severity of the message
 		 * @return bool
 		 */
-		public static function log( $message, $tag = null, $level = 'info' )
+		public static function log( $message, $tag = null, $logLevel = \Kisma\LogLevel::Info )
 		{
 			if ( null === $tag )
 			{
-				$tag = self::_getCallingMethod( self::$_baseLevel );
+				$tag = self::_getCallingMethod();
 			}
 
 			//	Get the indent, if any
-			$_unindent  = ( 0 > ( $_newIndent = self::_processMessage( $message ) ) );
+			$_unindent = ( 0 > ( $_newIndent = self::_processMessage( $message ) ) );
 
-			$_levelList = explode( '|', $level );
+			$_indicator = \K::o( self::$_levelIndicators, $logLevel, self::$_defaultLevelIndicator );
+			$_logEntry = self::$_prefix . $message;
 
-			//	Handle writing to multiple levels at once.
-			foreach ( $_levelList as $_level )
+			if ( self::$_echoData )
 			{
-				$_indicator = \K::o( self::$_levelIndicators, $_level, self::$_defaultLevelIndicator );
-				$_logEntry  = self::$_prefix . $message;
-
-				if ( self::$_echoData )
-				{
-					echo date( 'Y.m.d h.i.s' ) .
-						'[' . strtoupper( $_level[0] ) . '] ' .
-						'[' . sprintf( '%-40s', $tag = null ) . '] ' .
-						$_logEntry . '<br />';
-
-					flush();
-				}
-
-				//	Indent...
-				$_tempIndent = self::$_currentIndent;
-
-				if ( $_unindent )
-				{
-					$_tempIndent--;
-				}
-
-				if ( $_tempIndent < 0 )
-				{
-					$_tempIndent = 0;
-				}
-
-				$_logEntry = str_repeat( '  ', $_tempIndent ) . $_indicator . ' ' . $message;
-
-				\K::log( $_logEntry, $tag, $_level );
+				echo \K::log( $_logEntry, $tag, $logLevel, true );
+				flush();
 			}
+
+			//	Indent...
+			$_tempIndent = self::$_currentIndent;
+
+			if ( $_unindent )
+			{
+				$_tempIndent--;
+			}
+
+			if ( $_tempIndent < 0 )
+			{
+				$_tempIndent = 0;
+			}
+
+			$_logEntry = str_repeat( '  ', $_tempIndent ) . $_indicator . ' ' . $message;
+
+			\K::log( $_logEntry, $tag, $logLevel );
 
 			//	Set indent level...
 			self::$_currentIndent += $_newIndent;
 
-			return ( 'error' != $level );
+			//	Anything over a warning returns false so you can chain
+			return ( \Kisma\LogLevel::Warning > $logLevel );
 		}
 
 		/**
 		 * Creates an 'info' log entry
-		 * @param mixed $tag The message category. Please use only word letters. Note, category 'yii' is reserved for Yii framework core
-		 * code use. See {@link CPhpMessageSource} for more interpretation about message category.
-		 * @param mixed $message The message to log
+		 *
+		 * @param string $message The message to send to the log
+		 * @param string $tag|null A string that represents the object logging the message. If null,
+		 * the calling method will be used.
+		 * @return bool
 		 */
 		public static function info( $message, $tag = null )
 		{
-			self::log( $message, $tag, 'info' );
+			return self::log( $message, $tag, \Kisma\LogLevel::Info );
 		}
 
 		/**
 		 * Creates an 'error' log entry
-		 * @param mixed $tag The message category. Please use only word letters. Note, category 'yii' is reserved for Yii framework core
-		 * code use. See {@link CPhpMessageSource} for more interpretation about message category.
-		 * @param mixed $message The message to log
+		 *
+		 * @param string $message The message to send to the log
+		 * @param string $tag|null A string that represents the object logging the message. If null,
+		 * the calling method will be used.
+		 * @return bool
 		 */
 		public static function error( $message, $tag = null )
 		{
-			self::log( $message, $tag, 'error' );
+			return self::log( $message, $tag, \Kisma\LogLevel::Error );
 		}
 
 		/**
-		 * Creates an 'warning' log entry
-		 * @param mixed $tag The message category. Please use only word letters. Note, category 'yii' is reserved for Yii framework core
-		 * code use. See {@link CPhpMessageSource} for more interpretation about message category.
-		 * @param mixed $message The message to log
-		 * @param mixed $options Parameters to be applied to the message using <code>strtr</code>.
-		 * @param mixed $source Which message source application component to use.
-		 * @param mixed $language The target language. If null (default), the {@link CApplication::getLanguage application language} will be used.
+		 * Creates a 'warning' log entry
+		 *
+		 * @param string $message The message to send to the log
+		 * @param string $tag|null A string that represents the object logging the message. If null,
+		 * the calling method will be used.
+		 * @return bool
 		 */
 		public static function warning( $message, $tag = null )
 		{
-			self::log( $message, $tag, 'warning' );
+			return self::log( $message, $tag, \Kisma\LogLevel::Warning );
 		}
 
 		/**
-		 * Creates an 'trace' log entry
-		 * @param mixed $tag The message category. Please use only word letters. Note, category 'yii' is reserved for Yii framework core
-		 * code use. See {@link CPhpMessageSource} for more interpretation about message category.
-		 * @param mixed $message The message to log
-		 * @param mixed $options Parameters to be applied to the message using <code>strtr</code>.
-		 * @param mixed $source Which message source application component to use.
-		 * @param mixed $language The target language. If null (default), the {@link CApplication::getLanguage application language} will be used.
+		 * Alias of the 'debug' level
+		 *
+		 * @param string $message The message to send to the log
+		 * @param string $tag|null A string that represents the object logging the message. If null,
+		 * the calling method will be used.
+		 * @return bool
 		 */
 		public static function trace( $message, $tag = null )
 		{
-			self::log( $message, $tag, 'trace' );
-		}
-
-		/**
-		 * Creates an 'api' log entry
-		 * @param string $apiCall The API call made
-		 * @param mixed $response The API response to log
-		 */
-		public static function api( $apiCall, $response = null )
-		{
-			self::log( PHP_EOL . print_r( $response, true ) . PHP_EOL, $apiCall, 'api' );
+			return self::debug( $message, $tag );
 		}
 
 		/**
 		 * Creates a 'debug' log entry
-		 * @param mixed $tag The message category. Please use only word letters. Note, category 'yii' is reserved for Yii framework core
-		 * code use. See {@link CPhpMessageSource} for more interpretation about message category.
-		 * @param mixed $message The message to log
+		 *
+		 * @param string $message The message to send to the log
+		 * @param string $tag|null A string that represents the object logging the message. If null,
+		 * the calling method will be used.
+		 * @return bool
 		 */
 		public static function debug( $message, $tag = null )
 		{
-			self::log( $message, $tag, 'debug' );
-		}
-
-		/**
-		 * Returns the name of the method that made the call
-		 * @param integer $level The level of the call
-		 * @return string
-		 */
-		protected static function _getCallingMethod( $level = 2 )
-		{
-			$_className = null;
-
-			//	Increment by one to account for myself
-			$level++;
-
-			$_backTrace = debug_backtrace();
-			$_function = \K::o( $_backTrace[$level], 'method', \K::o( $_backTrace[$level], 'function', '__unknown__' ) );
-			$_class = \K::o( $_backTrace[$level], 'class' );
-
-			return ( null !== $_class ? $_class . \K::o( $_backTrace[$level], 'type' ) : null ) . $_function;
+			return self::log( $message, $tag, \Kisma\LogLevel::Debug );
 		}
 
 		/**
@@ -236,6 +208,29 @@ namespace Kisma\Utility
 			}
 		}
 
+		/**
+		 * Returns the name of the method that made the call
+		 * @param integer $logLevel The level of the call
+		 * @return string
+		 */
+		protected static function _getCallingMethod()
+		{
+			$_backTrace = debug_backtrace();
+			$_caller = count( $_backTrace ) - 1;
+			$_function = \K::o( $_backTrace[$_caller], 'method', \K::o( $_backTrace[$_caller], 'function' ) );
+			$_class = \K::o( $_backTrace[$_caller], 'class' );
+
+			$_callingMethod =
+				( null !== $_class
+					?
+					$_class . \K::o( $_backTrace[$_caller], 'type' )
+					:
+					null
+				) . $_function;
+
+			return str_replace( array( '::', 'kisma.' ), array( '.', 'k.' ), \K::untag( $_callingMethod ) );
+		}
+
 		//*************************************************************************
 		//* Protected Methods 
 		//*************************************************************************
@@ -249,38 +244,16 @@ namespace Kisma\Utility
 		{
 			$_newIndent = 0;
 
-			switch ( substr( $message, 0, 2 ) )
+			foreach ( self::$_indentTokens as $_key => $_token )
 			{
-				case '>>':
-					$_newIndent = 1;
-					$message    = trim( substr( $message, 2 ) );
-					break;
-
-				case '<<':
-					$_newIndent = -1;
-					$message    = trim( substr( $message, 2 ) );
-					break;
+				if ( $_token == substr( $message, 0, strlen( $_token ) ) )
+				{
+					$_newIndent = ( false === $_key ? -1 : 1 );
+					$message = substr( $message, strlen( self::$_indentTokens[true] ) );
+				}
 			}
 
 			return $_newIndent;
-		}
-
-		/**
-		 * @static
-		 * @param $baseLevel
-		 */
-		public static function setBaseLevel( $baseLevel = 2 )
-		{
-			self::$_baseLevel = $baseLevel;
-		}
-
-		/**
-		 * @static
-		 * @return int
-		 */
-		public static function getBaseLevel()
-		{
-			return self::$_baseLevel;
 		}
 
 		/**
@@ -336,11 +309,11 @@ namespace Kisma\Utility
 		}
 
 		/**
-		 * @param array $levelIndicators
+		 * @param array $logLevelIndicators
 		 */
-		public static function setLevelIndicators( $levelIndicators )
+		public static function setLevelIndicators( $logLevelIndicators )
 		{
-			self::$_levelIndicators = $levelIndicators;
+			self::$_levelIndicators = $logLevelIndicators;
 		}
 
 		/**
@@ -367,6 +340,22 @@ namespace Kisma\Utility
 		public static function getPrefix()
 		{
 			return self::$_prefix;
+		}
+
+		/**
+		 * @param array $indentTokens
+		 */
+		public static function setIndentTokens( $indentTokens )
+		{
+			self::$_indentTokens = $indentTokens;
+		}
+
+		/**
+		 * @return array
+		 */
+		public static function getIndentTokens()
+		{
+			return self::$_indentTokens;
 		}
 	}
 }

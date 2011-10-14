@@ -73,7 +73,7 @@ namespace Kisma\Components
 
 			if ( null === $this->_aspectName )
 			{
-				$this->_aspectName = \K::kismaTag( get_class( $this ), true );
+				$this->_aspectName = \K::tag( get_class( $this ), true );
 			}
 		}
 
@@ -137,7 +137,7 @@ namespace Kisma\Components
 					$_ignores,
 					function( &$ignore )
 					{
-						$ignore = \K::kismaTag( $ignore );
+						$ignore = \K::tag( $ignore );
 					}
 				);
 
@@ -156,7 +156,7 @@ namespace Kisma\Components
 
 					if ( 0 == strcasecmp( $_stub, $this->_eventHandlerSignature ) )
 					{
-						$_eventKey = \K::kismaTag( substr( $_realMethodName, $_length ), true );
+						$_eventKey = \K::tag( substr( $_realMethodName, $_length ), true );
 
 						//	Map the callback to the key
 						$this->_eventMap[$_eventKey] = array(

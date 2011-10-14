@@ -73,6 +73,10 @@ namespace Kisma\Services\Authentication
 		 * @var string
 		 */
 		protected $_refreshToken = null;
+		/**
+		 * @var string
+		 */
+		protected $_requestToken = null;
 
 		//*************************************************************************
 		//* Properties
