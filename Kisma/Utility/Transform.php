@@ -36,19 +36,19 @@ namespace Kisma\Utility
 	class Transform extends \Kisma\Components\SubComponent implements \Kisma\IUtility
 	{
 		//*************************************************************************
-		//* Class Constants 
+		//* Class Constants
 		//*************************************************************************
 
 		//*************************************************************************
-		//* Private Members 
+		//* Private Members
 		//*************************************************************************
 
 		//*************************************************************************
-		//* Public Methods 
+		//* Public Methods
 		//*************************************************************************
 
 		//*************************************************************************
-		//* Private Methods 
+		//* Private Methods
 		//*************************************************************************
 
 		//*************************************************************************
@@ -64,34 +64,31 @@ namespace Kisma\Utility
 		 */
 		public static function xmlToArray( $xmlText, $version = '1.0', $encoding = 'utf-8', $options = null )
 		{
-			if ( !( $xmlText instanceof \DOMDocument ) )
+			$_xml = $xmlText;
+
+			if ( $_xml instanceof \DOMDocument )
 			{
-				$_xml = $xmlText;
+				Log::debug( 'Received DOMDocument' );
+				$_xml = $xmlText->asXML();
 			}
-			else
+			else if ( $_xml instanceof \SimpleXMLElement )
 			{
-				if ( $xmlText instanceof \SimpleXMLElement )
-				{
-					$_xml = $xmlText->asXML();
-				}
+				Log::debug( 'Received SimpleXMLElement' );
+				$_xml = $xmlText->asXML();
+			}
 
-				if ( !is_string( $xmlText ) )
-				{
-					//	No clue what you've given me
-					return false;
-				}
-
-				//	Make a \DOMDocument
-				libxml_use_internal_errors( true );
-				$_xml = new \DOMDocument( $version, $encoding );
-				$_xml->loadXML( $xmlText, $options );
-
+			if ( !is_string( $xmlText ) )
+			{
+				//	No clue what you've given me
+				return false;
 			}
 
 			//	Start the chain reaction
-			return array(
-				$_xml->firstChild->tagName => self::_xmlNodeToArray( $_xml->firstChild ),
-			);
+			$_xmlObject = self::createArray( $_xml );
+
+			Log::debug( 'Transformed XML to Array: ' . print_r( $_xmlObject, true ) );
+
+			return $_xmlObject;
 		}
 
 		/**
@@ -101,8 +98,6 @@ namespace Kisma\Utility
 		 */
 		protected static function _xmlNodeToArray( $xmlNode )
 		{
-			$_array = array();
-
 			if ( XML_ELEMENT_NODE != $xmlNode->nodeType )
 			{
 				return false;
@@ -117,8 +112,10 @@ namespace Kisma\Utility
 				}
 
 				$_prefix = ( $_childNode->prefix ? $_childNode->prefix . ':' : null );
+				$_nodeName = $_prefix . $_childNode->nodeName;
+				$_subNode = false;
 
-				if ( false === ( $_subNode = is_array( $_array[$_prefix . $_childNode->nodeName] ) ) )
+				if ( false === ( isset( $_array[$_nodeName] ) && is_array( $_array[$_nodeName] ) ) )
 				{
 					/** @var $_childNodeCheck \DOMNode */
 					foreach ( $xmlNode->childNodes as $_childNodeCheck )
@@ -130,14 +127,18 @@ namespace Kisma\Utility
 						}
 					}
 				}
+				else
+				{
+					$_subNode = true;
+				}
 
 				if ( $_subNode )
 				{
-					$_array[$_prefix . $_childNode->nodeName][] = self::_xmlNodeToArray( $_childNode );
+					$_array[$_nodeName][] = self::_xmlNodeToArray( $_childNode );
 				}
 				else
 				{
-					$_array[$_prefix . $_childNode->nodeName] = self::_xmlNodeToArray( $_childNode );
+					$_array[$_nodeName] = self::_xmlNodeToArray( $_childNode );
 				}
 			}
 
@@ -159,11 +160,80 @@ namespace Kisma\Utility
 				foreach ( $xmlNode->attributes as $_attribute )
 				{
 					$_prefix = ( $_attribute->prefix ? $_attribute->prefix . ':' : null );
-					$_array['@' . $_prefix . $_attribute->nodeName] = $_attribute->nodeValue;
+					$_array['@attributes'][$_prefix . $_attribute->nodeName] = $_attribute->nodeValue;
 				}
 			}
 
 			return $_array;
+		}
+
+		public static function createArray( $xmlText )
+		{
+			$awsXml = $xmlText;
+			$awsVals = array();
+			$awsIndex = array();
+			$awsRetArray = array();
+			$awsParser = xml_parser_create();
+			xml_parser_set_option( $awsParser, XML_OPTION_SKIP_WHITE, 1 );
+			xml_parser_set_option( $awsParser, XML_OPTION_CASE_FOLDING, 0 );
+			xml_parse_into_struct( $awsParser, $awsXml, $awsVals, $awsIndex );
+			xml_parser_free( $awsParser );
+			$i = 0;
+			$awsName = $awsVals[$i]['tag'];
+			$awsRetArray[$awsName] = isset( $awsVals[$i]['attributes'] ) ? $awsVals[$i]['attributes'] : '';
+			$awsRetArray[$awsName] = self::_struct_to_array( $awsVals, $i );
+			return $awsRetArray;
+		}
+
+		protected static function _struct_to_array( $awsVals, &$i )
+		{
+			$awsChild = array();
+			if ( isset( $awsVals[$i]['value'] ) )
+				array_push( $awsChild, $awsVals[$i]['value'] );
+
+			while ( $i++ < count( $awsVals ) )
+			{
+				switch ( $awsVals[$i]['type'] )
+				{
+					default:
+						array_push( $awsChild, $awsVals[$i]['value'] );
+						break;
+
+					case 'cdata':
+						array_push( $awsChild, $awsVals[$i]['value'] );
+						break;
+
+					case 'complete':
+						$awsName = $awsVals[$i]['tag'];
+						if ( !empty( $awsName ) )
+						{
+							$awsChild[$awsName] = ( $awsVals[$i]['value'] ) ? ( $awsVals[$i]['value'] ) : '';
+							if ( isset( $awsVals[$i]['attributes'] ) )
+							{
+								$awsChild[$awsName] = $awsVals[$i]['attributes'];
+							}
+						}
+						break;
+
+					case 'open':
+						$awsName = $awsVals[$i]['tag'];
+						$size = isset( $awsChild[$awsName] ) ? sizeof( $awsChild[$awsName] ) : 0;
+						if ( intval( $size ) > 0 )
+						{
+							$awsChild[$awsName][$size] = self::_struct_to_array( $awsVals, $i );
+						}
+						else
+						{
+							$awsChild[$awsName] = self::_struct_to_array( $awsVals, $i );
+						}
+						break;
+
+					case 'close':
+						return $awsChild;
+						break;
+				}
+			}
+			return $awsChild;
 		}
 	}
 }
