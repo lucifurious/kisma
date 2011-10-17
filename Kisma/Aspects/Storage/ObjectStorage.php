@@ -91,6 +91,15 @@ namespace Kisma\Aspects\Storage
 		//*************************************************************************
 
 		/**
+		 * @param array $options
+		 */
+		public function __construct( $options = array() )
+		{
+			parent::__construct( $options );
+			$this->_storageObject = new \SplObjectStorage();
+		}
+
+		/**
 		 * Pass-through for the SplObjectStorage object
 		 *
 		 * @param string $method
