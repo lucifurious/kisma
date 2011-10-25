@@ -34,8 +34,8 @@ namespace Kisma\Components
 	use \Kisma\Utility as Utility;
 
 	/**
-	 * Event
-	 * The mother of all events!
+	 * EventHandler
+	 * The mother of all event handlers!
 	 */
 	class EventHandler extends SubComponent
 	{

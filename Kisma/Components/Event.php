@@ -91,6 +91,7 @@ namespace Kisma\Components
 
 			//	Reset the event
 			$this->_continuePropagation = true;
+			$this->_eventData = $eventData;
 
 			//	Loop through the handlers for this event, passing data
 			foreach ( $this->_handlers as $_handler )

@@ -28,7 +28,7 @@ namespace Kisma\Services\Remote
 
 	/**
 	 * Http
-	 * A base service to provide communication to an HTTP-based service
+	 * A base service to provide HTTP services
 	 */
 	class Http extends Services\Remote implements \Kisma\IHttpMethod, \Kisma\IHttpResponse
 	{

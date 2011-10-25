@@ -86,7 +86,7 @@ namespace Kisma\Components
 		public function link( Component $linker )
 		{
 			//	Assign my linker and find his handlers
-			$this->_linker = $linker;
+			$this->setLinker( $linker );
 			$this->_findEventHandlers( true );
 
 			//	trigger an event
@@ -184,6 +184,16 @@ namespace Kisma\Components
 		}
 
 		/**
+		 * @param \Kisma\Components\Component $linker
+		 * @return \Kisma\Components\Aspect
+		 */
+		public function setLinker( $linker )
+		{
+			$this->_linker = $linker;
+			return $this;
+		}
+
+		/**
 		 * @param string $eventHandlerSignature
 		 * @return \Kisma\Components\Aspect
 		 */
@@ -224,7 +234,7 @@ namespace Kisma\Components
 		 */
 		public function getAspectName()
 		{
-			return $this->_aspectName;
+			return \K::untag( $this->_aspectName );
 		}
 
 	}

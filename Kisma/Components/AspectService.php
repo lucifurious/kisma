@@ -17,11 +17,12 @@
  */
 namespace Kisma\Components
 {
+
 	/**
 	 * Service
 	 * The base class for services provided
 	 *
-	 * Provides two event handlers:
+	 * Provides two events:
 	 *
 	 * onBeforeServiceCall and onAfterServiceCall which are called before and after
 	 * the service is run, respectively.
@@ -29,7 +30,7 @@ namespace Kisma\Components
 	 * @property int $serviceType The type of service provided by this object
 	 * @property string $serviceName The name of this service
 	 */
-	abstract class Service extends Component implements \Kisma\IComponentService
+	abstract class AspectService extends Aspect implements \Kisma\IAspectService
 	{
 		//********************************************************************************
 		//* Private Members

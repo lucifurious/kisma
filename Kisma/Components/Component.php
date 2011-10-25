@@ -173,11 +173,6 @@ namespace Kisma\Components
 		 */
 		public function hasAspect( $aspectName, $returnAspect = false )
 		{
-//			if ( !\K::gestate( $aspectName ) )
-//			{
-//				throw new \Kisma\AspectNotFoundException( 'Unknown aspect "' . $aspectName . '".' );
-//			}
-
 			return \K::hasComponent( $this->_aspects, $aspectName, $returnAspect );
 		}
 
@@ -263,7 +258,7 @@ namespace Kisma\Components
 		 */
 		protected function _loadConfiguration( $options = array(), $noMerge = false )
 		{
-			//	No object storact by default
+			//	No object storage by default
 			$this->setOption( \KismaOptions::ObjectStorageClass, false );
 
 			parent::_loadConfiguration( $options, $noMerge );

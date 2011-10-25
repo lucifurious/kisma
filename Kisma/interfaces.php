@@ -63,6 +63,10 @@ namespace
 		 * @const string The default XML transformer
 		 */
 		const XmlTransformerClass = 'kisma.aspects.transformers.xml';
+		/**
+		 * @const string The CouchDbServer class
+		 */
+		const CouchDbServer = 'kisma.services.remote.couch_db_server';
 	}
 
 	/**
@@ -371,7 +375,21 @@ namespace Kisma
 	/**
 	 * Indicates that the component provides access to a service
 	 */
-	interface IService extends IComponent
+	interface IService extends IKisma
+	{
+	}
+
+	/**
+	 * Indicates that the aspect provides access to a service
+	 */
+	interface IAspectService extends IService, IAspect
+	{
+	}
+
+	/**
+	 * Indicates that the component provides access to a service
+	 */
+	interface IComponentService extends IService, IComponent
 	{
 	}
 

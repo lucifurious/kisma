@@ -488,24 +488,41 @@ namespace Kisma
 		}
 
 		/**
-		 * Sets a value within an array only if the value is not set (SetIfNotSet=SINS)
+		 * Sets a value within an array only if the value is not set (SetIfNotSet=SINS).
+		 * You can pass in an array of key value pairs and do many at once.
 		 *
-		 * @param array $options
+		 * @param \Kisma\Components\SubComponent|\stdClass|array $options
 		 * @param string $key
 		 * @param mixed $value
 		 * @return bool
 		 */
-		public static function sins( &$options = array(), $key, $value )
+		public static function sins( &$options = array(), $key, $value = null )
 		{
-			//	If the key is set, we bail...
-			if ( !is_array( $options ) || isset( $options, $options[$key] ) )
+			if ( !is_array( $key ) )
 			{
-				return false;
+				$key = array( $key => $value );
 			}
 
-			//	Set the value.
-			$options[$key] = $value;
-			return true;
+			foreach ( $key as $_key => $_value )
+			{
+				//	If the key is set, we bail...
+				if ( is_array( $options ) && !isset( $options[$_key] ) )
+				{
+					$options[$_key] = $_value;
+					return true;
+				}
+
+				if ( is_object( $options ) && !isset( $options->{$_key} ) )
+				{
+					$options->{$_key} = $_value;
+					return true;
+				}
+
+				//	Not set or goofy object
+			}
+
+			//	Sorry charlie...
+			return false;
 		}
 
 		/**

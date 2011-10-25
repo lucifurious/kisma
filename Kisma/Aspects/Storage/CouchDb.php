@@ -28,6 +28,7 @@ namespace
 
 	/**
 	 *  Require the Sag library, but keep it outside of Kisma
+	 * @todo Finish up the alias system and replace this nonsense
 	 */
 	/** @noinspection PhpIncludeInspection */
 	require_once \K::glue(
@@ -45,6 +46,8 @@ namespace
  */
 namespace Kisma\Aspects\Storage
 {
+	use \string;
+
 	//*************************************************************************
 	//* Aliases
 	//*************************************************************************
@@ -63,19 +66,15 @@ namespace Kisma\Aspects\Storage
 	 * CouchDb
 	 * An aspect that wraps the Sag library for working with a CouchDb instance
 	 *
-	 * @property string $hostName
-	 * @property int $hostPort
-	 * @property string $userName
-	 * @property string $password
-	 * @property string $database
+	 * @property \Kisma\Services\Remote\CouchDbServer $server
 	 * @property \Sag $sag
+	 * @property string $designDocumentName Defaults to '_design/document'
 	 *
 	 * Sag Methods
 	 * ===========
 	 * @method mixed login( $user, $pass, $type = null )
-	 * @method stdClass getSession()
+	 * @method \stdClass getSession()
 	 * @method \Sag decode( $decode )
-	 * @method mixed get( $url )
 	 * @method mixed head( $url )
 	 * @method mixed delete( $id, $rev )
 	 * @method mixed put( $id, $data )
@@ -87,7 +86,7 @@ namespace Kisma\Aspects\Storage
 	 * @method mixed getAllDatabases()
 	 * @method mixed generateIDs()
 	 * @method mixed createDatabase( $databaseName )
-	 * @method mixed deleteDatabase( $datbaseName )
+	 * @method mixed deleteDatabase( $databaseName )
 	 * @method mixed replicate( $src, $target, $continuous = false, $createTarget = null, $filter = null, $filterQueryParams = null )
 	 * @method mixed compact( $viewName = null )
 	 * @method mixed setAttachment( $name, $data, $contentType, $docID, $rev = null )
@@ -96,7 +95,7 @@ namespace Kisma\Aspects\Storage
 	 * @method \Sag setCache( &$cacheImplementer )
 	 * @method \SagCache getCache()
 	 * @method string currentDatabase()
-	 * @method stdClass getStats()
+	 * @method \stdClass getStats()
 	 * @method \Sag setStaleDefault( $stale )
 	 * @method \Sag setCookie( $key, $value )
 	 * @method string getCookie( $key )
@@ -108,62 +107,101 @@ namespace Kisma\Aspects\Storage
 		//*************************************************************************
 
 		/**
-		 * @var string
-		 */
-		protected $_hostName = '127.0.0.1';
-		/**
-		 * @var int
-		 */
-		protected $_hostPort = 5984;
-		/**
-		 * @var string
-		 */
-		protected $_userName = null;
-		/**
-		 * @var string
-		 */
-		protected $_password = null;
-		/**
-		 * @var string
-		 */
-		protected $_database = null;
-		/**
 		 * @var \Sag
 		 */
 		protected $_sag = null;
 		/**
-		 * @var string When opening a database, you have the option of having a design document created for you. If you do so,
-		 * it will be called this
+		 * @var string When opening a database, you have the option of having a design document created for you. If
+		 * you do so, it will be called this
 		 */
 		protected $_designDocumentName = '_design/document';
+		/**
+		 * @var \Kisma\Services\Remote\CouchDbServer An optional server aspect that provides additional functionality
+		 */
+		protected $_server = null;
 
 		//*************************************************************************
 		//* Public Methods
 		//*************************************************************************
 
 		/**
-		 * @param array $options
+		 * @param \Kisma\Components\Component $linker
+		 * @return \Kisma\Aspects\Storage\CouchDb
 		 */
-		public function __construct( $options = array() )
+		public function link( \Kisma\Components\Component $linker )
 		{
-			//	Now call the constructor
-			parent::__construct( $options );
+			parent::link( $linker );
 
-			//	Instantiate Sag
-			$this->_sag = new \Sag( $this->_hostName, $this->_hostPort );
-
-			if ( null !== $this->_userName && null !== $this->_password )
+			//	Create our server
+			if ( false === ( $this->_server = $linker->getAspect( \KismaSettings::CouchDbServer ) ) )
 			{
-				$this->_sag->login( $this->_userName, $this->_password );
+				$this->_server = $linker->linkAspect( \KismaSettings::CouchDbServer, $this->getOptions() );
+			}
+			else
+			{
+
 			}
 
-			if ( null !== $this->_database )
+			//	Instantiate Sag
+			$this->_sag = new \Sag( $this->_server->getHostName(), $this->_server->getHostPort() );
+
+			if ( null !== $this->_server->getUserName() && null !== $this->_server->getPassword() )
+			{
+				$this->_sag->login( $this->_server->getUserName(), $this->_server->getPassword() );
+			}
+
+			if ( null !== $this->_server->getDatabaseName() )
 			{
 				$this->_sag->setDatabase(
-					$this->_database,
+					$this->_server->getDatabaseName(),
 					$this->getOption( \KismaOptions::CreateIfNotFound, false )
 				);
 			}
+
+			return $this;
+		}
+
+		/**
+		 * Returns the upper bound of document revisions
+		 * @return mixed
+		 */
+		public function getRevsLimit()
+		{
+			return $this->get( '_revs_limit' );
+		}
+
+		/**
+		 * Returns a list of changes made to documents in the database.
+		 * @param array $options
+		 * @return mixed
+		 */
+		public function changes( $options = array() )
+		{
+			$_query = null;
+			$_options = array();
+
+			foreach ( $options as $_key => $_value )
+			{
+				switch ( $_key = strtolower( $_key ) )
+				{
+					case 'since':
+					case 'limit':
+					case 'feed':
+					case 'heartbeat':
+					case 'timeout':
+					case 'filter':
+					case 'include_docs':
+						$_options[] = $_key . '=' . urlencode( $_value );
+						break;
+				}
+			}
+
+			if ( !empty( $_options ) )
+			{
+				$_query = '?' . trim( implode( '&', $_options ), '&' );
+			}
+
+			return $this->get( '_changes' . $_query );
 		}
 
 		//*************************************************************************
@@ -196,145 +234,135 @@ namespace Kisma\Aspects\Storage
 			throw new \BadMethodCallException( __CLASS__ . '::' . $method . ' is undefined.' );
 		}
 
+		/**
+		 * Wrapper for \Sag::get() to return a \Kisma\Components\Document
+		 * @param string $url
+		 * @return \Kisma\Components\Document
+		 */
+		public function get( $url )
+		{
+			$_result = $this->_sag->get( $url )->body;
+
+			//	Arrays go back as arrays of Document
+			if ( is_array( $_result ) && !is_object( $_result ) )
+			{
+				$_documents = array();
+
+				foreach ( $_result as $_document )
+				{
+					$_documents[] = new \Kisma\Components\Document(
+						array(
+							'document' => $_document,
+						)
+					);
+
+					unset( $_document );
+				}
+
+				unset( $_result );
+
+				return $_documents;
+			}
+
+			//	Objects go back as Document
+			if ( is_object( $_result ) )
+			{
+				$_document = new \Kisma\Components\Document();
+				return $_document->setDocument( $_result );
+			}
+
+			//	No clue...
+			return $_result;
+		}
+
+		/**
+		 * Get an attachment by id and name
+		 *
+		 * @param string $id
+		 * @param string $fileName
+		 * @return mixed
+		 */
+		public function getAttachment( $id, $fileName )
+		{
+			return $this->get( '/' . $id . '/' . urlencode( $fileName ) );
+		}
+
+		//*************************************************************************
+		//* Event Handlers
+		//*************************************************************************
+
+//		/**
+//		 * Catch the aspect linked event and set the database name.
+//		 *
+//		 * We have to set it now because construction
+//		 * calls your setters for each property. Aspects are linked last. Therefore any pass-through method calls
+//		 * to your aspect will fail.
+//		 *
+//		 * @param \Kisma\Components\Event $event
+//		 * @return bool
+//		 */
+//		public function onAspectLinked( $event )
+//		{
+//			/** @var $_aspect \Kisma\Components\Aspect */
+//			$_aspect = $event->getEventData();
+//
+//			//	Create our server
+//			if ( null !== $_aspect && $_aspect instanceof ${\KismaSettings::CouchDbClass} == $_aspect->getAspectName() )
+//			{
+//				if ( false === ( $this->_server = $this->_linker->getAspect( \KismaSettings::CouchDbServer ) ) )
+//				{
+//					$this->_server = $this->_linker->linkAspect( \KismaSettings::CouchDbServer, $this->getOptions() );
+//				}
+//
+//				//	Instantiate Sag
+//				$this->_sag = new \Sag( $this->_server->getHostName(), $this->_server->getHostPort() );
+//
+//				if ( null !== $this->_server->getUserName() && null !== $this->_server->getPassword() )
+//				{
+//					$this->_sag->login( $this->_server->getUserName(), $this->_server->getPassword() );
+//				}
+//
+//				if ( null !== $this->_server->getDatabaseName() )
+//				{
+//					$this->_sag->setDatabase(
+//						$this->_server->getDatabaseName(),
+//						$this->getOption( \KismaOptions::CreateIfNotFound, false )
+//					);
+//				}
+//			}
+//
+//			return true;
+//		}
+
 		//*************************************************************************
 		//* Properties
 		//*************************************************************************
 
 		/**
-		 * @param string $hostName
-		 * @return \Kisma\Aspects\CouchDb
-		 */
-		public function setHostName( $hostName = null )
-		{
-			$this->_hostName = $hostName;
-			return $this;
-		}
-
-		/**
-		 * @return string
-		 */
-		public function getHostName()
-		{
-			return $this->_hostName;
-		}
-
-		/**
-		 * @param int $hostPort
-		 * @return \Kisma\Aspects\CouchDb
-		 */
-		public function setHostPort( $hostPort = 5984 )
-		{
-			$this->_hostPort = $hostPort;
-			return $this;
-		}
-
-		/**
-		 * @return int
-		 */
-		public function getHostPort()
-		{
-			return $this->_hostPort;
-		}
-
-		/**
-		 * @param string $password
-		 * @return \Kisma\Aspects\CouchDb
-		 */
-		public function setPassword( $password = null )
-		{
-			$this->_password = $password;
-
-			if ( null !== $this->_sag && null !== $this->_userName && null !== $this->_password )
-			{
-				$this->_sag->login( $this->_userName, $this->_password );
-			}
-
-			return $this;
-		}
-
-		/**
-		 * @return string
-		 */
-		public function getPassword()
-		{
-			return $this->_password;
-		}
-
-		/**
-		 * @param string $userName
-		 * @return \Kisma\Aspects\CouchDb
-		 */
-		public function setUserName( $userName = null )
-		{
-			$this->_userName = $userName;
-			return $this;
-		}
-
-		/**
-		 * @return string
-		 */
-		public function getUserName()
-		{
-			return $this->_userName;
-		}
-
-		/**
-		 * @param string $database
-		 * @param bool $createIfNotFound
-		 * @param bool $createDesignIfNotFound
+		 * @param \Kisma\Services\Remote\CouchDbServer $server
 		 * @return \Kisma\Aspects\Storage\CouchDb
 		 */
-		public function setDatabase( $database = null, $createIfNotFound = false, $createDesignIfNotFound = true )
+		protected function _setServer( $server )
 		{
-			$this->_database = $database;
+			$this->_server = $server;
+			return $this;
+		}
 
-			if ( null !== $this->_sag )
-			{
-				$this->_sag->setDatabase( $database, $createIfNotFound );
+		/**
+		 * @return \Kisma\Services\Remote\CouchDbServer
+		 */
+		public function getServer()
+		{
+			return $this->_server;
+		}
 
-				//	Create a design document if desired, and not created already
-				if ( false !== $createDesignIfNotFound )
-				{
-					try
-					{
-						if ( $this->_sag->head( $this->_designDocumentName )->headers->_HTTP->status != '404' )
-						{
-							return true;
-						}
-					}
-					catch ( \Exception $_ex )
-					{
-						//	Some kinda hot tub database issue
-						if ( 409 == $_ex->getCode() )
-						{
-							return $this;
-						}
-					}
-
-					//	Build the design document
-					$_doc = new \stdClass();
-					$_doc->_id = $this->_designDocumentName;
-					$_doc->views = new \stdClass();
-					$_doc->views->createDate = new \stdClass();
-					$_doc->views->createDate->map = 'function(doc) { emit(doc.create_date, null); }';
-
-					try
-					{
-						//	Store it
-						$this->_sag->put( $this->_designDocumentName, $_doc );
-					}
-					catch ( \Exception $_ex )
-					{
-						/**
-						 * A 409 status code means there was a conflict, so another client already created the design doc for us. This is fine. */
-						if ( 409 == $_ex->getCode() )
-						{
-							return $this;
-						}
-					}
-				}
-			}
-
+		/**
+		 * @param string $designDocumentName
+		 * @return \Kisma\Aspects\Storage\CouchDb
+		 */
+		public function setDesignDocumentName( $designDocumentName )
+		{
+			$this->_designDocumentName = $designDocumentName;
 			return $this;
 		}
 
@@ -347,28 +375,10 @@ namespace Kisma\Aspects\Storage
 		}
 
 		/**
-		 * @param string $designDocumentName
-		 * @return $this
-		 */
-		public function setDesignDocumentName( $designDocumentName )
-		{
-			$this->_designDocumentName = $designDocumentName;
-			return $this;
-		}
-
-		/**
-		 * @return string
-		 */
-		public function getDatabase()
-		{
-			return $this->_database;
-		}
-
-		/**
 		 * @param \Sag $sag
 		 * @return \Kisma\Aspects\Storage\CouchDb
 		 */
-		public function setSag( $sag = null )
+		protected function _setSag( $sag )
 		{
 			$this->_sag = $sag;
 			return $this;

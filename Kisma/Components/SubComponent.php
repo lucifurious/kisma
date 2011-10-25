@@ -133,21 +133,8 @@ namespace Kisma\Components
 				$options = \K::cleanOptions( $options );
 			}
 
-			//	Loop through, set...
-			foreach ( $options as $_key => $_value )
-			{
-				try
-				{
-					\K::__property( $this, $_key, \Kisma\AccessorMode::Set, $_value );
-				}
-				catch ( \Kisma\UndefinedPropertyException $_ex )
-				{
-					//	Undefined, add to options...
-					$_options[$_key] = $_value;
-				}
-			}
-
-			if ( $noMerge )
+			//	Set our own options and work from there
+			if ( true === $noMerge )
 			{
 				//	Overwrite the options...
 				$this->_options = $_options;
@@ -159,6 +146,20 @@ namespace Kisma\Components
 					$this->_options,
 					$_options
 				);
+			}
+
+			//	Loop through, set...
+			foreach ( $this->_options as $_key => $_value )
+			{
+				try
+				{
+					\K::__property( $this, $_key, \Kisma\AccessorMode::Set, $_value );
+				}
+				catch ( \Kisma\UndefinedPropertyException $_ex )
+				{
+					//	Undefined, add to options...
+//					$_options[$_key] = $_value;
+				}
 			}
 
 			//	Set our count...
@@ -338,7 +339,7 @@ namespace Kisma\Components
 		/**
 		 * @return array
 		 */
-		public function getOptions()
+		public function &getOptions()
 		{
 			return $this->_options;
 		}

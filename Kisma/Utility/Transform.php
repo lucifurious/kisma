@@ -36,24 +36,32 @@ namespace Kisma\Utility
 	class Transform extends \Kisma\Components\SubComponent implements \Kisma\IUtility
 	{
 		//*************************************************************************
-		//* Class Constants
-		//*************************************************************************
-
-		//*************************************************************************
-		//* Private Members
-		//*************************************************************************
-
-		//*************************************************************************
 		//* Public Methods
 		//*************************************************************************
 
-		//*************************************************************************
-		//* Private Methods
-		//*************************************************************************
+		/**
+		 * Converts a separator delimited string to camel case
+		 *
+		 * @param string $string
+		 * @param string $separator
+		 * @param boolean $preserveWhiteSpace
+		 * @return string
+		 */
+		public static function camelize( $string, $separator = '_', $preserveWhiteSpace = false )
+		{
+			$_newString = ucwords( str_replace( $separator, ' ', $str ) );
+			return ( false === $preserveWhiteSpace ? str_replace( ' ', '', $_newString ) : $_newString );
+		}
 
-		//*************************************************************************
-		//* Properties
-		//*************************************************************************
+		/**
+		 * Converts a camel-cased word to a delimited lowercase string
+		 * @param string $string
+		 * @return string
+		 */
+		public static function decamelize( $string )
+		{
+			return strtolower( preg_replace( "/([a-z])([A-Z])/", "\\1_\\2", $string ) );
+		}
 
 		/**
 		 * @param string|\DOMDocument|\SimpleXMLElement $xmlText

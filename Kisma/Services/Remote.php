@@ -21,6 +21,7 @@ namespace Kisma\Services
 {
 	/**
 	 * RemoteService
+	 *
 	 * A base service class that is intended to be used by to access remote
 	 * services (i.e. XML, HTTP, CouchDb, etc.)
 	 *
@@ -31,7 +32,7 @@ namespace Kisma\Services
 	 * @property string $userName
 	 * @property string $password
 	 */
-	abstract class Remote extends \Kisma\Components\Service
+	abstract class Remote extends \Kisma\Components\AspectService
 	{
 		//*************************************************************************
 		//* Private Members

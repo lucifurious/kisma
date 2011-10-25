@@ -40,14 +40,327 @@ namespace Kisma\Utility
 		 * @var array Our hash seeds
 		 */
 		protected static $_hashSeeds = array(
-			\Kisma\HashSeed::All => array( 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' ),
-			\Kisma\HashSeed::AlphaLower => array( 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z' ),
-			\Kisma\HashSeed::AlphaUpper => array( 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z' ),
-			\Kisma\HashSeed::Alpha => array( 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z' ),
-			\Kisma\HashSeed::AlphaNumeric => array( 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' ),
-			\Kisma\HashSeed::AlphaLowerNumeric => array( 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' ),
-			\Kisma\HashSeed::Numeric => array( '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' ),
-			\Kisma\HashSeed::AlphaLowerNumericIdiotProof => array( 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'j', 'k', 'm', 'n', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '2', '3', '4', '5', '6', '7', '8', '9' ),
+			\Kisma\HashSeed::All => array(
+				'a',
+				'b',
+				'c',
+				'd',
+				'e',
+				'f',
+				'g',
+				'h',
+				'i',
+				'j',
+				'k',
+				'l',
+				'm',
+				'n',
+				'o',
+				'p',
+				'q',
+				'r',
+				's',
+				't',
+				'u',
+				'v',
+				'w',
+				'x',
+				'y',
+				'z',
+				'A',
+				'B',
+				'C',
+				'D',
+				'E',
+				'F',
+				'G',
+				'H',
+				'I',
+				'J',
+				'K',
+				'L',
+				'M',
+				'N',
+				'O',
+				'P',
+				'Q',
+				'R',
+				'S',
+				'T',
+				'U',
+				'V',
+				'W',
+				'X',
+				'Y',
+				'Z',
+				'0',
+				'1',
+				'2',
+				'3',
+				'4',
+				'5',
+				'6',
+				'7',
+				'8',
+				'9'
+			),
+			\Kisma\HashSeed::AlphaLower => array(
+				'a',
+				'b',
+				'c',
+				'd',
+				'e',
+				'f',
+				'g',
+				'h',
+				'i',
+				'j',
+				'k',
+				'l',
+				'm',
+				'n',
+				'o',
+				'p',
+				'q',
+				'r',
+				's',
+				't',
+				'u',
+				'v',
+				'w',
+				'x',
+				'y',
+				'z'
+			),
+			\Kisma\HashSeed::AlphaUpper => array(
+				'A',
+				'B',
+				'C',
+				'D',
+				'E',
+				'F',
+				'G',
+				'H',
+				'I',
+				'J',
+				'K',
+				'L',
+				'M',
+				'N',
+				'O',
+				'P',
+				'Q',
+				'R',
+				'S',
+				'T',
+				'U',
+				'V',
+				'W',
+				'X',
+				'Y',
+				'Z'
+			),
+			\Kisma\HashSeed::Alpha => array(
+				'A',
+				'B',
+				'C',
+				'D',
+				'E',
+				'F',
+				'G',
+				'H',
+				'I',
+				'J',
+				'K',
+				'L',
+				'M',
+				'N',
+				'O',
+				'P',
+				'Q',
+				'R',
+				'S',
+				'T',
+				'U',
+				'V',
+				'W',
+				'X',
+				'Y',
+				'Z',
+				'a',
+				'b',
+				'c',
+				'd',
+				'e',
+				'f',
+				'g',
+				'h',
+				'i',
+				'j',
+				'k',
+				'l',
+				'm',
+				'n',
+				'o',
+				'p',
+				'q',
+				'r',
+				's',
+				't',
+				'u',
+				'v',
+				'w',
+				'x',
+				'y',
+				'z'
+			),
+			\Kisma\HashSeed::AlphaNumeric => array(
+				'A',
+				'B',
+				'C',
+				'D',
+				'E',
+				'F',
+				'G',
+				'H',
+				'I',
+				'J',
+				'K',
+				'L',
+				'M',
+				'N',
+				'O',
+				'P',
+				'Q',
+				'R',
+				'S',
+				'T',
+				'U',
+				'V',
+				'W',
+				'X',
+				'Y',
+				'Z',
+				'a',
+				'b',
+				'c',
+				'd',
+				'e',
+				'f',
+				'g',
+				'h',
+				'i',
+				'j',
+				'k',
+				'l',
+				'm',
+				'n',
+				'o',
+				'p',
+				'q',
+				'r',
+				's',
+				't',
+				'u',
+				'v',
+				'w',
+				'x',
+				'y',
+				'z',
+				'0',
+				'1',
+				'2',
+				'3',
+				'4',
+				'5',
+				'6',
+				'7',
+				'8',
+				'9'
+			),
+			\Kisma\HashSeed::AlphaLowerNumeric => array(
+				'a',
+				'b',
+				'c',
+				'd',
+				'e',
+				'f',
+				'g',
+				'h',
+				'i',
+				'j',
+				'k',
+				'l',
+				'm',
+				'n',
+				'o',
+				'p',
+				'q',
+				'r',
+				's',
+				't',
+				'u',
+				'v',
+				'w',
+				'x',
+				'y',
+				'z',
+				'0',
+				'1',
+				'2',
+				'3',
+				'4',
+				'5',
+				'6',
+				'7',
+				'8',
+				'9'
+			),
+			\Kisma\HashSeed::Numeric => array(
+				'0',
+				'1',
+				'2',
+				'3',
+				'4',
+				'5',
+				'6',
+				'7',
+				'8',
+				'9'
+			),
+			\Kisma\HashSeed::AlphaLowerNumericIdiotProof => array(
+				'a',
+				'b',
+				'c',
+				'd',
+				'e',
+				'f',
+				'g',
+				'h',
+				'j',
+				'k',
+				'm',
+				'n',
+				'p',
+				'q',
+				'r',
+				's',
+				't',
+				'u',
+				'v',
+				'w',
+				'x',
+				'y',
+				'z',
+				'2',
+				'3',
+				'4',
+				'5',
+				'6',
+				'7',
+				'8',
+				'9'
+			),
 		);
 
 		//********************************************************************************
@@ -61,7 +374,7 @@ namespace Kisma\Utility
 		 */
 		public static function __invoke()
 		{
-			return call_user_func_array( array( '\Kisma\Utility\Hash::hash' ), func_get_args() );
+			return call_user_func_array( array('\Kisma\Utility\Hash::hash'), func_get_args() );
 		}
 
 		/**
@@ -74,13 +387,16 @@ namespace Kisma\Utility
 		public static function generate( $hashLength = 20, $hashSeed = \Kisma\HashSeed::All )
 		{
 			//	If we ain't got what you're looking for, return simple md5 hash...
-			if ( !isset( self::$_hashSeeds, self::$_hashSeeds[$hashSeed] ) || !is_array( self::$_hashSeeds[$hashSeed] ) )
+			if ( !isset( self::$_hashSeeds, self::$_hashSeeds[$hashSeed] ) || !is_array(
+				self::$_hashSeeds[$hashSeed] )
+			)
 			{
 				return md5( time() . mt_rand() . time() );
 			}
 
 			//	Randomly pick elements from the array of seeds
-			for ( $_i = 0, $_hash = null, $_size = count( self::$_hashSeeds[$hashSeed] ) - 1; $_i < $hashLength; $_i++ )
+			for ( $_i = 0, $_hash = null, $_size = count( self::$_hashSeeds[$hashSeed] ) - 1; $_i < $hashLength;
+				  $_i++ )
 			{
 				$_hash .= self::$_hashSeeds[$hashSeed][mt_rand( 0, $_size )];
 			}
@@ -94,13 +410,16 @@ namespace Kisma\Utility
 		 * @param string $hashTarget The value to hash..
 		 * @param int $hashType [optional] The type of hash to create. Can be {@see Hash::MD5}, {@see Hash#SHA1},
 		 * or {@link Hash#CRC32}. Defaults to {@see Hash::SHA1}.
-		 * @param integer $hashLength [optional] The length of the hash to return. Only applies if <b>$hashType</b> is not MD5, SH1,
+		 * @param integer $hashLength [optional] The length of the hash to return. Only applies if <b>$hashType</b>
+		 * is not MD5, SH1,
 		 * or CRC32. . Defaults to 32.
-		 * @param boolean $rawOutput [optional] If <b>$rawOutput</b> is true, then the hash digest is returned in raw binary format instead of
+		 * @param boolean $rawOutput [optional] If <b>$rawOutput</b> is true, then the hash digest is returned in
+		 * raw binary format instead of
 		 * ASCII.
 		 * @return string
 		 */
-		public static function hash( $hashTarget = null, $hashType = \Kisma\HashType::SHA1, $hashLength = 32, $rawOutput = false )
+		public static function hash( $hashTarget = null, $hashType = \Kisma\HashType::SHA1, $hashLength = 32,
+									 $rawOutput = false )
 		{
 			$_value = ( null === $hashTarget ) ? self::generate( $hashLength ) : $hashTarget;
 
@@ -124,6 +443,62 @@ namespace Kisma\Utility
 			}
 
 			return $_hash;
+		}
+
+		/**
+		 * Simple string encryption using $salt
+		 * @param string $text
+		 * @param string $salt
+		 * @param boolean $urlEncode If true, the string will be url-encoded after encryption
+		 * @return string
+		 */
+		public static function encryptString( $text, $salt, $urlEncode = false )
+		{
+			$_value = trim(
+				\base64_encode(
+					\mcrypt_encrypt(
+						MCRYPT_RIJNDAEL_256,
+						sha1( $salt, true ),
+						$text,
+						MCRYPT_MODE_ECB,
+						\mcrypt_create_iv(
+							\mcrypt_get_iv_size(
+								MCRYPT_RIJNDAEL_256,
+								MCRYPT_MODE_ECB
+							),
+							MCRYPT_RAND
+						)
+					)
+				)
+			);
+
+			return $urlEncode ? urlencode( $_value ) : $_value;
+		}
+
+		/**
+		 * Simple string decryption using the $salt as a key
+		 * @param string $text
+		 * @param string $salt
+		 * @param boolean $urlDecode If true, the string will be url-decoded before decryption
+		 * @return string
+		 */
+		public static function decryptString( $text, $salt, $urlDecode = false )
+		{
+			return trim(
+				\mcrypt_decrypt(
+					MCRYPT_RIJNDAEL_256,
+					sha1( $salt, true ),
+					\base64_decode( $urlDecode ? urldecode( $text ) : $text ),
+					MCRYPT_MODE_ECB,
+					\mcrypt_create_iv(
+						\mcrypt_get_iv_size(
+							MCRYPT_RIJNDAEL_256,
+							MCRYPT_MODE_ECB
+						),
+						MCRYPT_RAND
+					)
+				)
+			);
 		}
 
 	}
