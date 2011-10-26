@@ -23,6 +23,9 @@ namespace Kisma\Extensions\Davenport
 	 * Generic queue handling class
 	 *
 	 * @property string $queueName
+	 * @property string $keyPrefix
+	 * @property boolean $encryptKeys
+	 * @property string $hashKeys
 	 */
 	class CouchDbQueueService extends \Kisma\Aspects\Storage\CouchDb
 	{
@@ -31,9 +34,17 @@ namespace Kisma\Extensions\Davenport
 		//*************************************************************************
 
 		/**
-		 * @var string
+		 * @var string A string which will be prepended along, with a colon separator, to all new _id values
 		 */
-		protected $_queueName = null;
+		protected $_keyPrefix = null;
+		/**
+		 * @var bool Enable to encrypt _id value before storing.
+		 */
+		protected $_encryptKeys = false;
+		/**
+		 * @var bool Enable to hash _id value before storing.
+		 */
+		protected $_hashKeys = true;
 
 		//*************************************************************************
 		//* Public Methods
@@ -46,13 +57,13 @@ namespace Kisma\Extensions\Davenport
 		 */
 		public function queueExists( $name )
 		{
-			$_dbName = \K::untag( $name );
+			$this->_ensureDatabase( $name );
+
+			$_queueName = \K::untag( $name );
 
 			try
 			{
-				$this->_sag->head( $_dbName );
-				$this->_sag->setDatabase( $_dbName, false );
-
+				$this->_sag->head( $_queueName );
 				return true;
 			}
 			catch ( \SagCouchException $_ex )
@@ -75,23 +86,52 @@ namespace Kisma\Extensions\Davenport
 		 */
 		public function createQueue( $name )
 		{
-			$_dbName = \K::untag( $name );
+			$this->_ensureDatabase( $name );
 
-			if ( $this->queueExists( $name ) )
-			{
-				return false;
-			}
+			$_queueName = \K::untag( $name );
 
-			$this->_sag->setDatabase( $_dbName );
 			$this->_createDesignDocument();
 
 			//	Create and return a new queue
 			return new Queue(
 				array(
-					'queueName' => $_dbName,
+					'queueName' => $_queueName,
 					'queueService' => $this,
 				)
 			);
+		}
+
+		/**
+		 * Given an $id, based on settings, hash/encrypt/prefix the $id
+		 *
+		 * @param null|string $id
+		 * @param null|string $salt If null, key will NOT be encrypted
+		 * @return string
+		 */
+		public function createKey( $id = null, $salt = null )
+		{
+			//	Start with the _id
+			$_key = $id;
+
+			//	Encrypt first
+			if ( null !== $salt && false !== $this->_encryptKeys )
+			{
+				$_key = $this->_encryptKey( $salt, $_key );
+			}
+
+			//	Then hash
+			if ( null !== $id && false !== $this->_hashKeys )
+			{
+				$_key = $this->_hashKey( $_key );
+			}
+
+			if ( null !== $this->_keyPrefix )
+			{
+				$_key = $this->_keyPrefix . ':' . $_key;
+			}
+
+			//	Return the new key!
+			return $_key;
 		}
 
 		//*************************************************************************
@@ -104,13 +144,30 @@ namespace Kisma\Extensions\Davenport
 		 */
 		protected function _createDesignDocument()
 		{
+			try
+			{
+				//	See if it's there...
+				$this->_sag->head( Queue::DesignDocumentName );
+				return true;
+			}
+			catch ( \SagCouchException $_ex )
+			{
+				if ( 404 != $_ex->getCode() )
+				{
+					//	Not not found
+					throw $_ex;
+				}
+			}
+
 			//	Build the design document
 			$_doc = new \stdClass();
 			$_doc->_id = Queue::DesignDocumentName;
 
 			$_doc->views = new \stdClass();
+
 			$_doc->views->pending = new \stdClass();
-			$_doc->views->pending->map = 'function(doc) { if (!doc.lock) emit(doc.create_time,null); }';
+			$_doc->views->pending->map = 'function( doc ) { if (!doc.lock) emit(doc.create_time,null); }';
+
 			$_doc->views->locked = new \stdClass();
 			$_doc->views->locked->map = 'function(doc) { if (doc.lock) emit(doc.lock.lock_time,null); }';
 
@@ -121,6 +178,12 @@ namespace Kisma\Extensions\Davenport
 			}
 			catch ( \Exception $_ex )
 			{
+				if ( 404 == $_ex->getCode() )
+				{
+					//	No database, rethrow
+					throw $_ex;
+				}
+
 				/**
 				 * Conflict-o-rama!
 				 */
@@ -134,26 +197,117 @@ namespace Kisma\Extensions\Davenport
 			return false;
 		}
 
+		/**
+		 * Hashes an _id
+		 * Override to use different hash or key types.
+		 *
+		 * @param string $id
+		 * @return string
+		 */
+		protected function _hashKey( $id )
+		{
+			return \Kisma\Utility\Hash::hash( $id, \Kisma\HashType::SHA1, 40 );
+		}
+
+		/**
+		 * Encrypts an _id. You may pass a null for $id and this will encrypt the user name and password (in a
+		 * special super-double-secret pattern that is not obvious) for storage as an authorization key of sorts. You
+		 * can use it just like an MD5 hash but it's a tad more secure I suppose.
+		 *
+		 * @param string $id
+		 * @param string $salt
+		 * @return string
+		 */
+		protected function _encryptKey( $salt, $id = null )
+		{
+			if ( null === $id )
+			{
+				$id = '|<|' . $this->_password . '|*|' . $this->_userName . '|>|';
+			}
+
+			//	Return encrypted string
+			return \Kisma\Utility\Hash::encryptString( $id, $salt );
+		}
+
+		/**
+		 * @param string $databaseName
+		 * @return \Kisma\Extensions\Davenport\CouchDbQueueService
+		 */
+		protected function _ensureDatabase( $databaseName )
+		{
+			//	Set our database
+			$this->setDatabaseName( $databaseName );
+			$this->setDatabase( $this->getDatabaseName(), true );
+			return $this;
+		}
+
 		//*************************************************************************
 		//* Properties
 		//*************************************************************************
 
 		/**
-		 * @param string $queueName
-		 * @return $this
+		 * @param bool $encryptKeys
+		 * @return CouchDbQueueService
 		 */
-		public function setQueueName( $queueName )
+		public function setEncryptKeys( $encryptKeys )
 		{
-			$this->_queueName = $queueName;
+			$this->_encryptKeys = $encryptKeys;
+			return $this;
+		}
+
+		/**
+		 * @return bool
+		 */
+		public function getEncryptKeys()
+		{
+			return $this->_encryptKeys;
+		}
+
+		/**
+		 * @param bool $hashKeys
+		 * @return CouchDbQueueService
+		 */
+		public function setHashKeys( $hashKeys )
+		{
+			$this->_hashKeys = $hashKeys;
+			return $this;
+		}
+
+		/**
+		 * @return boolean
+		 */
+		public function getHashKeys()
+		{
+			return $this->_hashKeys;
+		}
+
+		/**
+		 * @param string $keyPrefix
+		 * @return \Kisma\Extensions\Davenport\CouchDbQueueService
+		 */
+		public function setKeyPrefix( $keyPrefix )
+		{
+			$this->_keyPrefix = $keyPrefix;
 			return $this;
 		}
 
 		/**
 		 * @return string
 		 */
-		public function getQueueName()
+		public function getKeyPrefix()
 		{
-			return $this->_queueName;
+			return $this->_keyPrefix;
+		}
+
+		/**
+		 * @param string $database
+		 * @param bool $createIfNotFound
+		 * @return \Sag
+		 */
+		public function setDatabase( $database, $createIfNotFound = false )
+		{
+			//	Set our database
+			return $this->_sag->setDatabase( $database, $createIfNotFound );
 		}
 
 	}

@@ -18,16 +18,6 @@
  */
 namespace Kisma\Components;
 {
-	//*************************************************************************
-	//* Use-ages and Aliases 
-	//*************************************************************************
-
-	use \Kisma\Utility as Utility;
-
-	//*************************************************************************
-	//* Requirements 
-	//*************************************************************************
-
 	/**
 	 * Document
 	 * A magical bare-bones CouchDB document wrapper. Read and write document properties just like using
@@ -36,7 +26,7 @@ namespace Kisma\Components;
 	 * In addition, IF you create a getter or setter for a property, it will always be called. This allows
 	 * you to enforce property restrictions in a single place.
 	 *
-	 * @property array|\stdClass $document
+	 * @property \stdClass $document
 	 *
 	 * @property string $id The document _id
 	 * @property string $rev The document _rev
@@ -60,6 +50,19 @@ namespace Kisma\Components;
 		 * @var \stdClass|array The document contents
 		 */
 		protected $_document = null;
+
+		/**
+		 * @param array $options
+		 */
+		public function __construct( $options = array() )
+		{
+			parent::__construct( $options );
+
+			if ( null === $this->_document )
+			{
+				$this->_document = new \stdClass();
+			}
+		}
 
 		//*************************************************************************
 		//* Magic
@@ -139,13 +142,8 @@ namespace Kisma\Components;
 			if ( isset( $this->_document ) )
 			{
 				$this->_document->{$property} = $value;
+				return $this;
 			}
-			else
-			{
-				parent::__set( $property, $value );
-			}
-
-			return $this;
 		}
 
 		//*************************************************************************

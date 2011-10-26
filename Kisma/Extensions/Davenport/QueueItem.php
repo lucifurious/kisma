@@ -28,7 +28,7 @@ namespace Kisma\Extensions\Davenport
 	 *
 	 * @property int $create_time
 	 * @property int $expire_time
-	 * @property mixed $data
+	 * @property mixed $feedData
 	 * @property mixed $lock
 	 */
 	class QueueItem extends \Kisma\Components\Document
@@ -48,10 +48,11 @@ namespace Kisma\Extensions\Davenport
 		public function __construct( $options = array() )
 		{
 			//	Set our default fields
-			$this->create_time = microtime( true );
-			$this->expire_time = -1;
-			$this->data = null;
-			$this->lock = new \stdClass();
+			$this->setDocument();
+			$this->_document->id = \K::o( $options, 'id', null, true );
+			$this->_document->create_time = microtime( true );
+			$this->_document->expire_time = \K::o( $options, 'expire_time', -1, true );
+			$this->_document->feed_data = \K::o( $options, 'feed_data', null, true );
 
 			parent::__construct( $options );
 		}
@@ -66,7 +67,7 @@ namespace Kisma\Extensions\Davenport
 		 */
 		public function setCreateTime( $create_time )
 		{
-			$this->create_time = $create_time;
+			$this->create_time = $create_time ?: microtime( true );
 			return $this;
 		}
 
@@ -79,28 +80,28 @@ namespace Kisma\Extensions\Davenport
 		}
 
 		/**
-		 * @param $data
+		 * @param $feedData
 		 * @return QueueItem
 		 */
-		public function setData( $data )
+		public function setFeedData( $feedData = null )
 		{
-			$this->data = $data;
+			$this->feed_data = $feedData;
 			return $this;
 		}
 
 		/**
 		 * @return mixed
 		 */
-		public function getData()
+		public function getFeedData()
 		{
-			return $this->data;
+			return $this->feed_data;
 		}
 
 		/**
 		 * @param $expire_time
 		 * @return QueueItem
 		 */
-		public function setExpireTime( $expire_time )
+		public function setExpireTime( $expire_time = -1 )
 		{
 			$this->expire_time = $expire_time;
 			return $this;
@@ -118,7 +119,7 @@ namespace Kisma\Extensions\Davenport
 		 * @param $lock
 		 * @return QueueItem
 		 */
-		public function setLock( $lock )
+		public function setLock( $lock = null )
 		{
 			$this->lock = $lock;
 			return $this;

@@ -46,8 +46,6 @@ namespace
  */
 namespace Kisma\Aspects\Storage
 {
-	use \string;
-
 	//*************************************************************************
 	//* Aliases
 	//*************************************************************************
@@ -116,49 +114,52 @@ namespace Kisma\Aspects\Storage
 		 */
 		protected $_designDocumentName = '_design/document';
 		/**
-		 * @var \Kisma\Services\Remote\CouchDbServer An optional server aspect that provides additional functionality
+		 * @var string The name of the database
 		 */
-		protected $_server = null;
+		protected $_databaseName = null;
+		/**
+		 * @var string
+		 */
+		protected $_hostName = 'localhost';
+		/**
+		 * @var int
+		 */
+		protected $_hostPort = 5984;
+		/**
+		 * @var string
+		 */
+		protected $_userName = null;
+		/**
+		 * @var string
+		 */
+		protected $_password = null;
 
 		//*************************************************************************
 		//* Public Methods
 		//*************************************************************************
 
 		/**
-		 * @param \Kisma\Components\Component $linker
-		 * @return \Kisma\Aspects\Storage\CouchDb
+		 * @param array $options
 		 */
-		public function link( \Kisma\Components\Component $linker )
+		public function __construct( $options = array() )
 		{
-			parent::link( $linker );
-
-			//	Create our server
-			if ( false === ( $this->_server = $linker->getAspect( \KismaSettings::CouchDbServer ) ) )
-			{
-				$this->_server = $linker->linkAspect( \KismaSettings::CouchDbServer, $this->getOptions() );
-			}
-			else
-			{
-
-			}
+			parent::__construct( $options );
 
 			//	Instantiate Sag
-			$this->_sag = new \Sag( $this->_server->getHostName(), $this->_server->getHostPort() );
+			$this->_sag = new \Sag( $this->_hostName, $this->_hostPort );
 
-			if ( null !== $this->_server->getUserName() && null !== $this->_server->getPassword() )
+			if ( null !== $this->_userName )
 			{
-				$this->_sag->login( $this->_server->getUserName(), $this->_server->getPassword() );
+				$this->_sag->login( $this->_userName, $this->_password );
 			}
 
-			if ( null !== $this->_server->getDatabaseName() )
+			if ( null !== $this->_databaseName )
 			{
 				$this->_sag->setDatabase(
-					$this->_server->getDatabaseName(),
-					$this->getOption( \KismaOptions::CreateIfNotFound, false )
+					$this->_databaseName,
+					$this->getOption( \KismaOptions::CreateIfNotFound, true )
 				);
 			}
-
-			return $this;
 		}
 
 		/**
@@ -309,23 +310,23 @@ namespace Kisma\Aspects\Storage
 //			//	Create our server
 //			if ( null !== $_aspect && $_aspect instanceof ${\KismaSettings::CouchDbClass} == $_aspect->getAspectName() )
 //			{
-//				if ( false === ( $this->_server = $this->_linker->getAspect( \KismaSettings::CouchDbServer ) ) )
+//				if ( false === ( $this->_dbServer = $this->_linker->getAspect( \KismaSettings::CouchDbServer ) ) )
 //				{
-//					$this->_server = $this->_linker->linkAspect( \KismaSettings::CouchDbServer, $this->getOptions() );
+//					$this->_dbServer = $this->_linker->linkAspect( \KismaSettings::CouchDbServer, $this->getOptions() );
 //				}
 //
 //				//	Instantiate Sag
-//				$this->_sag = new \Sag( $this->_server->getHostName(), $this->_server->getHostPort() );
+//				$this->_sag = new \Sag( $this->_dbServer->getHostName(), $this->_dbServer->getHostPort() );
 //
-//				if ( null !== $this->_server->getUserName() && null !== $this->_server->getPassword() )
+//				if ( null !== $this->_dbServer->getUserName() && null !== $this->_dbServer->getPassword() )
 //				{
-//					$this->_sag->login( $this->_server->getUserName(), $this->_server->getPassword() );
+//					$this->_sag->login( $this->_dbServer->getUserName(), $this->_dbServer->getPassword() );
 //				}
 //
-//				if ( null !== $this->_server->getDatabaseName() )
+//				if ( null !== $this->_dbServer->getDatabaseName() )
 //				{
 //					$this->_sag->setDatabase(
-//						$this->_server->getDatabaseName(),
+//						$this->_dbServer->getDatabaseName(),
 //						$this->getOption( \KismaOptions::CreateIfNotFound, false )
 //					);
 //				}
@@ -337,24 +338,6 @@ namespace Kisma\Aspects\Storage
 		//*************************************************************************
 		//* Properties
 		//*************************************************************************
-
-		/**
-		 * @param \Kisma\Services\Remote\CouchDbServer $server
-		 * @return \Kisma\Aspects\Storage\CouchDb
-		 */
-		protected function _setServer( $server )
-		{
-			$this->_server = $server;
-			return $this;
-		}
-
-		/**
-		 * @return \Kisma\Services\Remote\CouchDbServer
-		 */
-		public function getServer()
-		{
-			return $this->_server;
-		}
 
 		/**
 		 * @param string $designDocumentName
@@ -390,6 +373,96 @@ namespace Kisma\Aspects\Storage
 		public function getSag()
 		{
 			return $this->_sag;
+		}
+
+		/**
+		 * @param string $databaseName
+		 * @return \Kisma\Aspects\Storage\CouchDb
+		 */
+		public function setDatabaseName( $databaseName )
+		{
+			$this->_databaseName = $databaseName;
+			return $this;
+		}
+
+		/**
+		 * @return string
+		 */
+		public function getDatabaseName()
+		{
+			return $this->_databaseName;
+		}
+
+		/**
+		 * @param string $hostName
+		 * @return \Kisma\Aspects\Storage\CouchDb
+		 */
+		public function setHostName( $hostName )
+		{
+			$this->_hostName = $hostName;
+			return $this;
+		}
+
+		/**
+		 * @return string
+		 */
+		public function getHostName()
+		{
+			return $this->_hostName;
+		}
+
+		/**
+		 * @param int $hostPort
+		 * @return \Kisma\Aspects\Storage\CouchDb
+		 */
+		public function setHostPort( $hostPort )
+		{
+			$this->_hostPort = $hostPort;
+			return $this;
+		}
+
+		/**
+		 * @return int
+		 */
+		public function getHostPort()
+		{
+			return $this->_hostPort;
+		}
+
+		/**
+		 * @param string $password
+		 * @return \Kisma\Aspects\Storage\CouchDb
+		 */
+		public function setPassword( $password )
+		{
+			$this->_password = $password;
+			return $this;
+		}
+
+		/**
+		 * @return string
+		 */
+		public function getPassword()
+		{
+			return $this->_password;
+		}
+
+		/**
+		 * @param string $userName
+		 * @return \Kisma\Aspects\Storage\CouchDb
+		 */
+		public function setUserName( $userName )
+		{
+			$this->_userName = $userName;
+			return $this;
+		}
+
+		/**
+		 * @return string
+		 */
+		public function getUserName()
+		{
+			return $this->_userName;
 		}
 
 	}

@@ -80,6 +80,20 @@ namespace Kisma\Extensions\Davenport
 		//*************************************************************************
 
 		/**
+		 * @param array $options
+		 */
+		public function __construct( $options = array() )
+		{
+			parent::__construct( $options );
+
+			if ( null === $this->_keyPrefix )
+			{
+				$this->_keyPrefix = 'davenport.queue.item';
+				$this->_queueService->setKeyPrefix( $this->_keyPrefix );
+			}
+		}
+
+		/**
 		 * Get work items from the queue
 		 * The descending param is used to get LIFO (if true) or FIFO (if false) behavior.
 		 * @param int $maxItems
@@ -89,6 +103,8 @@ namespace Kisma\Extensions\Davenport
 		 */
 		public function dequeue( $maxItems = self::DefaultMaxItems, $fifo = true )
 		{
+			\Kisma\Utility\Log::debug( 'Requesting pending view: ' . $this->_pendingViewName );
+
 			$_pendingMessages = $this->_queueService->get(
 				$this->_buildQueryUrl(
 					array(
@@ -99,6 +115,8 @@ namespace Kisma\Extensions\Davenport
 					$this->_pendingViewName
 				)
 			);
+
+			\Kisma\Utility\Log::debug( 'View results: ' . $_pendingMessages );
 
 			$_lock = $this->_createLock();
 
@@ -129,23 +147,22 @@ namespace Kisma\Extensions\Davenport
 
 		/**
 		 * Adds a work item to the queue
-		 *
-		 * @param mixed $data Any kind of info you want to pass the dequeuer process
-		 * @param int $expireTime How long to keep this guy around. -1 = until deleted
-		 * @internal param int $timeToLive
+		 * @param string $id
+		 * @param mixed $feedData Any kind of info you want to pass the dequeuer process
+		 * @param int $expireTime How long to keep this guy around. -1 = until deleted@internal param int $timeToLive
 		 * @return mixed The id of the message
 		 */
-		public function enqueue( $data = null, $expireTime = -1 )
+		public function enqueue( $id = null, $feedData = null, $expireTime = -1 )
 		{
 			try
 			{
 				//	Create an id
-				$_id = $this->_queueService->getServer()->createKey( $this->_queueName . microtime( true ) );
+				$_id = $this->_queueService->createKey( $id ?: $this->_queueName . microtime( true ) );
 
 				$_item = new QueueItem(
 					array(
 						'id' => $_id,
-						'data' => $data,
+						'feed_data' => $feedData,
 						'expire_time' => $expireTime,
 					)
 				);
@@ -167,10 +184,9 @@ namespace Kisma\Extensions\Davenport
 		 */
 		protected function _createLock()
 		{
-			$_lock = new \stdClass();
-			$_lock->lock_time = microtime( true );
-
-			return $_lock;
+			return array(
+				'lock_time' => microtime( true ),
+			);
 		}
 
 		/**

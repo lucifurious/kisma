@@ -118,10 +118,8 @@ namespace Kisma\Components
 		 * @param bool  $noMerge If true, this object's options will be cleared first
 		 * @return void
 		 */
-		protected function _loadConfiguration( $options = array(), $noMerge = false )
+		protected function _loadConfiguration( $options = array(), $mergeOptions = true )
 		{
-			$_options = array();
-
 			//	Catch null input...
 			if ( null === $options || !is_array( $options ) || empty( $options ) )
 			{
@@ -134,17 +132,17 @@ namespace Kisma\Components
 			}
 
 			//	Set our own options and work from there
-			if ( true === $noMerge )
+			if ( true !== $mergeOptions )
 			{
 				//	Overwrite the options...
-				$this->_options = $_options;
+				$this->_options = $options;
 			}
 			else
 			{
 				//	Merge the options...
 				$this->_options = array_merge(
 					$this->_options,
-					$_options
+					$options
 				);
 			}
 

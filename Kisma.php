@@ -674,13 +674,17 @@ namespace Kisma
 		 * @param string $key
 		 * @param mixed|null $defaultValue
 		 * @param boolean $unsetValue
+		 * @param bool $noTag
 		 * @return mixed
 		 * @see \Kisma\Kisma::getOption
 		 */
-		public static function o( $options = array(), $key, $defaultValue = null, $unsetValue = false )
+		public static function o( $options = array(), $key, $defaultValue = null, $unsetValue = false, $noTag = false )
 		{
 			//	Standardize the key
-			$key = self::tag( $key, true, false );
+			if ( false === $noTag )
+			{
+				$key = self::tag( $key, true, false );
+			}
 
 			//	Set the default value
 			$_newValue = $defaultValue;
@@ -737,17 +741,20 @@ namespace Kisma
 		 * @param mixed $defaultValue Only applies to target value
 		 * @return mixed
 		 */
-		public static function oo( $options = array(), $key, $subKey, $defaultValue = null, $unsetValue = false )
+		public static function oo( $options = array(), $key, $subKey, $defaultValue = null, $unsetValue = false, $noTag = false )
 		{
 			return self::o(
 				self::o(
 					$options,
 					$key,
-					array()
+					array(),
+					false,
+					$noTag
 				),
 				$subKey,
 				$defaultValue,
-				$unsetValue
+				$unsetValue,
+				$noTag
 			);
 		}
 
@@ -758,7 +765,7 @@ namespace Kisma
 		 * @param mixed $value
 		 * @return mixed
 		 */
-		public static function setOption( &$options = array(), $key, $value = null )
+		public static function setOption( &$options = array(), $key, $value = null, $noTag = false )
 		{
 			return self::so( $options, $key, $value );
 		}
@@ -771,11 +778,16 @@ namespace Kisma
 		 * @param mixed|null $value
 		 * @return mixed The new value of the key
 		 */
-		public static function so( &$options = array(), $key, $value = null )
+		public static function so( &$options = array(), $key, $value = null, $noTag = false )
 		{
+			if ( false === $noTag )
+			{
+				$key = self::tag( $key, true, false );
+			}
+
 			if ( is_array( $options ) )
 			{
-				return $options[self::tag( $key, true, false )] = $value;
+				return $options[$key] = $value;
 			}
 			else if ( is_object( $options ) )
 			{
@@ -791,7 +803,7 @@ namespace Kisma
 		 * @param string $key
 		 * @return mixed The last value of the key
 		 */
-		public static function unsetOption( &$options = array(), $key )
+		public static function unsetOption( &$options = array(), $key, $noTag = false )
 		{
 			return self::uo( $options, $key );
 		}
@@ -803,7 +815,7 @@ namespace Kisma
 		 * @param string $key
 		 * @return mixed The new value of the key
 		 */
-		public static function uo( &$options = array(), $key )
+		public static function uo( &$options = array(), $key, $noTag = false )
 		{
 			return self::o( $options, $key, null, true );
 		}

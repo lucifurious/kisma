@@ -54,10 +54,6 @@ namespace Kisma\Storage;
 		//*************************************************************************
 
 		/**
-		 * @var \Kisma\Services\Remote\CouchDbServer
-		 */
-		protected $_dbServer = null;
-		/**
 		 * @var \Kisma\Aspects\Storage\CouchDb
 		 */
 		protected $_db = null;
@@ -65,27 +61,6 @@ namespace Kisma\Storage;
 		//*************************************************************************
 		//* Public Methods
 		//*************************************************************************
-
-		/**
-		 * @param array $options
-		 * @return \Kisma\Storage\CouchDbDocument
-		 */
-		public function __construct( $options = array() )
-		{
-			parent::__construct( $options );
-
-			//	Add CouchDbServer first (cuz it can feed next aspect)
-			if ( !$this->hasAspect( \KismaSettings::CouchDbServer ) )
-			{
-				$this->_dbServer = $this->linkAspect( \KismaSettings::CouchDbServer, $options );
-			}
-
-			//	Add CouchDb service
-			if ( !$this->hasAspect( \KismaSettings::CouchDbClass ) )
-			{
-				$this->_db = $this->linkAspect( \KismaSettings::CouchDbClass, $options );
-			}
-		}
 
 		/**
 		 * Saves the current document if $couchDb is set
@@ -99,9 +74,9 @@ namespace Kisma\Storage;
 			}
 
 			$this->setDocument();
-			$this->setId( $this->getDb()->generateIDs( 1 )->uuids[0] );
+			$this->setId( $this->_db->generateIDs( 1 )->uuids[0] );
 
-			return $this->put( $this->getId(), $this->getDocument() );
+			return $this->_db->put( $this->getId(), $this->getDocument() );
 		}
 
 		/**
@@ -142,30 +117,30 @@ namespace Kisma\Storage;
 		//* Event Handlers
 		//*************************************************************************
 
-		/**
-		 * Catch the aspect linked event and set the database name.
-		 *
-		 * We have to set it now because construction
-		 * calls your setters for each property. Aspects are linked last. Therefore any pass-through method calls
-		 * to your aspect will fail.
-		 *
-		 * @param \Kisma\Components\Event $event
-		 * @return bool
-		 */
-		public function onAspectLinked( $event )
-		{
-			/** @var $_aspect \Kisma\Components\Aspect */
-			$_aspect = $event->getEventData();
-
-			if ( null !== $_aspect && \KismaSettings::CouchDbClass == $_aspect->getAspectName() )
-			{
-				//	Call the CouchDb aspect's setDatabase() method
-				$this->setDatabaseName( $this->_dbServer->getDatabaseName() );
-			}
-
-			return true;
-		}
-
+//		/**
+//		 * Catch the aspect linked event and set the database name.
+//		 *
+//		 * We have to set it now because construction
+//		 * calls your setters for each property. Aspects are linked last. Therefore any pass-through method calls
+//		 * to your aspect will fail.
+//		 *
+//		 * @param \Kisma\Components\Event $event
+//		 * @return bool
+//		 */
+//		public function onAspectLinked( $event )
+//		{
+//			/** @var $_aspect \Kisma\Components\Aspect */
+//			$_aspect = $event->getEventData();
+//
+//			if ( null !== $_aspect && \KismaSettings::CouchDbClass == $_aspect->getAspectName() )
+//			{
+//				//	Call the CouchDb aspect's setDatabase() method
+//				$this->setDatabaseName( $this->_db->getDatabaseName() );
+//			}
+//
+//			return true;
+//		}
+//
 		//*************************************************************************
 		//* Properties
 		//*************************************************************************
@@ -186,24 +161,6 @@ namespace Kisma\Storage;
 		public function getDb()
 		{
 			return $this->_db;
-		}
-
-		/**
-		 * @param \Kisma\Services\Remote\CouchDbServer $dbServer
-		 * @return $this
-		 */
-		public function setDbServer( $dbServer )
-		{
-			$this->_dbServer = $dbServer;
-			return $this;
-		}
-
-		/**
-		 * @return \Kisma\Services\Remote\CouchDbServer
-		 */
-		public function getDbServer()
-		{
-			return $this->_dbServer;
 		}
 
 	}
