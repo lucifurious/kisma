@@ -115,7 +115,7 @@ namespace Kisma\Components
 		/**
 		 * Loads an array into properties if they exist.
 		 * @param array $options
-		 * @param bool  $noMerge If true, this object's options will be cleared first
+		 * @param bool $mergeOptions If false, this object's options will be cleared first
 		 * @return void
 		 */
 		protected function _loadConfiguration( $options = array(), $mergeOptions = true )
@@ -156,7 +156,7 @@ namespace Kisma\Components
 				catch ( \Kisma\UndefinedPropertyException $_ex )
 				{
 					//	Undefined, add to options...
-//					$_options[$_key] = $_value;
+					//					$_options[$_key] = $_value;
 				}
 			}
 
