@@ -39,6 +39,7 @@ namespace Kisma\Utility
 		//* Public Methods
 		//*************************************************************************
 
+<<<<<<< Updated upstream
 		/**
 		 * Converts a separator delimited string to camel case
 		 *
@@ -63,6 +64,8 @@ namespace Kisma\Utility
 			return strtolower( preg_replace( "/([a-z])([A-Z])/", "\\1_\\2", $string ) );
 		}
 
+=======
+>>>>>>> Stashed changes
 		/**
 		 * @param string|\DOMDocument|\SimpleXMLElement $xmlText
 		 * @param string $version
@@ -321,6 +324,10 @@ namespace Kisma\Utility
 
 			return $_outputArray['feed'];
 		}
+
+		//**************************************************************************
+		//* Private Methods
+		//**************************************************************************
 
 		/**
 		 * Fixes up the attributes created by the slow-ass xmlToArray function.

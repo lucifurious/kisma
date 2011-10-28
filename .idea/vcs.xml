@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="VcsDirectoryMappings">
-    <mapping directory="" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/vendors/bootstrap" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/vendors/redbean" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/vendors/sag" vcs="Git" />
   </component>
 </project>
 
