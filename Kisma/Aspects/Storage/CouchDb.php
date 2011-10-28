@@ -20,8 +20,7 @@
 /**
  * Global namespace declarations
  */
-namespace
-{
+namespace {
 	//*************************************************************************
 	//* Requirements
 	//*************************************************************************
@@ -31,14 +30,7 @@ namespace
 	 * @todo Finish up the alias system and replace this nonsense
 	 */
 	/** @noinspection PhpIncludeInspection */
-	require_once \K::glue(
-		DIRECTORY_SEPARATOR,
-		\K::getSetting( \KismaSettings::BasePath ),
-		'vendors',
-		'sag',
-		'src',
-		'Sag.php'
-	);
+	require_once \K::glue( DIRECTORY_SEPARATOR, \K::getSetting( \KismaSettings::BasePath ), 'vendors', 'sag', 'src', 'Sag.php' );
 }
 
 /**
@@ -155,10 +147,33 @@ namespace Kisma\Aspects\Storage
 
 			if ( null !== $this->_databaseName )
 			{
-				$this->_sag->setDatabase(
-					$this->_databaseName,
-					$this->getOption( \KismaOptions::CreateIfNotFound, true )
-				);
+				$this->_sag->setDatabase( $this->_databaseName, $this->getOption( \KismaOptions::CreateIfNotFound, true ) );
+			}
+		}
+
+		/**
+		 * Non-Exception generating method to check the existence of a document. If found, it is returned. False is returned otherwise.
+		 * @param string $id
+		 * @param bool $returnObject
+		 * @return false|\Kisma\Storage\CouchDbDocument
+		 */
+		public function documentExists( $id, $returnObject = false )
+		{
+			try
+			{
+				$_document = $this->get( $id, $returnObject );
+				return empty( $_document ) ? false : $_document;
+			}
+			catch ( \SagCouchException $_ex )
+			{
+				if ( 404 == $_ex->getCode() )
+				{
+					//	Not found
+					return false;
+				}
+
+				//	Pssst... pass it on
+				throw $_ex;
 			}
 		}
 
@@ -222,13 +237,10 @@ namespace Kisma\Aspects\Storage
 			//	Sag pass-through...
 			if ( method_exists( $this->_sag, $method ) )
 			{
-				return call_user_func_array(
-					array(
-						$this->_sag,
-						$method
-					),
-					$arguments
-				);
+				return call_user_func_array( array(
+					$this->_sag,
+					$method
+				), $arguments );
 			}
 
 			//	No worky
@@ -238,9 +250,10 @@ namespace Kisma\Aspects\Storage
 		/**
 		 * Wrapper for \Sag::get() to return a \Kisma\Components\Document
 		 * @param string $url
-		 * @return \Kisma\Components\Document
+		 * @param bool $returnObject
+		 * @return \Kisma\Components\Document|\stdClass
 		 */
-		public function get( $url )
+		public function get( $url, $returnObject = false )
 		{
 			$_result = $this->_sag->get( $url )->body;
 
@@ -251,11 +264,18 @@ namespace Kisma\Aspects\Storage
 
 				foreach ( $_result as $_document )
 				{
-					$_documents[] = new \Kisma\Components\Document(
-						array(
-							'document' => $_document,
-						)
-					);
+					if ( false === $returnObject )
+					{
+						$_documents[] = new \Kisma\Components\Document(
+							array(
+								'document' => $_document,
+							)
+						);
+					}
+					else
+					{
+						$_documents[] = $_document;
+					}
 
 					unset( $_document );
 				}
@@ -266,7 +286,7 @@ namespace Kisma\Aspects\Storage
 			}
 
 			//	Objects go back as Document
-			if ( is_object( $_result ) )
+			if ( is_object( $_result ) && false === $returnObject )
 			{
 				$_document = new \Kisma\Components\Document();
 				return $_document->setDocument( $_result );
@@ -287,53 +307,6 @@ namespace Kisma\Aspects\Storage
 		{
 			return $this->get( '/' . $id . '/' . urlencode( $fileName ) );
 		}
-
-		//*************************************************************************
-		//* Event Handlers
-		//*************************************************************************
-
-//		/**
-//		 * Catch the aspect linked event and set the database name.
-//		 *
-//		 * We have to set it now because construction
-//		 * calls your setters for each property. Aspects are linked last. Therefore any pass-through method calls
-//		 * to your aspect will fail.
-//		 *
-//		 * @param \Kisma\Components\Event $event
-//		 * @return bool
-//		 */
-//		public function onAspectLinked( $event )
-//		{
-//			/** @var $_aspect \Kisma\Components\Aspect */
-//			$_aspect = $event->getEventData();
-//
-//			//	Create our server
-//			if ( null !== $_aspect && $_aspect instanceof ${\KismaSettings::CouchDbClass} == $_aspect->getAspectName() )
-//			{
-//				if ( false === ( $this->_dbServer = $this->_linker->getAspect( \KismaSettings::CouchDbServer ) ) )
-//				{
-//					$this->_dbServer = $this->_linker->linkAspect( \KismaSettings::CouchDbServer, $this->getOptions() );
-//				}
-//
-//				//	Instantiate Sag
-//				$this->_sag = new \Sag( $this->_dbServer->getHostName(), $this->_dbServer->getHostPort() );
-//
-//				if ( null !== $this->_dbServer->getUserName() && null !== $this->_dbServer->getPassword() )
-//				{
-//					$this->_sag->login( $this->_dbServer->getUserName(), $this->_dbServer->getPassword() );
-//				}
-//
-//				if ( null !== $this->_dbServer->getDatabaseName() )
-//				{
-//					$this->_sag->setDatabase(
-//						$this->_dbServer->getDatabaseName(),
-//						$this->getOption( \KismaOptions::CreateIfNotFound, false )
-//					);
-//				}
-//			}
-//
-//			return true;
-//		}
 
 		//*************************************************************************
 		//* Properties

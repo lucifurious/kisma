@@ -94,6 +94,11 @@ namespace
 		const Options = 'options';
 
 		const CreateIfNotFound = 'create_if_not_found';
+
+		/**
+		 * @const string The name of the item
+		 */
+		const CleanOptions = '@sub_component.auto_clean_options';
 	}
 
 }
@@ -323,6 +328,13 @@ namespace Kisma
 	 * Defines the interface for components
 	 */
 	interface IComponent extends IConfigurable, IAspectable
+	{
+	}
+
+	/**
+	 * A provider of a consumable
+	 */
+	interface IProvider extends IComponent
 	{
 	}
 

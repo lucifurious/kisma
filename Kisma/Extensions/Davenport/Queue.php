@@ -154,22 +154,41 @@ namespace Kisma\Extensions\Davenport
 		 */
 		public function enqueue( $id = null, $feedData = null, $expireTime = -1 )
 		{
+			//	Create an id
+			$_id = $this->_queueService->createKey( $id ?: $this->_queueName . microtime( true ) );
+
+			$_item = new QueueItem(
+				array(
+					'_id' => $_id,
+					'feed_data' => $feedData,
+					'expire_time' => $expireTime,
+				)
+			);
+
 			try
 			{
-				//	Create an id
-				$_id = $this->_queueService->createKey( $id ?: $this->_queueName . microtime( true ) );
+				//	See if this key is already in the queue...
+				if ( false !== ( $_document = $this->_queueService->documentExists( $_id, true ) ) )
+				{
+					//	Doc exists, read and update...
+					$_document->update_time = microtime( true );
+					$_document->feed_data = $feedData;
+					\Kisma\Utility\Log::debug( 'Found prior queue item, _rev: ' . $_document->_rev );
+				}
+				else
+				{
+					$_document = $_item->getDocument();
+				}
 
-				$_item = new QueueItem(
-					array(
-						'id' => $_id,
-						'feed_data' => $feedData,
-						'expire_time' => $expireTime,
-					)
-				);
+				$_response = $this->_queueService->put( $_id, $_document );
 
-				$this->_queueService->put( $_id, $_item );
+				if ( isset( $_response->body ) && $_response->body->ok )
+				{
+					\Kisma\Utility\Log::debug( 'Document queued: ' . print_r( $_response->body, true ) );
+					return $_response->body->id;
+				}
 
-				return $_id;
+				return false;
 			}
 			catch ( \Exception $_ex )
 			{

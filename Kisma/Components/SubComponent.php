@@ -115,7 +115,7 @@ namespace Kisma\Components
 		/**
 		 * Loads an array into properties if they exist.
 		 * @param array $options
-		 * @param bool  $noMerge If true, this object's options will be cleared first
+		 * @param bool $mergeOptions
 		 * @return void
 		 */
 		protected function _loadConfiguration( $options = array(), $mergeOptions = true )
@@ -127,7 +127,6 @@ namespace Kisma\Components
 			}
 			else
 			{
-				//	Clean up the keys
 				$options = \K::cleanOptions( $options );
 			}
 
@@ -393,7 +392,7 @@ namespace Kisma\Components
 		 * @param string $objectId
 		 * @return $this
 		 */
-		public function setObjectId( $objectId )
+		public function setObjectId( $objectId = null )
 		{
 			$this->_objectId = $objectId;
 			return $this;

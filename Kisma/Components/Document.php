@@ -41,7 +41,6 @@ namespace Kisma\Components;
 		 * @var string
 		 */
 		const DefaultContentType = 'application/octet-stream';
-
 		//*************************************************************************
 		//* Private Members 
 		//*************************************************************************
@@ -50,6 +49,10 @@ namespace Kisma\Components;
 		 * @var \stdClass|array The document contents
 		 */
 		protected $_document = null;
+
+		//*************************************************************************
+		//* Magic
+		//*************************************************************************
 
 		/**
 		 * @param array $options
@@ -63,10 +66,6 @@ namespace Kisma\Components;
 				$this->_document = new \stdClass();
 			}
 		}
-
-		//*************************************************************************
-		//* Magic
-		//*************************************************************************
 
 		/**
 		 * Checks if a document property is set
@@ -158,7 +157,7 @@ namespace Kisma\Components;
 		public function setDocument( $document = null )
 		{
 			//	blanket overwrite
-			$this->_document = ( $document ?: new \stdClass() );
+			$this->_document = ( $document ? : new \stdClass() );
 			return $this;
 		}
 
@@ -210,42 +209,6 @@ namespace Kisma\Components;
 		{
 			$this->_document->_rev = $rev;
 			return $this;
-		}
-
-		/**
-		 * @param \Kisma\Aspects\Storage\CouchDb $db
-		 * @return \Kisma\Components\Document
-		 */
-		public function setDb( $db )
-		{
-			$this->_db = $db;
-			return $this;
-		}
-
-		/**
-		 * @return \Kisma\Aspects\Storage\CouchDb
-		 */
-		public function getDb()
-		{
-			return $this->_db;
-		}
-
-		/**
-		 * @param \Kisma\Services\Remote\CouchDbServer $dbServer
-		 * @return \Kisma\Components\Document
-		 */
-		public function setDbServer( $dbServer )
-		{
-			$this->_dbServer = $dbServer;
-			return $this;
-		}
-
-		/**
-		 * @return \Kisma\Services\Remote\CouchDbServer
-		 */
-		public function getDbServer()
-		{
-			return $this->_dbServer;
 		}
 	}
 }

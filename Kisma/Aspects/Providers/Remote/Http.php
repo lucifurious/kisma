@@ -1,6 +1,6 @@
 <?php
 /**
- * HttpService.php
+ * Http.php
  *
  * Kisma(tm) : PHP Nanoframework (http://github.com/Pogostick/kisma/)
  * Copyright 2011, Pogostick, LLC. (http://www.pogostick.com/)
@@ -12,25 +12,18 @@
  * @link          http://github.com/Pogostick/kisma/ Kisma(tm)
  * @license       http://github.com/Pogostick/kisma/licensing/
  * @author        Jerry Ablan <kisma@pogostick.com>
- * @category      Kisma_Services
- * @package       kisma.services
+ * @category      Kisma_Providers
+ * @package       kisma.providers
  * @since         v1.0.0
  * @filesource
  */
-namespace Kisma\Services\Remote
+namespace Kisma\Providers\Remote
 {
-	//*************************************************************************
-	//* Aliases
-	//*************************************************************************
-
-	use Kisma\Services as Services;
-	use Kisma\IHttpMethod as Method;
-
 	/**
 	 * Http
 	 * A base service to provide HTTP services
 	 */
-	class Http extends Services\Remote implements \Kisma\IHttpMethod, \Kisma\IHttpResponse
+	class Http extends \Kisma\Providers\Remote implements \Kisma\IHttpMethod, \Kisma\IHttpResponse
 	{
 		//*************************************************************************
 		//* Private Members

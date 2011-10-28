@@ -12,17 +12,17 @@
  * @link          http://github.com/Pogostick/kisma/ Kisma(tm)
  * @license       http://github.com/Pogostick/kisma/licensing/
  * @author        Jerry Ablan <kisma@pogostick.com>
- * @category      Kisma_Services
- * @package       kisma.services
+ * @category      Kisma_Providers
+ * @package       kisma.providers
  * @since         v1.0.0
  * @filesource
  */
-namespace Kisma\Services
+namespace Kisma\Providers
 {
 	/**
-	 * RemoteService
+	 * Remote
 	 *
-	 * A base service class that is intended to be used by to access remote
+	 * A base provider class for remote providers
 	 * services (i.e. XML, HTTP, CouchDb, etc.)
 	 *
 	 * Contains properties useful for talking to these services
@@ -32,7 +32,7 @@ namespace Kisma\Services
 	 * @property string $userName
 	 * @property string $password
 	 */
-	abstract class Remote extends \Kisma\Components\AspectService
+	abstract class Remote extends \Kisma\Components\Component implements IProvider
 	{
 		//*************************************************************************
 		//* Private Members

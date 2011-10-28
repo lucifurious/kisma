@@ -611,7 +611,11 @@ namespace Kisma
 					$_value = self::cleanOptions( $_value, $recursive );
 				}
 
-				$_options[self::tag( $_key, true, false )] = $_value;
+				//	If a key starts with an '@', it will be ignored
+				if ( '@' != $_key[0] )
+				{
+					$_options[self::tag( $_key, true, false )] = $_value;
+				}
 			}
 
 			return $_options;
@@ -680,6 +684,8 @@ namespace Kisma
 		 */
 		public static function o( $options = array(), $key, $defaultValue = null, $unsetValue = false, $noTag = false )
 		{
+			$_originalKey = $key;
+
 			//	Standardize the key
 			if ( false === $noTag )
 			{
@@ -692,6 +698,12 @@ namespace Kisma
 			//	Get array value if it exists
 			if ( is_array( $options ) )
 			{
+				//	Check for the original key too
+				if ( isset( $options[$_originalKey] ) )
+				{
+					$key = $_originalKey;
+				}
+
 				if ( isset( $options[$key] ) )
 				{
 					$_newValue = $options[$key];
@@ -709,21 +721,29 @@ namespace Kisma
 				}
 			}
 			//	Also now handle accessible object properties
-			else if ( is_object( $options ) && property_exists( $options, $key ) )
+			else if ( is_object( $options ) )
 			{
-				if ( isset( $options->$key ) )
+				if ( property_exists( $options, $_originalKey ) )
 				{
-					$_newValue = $options->$key;
-
-					if ( $unsetValue )
-					{
-						unset( $options->$key );
-					}
+					$key = $_originalKey;
 				}
 
-				if ( !$unsetValue )
+				if ( property_exists( $options, $key ) )
 				{
-					$options->$key = $_newValue;
+					if ( isset( $options->$key ) )
+					{
+						$_newValue = $options->$key;
+
+						if ( $unsetValue )
+						{
+							unset( $options->$key );
+						}
+					}
+
+					if ( !$unsetValue )
+					{
+						$options->$key = $_newValue;
+					}
 				}
 			}
 

@@ -114,34 +114,6 @@ namespace Kisma\Storage;
 		}
 
 		//*************************************************************************
-		//* Event Handlers
-		//*************************************************************************
-
-//		/**
-//		 * Catch the aspect linked event and set the database name.
-//		 *
-//		 * We have to set it now because construction
-//		 * calls your setters for each property. Aspects are linked last. Therefore any pass-through method calls
-//		 * to your aspect will fail.
-//		 *
-//		 * @param \Kisma\Components\Event $event
-//		 * @return bool
-//		 */
-//		public function onAspectLinked( $event )
-//		{
-//			/** @var $_aspect \Kisma\Components\Aspect */
-//			$_aspect = $event->getEventData();
-//
-//			if ( null !== $_aspect && \KismaSettings::CouchDbClass == $_aspect->getAspectName() )
-//			{
-//				//	Call the CouchDb aspect's setDatabase() method
-//				$this->setDatabaseName( $this->_db->getDatabaseName() );
-//			}
-//
-//			return true;
-//		}
-//
-		//*************************************************************************
 		//* Properties
 		//*************************************************************************
 

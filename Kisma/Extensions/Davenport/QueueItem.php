@@ -48,11 +48,24 @@ namespace Kisma\Extensions\Davenport
 		public function __construct( $options = array() )
 		{
 			//	Set our default fields
-			$this->setDocument();
-			$this->_document->id = \K::o( $options, 'id', null, true );
+			$this->setDocument( \K::o( $options, 'document', null, true ) );
+			$this->_document->_id = \K::o( $options, '_id', null, true );
+			if ( null !== ( $_rev = \K::o( $options, '_rev', null, true ) ) )
+			{
+				$this->_document->_rev = $_rev;
+			}
 			$this->_document->create_time = microtime( true );
 			$this->_document->expire_time = \K::o( $options, 'expire_time', -1, true );
-			$this->_document->feed_data = \K::o( $options, 'feed_data', null, true );
+
+			$_feedData = \K::o( $options, 'feed_data', null, true );
+
+			if ( null !== $_feedData )
+			{
+				//	Turn off cleansing for me...
+				$_feedData[\KismaOptions::CleanOptions] = false;
+			}
+
+			$this->_document->feed_data = $_feedData;
 
 			parent::__construct( $options );
 		}
