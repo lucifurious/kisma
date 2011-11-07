@@ -20,27 +20,18 @@ namespace Kisma\Components;
 {
 	/**
 	 * Document
-	 * A magical bare-bones CouchDB document wrapper. Read and write document properties just like using
-	 * a \stdClass. _id and _rev had dedicated getters and setters.
+	 * A magical bare-bones generic document. It's a thinly veiled wrapper around a \stdClass.
+	 * This is the basis for document storage objects.
+	 *
+	 * You can read and write document properties just like using a \stdClass.
 	 *
 	 * In addition, IF you create a getter or setter for a property, it will always be called. This allows
 	 * you to enforce property restrictions in a single place.
 	 *
 	 * @property \stdClass $document
-	 *
-	 * @property string $id The document _id
-	 * @property string $rev The document _rev
 	 */
 	class Document extends Component
 	{
-		//*************************************************************************
-		//* Constants
-		//*************************************************************************
-
-		/**
-		 * @var string
-		 */
-		const DefaultContentType = 'application/octet-stream';
 		//*************************************************************************
 		//* Private Members 
 		//*************************************************************************
@@ -63,7 +54,7 @@ namespace Kisma\Components;
 
 			if ( null === $this->_document )
 			{
-				$this->_document = new \stdClass();
+				$this->setDocument();
 			}
 		}
 
@@ -120,7 +111,15 @@ namespace Kisma\Components;
 				return $this->_document->{$property};
 			}
 
-			return parent::__get( $property );
+			try
+			{
+				return parent::__get( $property );
+			}
+			catch ( \Kisma\UndefinedPropertyException $_ex )
+			{
+				//	Set the property in the document if it wasn't found
+				return $this->_document->{$property} = null;
+			}
 		}
 
 		/**
@@ -135,7 +134,7 @@ namespace Kisma\Components;
 
 			if ( method_exists( $this, $_setter ) )
 			{
-				return $this->{$_setter}( $property, $value );
+				return $this->{$_setter}( $value );
 			}
 
 			if ( isset( $this->_document ) )
@@ -143,6 +142,22 @@ namespace Kisma\Components;
 				$this->_document->{$property} = $value;
 				return $this;
 			}
+		}
+
+		/**
+		 * @return \stdClass
+		 */
+		public function toObject()
+		{
+			$_obj = new \stdClass();
+			$_obj->_id = $this->_document->_id;
+
+			if ( null !== $this->_document->_rev )
+			{
+				$_obj->_rev = $this->_document->_rev;
+			}
+
+			return $_obj;
 		}
 
 		//*************************************************************************
@@ -156,8 +171,15 @@ namespace Kisma\Components;
 		 */
 		public function setDocument( $document = null )
 		{
-			//	blanket overwrite
-			$this->_document = ( $document ? : new \stdClass() );
+			//	set the default stuff
+			if ( null === $document )
+			{
+				$document = new \stdClass();
+				$document->create_time = microtime( true );
+			}
+
+			$this->_document = $document;
+
 			return $this;
 		}
 
@@ -169,46 +191,10 @@ namespace Kisma\Components;
 			//	Should always have an object
 			if ( null === $this->_document )
 			{
-				$this->_document = new \stdClass();
+				$this->setDocument();
 			}
 
 			return $this->_document;
-		}
-
-		/**
-		 * @return string
-		 */
-		public function getId()
-		{
-			return $this->_document->_id;
-		}
-
-		/**
-		 * @param string $id
-		 * @return \Kisma\Components\Document
-		 */
-		public function setId( $id )
-		{
-			$this->getDocument()->_id = $id;
-			return $this;
-		}
-
-		/**
-		 * @return string
-		 */
-		public function getRev()
-		{
-			return $this->_document->_rev;
-		}
-
-		/**
-		 * @param string $rev
-		 * @return \Kisma\Components\Document
-		 */
-		public function setRev( $rev )
-		{
-			$this->_document->_rev = $rev;
-			return $this;
 		}
 	}
 }

@@ -20,7 +20,8 @@
 /**
  * Global namespace declarations
  */
-namespace {
+namespace
+{
 	//*************************************************************************
 	//* Requirements
 	//*************************************************************************
@@ -47,6 +48,7 @@ namespace Kisma\Aspects\Storage
 	 */
 	use Kisma\Components as Components;
 	use Kisma\Aspects as Aspects;
+	use \Kisma\Extensions\Davenport\Utility\CouchHelper;
 
 	//*************************************************************************
 	//* Requirements
@@ -135,19 +137,18 @@ namespace Kisma\Aspects\Storage
 		 */
 		public function __construct( $options = array() )
 		{
-			parent::__construct( $options );
-
-			//	Instantiate Sag
-			$this->_sag = new \Sag( $this->_hostName, $this->_hostPort );
-
-			if ( null !== $this->_userName )
+			//	Initialize Sag
+			if ( null === ( $this->_sag = \K::o( $options, 'sag', null, true ) ) )
 			{
-				$this->_sag->login( $this->_userName, $this->_password );
+				$this->_sag = CouchHelper::getSagClient( $options );
 			}
 
-			if ( null !== $this->_databaseName )
+			//	Call poppa
+			parent::__construct( $options );
+
+			if ( !$this->documentExists( $this->_designDocumentName ) )
 			{
-				$this->_sag->setDatabase( $this->_databaseName, $this->getOption( \KismaOptions::CreateIfNotFound, true ) );
+				$this->_createDesignDocument();
 			}
 		}
 
@@ -161,6 +162,11 @@ namespace Kisma\Aspects\Storage
 		{
 			try
 			{
+				if ( false !== $returnObject )
+				{
+					return $this->_sag->head( $id )->body->ok;
+				}
+
 				$_document = $this->get( $id, $returnObject );
 				return empty( $_document ) ? false : $_document;
 			}
@@ -251,11 +257,29 @@ namespace Kisma\Aspects\Storage
 		 * Wrapper for \Sag::get() to return a \Kisma\Components\Document
 		 * @param string $url
 		 * @param bool $returnObject
-		 * @return \Kisma\Components\Document|\stdClass
+		 * @return \Kisma\Components\Document|\stdClass|false|\Kisma\Components\Document[]|\stdClass[]
 		 */
 		public function get( $url, $returnObject = false )
 		{
-			$_result = $this->_sag->get( $url )->body;
+			try
+			{
+				$_result = $this->_sag->get( $url );
+				if ( '200' == $_result->_HTTP->status )
+				{
+					throw new \Exception( 'Couldn\'t find doc.' );
+				}
+			}
+			catch ( \SagCouchException $_ex )
+			{
+				if ( 404 != $_ex->getCode() )
+				{
+					//	Not not found is not cool
+					throw $_ex;
+				}
+
+				//	Not found
+				return false;
+			}
 
 			//	Arrays go back as arrays of Document
 			if ( is_array( $_result ) && !is_object( $_result ) )
@@ -309,6 +333,89 @@ namespace Kisma\Aspects\Storage
 		}
 
 		//*************************************************************************
+		//* Private Methods
+		//*************************************************************************
+
+		/**
+		 * Initializes Sag
+		 * @param array $options
+		 */
+		protected function _initializeClient( &$options = array() )
+		{
+			//	Nada
+		}
+
+		/**
+		 * @return bool
+		 * @throws \SagCouchException
+		 */
+		protected function _hasDesignDocument()
+		{
+			try
+			{
+				//	See if it's there...
+				$this->_sag->head( $this->_designDocumentName )->body;
+				return true;
+			}
+			catch ( \SagCouchException $_ex )
+			{
+				if ( 404 != $_ex->getCode() )
+				{
+					//	Not not found
+					throw $_ex;
+				}
+			}
+
+			return false;
+		}
+
+		/**
+		 * Creates our design document
+		 * @return bool
+		 */
+		protected function _createDesignDocument()
+		{
+			if ( $this->_hasDesignDocument() )
+			{
+				return true;
+			}
+
+			//	Build the design document
+			$_doc = new \stdClass();
+			$_doc->_id = $this->_designDocumentName;
+
+			$_doc->views = new \stdClass();
+
+			$_doc->views->by_date = new \stdClass();
+			$_doc->views->by_date->map = 'function( doc ) { emit(doc.create_time.getTime(), doc); }';
+
+			try
+			{
+				//	Store it
+				$this->_sag->put( $_doc->_id, $_doc );
+			}
+			catch ( \Exception $_ex )
+			{
+				if ( 404 == $_ex->getCode() )
+				{
+					//	No database, rethrow
+					throw $_ex;
+				}
+
+				/**
+				 * Conflict-o-rama!
+				 */
+				if ( 409 == $_ex->getCode() )
+				{
+					//	I guess we don't care...
+					return true;
+				}
+			}
+
+			return false;
+		}
+
+		//*************************************************************************
 		//* Properties
 		//*************************************************************************
 
@@ -334,7 +441,7 @@ namespace Kisma\Aspects\Storage
 		 * @param \Sag $sag
 		 * @return \Kisma\Aspects\Storage\CouchDb
 		 */
-		protected function _setSag( $sag )
+		public function setSag( $sag )
 		{
 			$this->_sag = $sag;
 			return $this;
@@ -352,9 +459,14 @@ namespace Kisma\Aspects\Storage
 		 * @param string $databaseName
 		 * @return \Kisma\Aspects\Storage\CouchDb
 		 */
-		public function setDatabaseName( $databaseName )
+		public function setDatabaseName( $databaseName = null )
 		{
-			$this->_databaseName = $databaseName;
+			if ( null !== $this->_sag && null !== ( $this->_databaseName = $databaseName ) )
+			{
+				$this->_sag->setDatabase( $this->_databaseName, $this->getOption( \KismaOptions::CreateIfNotFound, true ) );
+				$this->_createDesignDocument();
+			}
+
 			return $this;
 		}
 

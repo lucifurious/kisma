@@ -52,7 +52,7 @@ namespace Kisma\Extensions\Davenport
 		/**
 		 * @var int
 		 */
-		const DefaultMaxItems = 25;
+		const DefaultMaxItems = 1;
 
 		//*************************************************************************
 		//* Private Members
@@ -98,11 +98,13 @@ namespace Kisma\Extensions\Davenport
 		 * The descending param is used to get LIFO (if true) or FIFO (if false) behavior.
 		 * @param int $maxItems
 		 * @param bool $fifo
-		 * @internal param string $queueName
+		 * @param bool $useLocks If true, a lock will be added to the queue item
 		 * @return array|false
 		 */
-		public function dequeue( $maxItems = self::DefaultMaxItems, $fifo = true )
+		public function dequeue( $maxItems = self::DefaultMaxItems, $fifo = true, $useLocks = false )
 		{
+			$_queueItems = array();
+
 			\Kisma\Utility\Log::debug( 'Requesting pending view: ' . $this->_pendingViewName );
 
 			$_pendingMessages = $this->_queueService->get(
@@ -118,31 +120,41 @@ namespace Kisma\Extensions\Davenport
 
 			\Kisma\Utility\Log::debug( 'View results: ' . $_pendingMessages );
 
-			$_lock = $this->_createLock();
-
-			//	Lock each document
-			foreach ( $_pendingMessages as &$_message )
+			if ( false !== $useLocks )
 			{
-				$_message->lock = $_lock;
-			}
+				$_lock = $this->_createLock();
 
-			$_workItems = array();
-
-			//	Now, try and lock them all
-			foreach ( $this->_queueService->bulk( $_pendingMessages, true )->body as $_message )
-			{
-				if ( isset( $_message->error ) )
+				//	Lock each document
+				foreach ( $_pendingMessages as &$_message )
 				{
-					//	Skipping conflicts...
-					continue;
+					$_message->lock = $_lock;
 				}
 
-				//	Add successful lock to work item list
-				$_workItems[] = $_message;
+				//	Now, try and lock them all
+				foreach ( $this->_queueService->bulk( $_pendingMessages, true )->body as $_message )
+				{
+					if ( isset( $_message->error ) )
+					{
+						//	Skipping conflicts...
+						continue;
+					}
+
+					//	Add successful lock to work item list
+					$_queueItems[] = new QueueItem( array( 'document' => $_message ) );
+				}
+			}
+			else
+			{
+				//	Build doc array non-locked
+				foreach ( $_pendingMessages as $_message )
+				{
+					//	Add successful lock to work item list
+					$_queueItems[] = new QueueItem( array( 'document' => $_message ) );
+				}
 			}
 
-			//	Return locked items
-			return empty( $_workItems ) ? false : $_workItems;
+			//	Return queue item(s)
+			return empty( $_queueItems ) ? false : $_queueItems;
 		}
 
 		/**
@@ -159,7 +171,7 @@ namespace Kisma\Extensions\Davenport
 
 			$_item = new QueueItem(
 				array(
-					'_id' => $_id,
+					'id' => $_id,
 					'feed_data' => $feedData,
 					'expire_time' => $expireTime,
 				)
@@ -168,7 +180,9 @@ namespace Kisma\Extensions\Davenport
 			try
 			{
 				//	See if this key is already in the queue...
-				if ( false !== ( $_document = $this->_queueService->documentExists( $_id, true ) ) )
+				$_document = $this->_queueService->get( $_id, true );
+
+				if ( !empty( $_document ) )
 				{
 					//	Doc exists, read and update...
 					$_document->update_time = microtime( true );

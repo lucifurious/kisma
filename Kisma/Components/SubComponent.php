@@ -151,6 +151,7 @@ namespace Kisma\Components
 				try
 				{
 					\K::__property( $this, $_key, \Kisma\AccessorMode::Set, $_value );
+					unset( $this->_options[$_key] );
 				}
 				catch ( \Kisma\UndefinedPropertyException $_ex )
 				{

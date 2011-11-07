@@ -39,7 +39,6 @@ namespace Kisma\Utility
 		//* Public Methods
 		//*************************************************************************
 
-<<<<<<< Updated upstream
 		/**
 		 * Converts a separator delimited string to camel case
 		 *
@@ -50,7 +49,7 @@ namespace Kisma\Utility
 		 */
 		public static function camelize( $string, $separator = '_', $preserveWhiteSpace = false )
 		{
-			$_newString = ucwords( str_replace( $separator, ' ', $str ) );
+			$_newString = ucwords( str_replace( $separator, ' ', $string ) );
 			return ( false === $preserveWhiteSpace ? str_replace( ' ', '', $_newString ) : $_newString );
 		}
 
@@ -64,8 +63,6 @@ namespace Kisma\Utility
 			return strtolower( preg_replace( "/([a-z])([A-Z])/", "\\1_\\2", $string ) );
 		}
 
-=======
->>>>>>> Stashed changes
 		/**
 		 * @param string|\DOMDocument|\SimpleXMLElement $xmlText
 		 * @param string $version

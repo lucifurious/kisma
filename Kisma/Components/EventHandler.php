@@ -63,7 +63,7 @@ namespace Kisma\Components
 		 */
 		public function handle( $event )
 		{
-			Utility\Log::debug( 'Handling "' . $event->getEventName() . '" with handler ID: ' . $this->_handlerId );
+//			Utility\Log::debug( 'Handling "' . $event->getEventName() . '" with handler ID: ' . $this->_handlerId );
 
 			return call_user_func_array(
 				$this->_callback,

@@ -165,18 +165,18 @@ namespace Kisma
 			//	Convert underscores to spaces, then remove spaces
 			$_tag = str_replace( ' ', null, ucwords( trim( str_replace( '_', ' ', $tag ) ) ) );
 
-			if ( false !== $isKey )
-			{
-				//	Convert namespace separators to dots
-				$_tag = lcfirst( str_replace( '\\', '.', $_tag ) );
-				$keyParts = explode( '.', $_tag );
-			}
-
 			//	Only the base?
 			if ( false !== $baseNameOnly )
 			{
 				//	If this is a key, just get the last part
 				$_tag = end( explode( '\\', $_tag ) );
+			}
+
+			//	Make it a key?
+			if ( false !== $isKey )
+			{
+				//	Convert namespace separators to dots
+				$keyParts = explode( '.', $_tag = self::untag( $_tag ) );
 			}
 
 			if ( self::getDebugLevel( \Kisma\DebugLevel::Nutty ) )
@@ -589,6 +589,39 @@ namespace Kisma
 			return false;
 		}
 
+		/**
+		 * @static
+		 * @param $which
+		 */
+		public static function initializeDatabase( $which = 'primary' )
+		{
+			//	Set up the database...
+			if ( null === \K::o( $_SESSION, 'db.' . $which ) )
+			{
+				$_options = \K::getSetting( 'db.' . $which );
+			}
+			else
+			{
+				$_options = \K::o( $_SESSION, 'db.' . $which );
+			}
+
+			if ( isset( $_SESSION['db_options'] ) )
+			{
+				$_options = array_merge(
+					$_SESSION['db_options'],
+					$_options
+				);
+			}
+
+			$_SESSION['db_options'] = $_options;
+
+			\K::so(
+				$_SESSION,
+				'db',
+				$_db = \K::createComponent( \KismaSettings::CouchDbClass, $_options )
+			);
+		}
+
 		//*************************************************************************
 		//* Array/Option Methods
 		//*************************************************************************
@@ -665,7 +698,7 @@ namespace Kisma
 		 * @param boolean $unsetValue
 		 * @return mixed
 		 */
-		public static function getOption( $options = array(), $key, $defaultValue = null, $unsetValue = false )
+		public static function getOption( &$options = array(), $key, $defaultValue = null, $unsetValue = false )
 		{
 			return self::o( $options, $key, $defaultValue, $unsetValue );
 		}
@@ -682,7 +715,7 @@ namespace Kisma
 		 * @return mixed
 		 * @see \Kisma\Kisma::getOption
 		 */
-		public static function o( $options = array(), $key, $defaultValue = null, $unsetValue = false, $noTag = false )
+		public static function o( &$options = array(), $key, $defaultValue = null, $unsetValue = false, $noTag = false )
 		{
 			$_originalKey = $key;
 
@@ -761,7 +794,7 @@ namespace Kisma
 		 * @param mixed $defaultValue Only applies to target value
 		 * @return mixed
 		 */
-		public static function oo( $options = array(), $key, $subKey, $defaultValue = null, $unsetValue = false, $noTag = false )
+		public static function oo( &$options = array(), $key, $subKey, $defaultValue = null, $unsetValue = false, $noTag = false )
 		{
 			return self::o(
 				self::o(
@@ -1203,9 +1236,11 @@ namespace
 			\K::initialize( $configuration );
 
 			//	Add the library path to the includes
+			$_includePath = get_include_path();
+
 			if ( null !== ( $_libPath = \K::getSetting( 'library_path' ) ) )
 			{
-				\set_include_path( get_include_path() . PATH_SEPARATOR . $_libPath );
+				\set_include_path( $_includePath . PATH_SEPARATOR . $_libPath . PATH_SEPARATOR );
 			}
 
 			$_modules = \K::o( $configuration, 'modules' );

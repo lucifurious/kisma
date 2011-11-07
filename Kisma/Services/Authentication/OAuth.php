@@ -26,8 +26,21 @@ namespace Kisma\Services\Authentication
 	/**
 	 * OAuthService
 	 * A base class for OAuth services. Has properties for all the basics.
+	 *
+	 * @property string $developerKey
+	 * @property string $consumerKey
+	 * @property string $consumerSecret
+	 * @property string $authenticationUri
+	 * @property string $redirectUri
+	 * @property string $accessToken
+	 * @property string $oauthEndpoint
+	 * @property string $accessTokenExpiresIn
+	 * @property string $accessTokenType
+	 * @property string $refreshToken
+	 * @property string $requestToken
+	 * @property array $scopes
 	 */
-	abstract class OAuth extends \Kisma\Components\Service
+	abstract class OAuth extends \Kisma\Components\ServiceProvider
 	{
 		//*************************************************************************
 		//* Private Members
@@ -77,6 +90,10 @@ namespace Kisma\Services\Authentication
 		 * @var string
 		 */
 		protected $_requestToken = null;
+		/**
+		 * @var array The default permission scopes we are requesting
+		 */
+		protected $_scopes = array();
 
 		//*************************************************************************
 		//* Properties
@@ -260,6 +277,42 @@ namespace Kisma\Services\Authentication
 		public function getRefreshToken()
 		{
 			return $this->_refreshToken;
+		}
+
+		/**
+		 * @param string $requestToken
+		 * @return \Kisma\Services\Authentication\OAuth
+		 */
+		public function setRequestToken( $requestToken )
+		{
+			$this->_requestToken = $requestToken;
+			return $this;
+		}
+
+		/**
+		 * @return string
+		 */
+		public function getRequestToken()
+		{
+			return $this->_requestToken;
+		}
+
+		/**
+		 * @param array $scopes
+		 * @return \Kisma\Services\Authentication\OAuth
+		 */
+		public function setScopes( $scopes )
+		{
+			$this->_scopes = $scopes;
+			return $this;
+		}
+
+		/**
+		 * @return array
+		 */
+		public function getScopes()
+		{
+			return $this->_scopes;
 		}
 	}
 	

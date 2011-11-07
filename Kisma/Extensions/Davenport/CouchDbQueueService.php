@@ -57,26 +57,7 @@ namespace Kisma\Extensions\Davenport
 		 */
 		public function queueExists( $name )
 		{
-			$this->_ensureDatabase( $name );
-
-			$_queueName = \K::untag( $name );
-
-			try
-			{
-				$this->_sag->head( $_queueName );
-				return true;
-			}
-			catch ( \SagCouchException $_ex )
-			{
-				if ( 404 == $_ex->getCode() )
-				{
-					//	Not found
-					return false;
-				}
-
-				//	Something else...
-				throw $_ex;
-			}
+			return $this->documentExists( \K::untag( $name ) );
 		}
 
 		/**
@@ -86,11 +67,7 @@ namespace Kisma\Extensions\Davenport
 		 */
 		public function createQueue( $name )
 		{
-			$this->_ensureDatabase( $name );
-
 			$_queueName = \K::untag( $name );
-
-			$this->_createDesignDocument();
 
 			//	Create and return a new queue
 			return new Queue(
@@ -160,6 +137,8 @@ namespace Kisma\Extensions\Davenport
 			}
 
 			//	Build the design document
+			parent::_createDesignDocument();
+
 			$_doc = new \stdClass();
 			$_doc->_id = Queue::DesignDocumentName;
 
@@ -174,7 +153,7 @@ namespace Kisma\Extensions\Davenport
 			try
 			{
 				//	Store it
-				$this->_sag->put( $_doc->_id, $_doc );
+				return $this->put( $_doc->_id, $_doc );
 			}
 			catch ( \Exception $_ex )
 			{
@@ -227,18 +206,6 @@ namespace Kisma\Extensions\Davenport
 
 			//	Return encrypted string
 			return \Kisma\Utility\Hash::encryptString( $id, $salt );
-		}
-
-		/**
-		 * @param string $databaseName
-		 * @return \Kisma\Extensions\Davenport\CouchDbQueueService
-		 */
-		protected function _ensureDatabase( $databaseName )
-		{
-			//	Set our database
-			$this->setDatabaseName( $databaseName );
-			$this->setDatabase( $this->getDatabaseName(), true );
-			return $this;
 		}
 
 		//*************************************************************************
@@ -297,17 +264,6 @@ namespace Kisma\Extensions\Davenport
 		public function getKeyPrefix()
 		{
 			return $this->_keyPrefix;
-		}
-
-		/**
-		 * @param string $database
-		 * @param bool $createIfNotFound
-		 * @return \Sag
-		 */
-		public function setDatabase( $database, $createIfNotFound = false )
-		{
-			//	Set our database
-			return $this->_sag->setDatabase( $database, $createIfNotFound );
 		}
 
 	}
