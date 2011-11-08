@@ -20,7 +20,7 @@
 namespace Kisma\Components;
 {
 	//*************************************************************************
-	//* Requirements 
+	//* Requirements
 	//*************************************************************************
 
 	/**
@@ -45,7 +45,7 @@ namespace Kisma\Components;
 		const DefaultContentType = 'application/octet-stream';
 
 		//*************************************************************************
-		//* Private Members 
+		//* Private Members
 		//*************************************************************************
 
 		/**
@@ -182,7 +182,7 @@ namespace Kisma\Components;
 
 				$this->trigger( 'before_save', $this->_document );
 
-				$_result = $this->_db->put( $this->_document->_id, $this->_document );
+				$_result = $this->_db->put( urlencode( $this->_document->_id ), $this->_document );
 
 				$this->trigger( 'after_save', $this->_document );
 
@@ -204,7 +204,7 @@ namespace Kisma\Components;
 			}
 
 			$this->trigger( 'before_delete', $this->_document );
-			$_result = $this->_db->delete( $this->getId(), $this->getRev() );
+			$_result = $this->_db->delete( urlencode( $this->getId() ), $this->getRev() );
 			$this->trigger( 'after_delete', $this->_document );
 			return $_result;
 		}
