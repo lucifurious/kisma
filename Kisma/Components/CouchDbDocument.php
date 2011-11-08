@@ -77,53 +77,68 @@ namespace Kisma\Components;
 		 */
 		public function find( $id, $createIfNotFound = true )
 		{
+			$_key = null;
+
 			if ( null === $this->_db )
 			{
 				throw new \Kisma\StorageException( 'No database specified. Cannot find.' );
 			}
 
-			//	Transform the _id
-			$_key = $this->_createKey( $id );
+			//	Hash if requested
+			if ( false !== $this->_hashKeys )
+			{
+				$_key = \Kisma\Utility\Hash::hash( $id, \Kisma\HashType::SHA1, 40 );
+			}
+
+			//	Add key prefix is missing...
+			if ( null !== $this->_keyPrefix && false === strpos( $id, $this->_keyPrefix, 0 ) )
+			{
+				$_key = $this->_keyPrefix . ':' . $id;
+			}
+
+			if ( null === $_key )
+			{
+				$_key = $id;
+			}
 
 			try
 			{
 				//	Pull a fresh doc
 				$this->trigger( 'before_find', $this->_document );
 
-				$_dbDocument = $this->_db->get( $_key );
+				$_dbDocument = $this->_db->get( urlencode( $_key ) );
 
-				if ( "200" == $_dbDocument->headers->_HTTP->status )
+				if ( '200' != $_dbDocument->headers->_HTTP->status )
 				{
-					$this->setDocument( $_dbDocument->body );
-					\Kisma\Utility\Log::trace( 'Found document "' . $id . ' with id: ' . $_key );
+					//	Something icky here
+					throw new \Teledini\Exceptions\StorageException( 'Unable to determine if user exists!' );
 				}
-				else
-				{
-					$this->save();
-					\Kisma\Utility\Log::trace( 'New document "' . $id . ' with id: ' . $_key );
-				}
+
+				$this->setDocument( $_dbDocument->body );
+				\Kisma\Utility\Log::trace( 'Found document "' . $id . ' with id: ' . $_key );
 
 				$this->trigger( 'after_find', $this->_document );
-
 			}
 			catch ( \SagCouchException $_ex )
 			{
-				//	Thrown when document not found
-				if ( 404 == $_ex->getCode() && false === $createIfNotFound )
-				{
-					return null;
-				}
-
 				//	Something icky happened...
 				if ( 404 != $_ex->getCode() )
 				{
 					throw $_ex;
 				}
 
+				//	Thrown when document not found
+				if ( 404 == $_ex->getCode() && false === $createIfNotFound )
+				{
+					return null;
+				}
+
 				\Kisma\Utility\Log::trace( 'Creating document id "' . $id . '": ' . $_key );
 
 				//	Create a new document and assign the _id
 				$this->setDocument();
+				$this->setId( $_key );
+				$this->save();
 			}
 
 			//	Return the document
@@ -240,18 +255,6 @@ namespace Kisma\Components;
 		 */
 		public function onBeforeFind( $event )
 		{
-			//	Hash if requested
-			if ( false !== $this->_hashKeys )
-			{
-				$this->_document->_id = \Kisma\Utility\Hash::hash( $this->_document->_id, \Kisma\HashType::SHA1, 40 );
-			}
-
-			//	Add key prefix is missing...
-			if ( null !== $this->_keyPrefix && false === strpos( $this->_document->_id, $this->_keyPrefix, 0 ) )
-			{
-				$this->_document->_id = $this->_keyPrefix . $this->_document->_id;
-			}
-
 			return true;
 		}
 

@@ -264,7 +264,8 @@ namespace Kisma\Aspects\Storage
 			try
 			{
 				$_result = $this->_sag->get( $url );
-				if ( '200' == $_result->_HTTP->status )
+
+				if ( '200' != $_result->status )
 				{
 					throw new \Exception( 'Couldn\'t find doc.' );
 				}
