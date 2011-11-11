@@ -180,13 +180,16 @@ namespace Kisma\Extensions\Davenport
 			try
 			{
 				//	See if this key is already in the queue...
-				$_document = $this->_queueService->get( $_id, true );
+				$_dbDocument = $this->_queueService->get( $_id, true );
 
-				if ( !empty( $_document ) )
+				if ( isset( $_dbDocument->body ) )
 				{
+					$_document = $_dbDocument->body;
+
 					//	Doc exists, read and update...
 					$_document->update_time = microtime( true );
 					$_document->feed_data = $feedData;
+
 					\Kisma\Utility\Log::debug( 'Found prior queue item, _rev: ' . $_document->_rev );
 				}
 				else

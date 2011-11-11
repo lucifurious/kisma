@@ -40,13 +40,15 @@ namespace
  * The Kisma namespace
  */
 namespace Kisma
-{	/** Starts Namespace \Kisma */
+{
+	/** Starts Namespace \Kisma */
 
 	//*************************************************************************
 	//* Aliases
 	//*************************************************************************
 
 	use \Kisma\Utility as Utility;
+	use \Kisma\Utility\Log;
 
 	/**
 	 * Kisma
@@ -98,8 +100,8 @@ namespace Kisma
 		{
 			if ( null === $settings )
 			{
-				\Kisma\Utility\Log::debug( 'cwd: ' . getcwd() );
-				\Kisma\Utility\Log::debug( '__DIR__: ' . __DIR__ );
+				Utility\Log::debug( 'cwd: ' . getcwd() );
+				Utility\Log::debug( '__DIR__: ' . __DIR__ );
 			}
 
 			//	Save passed in options...
@@ -129,10 +131,11 @@ namespace Kisma
 		{
 			$_parts = explode( '\\', $tag );
 
-			array_walk( $_parts, function( &$part ) {
+			array_walk( $_parts, function( &$part )
+			{
 				//	Replace
 				$part = strtolower( preg_replace( '/(?<=\\w)([A-Z])/', '_\\1', $part ) );
-			});
+			} );
 
 			return implode( '.', $_parts );
 		}
@@ -240,8 +243,9 @@ namespace Kisma
 						throw new \RuntimeException( 'The configured log path "' . $_path . '" is not writable.' );
 					}
 				}
-				
-				$_logFile = rtrim( $_path, DIRECTORY_SEPARATOR ) . DIRECTORY_SEPARATOR . trim( $_name, DIRECTORY_SEPARATOR );
+
+				$_logFile = rtrim( $_path, DIRECTORY_SEPARATOR ) . DIRECTORY_SEPARATOR . trim( $_name,
+					DIRECTORY_SEPARATOR );
 			}
 
 			if ( empty( $_logFile ) )
@@ -251,7 +255,7 @@ namespace Kisma
 				return false;
 			}
 
-			$_entry =  sprintf( '%s %d:[%-30.30s] %s',
+			$_entry = sprintf( '%s %d:[%-30.30s] %s',
 				date( 'M d H:i:s' ),
 				$level,
 				$tag,
@@ -274,6 +278,7 @@ namespace Kisma
 
 		/**
 		 * Constructs a unique name based on component, hashes by default
+		 *
 		 * @param IComponent $component
 		 * @param boolean $humanReadable If true, names returned will not be hashed
 		 * @return string
@@ -299,28 +304,23 @@ namespace Kisma
 		/**
 		 * @static
 		 * @param string $moduleName
-		 * @param array $options
 		 * @return string
 		 */
-		public static function createModule( $moduleName, $options = array() )
+		public static function loadModule( $moduleName )
 		{
 			$_modulePath = self::getSetting( 'module_path', getcwd() . DIRECTORY_SEPARATOR . 'modules' );
 			$_class = self::tag( $moduleName, false, false, $_parts );
 
-			try
+			/** @noinspection PhpIncludeInspection */
+			if ( false === require_once( $_modulePath . DIRECTORY_SEPARATOR . $_class . '.php' ) )
 			{
-				/** @noinspection PhpIncludeInspection */
-				require_once $_modulePath . DIRECTORY_SEPARATOR . $_class . '.php';
+				Utility\Log::error( 'Module "' . $_moduleName . '" not found. Check your paths.' );
 			}
-			catch ( \Exception $_ex )
-			{
-				\Kisma\Utility\Log::error( 'Module "' . $_moduleName . '" not found. Check your paths.' );
-			}
-//			return self::$_modules[self::tag( $moduleName, true )] = new $_class( $options );
 		}
 
 		/**
 		 * Retrieve a module
+		 *
 		 * @static
 		 * @param string $moduleName
 		 * @return Components\Component|false
@@ -332,6 +332,7 @@ namespace Kisma
 
 		/**
 		 * Takes a list of things and returns them in an array as the values. Keys are maintained.
+		 *
 		 * @param mixed [optional]
 		 * @return array
 		 */
@@ -357,6 +358,7 @@ namespace Kisma
 		 * item is returned. Good for setting default values, etc. Last non-null value in list becomes the
 		 * new "default value".
 		 * NOTE: Since PHP evaluates the arguments before calling a function, this is NOT a short-circuit method.
+		 *
 		 * @param mixed [optional]
 		 * @return mixed
 		 */
@@ -382,6 +384,7 @@ namespace Kisma
 		 * The first argument is the needle, the rest are considered in the haystack. For example:
 		 * Kisma::in( 'x', 'x', 'y', 'z' ) returns true
 		 * Kisma::in( 'a', 'x', 'y', 'z' ) returns false
+		 *
 		 * @param mixed [optional]
 		 * @return boolean
 		 */
@@ -393,6 +396,7 @@ namespace Kisma
 
 		/**
 		 * Shortcut for str(i)pos
+		 *
 		 * @static
 		 * @param string $haystack
 		 * @param string $needle
@@ -414,6 +418,7 @@ namespace Kisma
 
 		/**
 		 * Takes the arguments and concatenates them with $separator in between.
+		 *
 		 * @param string $separator
 		 * @return string
 		 */
@@ -424,6 +429,7 @@ namespace Kisma
 
 		/**
 		 * Determine if PHP is running CLI mode or not
+		 *
 		 * @return boolean True if currently running in CLI
 		 */
 		public static function isCli()
@@ -434,6 +440,7 @@ namespace Kisma
 		/**
 		 * Create a path alias.
 		 * Note, this method neither checks the existence of the path nor normalizes the path.
+		 *
 		 * @param string $alias alias to the path
 		 * @param string $path the path corresponding to the alias. If this is null, the corresponding
 		 * path alias will be removed.
@@ -461,7 +468,7 @@ namespace Kisma
 		 */
 		public static function importLibrary( $libraryPath )
 		{
-			$_libraries = !is_array( $libraryPath ) ? array( $libraryPath ) : $libraryPath;
+			$_libraries = !is_array( $libraryPath ) ? array($libraryPath) : $libraryPath;
 
 			foreach ( $_libraries as $_libraryPath )
 			{
@@ -478,6 +485,7 @@ namespace Kisma
 
 		/**
 		 * Tests if a value needs unserialization
+		 *
 		 * @param string $value
 		 * @return boolean
 		 */
@@ -500,7 +508,7 @@ namespace Kisma
 		{
 			if ( !is_array( $key ) )
 			{
-				$key = array( $key => $value );
+				$key = array($key => $value);
 			}
 
 			foreach ( $key as $_key => $_value )
@@ -555,11 +563,11 @@ namespace Kisma
 
 			$_class =
 				__DIR__ .
-				DIRECTORY_SEPARATOR .
-				trim(
-					str_replace( '\\', DIRECTORY_SEPARATOR, Kisma::tag( $_root ) ),
-					DIRECTORY_SEPARATOR
-				);
+					DIRECTORY_SEPARATOR .
+					trim(
+						str_replace( '\\', DIRECTORY_SEPARATOR, Kisma::tag( $_root ) ),
+						DIRECTORY_SEPARATOR
+					);
 
 			//	Do we have it already?
 			if ( class_exists( $_class . '.php', false ) || interface_exists( $_class . '.php', false ) )
@@ -583,7 +591,6 @@ namespace Kisma
 				//	Sorry charlie...
 				return false;
 			}
-
 
 			//	No go
 			return false;
@@ -687,11 +694,12 @@ namespace Kisma
 				$_base = $_base[$_part];
 			}
 
-			return $_base ?: $defaultValue;
+			return $_base ? : $defaultValue;
 		}
 
 		/**
 		 * Alias for {@link \Kisma\Kisma::o)
+		 *
 		 * @param array $options
 		 * @param string $key
 		 * @param mixed|null $defaultValue
@@ -753,7 +761,7 @@ namespace Kisma
 					$options[$key] = $_newValue;
 				}
 			}
-			//	Also now handle accessible object properties
+				//	Also now handle accessible object properties
 			else if ( is_object( $options ) )
 			{
 				if ( property_exists( $options, $_originalKey ) )
@@ -786,6 +794,7 @@ namespace Kisma
 
 		/**
 		 * Similar to {@link \Kisma\Kisma::o} except it will pull a value from a nested array.
+		 *
 		 * @param array $options
 		 * @param string $key
 		 * @param string $subKey
@@ -813,6 +822,7 @@ namespace Kisma
 
 		/**
 		 * Alias for {@link \Kisma\Kisma::so}
+		 *
 		 * @param array $options
 		 * @param string $key
 		 * @param mixed $value
@@ -852,6 +862,7 @@ namespace Kisma
 
 		/**
 		 * Alias of {@link \Kisma\Kisma::unsetOption}
+		 *
 		 * @param array $options
 		 * @param string $key
 		 * @return mixed The last value of the key
@@ -866,15 +877,17 @@ namespace Kisma
 		 *
 		 * @param array $options
 		 * @param string $key
+		 * @param bool $noTag
 		 * @return mixed The new value of the key
 		 */
 		public static function uo( &$options = array(), $key, $noTag = false )
 		{
-			return self::o( $options, $key, null, true );
+			return self::o( $options, $key, null, true, $noTag );
 		}
 
 		/**
 		 * Generic super-easy/lazy way to convert lots of different things (like SimpleXmlElement) to an array
+		 *
 		 * @param object $object
 		 * @return array|false
 		 */
@@ -924,7 +937,7 @@ namespace Kisma
 				//	Try object first. Squelch undefineds...
 				return self::__property( $object, $propertyName, $access, $valueOrDefault );
 			}
-			//	Ignore undefined properties. Another aspect may have it
+				//	Ignore undefined properties. Another aspect may have it
 			catch ( \Kisma\UndefinedPropertyException $_ex )
 			{
 				//	Ignored
@@ -1022,6 +1035,7 @@ namespace Kisma
 
 		/**
 		 * A generic property error handler to go with our generic property system.
+		 *
 		 * @param string $name
 		 * @param int $type
 		 * @throws UndefinedPropertyException|ReadOnlyPropertyException|WriteOnlyPropertyException
@@ -1070,13 +1084,13 @@ namespace Kisma
 				is_array( $map ) && isset( $map[$_key] )
 					?
 					(
-						false !== $returnObject
-							?
-							//	Return the component
-							$map[$_key]
-							:
-							//	Return the key
-							$_key
+					false !== $returnObject
+						?
+						//	Return the component
+						$map[$_key]
+						:
+						//	Return the key
+						$_key
 					)
 					:
 					//	Not found
@@ -1104,7 +1118,7 @@ namespace Kisma
 
 			if ( null === $_paths )
 			{
-				$_paths = explode( PATH_SEPARATOR, get_include_path() );
+				$_paths = explode( PATH_SEPARATOR, \get_include_path() );
 			}
 
 			//	Build the class name
@@ -1122,7 +1136,8 @@ namespace Kisma
 			//	Look for the class
 			foreach ( $_paths as $_path )
 			{
-				$_path .= str_replace( '//', null, ( DIRECTORY_SEPARATOR !== $_path[strlen( $_path ) - 1] ) ? DIRECTORY_SEPARATOR : '' );
+				$_path .= str_replace( '//', null,
+					( DIRECTORY_SEPARATOR !== $_path[strlen( $_path ) - 1] ) ? DIRECTORY_SEPARATOR : '' );
 
 				foreach ( $_extensions as $_extension )
 				{
@@ -1199,7 +1214,9 @@ namespace Kisma
 			return self::$_settings;
 		}
 
-	};
+	}
+
+	;
 
 } /** Ends Namespace \Kisma */
 
@@ -1236,7 +1253,7 @@ namespace
 			\K::initialize( $configuration );
 
 			//	Add the library path to the includes
-			$_includePath = get_include_path();
+			$_includePath = \get_include_path();
 
 			if ( null !== ( $_libPath = \K::getSetting( 'library_path' ) ) )
 			{
@@ -1247,7 +1264,7 @@ namespace
 
 			foreach ( $_modules as $_moduleName => $_config )
 			{
-				\K::createModule( $_moduleName, $_config );
+				\K::loadModule( $_moduleName );
 			}
 		}
 	}
@@ -1259,7 +1276,7 @@ namespace
 	/**
 	 * Set up the autoloader
 	 */
-	\set_include_path( get_include_path() . PATH_SEPARATOR . __DIR__ );
+	\set_include_path( \get_include_path() . PATH_SEPARATOR . __DIR__ );
 	\spl_autoload_extensions( '.php' );
 	\spl_autoload_register();
 	\spl_autoload_register( '\\Kisma\\Kisma::gestate', true, true );

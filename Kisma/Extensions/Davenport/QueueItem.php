@@ -58,7 +58,7 @@ namespace Kisma\Extensions\Davenport
 
 			$this->_document->create_time = \K::o( $options, 'create_time', microtime( true ), true );
 			$this->_document->expire_time = \K::o( $options, 'expire_time', -1, true );
-			$this->_document->create_time = \K::o( $options, 'update_time', null, true );
+			$this->_document->update_time = \K::o( $options, 'update_time', null, true );
 
 			$_feedData = \K::o( $options, 'feed_data', null, true );
 

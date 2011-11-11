@@ -146,10 +146,8 @@ namespace Kisma\Aspects\Storage
 			//	Call poppa
 			parent::__construct( $options );
 
-			if ( !$this->documentExists( $this->_designDocumentName ) )
-			{
-				$this->_createDesignDocument();
-			}
+			//	Create a design document if it's not there...
+			$this->_createDesignDocument();
 		}
 
 		/**
@@ -162,12 +160,12 @@ namespace Kisma\Aspects\Storage
 		{
 			try
 			{
-				if ( false !== $returnObject )
+				if ( false === $returnObject )
 				{
-					return $this->_sag->head( $id )->body->ok;
+					return ( '200' == $this->head( urlencode( $id ) )->headers->_HTTP->status );
 				}
 
-				$_document = $this->get( $id, $returnObject );
+				$_document = $this->get( urlencode( $id ), $returnObject );
 				return empty( $_document ) ? false : $_document;
 			}
 			catch ( \SagCouchException $_ex )
@@ -265,7 +263,7 @@ namespace Kisma\Aspects\Storage
 			{
 				$_result = $this->_sag->get( $url );
 
-				if ( '200' != $_result->status )
+				if ( !\K::in( $_result->headers->_HTTP->status, '200', '201' ) )
 				{
 					throw new \Exception( 'Couldn\'t find doc.' );
 				}
@@ -355,8 +353,7 @@ namespace Kisma\Aspects\Storage
 			try
 			{
 				//	See if it's there...
-				$this->_sag->head( $this->_designDocumentName )->body;
-				return true;
+				return ( '200' == $this->_sag->head( urlencode( $this->_designDocumentName ) )->headers->_HTTP->status );
 			}
 			catch ( \SagCouchException $_ex )
 			{
@@ -393,7 +390,7 @@ namespace Kisma\Aspects\Storage
 			try
 			{
 				//	Store it
-				$this->_sag->put( $_doc->_id, $_doc );
+				$this->_sag->put( urlencode( $_doc->_id ), $_doc );
 			}
 			catch ( \Exception $_ex )
 			{
@@ -458,13 +455,23 @@ namespace Kisma\Aspects\Storage
 
 		/**
 		 * @param string $databaseName
+		 * @param bool $createIfNotFound
+		 * @return CouchDb
+		 */
+		public function setDatabase( $databaseName, $createIfNotFound = false )
+		{
+			return $this->setDatabaseName( $databaseName, $createIfNotFound );
+		}
+
+		/**
+		 * @param string $databaseName
 		 * @return \Kisma\Aspects\Storage\CouchDb
 		 */
-		public function setDatabaseName( $databaseName = null )
+		public function setDatabaseName( $databaseName = null, $createIfNotFound = false )
 		{
 			if ( null !== $this->_sag && null !== ( $this->_databaseName = $databaseName ) )
 			{
-				$this->_sag->setDatabase( $this->_databaseName, $this->getOption( \KismaOptions::CreateIfNotFound, true ) );
+				$this->_sag->setDatabase( $this->_databaseName, $createIfNotFound );
 				$this->_createDesignDocument();
 			}
 

@@ -75,7 +75,7 @@ namespace Kisma\Extensions\Davenport\Utility
 			$_client = new \Sag( $_hostName, $_hostPort );
 
 			//	Defaults to CURL
-			$_client->setHTTPAdapter( \Sag::$HTTP_CURL );
+//			$_client->setHTTPAdapter( \Sag::$HTTP_CURL );
 
 			if ( null !== $_userName )
 			{

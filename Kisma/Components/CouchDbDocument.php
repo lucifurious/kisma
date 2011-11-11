@@ -108,7 +108,7 @@ namespace Kisma\Components;
 
 				$_dbDocument = $this->_db->get( urlencode( $_key ) );
 
-				if ( '200' != $_dbDocument->headers->_HTTP->status )
+				if ( ! \K::in( $_dbDocument->headers->_HTTP->status, '200', '201' ) )
 				{
 					//	Something icky here
 					throw new \Teledini\Exceptions\StorageException( 'Unable to determine if user exists!' );
