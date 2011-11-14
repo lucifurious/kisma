@@ -186,7 +186,7 @@ namespace Kisma\Components;
 		/**
 		 * @return \stdClass
 		 */
-		public function getDocument()
+		public function &getDocument()
 		{
 			//	Should always have an object
 			if ( null === $this->_document )

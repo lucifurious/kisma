@@ -1275,9 +1275,28 @@ namespace
 
 	/**
 	 * Set up the autoloader
+	 * Use the UniversalClassLoader if available
 	 */
-	\set_include_path( \get_include_path() . PATH_SEPARATOR . __DIR__ );
-	\spl_autoload_extensions( '.php' );
-	\spl_autoload_register();
-	\spl_autoload_register( '\\Kisma\\Kisma::gestate', true, true );
+	if ( false !== class_exists( 'Symfony\Component\ClassLoader\UniversalClassLoader', false ) )
+	{
+		$_loader = new Symfony\Component\ClassLoader\UniversalClassLoader();
+		$_loader->registerNamespaces(
+			array(
+				'Kisma\Components' => __DIR__ . '/Components',
+				'Kisma\Aspects' => __DIR__ . '/Aspects',
+				'Kisma\Services' => __DIR__ . '/Services',
+				'Kisma\Utility' => __DIR__ . '/Utility',
+				'Kisma' => __DIR__,
+			)
+		);
+		$_loader->useIncludePath( true );
+		$_loader->register();
+	}
+	else
+	{
+		\set_include_path( \get_include_path() . PATH_SEPARATOR . __DIR__ );
+		\spl_autoload_extensions( '.php' );
+		\spl_autoload_register();
+		\spl_autoload_register( '\\Kisma\\Kisma::gestate' );
+	}
 }

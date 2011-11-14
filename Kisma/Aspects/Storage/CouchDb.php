@@ -320,6 +320,85 @@ namespace Kisma\Aspects\Storage
 		}
 
 		/**
+		 * Builds an url to a view with optional keys and url encoding and GETs it.
+		 * @param string $viewName
+		 * @param null|string|array $key
+		 * @param null|string|array $endKey
+		 * @param bool $urlEncode
+		 * @return string
+		 */
+		public function getView( $viewName, $key = null, $endKey = null, $urlEncode = true )
+		{
+			$_query = 'key=%%startKey%%';
+			$_startKey = $this->_makeViewKey( $key );
+			$_endKey = $this->_makeViewKey( $endKey );
+
+			//	Start/end?
+			if ( null === $_startKey )
+			{
+				$_query = null;
+			}
+			else if ( null !== $endKey )
+			{
+				$_query = 'startkey=%%startKey%%&endkey=%%endKey%%';
+			}
+
+			$_query = str_ireplace(
+				array(
+					'%%startKey%%',
+					'%%endKey%%',
+				),
+				array(
+					$_startKey, //( true === $urlEncode ? urlencode( $_startKey ) : $_startKey ),
+					$_endKey, //( true === $urlEncode ? urlencode( $_endKey ) : $_endKey ),
+				),
+				$_query
+			);
+
+			return $this->get(
+				$viewName . ( false === strpos( $viewName, '?' ) ? '?' . $_query : '&' . $_query )
+			);
+		}
+
+		/**
+		 * @param array|string $key
+		 * @return null|string
+		 */
+		protected function _makeViewKey( $key )
+		{
+			$_key = null;
+
+			if ( null !== $key )
+			{
+				//	Make a string from the complex array key
+				if ( is_array( $key ) )
+				{
+					$_key = null;
+
+					foreach ( $key as $_value )
+					{
+						if ( '{}' == $_value )
+						{
+							$_key .= ',{}';
+						}
+						else
+						{
+							$_key .= '"' . $_value . '"';
+						}
+					}
+
+					$_key = '[' . trim( $_key, ' ,' ) . ']';
+				}
+				else
+				{
+					$_key = '"' . $_key . '"';
+				}
+			}
+
+			return $_key;
+		}
+
+		/**
 		 * Get an attachment by id and name
 		 *
 		 * @param string $id
