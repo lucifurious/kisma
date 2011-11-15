@@ -59,7 +59,7 @@ namespace Kisma
 	 *
 	 * @property int $uniqueIdCounter
 	 * @property int $debugLevel
-	 * @proeprty array $settings
+	 * @property array $settings
 	 */
 	class Kisma implements IGlobalDebuggable, ISettings
 	{
@@ -1279,18 +1279,27 @@ namespace
 	 */
 	if ( false !== class_exists( 'Symfony\Component\ClassLoader\UniversalClassLoader', false ) )
 	{
-		$_loader = new Symfony\Component\ClassLoader\UniversalClassLoader();
-		$_loader->registerNamespaces(
-			array(
-				'Kisma\Components' => __DIR__ . '/Components',
-				'Kisma\Aspects' => __DIR__ . '/Aspects',
-				'Kisma\Services' => __DIR__ . '/Services',
-				'Kisma\Utility' => __DIR__ . '/Utility',
-				'Kisma' => __DIR__,
-			)
+		global $_silexApp;
+
+		$_namespaces = array(
+			'Kisma\\Components' => __DIR__ . '/Components',
+			'Kisma\\Aspects' => __DIR__ . '/Aspects',
+			'Kisma\\Services' => __DIR__ . '/Services',
+			'Kisma\\Utility' => __DIR__ . '/Utility',
+			'Kisma' => __DIR__,
 		);
-		$_loader->useIncludePath( true );
-		$_loader->register();
+
+		if ( isset( $_silexApp ) )
+		{
+			$_silexApp['autoloader']->registerNamespaces( $_namespaces );
+		}
+		else
+		{
+			$_loader = new Symfony\Component\ClassLoader\UniversalClassLoader();
+			$_loader->registerNamespaces( $_namespaces );
+			$_loader->useIncludePath( true );
+			$_loader->register();
+		}
 	}
 	else
 	{

@@ -165,7 +165,7 @@ namespace Kisma\Aspects\Storage
 					return ( '200' == $this->head( urlencode( $id ) )->headers->_HTTP->status );
 				}
 
-				$_document = $this->get( urlencode( $id ), $returnObject );
+				$_document = $this->_get( urlencode( $id ), $returnObject );
 				return empty( $_document ) ? false : $_document;
 			}
 			catch ( \SagCouchException $_ex )
@@ -182,12 +182,25 @@ namespace Kisma\Aspects\Storage
 		}
 
 		/**
+		 * An overridable "get"
+		 *
+		 * @param string $url
+		 * @param null $otherStuff
+		 * @internal param array|null $options
+		 * @return mixed
+		 */
+		public function get( $url, $otherStuff = null )
+		{
+			return $this->_get( $url, $otherStuff );
+		}
+
+		/**
 		 * Returns the upper bound of document revisions
 		 * @return mixed
 		 */
 		public function getRevsLimit()
 		{
-			return $this->get( '_revs_limit' );
+			return $this->_get( '_revs_limit' );
 		}
 
 		/**
@@ -221,7 +234,7 @@ namespace Kisma\Aspects\Storage
 				$_query = '?' . trim( implode( '&', $_options ), '&' );
 			}
 
-			return $this->get( '_changes' . $_query );
+			return $this->_get( '_changes' . $_query );
 		}
 
 		//*************************************************************************
@@ -257,7 +270,7 @@ namespace Kisma\Aspects\Storage
 		 * @param bool $returnObject
 		 * @return \Kisma\Components\Document|\stdClass|false|\Kisma\Components\Document[]|\stdClass[]
 		 */
-		public function get( $url, $returnObject = false )
+		protected function _get( $url, $returnObject = false )
 		{
 			try
 			{
@@ -355,7 +368,7 @@ namespace Kisma\Aspects\Storage
 				$_query
 			);
 
-			return $this->get(
+			return $this->_get(
 				$viewName . ( false === strpos( $viewName, '?' ) ? '?' . $_query : '&' . $_query )
 			);
 		}
@@ -407,7 +420,7 @@ namespace Kisma\Aspects\Storage
 		 */
 		public function getAttachment( $id, $fileName )
 		{
-			return $this->get( '/' . $id . '/' . urlencode( $fileName ) );
+			return $this->_get( '/' . $id . '/' . urlencode( $fileName ) );
 		}
 
 		//*************************************************************************
