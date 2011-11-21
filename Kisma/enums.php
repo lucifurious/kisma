@@ -181,6 +181,29 @@ namespace Kisma
 	}
 
 	/**
+	 * Validation types and modifiers
+	 */
+	class HttpMethod extends \Kisma\KismaEnum
+	{
+		//*************************************************************************
+		//* Constants
+		//*************************************************************************
+
+		const __default = self::Get;
+
+		/**
+		 * @const string Available HTTP Methods
+		 */
+		const Get = 'GET';
+		const Put = 'PUT';
+		const Head = 'HEAD';
+		const Post = 'POST';
+		const Delete = 'DELETE';
+		const Options = 'OPTIONS';
+		const Copy = 'COPY';
+	}
+
+	/**
 	 *
 	 */
 	class OperationMode extends \Kisma\KismaEnum

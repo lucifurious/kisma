@@ -16,27 +16,6 @@
  * @since		 v1.0.0
  * @filesource
  */
-
-/**
- * Global namespace declarations
- */
-namespace
-{
-	//*************************************************************************
-	//* Requirements
-	//*************************************************************************
-
-	/**
-	 *  Require the Sag library, but keep it outside of Kisma
-	 * @todo Finish up the alias system and replace this nonsense
-	 */
-	/** @noinspection PhpIncludeInspection */
-	require_once \K::glue( DIRECTORY_SEPARATOR, \K::getSetting( \KismaSettings::BasePath ), 'vendors', 'sag', 'src', 'Sag.php' );
-}
-
-/**
- * @namespace Kisma\Aspects\Storage
- */
 namespace Kisma\Aspects\Storage
 {
 	//*************************************************************************
@@ -99,10 +78,6 @@ namespace Kisma\Aspects\Storage
 		//*************************************************************************
 
 		/**
-		 * @var \Sag
-		 */
-		protected $_sag = null;
-		/**
 		 * @var string When opening a database, you have the option of having a design document created for you. If
 		 * you do so, it will be called this
 		 */
@@ -127,6 +102,10 @@ namespace Kisma\Aspects\Storage
 		 * @var string
 		 */
 		protected $_password = null;
+		/**
+		 * @var \Sag
+		 */
+		protected $_sag = null;
 
 		//*************************************************************************
 		//* Public Methods
@@ -137,17 +116,14 @@ namespace Kisma\Aspects\Storage
 		 */
 		public function __construct( $options = array() )
 		{
-			//	Initialize Sag
-			if ( null === ( $this->_sag = \K::o( $options, 'sag', null, true ) ) )
-			{
-				$this->_sag = CouchHelper::getSagClient( $options );
-			}
-
 			//	Call poppa
 			parent::__construct( $options );
 
-			//	Create a design document if it's not there...
-			$this->_createDesignDocument();
+			//	Create a design document if it's not there, if configured...
+			if ( \K::getSetting( 'db.schema.createDesignDocuments', false ) )
+			{
+				$this->_createDesignDocument();
+			}
 		}
 
 		/**
@@ -162,10 +138,10 @@ namespace Kisma\Aspects\Storage
 			{
 				if ( false === $returnObject )
 				{
-					return ( '200' == $this->head( urlencode( $id ) )->headers->_HTTP->status );
+					return ( '200' == $this->_sag->head( '/', $id )->status );
 				}
 
-				$_document = $this->_get( urlencode( $id ), $returnObject );
+				$_document = $this->_get( $id, $returnObject );
 				return empty( $_document ) ? false : $_document;
 			}
 			catch ( \SagCouchException $_ex )
@@ -272,25 +248,10 @@ namespace Kisma\Aspects\Storage
 		 */
 		protected function _get( $url, $returnObject = false )
 		{
-			try
+			if ( false === ( $_result = $this->_sag->get( $url ) ) || !\K::in( $_result->status, 404, 200 ) )
 			{
-				$_result = $this->_sag->get( $url );
-
-				if ( !\K::in( $_result->headers->_HTTP->status, '200', '201' ) )
-				{
-					throw new \Exception( 'Couldn\'t find doc.' );
-				}
-			}
-			catch ( \SagCouchException $_ex )
-			{
-				if ( 404 != $_ex->getCode() )
-				{
-					//	Not not found is not cool
-					throw $_ex;
-				}
-
-				//	Not found
-				return false;
+				//	Ruh-roh
+				throw new \Exception( 'Unexpected CouchDb response: ' . var_export( $_result, true ), $_result->status );
 			}
 
 			//	Arrays go back as arrays of Document
@@ -442,21 +403,7 @@ namespace Kisma\Aspects\Storage
 		 */
 		protected function _hasDesignDocument()
 		{
-			try
-			{
-				//	See if it's there...
-				return ( '200' == $this->_sag->head( urlencode( $this->_designDocumentName ) )->headers->_HTTP->status );
-			}
-			catch ( \SagCouchException $_ex )
-			{
-				if ( 404 != $_ex->getCode() )
-				{
-					//	Not not found
-					throw $_ex;
-				}
-			}
-
-			return false;
+			return $this->documentExists( $this->_designDocumentName );
 		}
 
 		/**
@@ -482,7 +429,7 @@ namespace Kisma\Aspects\Storage
 			try
 			{
 				//	Store it
-				$this->_sag->put( urlencode( $_doc->_id ), $_doc );
+				$this->_sag->put( $_doc->_id, $_doc );
 			}
 			catch ( \Exception $_ex )
 			{

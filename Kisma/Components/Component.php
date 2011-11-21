@@ -89,33 +89,27 @@ namespace Kisma\Components
 		 */
 		public function __call( $method, $arguments )
 		{
-			//	See if any of our aspects have this method
-			foreach ( $this->_aspects as $_aspect )
+			if ( !empty( $this->_aspects ) )
 			{
-				//	Call aspect methods if they exist
-				if ( method_exists( $_aspect, $method ) )
+				//	See if any of our aspects have this method
+				foreach ( $this->_aspects as $_aspect )
 				{
-					return call_user_func_array(
-						array(
-							$_aspect,
-							$method
-						),
-						$arguments
-					);
+					//	Call aspect methods if they exist
+					if ( method_exists( $_aspect, $method ) )
+					{
+						return call_user_func_array(
+							array(
+								$_aspect,
+								$method
+							),
+							$arguments
+						);
+					}
 				}
 			}
 
 			//	Guess not...
 			throw new \BadMethodCallException( __CLASS__ . '::' . $method . ' is undefined.' );
-		}
-
-		/**
-		 * Destructor
-		 */
-		public function __destruct()
-		{
-			//	Fire an event
-			$this->trigger( 'before_destruct' );
 		}
 
 		/**

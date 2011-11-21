@@ -43,6 +43,10 @@ namespace Kisma\Components;
 		 * @var string
 		 */
 		const DefaultContentType = 'application/octet-stream';
+		/**
+		 * @var string
+		 */
+		const DesignDocumentName = 'document';
 
 		//*************************************************************************
 		//* Private Members
@@ -108,7 +112,7 @@ namespace Kisma\Components;
 
 				$_dbDocument = $this->_db->get( urlencode( $_key ) );
 
-				if ( ! \K::in( $_dbDocument->headers->_HTTP->status, '200', '201' ) )
+				if ( ! \K::in( $_dbDocument->status, '200', '201' ) )
 				{
 					//	Something icky here
 					throw new \Teledini\Exceptions\StorageException( 'Unable to determine if user exists!' );
@@ -182,7 +186,7 @@ namespace Kisma\Components;
 
 				$this->trigger( 'before_save', $this->_document );
 
-				$_result = $this->_db->put( urlencode( $this->_document->_id ), $this->_document );
+				$_result = $this->_db->put( $this->_document->_id, $this->_document );
 
 				$this->trigger( 'after_save', $this->_document );
 
