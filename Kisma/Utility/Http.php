@@ -59,13 +59,12 @@ namespace Kisma\Utility
 		/**
 		 * @
 		 * @param string $url
-		 * @param null $payload
 		 * @param null $options
 		 * @return string
 		 */
-		public function get( $url, $payload = null, $options = null )
+		public function get( $url, $options = null )
 		{
-			return $this->_httpRequest( \Kisma\HttpMethod::Get, $url, $payload, $options );
+			return $this->_httpRequest( \Kisma\HttpMethod::Get, $url, array(), $options );
 		}
 
 		/**
@@ -160,7 +159,7 @@ namespace Kisma\Utility
 			$_curlOptions = array(
 				CURLOPT_FOLLOWLOCATION => true,
 				CURLOPT_RETURNTRANSFER => true,
-				CURLOPT_HEADER => false,
+				CURLOPT_HEADER => true,
 				CURLOPT_SSL_VERIFYPEER => false,
 			);
 
@@ -249,6 +248,10 @@ namespace Kisma\Utility
 
 			return $_result;
 		}
+
+		//*************************************************************************
+		//* Properties
+		//*************************************************************************
 
 		/**
 		 * @param array $error
@@ -340,10 +343,6 @@ namespace Kisma\Utility
 			return $this->_userName;
 		}
 
-		//*************************************************************************
-		//* Properties
-		//*************************************************************************
-
-
 	}
+
 }
