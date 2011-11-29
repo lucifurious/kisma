@@ -181,7 +181,7 @@ namespace Kisma\Components;
 				//	Add key prefix is missing...
 				if ( null !== $this->_keyPrefix && false === strpos( $this->_document->_id, $this->_keyPrefix, 0 ) )
 				{
-					$this->_document->_id = $this->_keyPrefix . ':' . $this->_document->_id;
+					$this->_document->_id = urlencode( $this->_keyPrefix . ':' . $this->_document->_id );
 				}
 
 				$this->trigger( 'before_save', $this->_document );
