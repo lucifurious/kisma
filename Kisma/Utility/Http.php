@@ -18,7 +18,7 @@
 namespace Kisma\Utility
 {
 	//*************************************************************************
-	//* Requirements 
+	//* Requirements
 	//*************************************************************************
 
 	/**
@@ -28,7 +28,7 @@ namespace Kisma\Utility
 	class Http extends \Kisma\Components\SubComponent implements \Kisma\IUtility
 	{
 		//*************************************************************************
-		//* Private Members 
+		//* Private Members
 		//*************************************************************************
 
 		/**
@@ -53,94 +53,86 @@ namespace Kisma\Utility
 		protected $_info = null;
 
 		//*************************************************************************
-		//* Public Methods 
+		//* Public Methods
 		//*************************************************************************
 
 		/**
-		 * @
 		 * @param string $url
-		 * @param null $options
+		 * @param array|null $options
 		 * @return string
 		 */
-		public function get( $url, $options = null )
+		public function get( $url, $options = array() )
 		{
 			return $this->_httpRequest( \Kisma\HttpMethod::Get, $url, array(), $options );
 		}
 
 		/**
-		 * @
 		 * @param string $url
-		 * @param null $payload
-		 * @param null $options
+		 * @param array|null $payload
+		 * @param array|null $options
 		 * @return bool|mixed
 		 */
-		public function put( $url, $payload = null, $options = null )
+		public function put( $url, $payload = array(), $options = array() )
 		{
 			return $this->_httpRequest( \Kisma\HttpMethod::Put, $url, $payload, $options );
 		}
 
 		/**
-		 * @
 		 * @param string $url
-		 * @param null $payload
-		 * @param null $options
+		 * @param array|null $payload
+		 * @param array|null $options
 		 * @return bool|mixed
 		 */
-		public function post( $url, $payload = null, $options = null )
+		public function post( $url, $payload = array(), $options = array() )
 		{
 			return $this->_httpRequest( \Kisma\HttpMethod::Post, $url, $payload, $options );
 		}
 
 		/**
-		 * @
 		 * @param string $url
-		 * @param null $payload
-		 * @param null $options
+		 * @param array|null $payload
+		 * @param array|null $options
 		 * @return bool|mixed
 		 */
-		public function delete( $url, $payload = null, $options = null )
+		public function delete( $url, $payload = array(), $options = array() )
 		{
 			return $this->_httpRequest( \Kisma\HttpMethod::Delete, $url, $payload, $options );
 		}
 
 		/**
-		 * @
 		 * @param string $url
-		 * @param null $payload
-		 * @param null $options
+		 * @param array|null $payload
+		 * @param array|null $options
 		 * @return bool|mixed
 		 */
-		public function head( $url, $payload = null, $options = null )
+		public function head( $url, $payload = array(), $options = array() )
 		{
 			return $this->_httpRequest( \Kisma\HttpMethod::Head, $url, $payload, $options );
 		}
 
 		/**
-		 * @
 		 * @param string $url
-		 * @param null $payload
-		 * @param null $options
+		 * @param array|null $payload
+		 * @param array|null $options
 		 * @return bool|mixed
 		 */
-		public function options( $url, $payload = null, $options = null )
+		public function options( $url, $payload = array(), $options = array() )
 		{
 			return $this->_httpRequest( \Kisma\HttpMethod::Options, $url, $payload, $options );
 		}
 
 		/**
-		 * @
 		 * @param string $url
-		 * @param null $payload
-		 * @param null $options
+		 * @param array|null $payload
+		 * @param array|null $options
 		 * @return bool|mixed
 		 */
-		public function copy( $url, $payload = null, $options = null )
+		public function copy( $url, $payload = array(), $options = array() )
 		{
 			return $this->_httpRequest( \Kisma\HttpMethod::Copy, $url, $payload, $options );
 		}
 
 		/**
-		 * @
 		 * @param \Kisma\HttpMethod|string $method
 		 * @param string $url
 		 * @param array $payload
@@ -159,7 +151,7 @@ namespace Kisma\Utility
 			$_curlOptions = array(
 				CURLOPT_FOLLOWLOCATION => true,
 				CURLOPT_RETURNTRANSFER => true,
-				CURLOPT_HEADER => true,
+				CURLOPT_HEADER => false,
 				CURLOPT_SSL_VERIFYPEER => false,
 			);
 
