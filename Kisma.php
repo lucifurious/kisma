@@ -314,7 +314,7 @@ namespace Kisma
 			/** @noinspection PhpIncludeInspection */
 			if ( false === require_once( $_modulePath . DIRECTORY_SEPARATOR . $_class . '.php' ) )
 			{
-				Utility\Log::error( 'Module "' . $_moduleName . '" not found. Check your paths.' );
+				Utility\Log::error( 'Module "' . $moduleName . '" not found. Check your paths.' );
 			}
 		}
 
