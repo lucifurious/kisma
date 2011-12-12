@@ -57,7 +57,7 @@ namespace Kisma\Components;
 		 */
 		protected $_keyPrefix = null;
 		/**
-		 * @var \Sag
+		 * @var \Kisma\Utility\CouchDbClient
 		 */
 		protected $_db = null;
 		/**
@@ -75,55 +75,36 @@ namespace Kisma\Components;
 
 		/**
 		 * Get a document from storage
+		 *
 		 * @param string $id
 		 * @param bool $createIfNotFound If true, an empty document will be returned if the $id does not exist.
+		 * @param \stdClass|array|null $defaultDocument
 		 * @return \stdClass|null
 		 */
-		public function find( $id, $createIfNotFound = true )
+		public function find( $id, $createIfNotFound = true, $defaultDocument = null )
 		{
-			$_key = null;
-
 			if ( null === $this->_db )
 			{
 				throw new \Kisma\StorageException( 'No database specified. Cannot find.' );
 			}
 
-			//	Hash if requested
-			if ( false !== $this->_hashKeys )
-			{
-				$_key = \Kisma\Utility\Hash::hash( $id, \Kisma\HashType::SHA1, 40 );
-			}
-
-			//	Add key prefix is missing...
-			if ( null !== $this->_keyPrefix && false === strpos( $id, $this->_keyPrefix, 0 ) )
-			{
-				$_key = $this->_keyPrefix . ':' . $id;
-			}
-
-			if ( null === $_key )
-			{
-				$_key = $id;
-			}
+			//	Build our key (_id)
+			$_key = $this->_makeKey( $id );
 
 			try
 			{
-				//	Pull a fresh doc
-				$this->trigger( 'before_find', $this->_document );
+				$_response = $this->_db->get( urlencode( $_key ) );
 
-				$_dbDocument = $this->_db->get( urlencode( $_key ) );
-
-				if ( ! \K::in( $_dbDocument->status, '200', '201' ) )
+				if ( ! \K::in( $_response->status, '200', '201' ) )
 				{
 					//	Something icky here
-					throw new \Teledini\Exceptions\StorageException( 'Unable to determine if user exists!' );
+					throw new \Kisma\CouchDbException( 'Unexpected CouchDb response.', $_response->status );
 				}
 
-				$this->setDocument( $_dbDocument->body );
+				$this->setDocument( $_response->body );
 				\Kisma\Utility\Log::trace( 'Found document "' . $id . ' with id: ' . $_key );
-
-				$this->trigger( 'after_find', $this->_document );
 			}
-			catch ( \SagCouchException $_ex )
+			catch ( \Exception $_ex )
 			{
 				//	Something icky happened...
 				if ( 404 != $_ex->getCode() )
@@ -140,7 +121,7 @@ namespace Kisma\Components;
 				\Kisma\Utility\Log::trace( 'Creating document id "' . $id . '": ' . $_key );
 
 				//	Create a new document and assign the _id
-				$this->setDocument();
+				$this->setDocument( $defaultDocument );
 				$this->setId( $_key );
 				$this->save();
 			}
@@ -169,7 +150,7 @@ namespace Kisma\Components;
 						throw new \Teledini\Exceptions\StorageException( 'Required document field "_id" missing.' );
 					}
 
-					$this->_document->_id = $this->_db->generateIDs( 1 )->body->uuids[0];
+					$this->_document->_id = $this->_db->get( '//_uuids?count=1' )->body->uuids[0];
 				}
 
 				//	Hash if requested
@@ -181,7 +162,7 @@ namespace Kisma\Components;
 				//	Add key prefix is missing...
 				if ( null !== $this->_keyPrefix && false === strpos( $this->_document->_id, $this->_keyPrefix, 0 ) )
 				{
-					$this->_document->_id = urlencode( $this->_keyPrefix . ':' . $this->_document->_id );
+					$this->_document->_id = $this->_keyPrefix . ':' . $this->_document->_id;
 				}
 
 				$this->trigger( 'before_save', $this->_document );
@@ -276,12 +257,40 @@ namespace Kisma\Components;
 			return $id;
 		}
 
+		/**
+		 * @param string $id
+		 * @return null|string
+		 */
+		protected function _makeKey( $id )
+		{
+			$_key = null;
+
+			//	Hash if requested
+			if ( false !== $this->_hashKeys )
+			{
+				$_key = \Kisma\Utility\Hash::hash( $id, \Kisma\HashType::SHA1, 40 );
+			}
+
+			//	Add key prefix is missing...
+			if ( null !== $this->_keyPrefix && false === strpos( $id, $this->_keyPrefix, 0 ) )
+			{
+				$_key = $this->_keyPrefix . ':' . $id;
+			}
+
+			if ( null === $_key )
+			{
+				$_key = $id;
+			}
+
+			return $_key;
+		}
+
 		//*************************************************************************
 		//* Properties
 		//*************************************************************************
 
 		/**
-		 * @param \Sag $db
+		 * @param \Kisma\Utility\CouchDbClient $db
 		 * @return $this
 		 */
 		public function setDb( $db )
@@ -291,7 +300,7 @@ namespace Kisma\Components;
 		}
 
 		/**
-		 * @return \Sag
+		 * @return \Kisma\Utility\CouchDbClient
 		 */
 		public function getDb()
 		{

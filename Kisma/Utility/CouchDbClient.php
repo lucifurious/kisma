@@ -54,44 +54,66 @@ namespace Kisma\Utility
 		//*************************************************************************
 
 		/**
-		 * @param $databaseName
+		 * Checks if the server is alive
+		 *
+		 * @return bool|mixed
+		 */
+		public function serverExists()
+		{
+			try
+			{
+				return ( 200 === $this->head( '//' )->status );
+			}
+			catch ( \Exception $_ex )
+			{
+				return false;
+			}
+		}
+
+		/**
+		 * @param string $databaseName
 		 * @param bool $createIfNotFound
 		 * @return bool|mixed
 		 * @throws \Teledini\Exceptions\StorageException
 		 */
-		public function setDatabase( $databaseName, $createIfNotFound = true )
+		public function databaseExists( $databaseName, $createIfNotFound = true )
 		{
-			$this->setDatabaseName( $databaseName );
-
-			if ( $createIfNotFound )
+			//	No server? no worky!
+			if ( !$this->serverExists() )
 			{
-				if ( false !== ( $_response = $this->head( '/' ) ) )
-				{
-					if ( 404 == $_response->status )
-					{
-						$_databaseName = '/' . trim( $databaseName, '/ ' );
-						$this->put( '/', $_databaseName );
-						$this->_createDesignDocument();
-						return true;
-					}
-
-					if ( 200 == $_response->status )
-					{
-						return true;
-					}
-
-					//	Not sure what else would constitute acceptance...
-					throw new \Teledini\Exceptions\StorageException( 'Unexpected response from CouchDb: ' . var_export( $_response, true ), $_response->status );
-				}
-
-				return true;
+				return false;
 			}
 
-			return false;
+			//	Get the database
+			$_databaseName = '//' . trim( $databaseName, '/ ' );
+			$_response = $this->get( $_databaseName );
+
+			if ( 200 !== $_response->status )
+			{
+				if ( 404 !== $_response->status )
+				{
+					//	Problems...
+					throw new \Kisma\CouchDbException( 'Unexpected status "' . $_response->status . '"', $_response->status, null, $_response );
+				}
+
+				//	Create the database...
+				$_response = $this->put( $_databaseName );
+
+				if ( isset( $_response->error ) || true !== $_response->body->ok )
+				{
+					throw new \Kisma\CouchDbException( 'Error creating database', $_response->status, null, $_response );
+				}
+
+				$this->_createDesignDocument();
+				return $_response;
+			}
+
+			return true;
 		}
 
 		/**
 		 * Non-Exception generating method to check the existence of a document. If found, it is returned. False is returned otherwise.
+		 *
 		 * @param string $id
 		 * @param bool $returnObject
 		 * @return false|\Kisma\Storage\CouchDbDocument
@@ -110,6 +132,7 @@ namespace Kisma\Utility
 
 		/**
 		 * Returns the upper bound of document revisions
+		 *
 		 * @return mixed
 		 */
 		public function getRevsLimit()
@@ -119,6 +142,7 @@ namespace Kisma\Utility
 
 		/**
 		 * Returns a list of changes made to documents in the database.
+		 *
 		 * @param array $options
 		 * @return mixed
 		 */
@@ -153,43 +177,41 @@ namespace Kisma\Utility
 
 		/**
 		 * Builds an url to a view with optional keys and url encoding and GETs it.
+		 *
 		 * @param string $viewName
-		 * @param null|string|array $key
+		 * @param string|array|null $startKey
 		 * @param null|string|array $endKey
-		 * @param bool $urlEncode
+		 * @param array $options
 		 * @return string
 		 */
-		public function getView( $viewName, $key = null, $endKey = null, $urlEncode = true )
+		public function getView( $viewName, $startKey = null, $endKey = null, $options = array() )
 		{
-			$_query = 'key=%%startKey%%';
-			$_startKey = $this->_makeViewKey( $key );
-			$_endKey = $this->_makeViewKey( $endKey );
+			$_keys = array(
+				'startKey' => $this->_makeViewKey( $startKey ),
+				'endKey' => $this->_makeViewKey( $endKey ),
+			);
+
+			//	Build the query
+			$_query = null;
 
 			//	Start/end?
-			if ( null === $_startKey )
+			foreach ( $_keys as $_keyName => $_keyValue )
 			{
-				$_query = null;
-			}
-			else if ( null !== $endKey )
-			{
-				$_query = 'startkey=%%startKey%%&endkey=%%endKey%%';
+				if ( null !== $_keyValue )
+				{
+					$_query .= '&' . $_keyName . '=' . $_keyValue;
+				}
 			}
 
-			$_query = str_ireplace(
-				array(
-					'%%startKey%%',
-					'%%endKey%%',
-				),
-				array(
-					$_startKey, //( true === $urlEncode ? urlencode( $_startKey ) : $_startKey ),
-					$_endKey, //( true === $urlEncode ? urlencode( $_endKey ) : $_endKey ),
-				),
-				$_query
-			);
+			//	Add in any options
+			foreach ( $options as $_key => $_value )
+			{
+				$_query .= '&' . $_key . '=' . $_value;
+			}
 
-			return $this->get(
-				$viewName . ( false === strpos( $viewName, '?' ) ? '?' . $_query : '&' . $_query )
-			);
+			$_query = trim( $_query, '&' );
+
+			return $this->get( $viewName . ( false === strpos( $viewName, '?' ) ? '?' . $_query : '&' . $_query ) );
 		}
 
 		/**
@@ -242,11 +264,54 @@ namespace Kisma\Utility
 			return $this->get( '/' . $id . '/' . urlencode( $fileName ) );
 		}
 
+		/**
+		 * Bulk document storage
+		 *
+		 * @param array $documents
+		 * @param bool $allOrNothing
+		 * @return bool|mixed
+		 */
+		public function bulk( $documents = array(), $allOrNothing = false )
+		{
+			$_payload = new \stdClass();
+			$_payload->all_or_nothing = $allOrNothing;
+			$_payload->docs = $documents;
+
+			return $this->post( '/_bulk_docs', json_encode( $_payload ) );
+		}
+
+		/**
+		 * Copy a document
+		 *
+		 * @param string $fromId
+		 * @param string $targetId
+		 * @param string $targetRev
+		 * @return mixed
+		 */
+		public function copy( $fromId, $targetId, $targetRev = null )
+		{
+			return $this->_httpRequest(
+				\Kisma\HttpMethod::Copy,
+				$fromId,
+				array(),
+				array(
+					CURLOPT_HTTPHEADER => 'Destination: ' . $targetId . ( $targetRev ? '?rev=' . $targetRev : null ),
+				)
+			);
+		}
+
 		//*************************************************************************
 		//* Private Methods
 		//*************************************************************************
 
 		/**
+		 * Adds the current database name to the front of the url unless the url starts with two slashes.
+		 *
+		 * Example:
+		 *
+		 *  $url = '12345'		becomes				$url = '/[$this->_databaseName]/12345'
+		 *  $url = '//database_awesome/12345'		$url = '/database_awesome/12345'
+		 *
 		 * @param \Kisma\HttpMethod|string $method
 		 * @param string $url
 		 * @param array $payload
@@ -256,15 +321,19 @@ namespace Kisma\Utility
 		protected function _httpRequest( $method = \Kisma\HttpMethod::Get, $url, $payload = array(), $options = array() )
 		{
 			$_response = false;
-			if ( false !== ( $_noDatabaseName = ( substr( $url, 0, 2 ) == '//' ) ) )
+
+			//	Add database name if necessary
+			if ( false !== ( $_noDatabaseName = ( '//' == substr( $url, 0, 2 ) ) ) )
 			{
 				$url = '/' . ltrim( $url, '/' );
 			}
+			else
+			{
+				$url = '/' . $this->_databaseName . '/' . ltrim( $url, ' /' );
+			}
 
-			$_url = 'http://' .
-				$this->_hostName . ( $this->_hostPort ? ':' . $this->_hostPort : null ) .
-				( false === $_noDatabaseName ? '/' . $this->_databaseName : null ) . '/' .
-				trim( $url, '/ ' );
+			//	Construct the url
+			$_url = 'http://' . $this->_hostName . ( $this->_hostPort ? ':' . $this->_hostPort : null ) . $url;
 
 			if ( false !== ( $_result = parent::_httpRequest( $method, $_url, $payload, $options ) ) )
 			{
@@ -288,6 +357,7 @@ namespace Kisma\Utility
 
 		/**
 		 * Creates our design document
+		 *
 		 * @return bool
 		 */
 		protected function _createDesignDocument()
@@ -331,10 +401,6 @@ namespace Kisma\Utility
 			return false;
 		}
 
-		//*************************************************************************
-		//* Properties
-		//*************************************************************************
-
 		/**
 		 * Constructs and sets all options at once.
 		 *
@@ -342,8 +408,8 @@ namespace Kisma\Utility
 		 *
 		 * Options are:
 		 *
-		 * Name                Default
-		 * -------------       -------------
+		 * Name				Default
+		 * -------------	   -------------
 		 * host_name		   localhost
 		 * host_port		   5984
 		 * user_name		   null
@@ -354,12 +420,13 @@ namespace Kisma\Utility
 		 */
 		public static function create( &$options = array() )
 		{
+			// Client factory...
 			$_client = new self();
 			$_client->setUserName( \K::o( $options, 'user_name', null, true ) );
 			$_client->setPassword( \K::o( $options, 'password', null, true ) );
 			$_client->setHostName( \K::o( $options, 'host_name', 'localhost', true ) );
 			$_client->setHostPort( \K::o( $options, 'host_port', 5984, true ) );
-			$_client->setDatabase(
+			$_client->setDatabaseName(
 				\K::o( $options, 'database_name', null, true ),
 				\K::o( $options, 'create_if_not_found', true, true )
 			);
@@ -367,12 +434,20 @@ namespace Kisma\Utility
 			return $_client;
 		}
 
+		//*************************************************************************
+		//* Properties
+		//*************************************************************************
+
 		/**
 		 * @param string $databaseName
+		 * @param bool $createIfNotFound
+		 * @return \Kisma\Utility\CouchDbClient
 		 */
-		public function setDatabaseName( $databaseName )
+		public function setDatabaseName( $databaseName, $createIfNotFound = true )
 		{
 			$this->_databaseName = $databaseName;
+			$this->databaseExists( $databaseName, $createIfNotFound );
+			return $this;
 		}
 
 		/**
@@ -389,6 +464,7 @@ namespace Kisma\Utility
 		public function setHostName( $hostName )
 		{
 			$this->_hostName = $hostName;
+			return $this;
 		}
 
 		/**

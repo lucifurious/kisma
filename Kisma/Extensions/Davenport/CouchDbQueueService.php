@@ -18,6 +18,12 @@
  */
 namespace Kisma\Extensions\Davenport
 {
+	//*************************************************************************
+	//* Usage
+	//*************************************************************************
+
+	use \Kisma\CouchDbException;
+
 	/**
 	 * CouchDbQueueService
 	 * Generic queue handling class
@@ -117,27 +123,15 @@ namespace Kisma\Extensions\Davenport
 
 		/**
 		 * Creates our design document
-		 * @return bool
+		 * @param bool $noSave
+		 * @return bool|\Kisma\Components\Document
 		 */
-		protected function _createDesignDocument()
+		protected function _createDesignDocument( $noSave = false )
 		{
-			try
+			if ( false !== ( $_doc = $this->documentExists( Queue::DesignDocumentName, $noSave ) ) )
 			{
-				//	See if it's there...
-				$this->_sag->head( Queue::DesignDocumentName );
-				return true;
+				return $_doc;
 			}
-			catch ( \SagCouchException $_ex )
-			{
-				if ( 404 != $_ex->getCode() )
-				{
-					//	Not not found
-					throw $_ex;
-				}
-			}
-
-			//	Build the design document
-			parent::_createDesignDocument();
 
 			$_doc = new \stdClass();
 			$_doc->_id = Queue::DesignDocumentName;
@@ -155,7 +149,7 @@ namespace Kisma\Extensions\Davenport
 				//	Store it
 				return $this->put( $_doc->_id, $_doc );
 			}
-			catch ( \Exception $_ex )
+			catch ( CouchDbException $_ex )
 			{
 				if ( 404 == $_ex->getCode() )
 				{

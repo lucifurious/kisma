@@ -391,7 +391,10 @@ namespace Kisma
 		public static function in()
 		{
 			//	Clever or dumb? Dunno...
-			return in_array( array_shift( func_get_args() ), func_get_args() );
+			$_haystack = func_get_args();
+			$_needle = array_shift( $_haystack );
+
+			return in_array( $_needle, $_haystack );
 		}
 
 		/**
@@ -468,7 +471,7 @@ namespace Kisma
 		 */
 		public static function importLibrary( $libraryPath )
 		{
-			$_libraries = !is_array( $libraryPath ) ? array($libraryPath) : $libraryPath;
+			$_libraries = !is_array( $libraryPath ) ? array( $libraryPath ) : $libraryPath;
 
 			foreach ( $_libraries as $_libraryPath )
 			{
@@ -508,7 +511,7 @@ namespace Kisma
 		{
 			if ( !is_array( $key ) )
 			{
-				$key = array($key => $value);
+				$key = array( $key => $value );
 			}
 
 			foreach ( $key as $_key => $_value )
@@ -761,7 +764,7 @@ namespace Kisma
 					$options[$key] = $_newValue;
 				}
 			}
-				//	Also now handle accessible object properties
+			//	Also now handle accessible object properties
 			else if ( is_object( $options ) )
 			{
 				if ( property_exists( $options, $_originalKey ) )

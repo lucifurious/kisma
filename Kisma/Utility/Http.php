@@ -59,7 +59,7 @@ namespace Kisma\Utility
 		/**
 		 * @param string $url
 		 * @param array|null $options
-		 * @return string
+		 * @return bool|mixed
 		 */
 		public function get( $url, $options = array() )
 		{
@@ -68,7 +68,7 @@ namespace Kisma\Utility
 
 		/**
 		 * @param string $url
-		 * @param array|null $payload
+		 * @param array|\stdClass|\stdClass[]|null $payload
 		 * @param array|null $options
 		 * @return bool|mixed
 		 */
@@ -155,7 +155,20 @@ namespace Kisma\Utility
 				CURLOPT_SSL_VERIFYPEER => false,
 			);
 
-			//	Add/override user options
+			//	Special treatment of headers
+			if ( isset( $options, $options[CURLOPT_HTTPHEADER] ) )
+			{
+				$_headers = \K::o( $_curlOptions, CURLOPT_HTTPHEADER, array(), true );
+
+				foreach ( $options[CURLOPT_HTTPHEADER] as $_header )
+				{
+					$_headers[] = $_header;
+				}
+
+				$_curlOptions[CURLOPT_HTTPHEADER] = $_headers;
+			}
+
+			//	Now, add/override user options
 			if ( !empty( $options ) )
 			{
 				foreach ( $_curlOptions as $_key => $_value )

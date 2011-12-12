@@ -48,16 +48,27 @@ namespace Kisma
 	class KismaException extends \Exception
 	{
 		//*************************************************************************
+		//* Private Members
+		//*************************************************************************
+
+		/**
+		 * @var mixed
+		 */
+		protected $_info = null;
+
+		//*************************************************************************
 		//* Default/Magic Methods
 		//*************************************************************************
 
 		/**
 		 * Constructs an exception.
+		 *
 		 * @param mixed $message
 		 * @param int|null $code
 		 * @param mixed $previous
+		 * @param mixed|null $info Additional information
 		 */
-		public function __construct( $message = null, $code = null, $previous = null )
+		public function __construct( $message = null, $code = null, $previous = null, $info = null )
 		{
 			//	If an exception is passed in, translate...
 			if ( null === $code && $message instanceof \Exception )
@@ -79,6 +90,14 @@ namespace Kisma
 		public function __toString()
 		{
 			return '[' . $this->getCode() . '] ' . $this->getMessage();
+		}
+
+		/**
+		 * @return mixed
+		 */
+		public function getInfo()
+		{
+			return $this->_info;
 		}
 	}
 

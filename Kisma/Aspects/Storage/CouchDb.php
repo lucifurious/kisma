@@ -27,7 +27,6 @@ namespace Kisma\Aspects\Storage
 	 */
 	use Kisma\Components as Components;
 	use Kisma\Aspects as Aspects;
-	use \Kisma\Extensions\Davenport\Utility\CouchHelper;
 
 	//*************************************************************************
 	//* Requirements
@@ -35,41 +34,10 @@ namespace Kisma\Aspects\Storage
 
 	/**
 	 * CouchDb
-	 * An aspect that wraps the Sag library for working with a CouchDb instance
+	 * An aspect that wraps the CouchDbClient library for working with a CouchDb instance
 	 *
-	 * @property \Kisma\Services\Remote\CouchDbServer $server
-	 * @property \Sag $sag
+	 * @property \Kisma\Utility\CouchDbClient $db
 	 * @property string $designDocumentName Defaults to '_design/document'
-	 *
-	 * Sag Methods
-	 * ===========
-	 * @method mixed login( $user, $pass, $type = null )
-	 * @method \stdClass getSession()
-	 * @method \Sag decode( $decode )
-	 * @method mixed head( $url )
-	 * @method mixed delete( $id, $rev )
-	 * @method mixed put( $id, $data )
-	 * @method mixed post( $data, $path = null )
-	 * @method mixed bulk( $docs, $allOrNothing = false )
-	 * @method mixed copy( $sourceId, $destinationId, $destinationRev )
-	 * @method \Sag setDatabase( $databaseName, $createIfNotFound = false )
-	 * @method mixed getAllDocs( $incDocs = false, $limit = null, $startKey = null, $endKey = null, $keys = null )
-	 * @method mixed getAllDatabases()
-	 * @method mixed generateIDs()
-	 * @method mixed createDatabase( $databaseName )
-	 * @method mixed deleteDatabase( $databaseName )
-	 * @method mixed replicate( $src, $target, $continuous = false, $createTarget = null, $filter = null, $filterQueryParams = null )
-	 * @method mixed compact( $viewName = null )
-	 * @method mixed setAttachment( $name, $data, $contentType, $docID, $rev = null )
-	 * @method \Sag setOpenTimeout( $seconds )
-	 * @method \Sag setRWTimeout( $seconds, $microSeconds = 0 )
-	 * @method \Sag setCache( &$cacheImplementer )
-	 * @method \SagCache getCache()
-	 * @method string currentDatabase()
-	 * @method \stdClass getStats()
-	 * @method \Sag setStaleDefault( $stale )
-	 * @method \Sag setCookie( $key, $value )
-	 * @method string getCookie( $key )
 	 */
 	class CouchDb extends Components\Aspect implements \Kisma\IStorage
 	{
@@ -78,34 +46,9 @@ namespace Kisma\Aspects\Storage
 		//*************************************************************************
 
 		/**
-		 * @var string When opening a database, you have the option of having a design document created for you. If
-		 * you do so, it will be called this
+		 * @var \Kisma\Utility\CouchDbClient
 		 */
-		protected $_designDocumentName = '_design/document';
-		/**
-		 * @var string The name of the database
-		 */
-		protected $_databaseName = null;
-		/**
-		 * @var string
-		 */
-		protected $_hostName = 'localhost';
-		/**
-		 * @var int
-		 */
-		protected $_hostPort = 5984;
-		/**
-		 * @var string
-		 */
-		protected $_userName = null;
-		/**
-		 * @var string
-		 */
-		protected $_password = null;
-		/**
-		 * @var \Sag
-		 */
-		protected $_sag = null;
+		protected $_db = null;
 
 		//*************************************************************************
 		//* Public Methods
@@ -119,139 +62,33 @@ namespace Kisma\Aspects\Storage
 			//	Call poppa
 			parent::__construct( $options );
 
-			//	Create a design document if it's not there, if configured...
-			if ( \K::getSetting( 'db.schema.createDesignDocuments', false ) )
+			if ( null === $this->_db )
 			{
-				$this->_createDesignDocument();
+				$this->_db = new \Kisma\Utility\CouchDbClient( $options );
 			}
 		}
 
 		/**
-		 * Non-Exception generating method to check the existence of a document. If found, it is returned. False is returned otherwise.
-		 * @param string $id
-		 * @param bool $returnObject
-		 * @return false|\Kisma\Storage\CouchDbDocument
-		 */
-		public function documentExists( $id, $returnObject = false )
-		{
-			try
-			{
-				if ( false === $returnObject )
-				{
-					return ( '200' == $this->_sag->head( '/', $id )->status );
-				}
-
-				$_document = $this->_get( $id, $returnObject );
-				return empty( $_document ) ? false : $_document;
-			}
-			catch ( \SagCouchException $_ex )
-			{
-				if ( 404 == $_ex->getCode() )
-				{
-					//	Not found
-					return false;
-				}
-
-				//	Pssst... pass it on
-				throw $_ex;
-			}
-		}
-
-		/**
-		 * An overridable "get"
-		 *
 		 * @param string $url
-		 * @param null $otherStuff
-		 * @internal param array|null $options
-		 * @return mixed
+		 * @param array|null $options
+		 * @param bool $raw
+		 * @return mixed|bool
 		 */
-		public function get( $url, $otherStuff = null )
+		public function get( $url, $options = array(), $raw = false )
 		{
-			return $this->_get( $url, $otherStuff );
-		}
-
-		/**
-		 * Returns the upper bound of document revisions
-		 * @return mixed
-		 */
-		public function getRevsLimit()
-		{
-			return $this->_get( '_revs_limit' );
-		}
-
-		/**
-		 * Returns a list of changes made to documents in the database.
-		 * @param array $options
-		 * @return mixed
-		 */
-		public function changes( $options = array() )
-		{
-			$_query = null;
-			$_options = array();
-
-			foreach ( $options as $_key => $_value )
-			{
-				switch ( $_key = strtolower( $_key ) )
-				{
-					case 'since':
-					case 'limit':
-					case 'feed':
-					case 'heartbeat':
-					case 'timeout':
-					case 'filter':
-					case 'include_docs':
-						$_options[] = $_key . '=' . urlencode( $_value );
-						break;
-				}
-			}
-
-			if ( !empty( $_options ) )
-			{
-				$_query = '?' . trim( implode( '&', $_options ), '&' );
-			}
-
-			return $this->_get( '_changes' . $_query );
-		}
-
-		//*************************************************************************
-		//* Default/Magic Methods
-		//*************************************************************************
-
-		/**
-		 * Allow calling Aspect methods from the object
-		 *
-		 * @throws \BadMethodCallException
-		 * @param string $method
-		 * @param array  $arguments
-		 * @return mixed
-		 */
-		public function __call( $method, $arguments )
-		{
-			//	Sag pass-through...
-			if ( method_exists( $this->_sag, $method ) )
-			{
-				return call_user_func_array( array(
-					$this->_sag,
-					$method
-				), $arguments );
-			}
-
-			//	No worky
-			throw new \BadMethodCallException( __CLASS__ . '::' . $method . ' is undefined.' );
-		}
-
-		/**
-		 * Wrapper for \Sag::get() to return a \Kisma\Components\Document
-		 * @param string $url
-		 * @param bool $returnObject
-		 * @return \Kisma\Components\Document|\stdClass|false|\Kisma\Components\Document[]|\stdClass[]
-		 */
-		protected function _get( $url, $returnObject = false )
-		{
-			if ( false === ( $_result = $this->_sag->get( $url ) ) || !\K::in( $_result->status, 404, 200 ) )
+			if ( false === ( $_result = $this->_db->get( $url, $options ) ) || !\K::in( $_result->status, 404, 200 ) )
 			{
 				//	Ruh-roh
-				throw new \Exception( 'Unexpected CouchDb response: ' . var_export( $_result, true ), $_result->status );
+				throw new \Kisma\CouchDbException(
+					'Unexpected CouchDb response: ' . var_export( $_result, true ),
+					$_result->status
+				);
+			}
+
+			//  Not an array and not an object or raw request? Send back nekkid
+			if ( false !== $raw || ( !is_array( $_result ) && !is_object( $_result ) ) )
+			{
+				return $_result;
 			}
 
 			//	Arrays go back as arrays of Document
@@ -261,18 +98,11 @@ namespace Kisma\Aspects\Storage
 
 				foreach ( $_result as $_document )
 				{
-					if ( false === $returnObject )
-					{
-						$_documents[] = new \Kisma\Components\Document(
-							array(
-								'document' => $_document,
-							)
-						);
-					}
-					else
-					{
-						$_documents[] = $_document;
-					}
+					$_documents[] = new \Kisma\Components\Document(
+						array(
+							'document' => $_document,
+						)
+					);
 
 					unset( $_document );
 				}
@@ -282,319 +112,41 @@ namespace Kisma\Aspects\Storage
 				return $_documents;
 			}
 
-			//	Objects go back as Document
-			if ( is_object( $_result ) && false === $returnObject )
+			//  Single document
+			if ( is_object( $_result ) )
 			{
-				$_document = new \Kisma\Components\Document();
-				return $_document->setDocument( $_result );
+				return new \Kisma\Components\Document( array( 'document' => $_result ) );
 			}
-
-			//	No clue...
-			return $_result;
 		}
 
-		/**
-		 * Builds an url to a view with optional keys and url encoding and GETs it.
-		 * @param string $viewName
-		 * @param null|string|array $key
-		 * @param null|string|array $endKey
-		 * @param bool $urlEncode
-		 * @return string
-		 */
-		public function getView( $viewName, $key = null, $endKey = null, $urlEncode = true )
-		{
-			$_query = 'key=%%startKey%%';
-			$_startKey = $this->_makeViewKey( $key );
-			$_endKey = $this->_makeViewKey( $endKey );
-
-			//	Start/end?
-			if ( null === $_startKey )
-			{
-				$_query = null;
-			}
-			else if ( null !== $endKey )
-			{
-				$_query = 'startkey=%%startKey%%&endkey=%%endKey%%';
-			}
-
-			$_query = str_ireplace(
-				array(
-					'%%startKey%%',
-					'%%endKey%%',
-				),
-				array(
-					$_startKey, //( true === $urlEncode ? urlencode( $_startKey ) : $_startKey ),
-					$_endKey, //( true === $urlEncode ? urlencode( $_endKey ) : $_endKey ),
-				),
-				$_query
-			);
-
-			return $this->_get(
-				$viewName . ( false === strpos( $viewName, '?' ) ? '?' . $_query : '&' . $_query )
-			);
-		}
+		//*************************************************************************
+		//* Default/Magic Methods
+		//*************************************************************************
 
 		/**
-		 * @param array|string $key
-		 * @return null|string
-		 */
-		protected function _makeViewKey( $key )
-		{
-			$_key = null;
-
-			if ( null !== $key )
-			{
-				//	Make a string from the complex array key
-				if ( is_array( $key ) )
-				{
-					$_key = null;
-
-					foreach ( $key as $_value )
-					{
-						if ( '{}' == $_value )
-						{
-							$_key .= ',{}';
-						}
-						else
-						{
-							$_key .= '"' . $_value . '"';
-						}
-					}
-
-					$_key = '[' . trim( $_key, ' ,' ) . ']';
-				}
-				else
-				{
-					$_key = '"' . $_key . '"';
-				}
-			}
-
-			return $_key;
-		}
-
-		/**
-		 * Get an attachment by id and name
+		 * Allow calling methods in our CouchDb client directly
 		 *
-		 * @param string $id
-		 * @param string $fileName
+		 * @throws \BadMethodCallException
+		 * @param string $method
+		 * @param array $arguments
 		 * @return mixed
 		 */
-		public function getAttachment( $id, $fileName )
+		public function __call( $method, $arguments )
 		{
-			return $this->_get( '/' . $id . '/' . urlencode( $fileName ) );
-		}
-
-		//*************************************************************************
-		//* Private Methods
-		//*************************************************************************
-
-		/**
-		 * Initializes Sag
-		 * @param array $options
-		 */
-		protected function _initializeClient( &$options = array() )
-		{
-			//	Nada
-		}
-
-		/**
-		 * @return bool
-		 * @throws \SagCouchException
-		 */
-		protected function _hasDesignDocument()
-		{
-			return $this->documentExists( $this->_designDocumentName );
-		}
-
-		/**
-		 * Creates our design document
-		 * @return bool
-		 */
-		protected function _createDesignDocument()
-		{
-			if ( $this->_hasDesignDocument() )
+			//	CouchDbClient pass-through...
+			if ( method_exists( $this->_db, $method ) )
 			{
-				return true;
+				return call_user_func_array(
+					array(
+						$this->_db,
+						$method
+					),
+					$arguments
+				);
 			}
 
-			//	Build the design document
-			$_doc = new \stdClass();
-			$_doc->_id = $this->_designDocumentName;
-
-			$_doc->views = new \stdClass();
-
-			$_doc->views->by_date = new \stdClass();
-			$_doc->views->by_date->map = 'function( doc ) { emit(doc.create_time.getTime(), doc); }';
-
-			try
-			{
-				//	Store it
-				$this->_sag->put( $_doc->_id, $_doc );
-			}
-			catch ( \Exception $_ex )
-			{
-				if ( 404 == $_ex->getCode() )
-				{
-					//	No database, rethrow
-					throw $_ex;
-				}
-
-				/**
-				 * Conflict-o-rama!
-				 */
-				if ( 409 == $_ex->getCode() )
-				{
-					//	I guess we don't care...
-					return true;
-				}
-			}
-
-			return false;
-		}
-
-		//*************************************************************************
-		//* Properties
-		//*************************************************************************
-
-		/**
-		 * @param string $designDocumentName
-		 * @return \Kisma\Aspects\Storage\CouchDb
-		 */
-		public function setDesignDocumentName( $designDocumentName )
-		{
-			$this->_designDocumentName = $designDocumentName;
-			return $this;
-		}
-
-		/**
-		 * @return string
-		 */
-		public function getDesignDocumentName()
-		{
-			return $this->_designDocumentName;
-		}
-
-		/**
-		 * @param \Sag $sag
-		 * @return \Kisma\Aspects\Storage\CouchDb
-		 */
-		public function setSag( $sag )
-		{
-			$this->_sag = $sag;
-			return $this;
-		}
-
-		/**
-		 * @return \Sag
-		 */
-		public function getSag()
-		{
-			return $this->_sag;
-		}
-
-		/**
-		 * @param string $databaseName
-		 * @param bool $createIfNotFound
-		 * @return CouchDb
-		 */
-		public function setDatabase( $databaseName, $createIfNotFound = false )
-		{
-			return $this->setDatabaseName( $databaseName, $createIfNotFound );
-		}
-
-		/**
-		 * @param string $databaseName
-		 * @return \Kisma\Aspects\Storage\CouchDb
-		 */
-		public function setDatabaseName( $databaseName = null, $createIfNotFound = false )
-		{
-			if ( null !== $this->_sag && null !== ( $this->_databaseName = $databaseName ) )
-			{
-				$this->_sag->setDatabase( $this->_databaseName, $createIfNotFound );
-				$this->_createDesignDocument();
-			}
-
-			return $this;
-		}
-
-		/**
-		 * @return string
-		 */
-		public function getDatabaseName()
-		{
-			return $this->_databaseName;
-		}
-
-		/**
-		 * @param string $hostName
-		 * @return \Kisma\Aspects\Storage\CouchDb
-		 */
-		public function setHostName( $hostName )
-		{
-			$this->_hostName = $hostName;
-			return $this;
-		}
-
-		/**
-		 * @return string
-		 */
-		public function getHostName()
-		{
-			return $this->_hostName;
-		}
-
-		/**
-		 * @param int $hostPort
-		 * @return \Kisma\Aspects\Storage\CouchDb
-		 */
-		public function setHostPort( $hostPort )
-		{
-			$this->_hostPort = $hostPort;
-			return $this;
-		}
-
-		/**
-		 * @return int
-		 */
-		public function getHostPort()
-		{
-			return $this->_hostPort;
-		}
-
-		/**
-		 * @param string $password
-		 * @return \Kisma\Aspects\Storage\CouchDb
-		 */
-		public function setPassword( $password )
-		{
-			$this->_password = $password;
-			return $this;
-		}
-
-		/**
-		 * @return string
-		 */
-		public function getPassword()
-		{
-			return $this->_password;
-		}
-
-		/**
-		 * @param string $userName
-		 * @return \Kisma\Aspects\Storage\CouchDb
-		 */
-		public function setUserName( $userName )
-		{
-			$this->_userName = $userName;
-			return $this;
-		}
-
-		/**
-		 * @return string
-		 */
-		public function getUserName()
-		{
-			return $this->_userName;
+			//	No worky
+			throw new \BadMethodCallException( __CLASS__ . '::' . $method . ' is undefined.' );
 		}
 
 	}
