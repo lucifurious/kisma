@@ -298,11 +298,28 @@ namespace Kisma
 		/**
 		 * @static
 		 * @param string $moduleName
+		 * @param array $config
 		 * @return string
 		 */
-		public static function loadModule( $moduleName )
+		public static function loadModule( $moduleName, $config = array() )
 		{
-			$_modulePath = self::getSetting( 'module_path', getcwd() . DIRECTORY_SEPARATOR . 'modules' );
+			$_parts = array();
+
+			if ( null === ( $_modulePath = self::getSetting( 'module_path' ) ) )
+			{
+				$_modulePath = getcwd() . DIRECTORY_SEPARATOR . 'modules';
+			}
+			//
+			//	Auto-set from namespace if using "lib/namespace" structure
+			//
+			else if ( false === $_modulePath )
+			{
+				if ( null !== ( $_namespace = self::o( $config, 'namespace' ) ) )
+				{
+					$_modulePath = __DIR__ . '/../' . $_namespace;
+				}
+			}
+
 			$_class = self::tag( $moduleName, false, false, $_parts );
 
 			/** @noinspection PhpIncludeInspection */
@@ -663,6 +680,7 @@ namespace Kisma
 		 */
 		public static function getSetting( $key, $defaultValue = null )
 		{
+			$_parts = array();
 			$_key = self::tag( $key, true, false, $_parts );
 
 			if ( isset( self::$_settings[$_key] ) )
@@ -1214,21 +1232,21 @@ namespace {
 		public static function loadModules( $configuration = array() )
 		{
 			//	Initialize Kisma
-			\K::initialize( $configuration );
+			\Kisma\Kisma::initialize( $configuration );
 
 			//	Add the library path to the includes
 			$_includePath = \get_include_path();
 
-			if ( null !== ( $_libPath = \K::getSetting( 'library_path' ) ) )
+			if ( null !== ( $_libPath = \Kisma\Kisma::getSetting( 'library_path' ) ) )
 			{
 				\set_include_path( $_includePath . PATH_SEPARATOR . $_libPath . PATH_SEPARATOR );
 			}
 
-			$_modules = \K::o( $configuration, 'modules' );
+			$_modules = \Kisma\Kisma::o( $configuration, 'modules' );
 
 			foreach ( $_modules as $_moduleName => $_config )
 			{
-				\K::loadModule( $_moduleName );
+				\Kisma\Kisma::loadModule( $_moduleName, $_config );
 			}
 		}
 	}
