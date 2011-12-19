@@ -100,16 +100,11 @@ namespace Kisma\Extensions\Davenport
 
 			\Kisma\Utility\Log::debug( 'Requesting pending view: ' . $this->_pendingViewName );
 
-			$_pendingMessages = $this->_queueService->get(
-				$this->_buildQueryUrl(
-					array(
+			$_pendingMessages = $this->_queueService->get( $this->_buildQueryUrl( array(
 						'include_docs' => true,
 						'limit' => $maxItems,
 						'descending' => $fifo ? 'true' : 'false',
-					),
-					$this->_pendingViewName
-				)
-			);
+					), $this->_pendingViewName ) );
 
 			\Kisma\Utility\Log::debug( 'View results: ' . $_pendingMessages );
 
@@ -163,13 +158,11 @@ namespace Kisma\Extensions\Davenport
 			//	Create an id
 			$_id = $this->_queueService->createKey( $id ? : $this->_queueName . microtime( true ) );
 
-			$_item = new QueueItem(
-				array(
+			$_item = new QueueItem( array(
 					'id' => $_id,
 					'feed_data' => $feedData,
 					'expire_time' => $expireTime,
-				)
-			);
+				) );
 
 			//	See if this key is already in the queue...
 			$_response = $this->_queueService->get( $_id, null, true );
@@ -185,19 +178,19 @@ namespace Kisma\Extensions\Davenport
 			else
 			{
 				$_document = $_response->body;
+				\Kisma\Utility\Log::debug( 'Found prior queue item, _rev: ' . $_document->_rev );
 			}
 
 			//	Doc exists, read and update...
 			$_document->update_time = microtime( true );
-			$_document->feed_data = $feedData;
+			$_document->feed_data = $_item->getFeedData();
 
-			\Kisma\Utility\Log::debug( 'Found prior queue item, _rev: ' . $_document->_rev );
 			$_response = $this->_queueService->put( $_id, $_document );
 
 			if ( isset( $_response->body ) && $_response->body->ok )
 			{
 				\Kisma\Utility\Log::debug( 'Document queued: ' . print_r( $_response->body, true ) );
-				return $_response->body->id;
+				return $_response->body->rev;
 			}
 
 			return false;
@@ -209,8 +202,7 @@ namespace Kisma\Extensions\Davenport
 		 *
 		 * @return array
 		 */
-		protected
-		function _createLock()
+		protected function _createLock()
 		{
 			return array(
 				'lock_time' => microtime( true ),
@@ -224,8 +216,7 @@ namespace Kisma\Extensions\Davenport
 		 * @param string $viewName Optional view name to query
 		 * @return string
 		 */
-		protected
-		function _buildQueryUrl( $parameters = array(), $viewName = null )
+		protected function _buildQueryUrl( $parameters = array(), $viewName = null )
 		{
 			$_url = null;
 
@@ -245,8 +236,7 @@ namespace Kisma\Extensions\Davenport
 		 * @param string $lockedViewName
 		 * @return $this
 		 */
-		public
-		function setLockedViewName( $lockedViewName )
+		public function setLockedViewName( $lockedViewName )
 		{
 			$this->_lockedViewName = $lockedViewName;
 			return $this;
@@ -255,8 +245,7 @@ namespace Kisma\Extensions\Davenport
 		/**
 		 * @return string
 		 */
-		public
-		function getLockedViewName()
+		public function getLockedViewName()
 		{
 			return $this->_lockedViewName;
 		}
@@ -265,8 +254,7 @@ namespace Kisma\Extensions\Davenport
 		 * @param string $pendingViewName
 		 * @return $this
 		 */
-		public
-		function setPendingViewName( $pendingViewName )
+		public function setPendingViewName( $pendingViewName )
 		{
 			$this->_pendingViewName = $pendingViewName;
 			return $this;
@@ -275,8 +263,7 @@ namespace Kisma\Extensions\Davenport
 		/**
 		 * @return string
 		 */
-		public
-		function getPendingViewName()
+		public function getPendingViewName()
 		{
 			return $this->_pendingViewName;
 		}
@@ -285,8 +272,7 @@ namespace Kisma\Extensions\Davenport
 		 * @param string $queueName
 		 * @return \Kisma\Extensions\Davenport\Queue
 		 */
-		public
-		function setQueueName( $queueName )
+		public function setQueueName( $queueName )
 		{
 			$this->_queueName = $queueName;
 			return $this;
@@ -295,8 +281,7 @@ namespace Kisma\Extensions\Davenport
 		/**
 		 * @return string
 		 */
-		public
-		function getQueueName()
+		public function getQueueName()
 		{
 			return $this->_queueName;
 		}
@@ -305,8 +290,7 @@ namespace Kisma\Extensions\Davenport
 		 * @param \Kisma\Extensions\Davenport\CouchDbQueueService $queueService
 		 * @return \Kisma\Extensions\Davenport\Queue
 		 */
-		public
-		function setQueueService( $queueService )
+		public function setQueueService( $queueService )
 		{
 			$this->_queueService = $queueService;
 			return $this;
@@ -315,8 +299,7 @@ namespace Kisma\Extensions\Davenport
 		/**
 		 * @return \Kisma\Extensions\Davenport\CouchDbQueueService
 		 */
-		public
-		function getQueueService()
+		public function getQueueService()
 		{
 			return $this->_queueService;
 		}

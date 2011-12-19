@@ -186,10 +186,19 @@ namespace Kisma\Utility
 		 */
 		public function getView( $viewName, $startKey = null, $endKey = null, $options = array() )
 		{
-			$_keys = array(
-				'startKey' => $this->_makeViewKey( $startKey ),
-				'endKey' => $this->_makeViewKey( $endKey ),
-			);
+			if ( null !== $startKey && null === $endKey )
+			{
+				$_keys = array(
+					'key' => '"' . $startKey . '"',
+				);
+			}
+			else
+			{
+				$_keys = array(
+					'startKey' => $this->_makeViewKey( $startKey ),
+					'endKey' => $this->_makeViewKey( $endKey ),
+				);
+			}
 
 			//	Build the query
 			$_query = null;
@@ -211,14 +220,18 @@ namespace Kisma\Utility
 
 			$_query = trim( $_query, '&' );
 
+			Log::trace( 'Getting view: ' . $viewName . ( false === strpos( $viewName,
+				'?' ) ? '?' . $_query : '&' . $_query ) );
+
 			return $this->get( $viewName . ( false === strpos( $viewName, '?' ) ? '?' . $_query : '&' . $_query ) );
 		}
 
 		/**
 		 * @param array|string $key
+		 * @param bool $encode
 		 * @return null|string
 		 */
-		protected function _makeViewKey( $key )
+		protected function _makeViewKey( $key, $encode = false )
 		{
 			$_key = null;
 
@@ -247,6 +260,11 @@ namespace Kisma\Utility
 				{
 					$_key = '"' . $_key . '"';
 				}
+			}
+
+			if ( $encode )
+			{
+				$_key = urlencode( $_key );
 			}
 
 			return $_key;
@@ -290,14 +308,9 @@ namespace Kisma\Utility
 		 */
 		public function copy( $fromId, $targetId, $targetRev = null )
 		{
-			return $this->_httpRequest(
-				\Kisma\HttpMethod::Copy,
-				$fromId,
-				array(),
-				array(
+			return $this->_httpRequest( \Kisma\HttpMethod::Copy, $fromId, array(), array(
 					CURLOPT_HTTPHEADER => 'Destination: ' . $targetId . ( $targetRev ? '?rev=' . $targetRev : null ),
-				)
-			);
+				) );
 		}
 
 		//*************************************************************************
@@ -426,10 +439,8 @@ namespace Kisma\Utility
 			$_client->setPassword( \K::o( $options, 'password', null, true ) );
 			$_client->setHostName( \K::o( $options, 'host_name', 'localhost', true ) );
 			$_client->setHostPort( \K::o( $options, 'host_port', 5984, true ) );
-			$_client->setDatabaseName(
-				\K::o( $options, 'database_name', null, true ),
-				\K::o( $options, 'create_if_not_found', true, true )
-			);
+			$_client->setDatabaseName( \K::o( $options, 'database_name', null, true ),
+				\K::o( $options, 'create_if_not_found', true, true ) );
 
 			return $_client;
 		}

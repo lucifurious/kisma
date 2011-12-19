@@ -55,12 +55,101 @@ namespace Kisma\Utility
 
 		/**
 		 * Converts a camel-cased word to a delimited lowercase string
+		 *
 		 * @param string $string
 		 * @return string
 		 */
 		public static function decamelize( $string )
 		{
 			return strtolower( preg_replace( "/([a-z])([A-Z])/", "\\1_\\2", $string ) );
+		}
+
+		/**
+		 * Dynamically generates the object from the properties of the given object
+		 *
+		 * @param $object
+		 * @return \stdClass
+		 */
+		public static function toObject( $object )
+		{
+			if ( null === $object )
+			{
+				return null;
+			}
+
+			$_obj = new \stdClass();
+
+			if ( is_array( $object ) )
+			{
+				$_properties = array();
+
+				foreach ( $object as $_key => $_value )
+				{
+					$_property = new \stdClass();
+					$_property->name = $_key;
+				}
+			}
+			else
+			{
+				$_me = new \ReflectionObject( $object );
+				$_properties = $_me->getProperties();
+			}
+
+			if ( !empty( $_properties ) )
+			{
+				if ( !is_array( $object ) )
+				{
+					$_myClass = get_class( $object );
+				}
+				else
+				{
+					$_myClass = '_array_';
+				}
+
+				foreach ( $_properties as $_property )
+				{
+					//	Only want properties of $object hierarchy...
+					if ( isset( $_property->class ) )
+					{
+						$_class = new \ReflectionClass( $_property->class );
+
+						if ( !empty( $_class ) && !$_class->isInstance( $object ) && !$_class->isSubclassOf( $_myClass ) )
+						{
+							continue;
+						}
+
+						unset( $_class );
+					}
+
+					try
+					{
+						$_propertyName = ltrim( $_property->name, '_' );
+
+						if ( 'parentId' != $_propertyName )
+						{
+							$_getter = 'get' . $_propertyName;
+
+							if ( method_exists( $object, $_getter ) )
+							{
+								$_propertyValue = $object->{$_getter}();
+
+								if ( !is_scalar( $_propertyValue ) )
+								{
+									$_propertyValue = self::toObject( $_propertyValue );
+								}
+
+								$_obj->{$_propertyName} = $_propertyValue;
+							}
+						}
+					}
+					catch ( \Exception $_ex )
+					{
+						//	Just ignore, not a valid property if we can't read it with a getter
+					}
+				}
+			}
+
+			return $_obj;
 		}
 
 		/**
@@ -100,7 +189,7 @@ namespace Kisma\Utility
 			/** @var $_entry \SimpleXMLElement */
 			foreach ( $_entries->entry->children as $_entry )
 			{
-				//				$_values = $_entry->children( 'http://schemas.google.com/g/2005' );
+				$_values = $_entry->children( 'http://schemas.google.com/g/2005' );
 
 				$_resultName = ( $_entry->prefix ? $_entry->prefix . ':' : null ) . $_entry->nodeName;
 
@@ -150,6 +239,79 @@ namespace Kisma\Utility
 			}
 
 			return $_result;
+		}
+
+		/**
+		 * @static
+		 * @param string $xmlString
+		 * @param string $encoding
+		 * @param bool $includeAttributes
+		 * @return array
+		 */
+		public static function xmlToArray3( $xmlString, $encoding = 'utf-8', $includeAttributes = true )
+		{
+			$_parser = xml_parser_create( $encoding );
+			xml_parser_set_option( $_parser, XML_OPTION_CASE_FOLDING, 0 );
+			xml_parser_set_option( $_parser, XML_OPTION_SKIP_WHITE, 1 );
+			xml_parse_into_struct( $_parser, $xmlString, $_xml, $_index );
+			xml_parser_free( $_parser );
+
+			$_levels = array( null );
+
+			foreach ( $_xml as $_value )
+			{
+				if ( \K::in( $_value['type'], 'open', 'complete' ) )
+				{
+					if ( !array_key_exists( $_value['level'], $_levels ) )
+					{
+						$_levels[$_value['level']] = array();
+					}
+				}
+
+				$_priorLevel = &$_levels[$_value['level'] - 1];
+				$_parent = $_priorLevel[sizeof( $_priorLevel ) - 1];
+
+				if ( 'open' == $_value['type'] )
+				{
+					$_value['children'] = array();
+					array_push( &$_levels[$_value['level']], $_value );
+					continue;
+				}
+				else if ( 'complete' == $_value['type'] )
+				{
+					$_parent['children'][$_value['tag']] = $_value['value'];
+				}
+				else if ( 'close' == $_value['type'] )
+				{
+					$_popped = array_pop( $_levels[$_value['level']] );
+					$_tag = $_popped['tag'];
+
+					if ( $_parent )
+					{
+						if ( !array_key_exists( $_tag, $_parent['children'] ) )
+						{
+							$_parent['children'][$_tag] = $_popped['children'];
+						}
+						else if ( is_array( $_parent['children'][$_tag] ) )
+						{
+							if ( !isset( $_parent['children'][$_tag][0] ) )
+							{
+								$_oldSingle = $_parent['children'][$_tag];
+								$_parent['children'][$_tag] = null;
+								$_parent['children'][$_tag][] = $_oldSingle;
+							}
+
+							$parent['children'][$_tag][] = $_popped['children'];
+						}
+					}
+					else
+					{
+						return ( array( $_popped['tag'] => $_popped['children'] ) );
+					}
+				}
+
+				$_priorLevel[sizeof( $_priorLevel ) - 1] = $_parent;
+			}
 		}
 
 		/**
@@ -293,8 +455,7 @@ namespace Kisma\Utility
 
 								if ( $attributes_data )
 								{
-									$current[$tag][$repeated_tag_index[$tag . '_' . $level] . '_attr'] =
-										$attributes_data;
+									$current[$tag][$repeated_tag_index[$tag . '_' . $level] . '_attr'] = $attributes_data;
 								}
 							}
 
@@ -316,10 +477,56 @@ namespace Kisma\Utility
 
 			if ( $includeAttributes )
 			{
-				self::_normalizeAttributes( $_outputArray );
+				//				self::_normalizeAttributes( $_outputArray );
 			}
 
 			return $_outputArray['feed'];
+		}
+
+		/**
+		 * Down and dirty object to array function
+		 *
+		 * @static
+		 * @param object $object
+		 * @return array
+		 */
+		public static function objectToArray( $object )
+		{
+			if ( is_object( $object ) )
+			{
+				$object = get_object_vars( $object );
+			}
+
+			if ( is_array( $object ) )
+			{
+				return array_map( array(
+					'\\Kisma\\Utility\\Transform',
+					'objectToArray'
+				), $object );
+			}
+
+			// Return array
+			return $object;
+		}
+
+		/**
+		 * Down and dirty array to object function
+		 *
+		 * @static
+		 * @param array $array
+		 * @return object
+		 */
+		public static function arrayToObject( $array )
+		{
+			if ( is_array( $array ) )
+			{
+				return (object)array_map( array(
+					'\\Kisma\\Utility\\Transform',
+					'arrayToObject'
+				), $array );
+			}
+
+			return $array;
 		}
 
 		//**************************************************************************
@@ -328,6 +535,7 @@ namespace Kisma\Utility
 
 		/**
 		 * Fixes up the attributes created by the slow-ass xmlToArray function.
+		 *
 		 * @param array $source
 		 */
 		protected function _normalizeAttributes( &$source = null )
@@ -339,6 +547,8 @@ namespace Kisma\Utility
 
 			foreach ( $source as $_key => $_value )
 			{
+				$_attributeCounter = 0;
+
 				//	Get the value fixed up...
 				if ( is_array( $_value ) )
 				{
@@ -356,12 +566,7 @@ namespace Kisma\Utility
 
 					foreach ( $source[$_bogusKey] as $_attributeKey => $_attributeValue )
 					{
-						$_attributes[$_attributeKey] =
-							is_array( $_attributeValue )
-								?
-								self::_normalizeAttributes( $_attributeValue )
-								:
-								$_attributeValue;
+						$_attributes[$_attributeKey] = is_array( $_attributeValue ) ? self::_normalizeAttributes( $_attributeValue ) : $_attributeValue;
 					}
 
 					//	Remove bogus entry
@@ -370,7 +575,7 @@ namespace Kisma\Utility
 					//	Add attributes to source key
 					if ( is_array( $source[$_key] ) )
 					{
-						$source[$_key]['@attributes'] = $_attributes;
+						array_push( $source[$_key], array( '@attributes' => $_attributes ) );
 					}
 					else
 					{

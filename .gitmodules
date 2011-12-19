@@ -1,9 +1,0 @@
-[submodule "vendors/sag"]
-	path = vendors/sag
-	url = https://github.com/sbisbee/sag.git
-[submodule "vendors/redbean"]
-	path = vendors/redbean
-	url = https://github.com/gabordemooij/redbean.git
-[submodule "vendors/bootstrap"]
-	path = vendors/bootstrap
-	url = https://github.com/twitter/bootstrap.git

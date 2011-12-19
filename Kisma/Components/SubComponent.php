@@ -108,6 +108,14 @@ namespace Kisma\Components
 			$this->_loadConfiguration( $options, true );
 		}
 
+		/**
+		 * Destructor stub
+		 */
+		public function __destruct()
+		{
+			//	Does nothing, but allows references from subclasses
+		}
+
 		//*************************************************************************
 		//* Private Methods
 		//*************************************************************************

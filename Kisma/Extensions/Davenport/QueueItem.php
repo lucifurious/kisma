@@ -71,7 +71,7 @@ namespace Kisma\Extensions\Davenport
 				}
 			}
 
-			$this->_document->feed_data = $_feedData;
+			$this->feed_data = $_feedData;
 
 			parent::__construct( $options );
 		}
@@ -104,7 +104,7 @@ namespace Kisma\Extensions\Davenport
 		 */
 		public function setFeedData( $feedData = null )
 		{
-			$this->feed_data = $feedData;
+			$this->_document->feed_data = $feedData;
 			return $this;
 		}
 
@@ -113,7 +113,7 @@ namespace Kisma\Extensions\Davenport
 		 */
 		public function getFeedData()
 		{
-			return $this->feed_data;
+			return $this->_document->feed_data;
 		}
 
 		/**

@@ -21,8 +21,7 @@
 /**
  * The global namespace
  */
-namespace
-{
+namespace {
 	/**************************************************************************
 	 ** Requirements
 	 **************************************************************************/
@@ -255,12 +254,7 @@ namespace Kisma
 				return false;
 			}
 
-			$_entry = sprintf( '%s %d:[%-30.30s] %s',
-				date( 'M d H:i:s' ),
-				$level,
-				$tag,
-				$logEntry
-			);
+			$_entry = sprintf( '%s %d:[%-30.30s] %s', date( 'M d H:i:s' ), $level, $tag, $logEntry );
 
 			if ( false !== $returnEntry )
 			{
@@ -475,11 +469,8 @@ namespace Kisma
 
 			foreach ( $_libraries as $_libraryPath )
 			{
-				$_realPath = str_replace(
-					'\\',
-					DIRECTORY_SEPARATOR,
-					self::tag( rtrim( \K::getSetting( 'library_path' ), DIRECTORY_SEPARATOR ) )
-				);
+				$_realPath = str_replace( '\\', DIRECTORY_SEPARATOR,
+					self::tag( rtrim( \K::getSetting( 'library_path' ), DIRECTORY_SEPARATOR ) ) );
 
 				$_realPath .= DIRECTORY_SEPARATOR . rtrim( $_libraryPath, DIRECTORY_SEPARATOR );
 				\set_include_path( \get_include_path() . PATH_SEPARATOR . $_realPath );
@@ -509,6 +500,7 @@ namespace Kisma
 		 */
 		public static function sins( &$options = array(), $key, $value = null )
 		{
+			//	Accept an array as input or single KVP
 			if ( !is_array( $key ) )
 			{
 				$key = array( $key => $value );
@@ -516,20 +508,30 @@ namespace Kisma
 
 			foreach ( $key as $_key => $_value )
 			{
+				$_key = \K::tag( $_key, true );
+
 				//	If the key is set, we bail...
-				if ( is_array( $options ) && !isset( $options[$_key] ) )
+				if ( is_array( $options ) )
 				{
+					if ( isset( $options[$_key] ) )
+					{
+						return false;
+					}
+
 					$options[$_key] = $_value;
 					return true;
 				}
 
-				if ( is_object( $options ) && !isset( $options->{$_key} ) )
+				if ( is_object( $options ) )
 				{
+					if ( isset( $options->{$_key} ) )
+					{
+						return false;
+					}
+
 					$options->{$_key} = $_value;
 					return true;
 				}
-
-				//	Not set or goofy object
 			}
 
 			//	Sorry charlie...
@@ -564,13 +566,8 @@ namespace Kisma
 				}
 			}
 
-			$_class =
-				__DIR__ .
-					DIRECTORY_SEPARATOR .
-					trim(
-						str_replace( '\\', DIRECTORY_SEPARATOR, Kisma::tag( $_root ) ),
-						DIRECTORY_SEPARATOR
-					);
+			$_class = __DIR__ . DIRECTORY_SEPARATOR . trim( str_replace( '\\', DIRECTORY_SEPARATOR,
+				Kisma::tag( $_root ) ), DIRECTORY_SEPARATOR );
 
 			//	Do we have it already?
 			if ( class_exists( $_class . '.php', false ) || interface_exists( $_class . '.php', false ) )
@@ -617,19 +614,12 @@ namespace Kisma
 
 			if ( isset( $_SESSION['db_options'] ) )
 			{
-				$_options = array_merge(
-					$_SESSION['db_options'],
-					$_options
-				);
+				$_options = array_merge( $_SESSION['db_options'], $_options );
 			}
 
 			$_SESSION['db_options'] = $_options;
 
-			\K::so(
-				$_SESSION,
-				'db',
-				$_db = \K::createComponent( \KismaSettings::CouchDbClass, $_options )
-			);
+			\K::so( $_SESSION, 'db', $_db = \K::createComponent( \KismaSettings::CouchDbClass, $_options ) );
 		}
 
 		//*************************************************************************
@@ -808,19 +798,8 @@ namespace Kisma
 		 */
 		public static function oo( &$options = array(), $key, $subKey, $defaultValue = null, $unsetValue = false, $noTag = false )
 		{
-			return self::o(
-				self::o(
-					$options,
-					$key,
-					array(),
-					false,
-					$noTag
-				),
-				$subKey,
-				$defaultValue,
-				$unsetValue,
-				$noTag
-			);
+			return self::o( self::o( $options, $key, array(), false, $noTag ), $subKey, $defaultValue, $unsetValue,
+				$noTag );
 		}
 
 		/**
@@ -1083,21 +1062,10 @@ namespace Kisma
 		{
 			$_key = self::tag( $name, true );
 
-			return
-				is_array( $map ) && isset( $map[$_key] )
-					?
-					(
-					false !== $returnObject
-						?
-						//	Return the component
-						$map[$_key]
-						:
-						//	Return the key
-						$_key
-					)
-					:
-					//	Not found
-					false;
+			return is_array( $map ) && isset( $map[$_key] ) ? ( false !== $returnObject ? //	Return the component
+				$map[$_key] : //	Return the key
+				$_key ) : //	Not found
+				false;
 		}
 
 		/**
@@ -1113,10 +1081,7 @@ namespace Kisma
 
 			if ( null === $_extensions )
 			{
-				$_extensions = array_map(
-					'trim',
-					explode( ',', spl_autoload_extensions() )
-				);
+				$_extensions = array_map( 'trim', explode( ',', spl_autoload_extensions() ) );
 			}
 
 			if ( null === $_paths )
@@ -1125,10 +1090,7 @@ namespace Kisma
 			}
 
 			//	Build the class name
-			$_class = trim(
-				str_replace( '\\', DIRECTORY_SEPARATOR, self::tag( $className ) ),
-				DIRECTORY_SEPARATOR
-			);
+			$_class = trim( str_replace( '\\', DIRECTORY_SEPARATOR, self::tag( $className ) ), DIRECTORY_SEPARATOR );
 
 			//	Are we aware of this class?
 			if ( class_exists( $_class, false ) || interface_exists( $_class, false ) )
@@ -1226,8 +1188,7 @@ namespace Kisma
 /**
  * A global alias of Kisma called "K"
  */
-namespace
-{
+namespace {
 	//*************************************************************************
 	//* Classes
 	//*************************************************************************
