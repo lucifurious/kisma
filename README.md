@@ -9,18 +9,19 @@ These are the design goals of Kisma. My main design goal is consistency. Too man
 
 This framework is NOT designed for ultra-fast performance. While the code is, for the most part, stream-lined and fast, I'm sure there are areas where it could be improved to make it faster. However, I've focused on readability and consistency over speed. Can you use this framework for your web site? Absolutely. Will it handle thousands of requests per second? No clue.
 
-* Fully leverage PHP namespaces
+* Fully leverage PHP 5.3, its features such as namespaces. In addition prepare for 5.4 and beyond with fresh code, embracing the DRY KISS.
 * Consistent interface to all objects
-* Completely extensible from the base up
+* Completely extensible from the base up, minimal cohesion and coupling
 * Usable from any other framework
-* Use built-in PHP library calls whenever possible for speed
+* Use built-in PHP library calls whenever possible for speed.
 
 Features
 ========
 
 * Quicker to code repetitive tasks
 * All setters return $this for easy chaining
-* Streamlined the entire autoloader sequence to lessen burden on configuration
+* Easy to configure
+* PSR-0 compliant
 
 Notes
 =====
