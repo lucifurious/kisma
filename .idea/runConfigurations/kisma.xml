@@ -1,5 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="kisma" type="PHPUnitRunConfigurationType" factoryName="PHPUnit" scope="XML" config_file="$PROJECT_DIR$/tests/phpunit.xml" path="$PROJECT_DIR$/tests/phpunit.xml">
+    <TestRunner configuration_file="$PROJECT_DIR$/tests/phpunit.xml" file="$PROJECT_DIR$/tests/phpunit.xml" scope="XML" />
     <method />
   </configuration>
 </component>
