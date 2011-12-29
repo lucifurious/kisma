@@ -1,0 +1,3 @@
+[submodule "tests/fig-standards"]
+	path = tests/fig-standards
+	url = git://github.com/lapistano/fig-standards.git

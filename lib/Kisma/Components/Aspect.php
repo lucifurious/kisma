@@ -2,18 +2,17 @@
 /**
  * Kisma(tm) : PHP Nanoframework (http://github.com/Pogostick/kisma/)
  * Copyright 2011, Pogostick, LLC. (http://www.pogostick.com/)
- *
  * Dual licensed under the MIT License and the GNU General Public License (GPL) Version 2.
  * See {@link http://github.com/Pogostick/kisma/licensing/} for complete information.
  *
  * @copyright Copyright 2011, Pogostick, LLC. (http://www.pogostick.com/)
- * @link http://github.com/Pogostick/kisma/ Kisma(tm)
- * @license http://github.com/Pogostick/kisma/licensing/
- * @author Jerry Ablan <kisma@pogostick.com>
- * @category Kisma_Components
- * @package kisma.components
+ * @link	  http://github.com/Pogostick/kisma/ Kisma(tm)
+ * @license   http://github.com/Pogostick/kisma/licensing/
+ * @author	Jerry Ablan <kisma@pogostick.com>
+ * @category  Kisma_Components
+ * @package   kisma.components
  * @namespace \Kisma\Components
- * @since v1.0.0
+ * @since	 v1.0.0
  * @filesource
  */
 
@@ -30,10 +29,9 @@ namespace Kisma\Components
 	 * Aspect
 	 * Aspects allow objects to take on functionality defined in another class.
 	 *
-	 * @TODO Rethink with traits once PHP 5.4 is released/stable/commonplace (i.e. 10 years)
-	 *
+	 * @TODO								   Rethink with traits once PHP 5.4 is released/stable/commonplace (i.e. 10 years)
 	 * @property string $eventHandlerSignature The prefix of a method indicating it is an event handler
-	 * @property array $eventMap A map of event names to handlers provided by this aspect.
+	 * @property array $eventMap			   A map of event names to handlers provided by this aspect.
 	 * @property-read \Kisma\Components\Component $linker
 	 * @property-read string $aspectName
 	 */
@@ -81,6 +79,7 @@ namespace Kisma\Components
 		 * Link to a parent component
 		 *
 		 * @param \Kisma\Components\Component $linker
+		 *
 		 * @return \Kisma\Components\Aspect
 		 */
 		public function link( Component $linker )
@@ -99,6 +98,7 @@ namespace Kisma\Components
 		 * Unlinks the aspect from a $linker
 		 *
 		 * @param \Kisma\Components\Component $linker
+		 *
 		 * @return \Kisma\Components\Aspect
 		 */
 		public function unlink( Component $linker )
@@ -121,6 +121,7 @@ namespace Kisma\Components
 		 * This merely builds the hash, nothing is done with it.
 		 *
 		 * @param bool $appendToList
+		 *
 		 * @return array
 		 */
 		protected function _findEventHandlers( $appendToList = false )
@@ -133,13 +134,10 @@ namespace Kisma\Components
 				$_ignores = $this->getOption( \KismaOptions::IgnoreEvents, array() );
 
 				//	Clean up the ignore list
-				array_walk(
-					$_ignores,
-					function( &$ignore )
-					{
-						$ignore = \K::tag( $ignore );
-					}
-				);
+				array_walk( $_ignores, function( &$ignore )
+				{
+					$ignore = \K::tag( $ignore );
+				} );
 
 				//	If we're appending to the list, then don't erase prior data
 				if ( false === $appendToList )
@@ -160,8 +158,7 @@ namespace Kisma\Components
 
 						//	Map the callback to the key
 						$this->_eventMap[$_eventKey] = array(
-							$this->_linker,
-							$_realMethodName
+							$this->_linker, $_realMethodName
 						);
 					}
 				}
@@ -185,6 +182,7 @@ namespace Kisma\Components
 
 		/**
 		 * @param \Kisma\Components\Component $linker
+		 *
 		 * @return \Kisma\Components\Aspect
 		 */
 		public function setLinker( $linker )
@@ -195,6 +193,7 @@ namespace Kisma\Components
 
 		/**
 		 * @param string $eventHandlerSignature
+		 *
 		 * @return \Kisma\Components\Aspect
 		 */
 		public function setEventHandlerSignature( $eventHandlerSignature = 'on' )
@@ -213,6 +212,7 @@ namespace Kisma\Components
 
 		/**
 		 * @param array $eventMap
+		 *
 		 * @return \Kisma\Components\Aspect
 		 */
 		public function setEventMap( $eventMap = array() )

@@ -150,7 +150,7 @@ namespace Kisma\Aspects\Reactors
 		 * @param string $eventClass
 		 * @return \Kisma\Components\Event|false
 		 */
-		public function create( $eventName, $linker, $eventData = null, $eventClass = \KismaSettings::DefaultEventClass )
+		public function create( $eventName, $linker, $eventData = null, $eventClass = \AppConfig::DefaultEventClass )
 		{
 			$_eventKey = \K::tag( $eventName, true );
 
@@ -166,8 +166,8 @@ namespace Kisma\Aspects\Reactors
 
 		/**
 		 * @param mixed|null $eventData
-		 * @param #P#C\KismaSettings.DefaultEventClass|? $eventClass
-		 * @internal param $ #P#C\KismaSettings.DefaultEventClass|\Kisma\Aspects\Reactors\KismaSettings|string|? $eventClass
+		 * @param #P#C\AppConfig.DefaultEventClass|? $eventClass
+		 * @internal param $ #P#C\AppConfig.DefaultEventClass|\Kisma\Aspects\Reactors\AppConfig|string|? $eventClass
 		 * @return
 		 */
 
@@ -178,7 +178,7 @@ namespace Kisma\Aspects\Reactors
 		 * @param string $eventClass
 		 * @return \Kisma\Components\Event
 		 */
-		public function bind( $eventName, $callback, $eventData = null, $eventClass = \KismaSettings::DefaultEventClass )
+		public function bind( $eventName, $callback, $eventData = null, $eventClass = \Kisma\AppConfig::DefaultEventClass )
 		{
 			$_eventKey = \K::tag( $eventName, true );
 

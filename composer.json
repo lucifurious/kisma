@@ -1,0 +1,30 @@
+{
+	name        : "Pogostick/Kisma",
+	description : "PHP Nanoframework",
+	keywords    :
+		[
+			"php framework rest psr-0 5.3"
+		],
+	homepage    : "https://github.com/Pogostick/Kisma",
+	type        : "library",
+	license     : "MIT",
+	authors     :
+		[
+			{
+				name     : "Jerry Ablan",
+				email    : "kisma@pogostick.com",
+				homepage : "http://pogostick.com/"
+			}
+		],
+	require     : {
+		php : ">=5.3.0"
+	},
+	suggest     : {
+		ext-curl: "*"
+},
+autoload: {
+psr-0: {
+Kisma: "lib/"
+}
+}
+}

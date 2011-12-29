@@ -2,5 +2,6 @@ doc/
 original/
 .work/
 vendors/redbean
-vendors/sag
+yii-read-only/
+.idea/
 
