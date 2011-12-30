@@ -33,6 +33,19 @@ class KismaTest extends TestCase
 				),
 			)
 		);
+
+		$this->object->register(
+			new Provider\CouchDbQueueServiceProvider(),
+			array(
+				'couchdb.queue.options' =>
+				'couchdb.options' => array(
+					'dbname' => '_users',
+					'host' => 'teledini.gna.me',
+					'user' => 'sinker',
+					'password' => 'sinker',
+				),
+			)
+		);
 	}
 
 	/**

@@ -22,7 +22,7 @@ namespace Kisma\Provider
 	 * CouchDbQueueServiceProvider
 	 * A provider that wraps the CouchDbClient library for working with a CouchDb instance
 	 */
-	class CouchDbQueueServiceProvider extends CouchDbQueueServiceProvider
+	class CouchDbQueueServiceProvider extends CouchDbServiceProvider
 	{
 		/**
 		 * Registers the service with Silex
@@ -33,13 +33,9 @@ namespace Kisma\Provider
 		{
 			parent::register( $app );
 
-			$app['couchdb.queues'] = $app->share( function() use( $app )
+			$app['couchdb.queue'] = $app->share( function() use( $app )
 			{
-				$_queues = isset( $app['couchdb.queues'] ) ? $app['couchdb.queues'] : array();
-
-
-
-				return $_queues;
+				return $app->register( new CouchDbQueueServiceProvider(), $_options );
 			} );
 		}
 	}
