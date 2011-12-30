@@ -40,7 +40,7 @@ namespace Kisma\Provider
 	 * ConfigurationServiceProvider
 	 * An encapsulated options container
 	 */
-	class AppConfigServiceProvider extends \Kisma\Components\ServiceProvider implements \Serializable, \ArrayAccess
+	class OptionsServiceProvider extends \Kisma\Components\ServiceProvider implements \Serializable, \ArrayAccess
 	{
 		//*************************************************************************
 		//* Constants 

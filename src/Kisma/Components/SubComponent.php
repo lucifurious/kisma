@@ -59,38 +59,17 @@ abstract class SubComponent extends \Pimple implements \Kisma\IKisma, \Kisma\ICo
 	/**
 	 * The base component constructor
 	 *
-	 * @param array $options
+	 * @param \stdClass|array|\Kisma\Components\SubComponent $options
 	 *
 	 * @return \Kisma\Components\SubComponent
 	 */
 	public function __construct( $options = array() )
 	{
-		//	Catch null input...
-		if ( null === $options || !is_array( $options ) || empty( $options ) )
-		{
-			$options = array();
-		}
-		else
-		{
-			$options = K::cleanOptions( $options );
-		}
+		parent::__construct();
 
-		//	Merge the options...
-		$this['options'] = array_merge( $this['options'], $options );
-
-		//	Loop through, set...
-		foreach ( $this['options'] as $_key => $_value )
+		foreach ( $options as $_key => $_value )
 		{
-			try
-			{
-				K::__property( $this, $_key, \Kisma\AccessorMode::Set, $_value );
-				unset( $this['options'][$_key] );
-			}
-			catch ( \Kisma\UndefinedPropertyException $_ex )
-			{
-				//	Undefined, add to options...
-				// $_options[$_key] = $_value;
-			}
+			$this[$_key] = $_value;
 		}
 	}
 

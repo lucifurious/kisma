@@ -97,6 +97,8 @@ class Kisma extends \Silex\Application
 	{
 		parent::__construct();
 
+		$this['base_path'] = __DIR__ . '/..';
+
 		//	Add our event handler
 		$this[self::Dispatcher]->addSubscriber( new ApplicationListener() );
 

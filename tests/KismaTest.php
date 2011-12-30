@@ -21,6 +21,18 @@ class KismaTest extends TestCase
 	protected function setUp()
 	{
 		$this->object = new Kisma();
+
+		$this->object->register(
+			new Provider\CouchDbServiceProvider(),
+			array(
+				'couchdb.options' => array(
+					'dbname' => '_users',
+					'host' => 'teledini.gna.me',
+					'user' => 'sinker',
+					'password' => 'sinker',
+				),
+			)
+		);
 	}
 
 	/**
@@ -31,95 +43,89 @@ class KismaTest extends TestCase
 	{
 	}
 
-	/**
-	 * @covers {className}::{origMethodName}
-	 * @todo Implement testInitialize().
-	 */
 	public function testInitialize()
 	{
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete( 'This test has not been implemented yet.' );
+		$_databases = $this->object['couchdb.client']->allDocs();
+		$this->assertNull( $_databases, 'All databases returned null: ' . print_r( $_databases, true ) );
 	}
 
-	/**
-	 * @covers {className}::{origMethodName}
-	 * @todo Implement testTerminate().
-	 */
-	public function testTerminate()
-	{
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete( 'This test has not been implemented yet.' );
-	}
-
-	/**
-	 * @covers {className}::{origMethodName}
-	 * @todo Implement testGetOption().
-	 */
-	public function testGetOption()
-	{
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete( 'This test has not been implemented yet.' );
-	}
-
-	/**
-	 * @covers {className}::{origMethodName}
-	 * @todo Implement testO().
-	 */
-	public function testO()
-	{
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete( 'This test has not been implemented yet.' );
-	}
-
-	/**
-	 * @covers {className}::{origMethodName}
-	 * @todo Implement testOo().
-	 */
-	public function testOo()
-	{
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete( 'This test has not been implemented yet.' );
-	}
-
-	/**
-	 * @covers {className}::{origMethodName}
-	 * @todo Implement testSetOption().
-	 */
-	public function testSetOption()
-	{
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete( 'This test has not been implemented yet.' );
-	}
-
-	/**
-	 * @covers {className}::{origMethodName}
-	 * @todo Implement testSo().
-	 */
-	public function testSo()
-	{
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete( 'This test has not been implemented yet.' );
-	}
-
-	/**
-	 * @covers {className}::{origMethodName}
-	 * @todo Implement testUnsetOption().
-	 */
-	public function testUnsetOption()
-	{
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete( 'This test has not been implemented yet.' );
-	}
-
-	/**
-	 * @covers {className}::{origMethodName}
-	 * @todo Implement testUo().
-	 */
-	public function testUo()
-	{
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete( 'This test has not been implemented yet.' );
-	}
+//	/**
+//	 * @covers {className}::{origMethodName}
+//	 * @todo Implement testTerminate().
+//	 */
+//	public function testTerminate()
+//	{
+//		// Remove the following lines when you implement this test.
+//		$this->markTestSkipped( 'This test has not been implemented yet.' );
+//	}
+//
+//	/**
+//	 * @covers {className}::{origMethodName}
+//	 * @todo Implement testGetOption().
+//	 */
+//	public function testGetOption()
+//	{
+//		// Remove the following lines when you implement this test.
+//		$this->markTestSkipped( 'This test has not been implemented yet.' );
+//	}
+//
+//	/**
+//	 * @covers {className}::{origMethodName}
+//	 * @todo Implement testO().
+//	 */
+//	public function testO()
+//	{
+//		// Remove the following lines when you implement this test.
+//		$this->markTestSkipped( 'This test has not been implemented yet.' );
+//	}
+//
+//	/**
+//	 * @covers {className}::{origMethodName}
+//	 * @todo Implement testOo().
+//	 */
+//	public function testOo()
+//	{
+//		// Remove the following lines when you implement this test.
+//		$this->markTestSkipped( 'This test has not been implemented yet.' );
+//	}
+//
+//	/**
+//	 * @covers {className}::{origMethodName}
+//	 * @todo Implement testSetOption().
+//	 */
+//	public function testSetOption()
+//	{
+//		// Remove the following lines when you implement this test.
+//		$this->markTestSkipped( 'This test has not been implemented yet.' );
+//	}
+//
+//	/**
+//	 * @covers {className}::{origMethodName}
+//	 * @todo Implement testSo().
+//	 */
+//	public function testSo()
+//	{
+//		// Remove the following lines when you implement this test.
+//		$this->markTestSkipped( 'This test has not been implemented yet.' );
+//	}
+//
+//	/**
+//	 * @covers {className}::{origMethodName}
+//	 * @todo Implement testUnsetOption().
+//	 */
+//	public function testUnsetOption()
+//	{
+//		// Remove the following lines when you implement this test.
+//		$this->markTestSkipped( 'This test has not been implemented yet.' );
+//	}
+//
+//	/**
+//	 * @covers {className}::{origMethodName}
+//	 * @todo Implement testUo().
+//	 */
+//	public function testUo()
+//	{
+//		// Remove the following lines when you implement this test.
+//		$this->markTestSkipped( 'This test has not been implemented yet.' );
+//	}
 }
-
-?>

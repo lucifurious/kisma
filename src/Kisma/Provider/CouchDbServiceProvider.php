@@ -22,140 +22,168 @@ namespace Kisma\Provider
 	//* Aliases
 	//*************************************************************************
 
-	/**
-	 * Kisma Aliases
-	 */
-	use Kisma\Components as Components;
-	use Kisma\Aspects as Aspects;
+	use Silex\ServiceProviderInterface;
+	use Doctrine\CouchDB\CouchDBClient;
+	use Doctrine\ODM\CouchDB\Configuration;
+	use Doctrine\ODM\CouchDB\DocumentManager;
+	use Doctrine\Common\EventManager;
 
 	//*************************************************************************
 	//* Requirements
 	//*************************************************************************
 
 	/**
-	 * CouchDb
-	 * An aspect that wraps the CouchDbClient library for working with a CouchDb instance
-	 *
-	 * @property \Kisma\Utility\CouchDbClient $db
-	 * @property string $designDocumentName Defaults to '_design/document'
+	 * CouchDbServiceProvider
+	 * A provider that wraps the CouchDbClient library for working with a CouchDb instance
 	 */
-	class CouchDbServiceProvider extends \Kisma\Components\ServiceProvider
+	class CouchDbServiceProvider implements ServiceProviderInterface
 	{
-		//*************************************************************************
-		//* Private Members
-		//*************************************************************************
-
-		/**
-		 * @var \Kisma\Utility\CouchDbClient
-		 */
-		protected $_db = null;
-
-		//*************************************************************************
-		//* Public Methods
-		//*************************************************************************
-
 		/**
 		 * Registers the service with Silex
 		 *
-		 * @param \Kisma\Kisma $app
+		 * @param \Silex\Application $app
 		 */
-		public function register( \Kisma\Kisma $app )
+		public function register( \Silex\Application $app )
 		{
-			$app['db.couch'] = $app->share( function() use ( $app )
+			//	Set the default options
+			$app['couchdb.default_options'] = array(
+				'dbname' => null,
+				'host' => 'localhost',
+				'port' => 5984,
+				'user' => null,
+				'password' => null,
+				'logging' => false,
+			);
+
+			//	Register our paths
+			$app['couchdb.common.class_path'] = $app['base_path'] . '/vendor/doctrine-common/lib';
+
+			$app['autoloader']->registerNamespaces(
+				array(
+					'Doctrine\\CouchDB' => $app['base_path'] . '/vendor/couchdb_odm/lib',
+					'Doctrine\\ODM' => $app['base_path'] . '/vendor/couchdb_odm/lib',
+				)
+			);
+
+			$app['couchdbs.options.initializer'] = $app->protect( function () use ( $app )
 			{
-				return new self( $app['db.config'] );
-			} );
-		}
+				static $_initialized = false;
 
-		/**
-		 * @param array $options
-		 */
-		public function __construct( $options = array() )
-		{
-			//	Call poppa
-			parent::__construct( $options );
-
-			if ( null === $this->_db )
-			{
-				$this->_db = new \Kisma\Utility\CouchDbClient( $options );
-			}
-		}
-
-		/**
-		 * @param string	 $url
-		 * @param array|null $options
-		 * @param bool	   $raw
-		 *
-		 * @return mixed|bool
-		 */
-		public function get( $url, $options = array(), $raw = false )
-		{
-			if ( false === ( $_result = $this->_db->get( $url, $options ) ) || !\K::in( $_result->status, 404, 200 ) )
-			{
-				//	Ruh-roh
-				throw new \Kisma\CouchDbException( 'Unexpected CouchDb response: ' . var_export( $_result,
-					true ), $_result->status );
-			}
-
-			//  Not an array and not an object or raw request? Send back nekkid
-			if ( false !== $raw || ( !is_array( $_result ) && !is_object( $_result ) ) )
-			{
-				return $_result;
-			}
-
-			//	Arrays go back as arrays of Document
-			if ( is_array( $_result ) && !is_object( $_result ) )
-			{
-				$_documents = array();
-
-				foreach ( $_result as $_document )
+				if ( $_initialized )
 				{
-					$_documents[] = new \Kisma\Components\Document( array(
-						'document' => $_document,
-					) );
-
-					unset( $_document );
+					return;
 				}
 
-				unset( $_result );
+				$_initialized = true;
 
-				return $_documents;
-			}
+				if ( !isset( $app['couchdbs.options'] ) )
+				{
+					$app['couchdbs.options'] = array( 'default' => isset( $app['couchdb.options'] ) ? $app['couchdb.options'] : array() );
+				}
 
-			//  Single document
-			if ( is_object( $_result ) )
+				$_couchOptions = $app['couchdbs.options'];
+
+				foreach ( $_couchOptions as $_name => &$_options )
+				{
+					$_options = array_replace( $app['couchdb.default_options'], $_options );
+
+					if ( !isset( $app['couchdbs.default'] ) )
+					{
+						$app['couchdbs.default'] = $_name;
+					}
+				}
+				$app['couchdbs.options'] = $_couchOptions;
+			} );
+
+			$app['couchdbs'] = $app->share( function () use ( $app )
 			{
-				return new \Kisma\Components\Document( array( 'document' => $_result ) );
+				$app['couchdbs.options.initializer']();
+
+				$_dbs = new \Pimple();
+				foreach ( $app['couchdbs.options'] as $_name => $_options )
+				{
+					if ( $_name === $app['couchdbs.default'] )
+					{
+						// we use shortcuts here in case the default has been overriden
+						$_config = $app['couchdb.config'];
+						$_manager = $app['couchdb.event_manager'];
+					}
+					else
+					{
+						$_config = $app['couchdbs.config'][$_name];
+						$_manager = $app['couchdbs.event_manager'][$_name];
+					}
+
+					$_dbs[$_name] = DocumentManager::create( $_options, $_config, $_manager );
+				}
+
+				return $_dbs;
+			} );
+
+			$app['couchdbs.config'] = $app->share( function () use ( $app )
+			{
+				$app['couchdbs.options.initializer']();
+
+				$_configs = new \Pimple();
+				foreach ( $app['couchdbs.options'] as $_name => $_options )
+				{
+					$_configs[$_name] = new Configuration();
+				}
+
+				return $_configs;
+			} );
+
+			$app['couchdbs.event_manager'] = $app->share( function () use ( $app )
+			{
+				$app['couchdbs.options.initializer']();
+
+				$_managers = new \Pimple();
+				foreach ( $app['couchdbs.options'] as $_name => $_options )
+				{
+					$_managers[$_name] = new EventManager();
+				}
+
+				return $_managers;
+			} );
+
+			// shortcuts for the "first" DB
+			$app['couchdb'] = $app->share( function() use ( $app )
+			{
+				$_dbs = $app['couchdbs'];
+
+				return $_dbs[$app['couchdbs.default']];
+			} );
+
+			//	Shortcut to client
+			$app['couchdb.client'] = $app->share( function() use( $app )
+			{
+				return $app['couchdb']->getCouchDBClient();
+			} );
+
+			//	Shortcut to dbname
+			$app['couchdb.client'] = $app->share( function() use( $app )
+			{
+				return $app['couchdb']->getCouchDBClient();
+			} );
+
+			$app['couchdb.config'] = $app->share( function() use ( $app )
+			{
+				$_dbs = $app['couchdbs.config'];
+
+				return $_dbs[$app['couchdbs.default']];
+			} );
+
+			$app['couchdb.event_manager'] = $app->share( function() use ( $app )
+			{
+				$_dbs = $app['couchdbs.event_manager'];
+
+				return $_dbs[$app['couchdbs.default']];
+			} );
+
+			if ( isset( $app['couchdb.common.class_path'] ) )
+			{
+				$app['autoloader']->registerNamespace( 'Doctrine\\Common', $app['couchdb.common.class_path'] );
 			}
 		}
-
-		//*************************************************************************
-		//* Default/Magic Methods
-		//*************************************************************************
-
-		/**
-		 * Allow calling methods in our CouchDb client directly
-		 *
-		 * @throws \BadMethodCallException
-		 *
-		 * @param string $method
-		 * @param array  $arguments
-		 *
-		 * @return mixed
-		 */
-		public function __call( $method, $arguments )
-		{
-			//	CouchDbClient pass-through...
-			if ( method_exists( $this->_db, $method ) )
-			{
-				return call_user_func_array( array(
-					$this->_db, $method
-				), $arguments );
-			}
-
-			//	No worky
-			throw new \BadMethodCallException( __CLASS__ . '::' . $method . ' is undefined.' );
-		}
-
 	}
 }
