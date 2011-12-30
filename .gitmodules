@@ -1,8 +1,8 @@
 [submodule "tests/fig-standards"]
 	path = tests/fig-standards
 	url = git://github.com/lapistano/fig-standards.git
-[submodule "vendor/Silex"]
-	path = vendor/Silex
+[submodule "vendor/silex"]
+	path = vendor/silex
 	url = git://github.com/fabpot/Silex.git
 [submodule "vendor/couchdb_odm"]
 	path = vendor/couchdb_odm
