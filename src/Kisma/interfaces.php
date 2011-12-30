@@ -119,7 +119,7 @@ interface IObservable extends IKisma
 	 *
 	 * @return integer
 	 */
-	public function getLogging();
+//	public function getLogging();
 
 	/**
 	 * Sets the debug level
@@ -129,7 +129,7 @@ interface IObservable extends IKisma
 	 * @internal param $ #P#C\kisma\interfaces\IObservable.DEVELOPMENT|int|? $value
 	 * @return integer The previous value
 	 */
-	public function setLogging( $logging );
+//	public function setLogging( $logging );
 }
 
 /**
@@ -149,13 +149,13 @@ interface IAspectable extends IObservable
 	 *
 	 * @return false|string
 	 */
-	public function hasAspect( $aspectName, $returnAspect = false );
+//	public function hasAspect( $aspectName, $returnAspect = false );
 
 	/**
 	 * @abstract
 	 * @return \Kisma\IAspect[]|array
 	 */
-	public function getAspects();
+//	public function getAspects();
 
 	/**
 	 * @abstract
@@ -164,7 +164,7 @@ interface IAspectable extends IObservable
 	 *
 	 * @return \Kisma\IAspect[]|array
 	 */
-	public function setAspects( $value );
+//	public function setAspects( $value );
 }
 
 /**
@@ -177,7 +177,7 @@ interface IOptions extends IKisma
 	 *
 	 * @return array
 	 */
-	public function getOptions();
+//	public function getOptions();
 
 	/**
 	 * Sets an array of options at once
@@ -186,14 +186,14 @@ interface IOptions extends IKisma
 	 *
 	 * @return \Kisma\IOptions
 	 */
-	public function setOptions( $options = array() );
+//	public function setOptions( $options = array() );
 
 }
 
 /**
  * Defines an object that has static options
  */
-interface ISettings extends IKisma
+interface IAppSettings extends IKisma
 {
 	/**
 	 * Gets a Kisma setting
@@ -203,7 +203,7 @@ interface ISettings extends IKisma
 	 *
 	 * @return array
 	 */
-	public static function getSetting( $name, $defaultValue = null );
+//	public static function appSetting( $name, $defaultValue = null );
 
 }
 
@@ -220,7 +220,7 @@ interface IConfigurable extends IOptions
 	 *
 	 * @return array
 	 */
-	public function getOption( $name, $defaultValue = null );
+//	public function getOption( $name, $defaultValue = null );
 
 	/**
 	 * Sets a single option
@@ -230,7 +230,7 @@ interface IConfigurable extends IOptions
 	 *
 	 * @return mixed
 	 */
-	public function setOption( $name, $value = null );
+//	public function setOption( $name, $value = null );
 }
 
 /**

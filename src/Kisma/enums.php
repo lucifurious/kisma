@@ -50,6 +50,9 @@ namespace Kisma
 	//*	Enums
 	//*************************************************************************
 
+	/**
+	 * Various pre-defined application access levels
+	 */
 	class AccessLevel extends \Kisma\KismaEnum
 	{
 		//*************************************************************************
@@ -70,6 +73,7 @@ namespace Kisma
 	}
 
 	/**
+	 * Property constants
 	 */
 	class AccessorMode extends \Kisma\KismaEnum
 	{
@@ -91,11 +95,11 @@ namespace Kisma
 		 */
 		const Undefined = 1000;
 		const WriteOnly = 1001;
-		const ReadOnly = 100e2;
+		const ReadOnly = 1002;
 	}
 
 	/**
-	 * The various predefined actions that can be used on an xlForm
+	 * The various predefined actions that can be used on a form
 	 */
 	class ActionButton extends \Kisma\KismaEnum
 	{
