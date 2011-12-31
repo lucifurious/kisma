@@ -22,7 +22,7 @@ namespace Kisma\Provider
 	 * CouchDbQueueServiceProvider
 	 * A provider that wraps the CouchDbClient library for working with a CouchDb instance
 	 */
-	class CouchDbQueueServiceProvider extends CouchDbServiceProvider
+	class CouchDbQueueServiceProvider implements \Silex\ServiceProviderInterface
 	{
 		/**
 		 * Registers the service with Silex
@@ -31,11 +31,19 @@ namespace Kisma\Provider
 		 */
 		public function register( \Silex\Application $app )
 		{
-			parent::register( $app );
-
-			$app['couchdb.queue'] = $app->share( function() use( $app )
+			$app['couchdb.queues'] = $app->share( function() use( $app )
 			{
-				return $app->register( new CouchDbQueueServiceProvider(), $_options );
+				$_queues = K::o( $app, 'couchdb.queues', array() );
+				$_options = K::o( $app, 'couchdb.options', array() );
+				$_queueNames = K::o( $app, 'couchdb.options.queues', array() );
+
+				foreach ( $_queueNames as $_name )
+				{
+					$_options['dbname'] = $_name;
+					$_queues[$_name] = $app->register( new CouchDbServiceProvider(), $_options );
+				}
+
+				return $_queues;
 			} );
 		}
 	}

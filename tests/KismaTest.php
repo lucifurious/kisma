@@ -37,12 +37,21 @@ class KismaTest extends TestCase
 		$this->object->register(
 			new Provider\CouchDbQueueServiceProvider(),
 			array(
-				'couchdb.queue.options' =>
 				'couchdb.options' => array(
-					'dbname' => '_users',
 					'host' => 'teledini.gna.me',
 					'user' => 'sinker',
 					'password' => 'sinker',
+				),
+
+				'couchdb.options.queues' => array(
+					'feed_google_inbound',
+					'feed_google_outbound',
+					'feed_yahoo_inbound',
+					'feed_yahoo_inbound',
+					'feed_facebook_inbound',
+					'feed_plaxo_inbound',
+					'feed_plaxo_outbound',
+					'feed_linkedin_inbound',
 				),
 			)
 		);
