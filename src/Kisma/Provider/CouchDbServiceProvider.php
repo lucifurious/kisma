@@ -38,6 +38,43 @@ namespace Kisma\Provider
 	 */
 	class CouchDbServiceProvider implements ServiceProviderInterface
 	{
+		//*************************************************************************
+		//* Constants
+		//*************************************************************************
+
+		/**
+		 * @var string Our options prefix
+		 */
+		const Options_Prefix = 'couchdb';
+		/**
+		 * @var string Our group options prefix
+		 */
+		const Options_GroupPrefix = 'couchdbs';
+		/**
+		 * @var string Our group options prefix
+		 */
+		const GroupOptions = 'couchdbs.options';
+		/**
+		 * @var string The name of our options element
+		 */
+		const Options = 'couchdb.options';
+		/**
+		 * @var string The name of our options element
+		 */
+		const DefaultOptions = 'couchdb.default_options';
+		/**
+		 * @var string The name of our group options default
+		 */
+		const DefaultGroupOptions = 'couchdbs.default';
+		/**
+		 * @var string The name of our initializer method
+		 */
+		const ServiceInitializer = 'couchdbs.options.initializer';
+
+		//*************************************************************************
+		//* Public Methods
+		//*************************************************************************
+
 		/**
 		 * Registers the service with Silex
 		 *
@@ -45,27 +82,10 @@ namespace Kisma\Provider
 		 */
 		public function register( \Silex\Application $app )
 		{
-			//	Set the default options
-			$app['couchdb.default_options'] = array(
-				'dbname' => null,
-				'host' => 'localhost',
-				'port' => 5984,
-				'user' => null,
-				'password' => null,
-				'logging' => false,
-			);
-
-			//	Register our paths
-			$app['couchdb.common.class_path'] = $app['base_path'] . '/vendor/doctrine-common/lib';
-
-			$app['autoloader']->registerNamespaces(
-				array(
-					'Doctrine\\CouchDB' => $app['base_path'] . '/vendor/couchdb_odm/lib',
-					'Doctrine\\ODM' => $app['base_path'] . '/vendor/couchdb_odm/lib',
-				)
-			);
-
-			$app['couchdbs.options.initializer'] = $app->protect( function () use ( $app )
+			/**
+			 * Service Initializer
+			 */
+			$app[CouchDbServiceProvider::ServiceInitializer] = $app->protect( function () use ( $app )
 			{
 				static $_initialized = false;
 
@@ -76,42 +96,63 @@ namespace Kisma\Provider
 
 				$_initialized = true;
 
-				if ( !isset( $app['couchdbs.options'] ) )
+				//	Set the default options
+				$app[CouchDbServiceProvider::DefaultOptions] = array(
+					'dbname' => null,
+					'host' => 'localhost',
+					'port' => 5984,
+					'user' => null,
+					'password' => null,
+					'logging' => false,
+				);
+
+				//	Register our paths
+				$app['autoloader']->registerNamespaces( array(
+						'Doctrine\\Common' => $app['base_path'] . '/vendor/doctrine-common/lib',
+						'Doctrine\\CouchDB' => $app['base_path'] . '/vendor/couchdb_odm/lib',
+						'Doctrine\\ODM' => $app['base_path'] . '/vendor/couchdb_odm/lib',
+					) );
+
+				if ( !isset( $app[CouchDbServiceProvider::GroupOptions] ) )
 				{
-					$app['couchdbs.options'] = array( 'default' => isset( $app['couchdb.options'] ) ? $app['couchdb.options'] : array() );
+					$app[CouchDbServiceProvider::GroupOptions] =
+						array(
+							'default' => isset( $app[CouchDbServiceProvider::Options] ) ?
+								$app[CouchDbServiceProvider::Options] : array()
+						);
 				}
 
-				$_couchOptions = $app['couchdbs.options'];
+				$_couchOptions = $app[CouchDbServiceProvider::GroupOptions];
 
 				foreach ( $_couchOptions as $_name => &$_options )
 				{
-					$_options = array_replace( $app['couchdb.default_options'], $_options );
+					$_options = array_replace( $app[CouchDbServiceProvider::DefaultOptions], $_options );
 
-					if ( !isset( $app['couchdbs.default'] ) )
+					if ( !isset( $app[CouchDbServiceProvider::DefaultGroupOptions] ) )
 					{
-						$app['couchdbs.default'] = $_name;
+						$app[CouchDbServiceProvider::DefaultGroupOptions] = $_name;
 					}
 				}
-				$app['couchdbs.options'] = $_couchOptions;
+				$app[CouchDbServiceProvider::GroupOptions] = $_couchOptions;
 			} );
 
-			$app['couchdbs'] = $app->share( function () use ( $app )
+			$app[CouchDbServiceProvider::Options_GroupPrefix] = $app->share( function () use ( $app )
 			{
-				$app['couchdbs.options.initializer']();
+				$app[CouchDbServiceProvider::ServiceInitializer]();
 
 				$_dbs = new \Pimple();
-				foreach ( $app['couchdbs.options'] as $_name => $_options )
+				foreach ( $app[CouchDbServiceProvider::GroupOptions] as $_name => $_options )
 				{
-					if ( $_name === $app['couchdbs.default'] )
+					if ( $_name === $app[CouchDbServiceProvider::DefaultGroupOptions] )
 					{
 						// we use shortcuts here in case the default has been overriden
-						$_config = $app['couchdb.config'];
-						$_manager = $app['couchdb.event_manager'];
+						$_config = $app[CouchDbServiceProvider::Options_Prefix . '.config'];
+						$_manager = $app[CouchDbServiceProvider::Options_Prefix . '.event_manager'];
 					}
 					else
 					{
-						$_config = $app['couchdbs.config'][$_name];
-						$_manager = $app['couchdbs.event_manager'][$_name];
+						$_config = $app[CouchDbServiceProvider::Options_GroupPrefix . '.config'][$_name];
+						$_manager = $app[CouchDbServiceProvider::Options_GroupPrefix . '.event_manager'][$_name];
 					}
 
 					$_dbs[$_name] = DocumentManager::create( $_options, $_config, $_manager );
@@ -120,12 +161,15 @@ namespace Kisma\Provider
 				return $_dbs;
 			} );
 
-			$app['couchdbs.config'] = $app->share( function () use ( $app )
+			/**
+			 * Group configuration
+			 */
+			$app[CouchDbServiceProvider::Options_GroupPrefix . '.config'] = $app->share( function () use ( $app )
 			{
-				$app['couchdbs.options.initializer']();
+				$app[CouchDbServiceProvider::GroupOptions . '.initializer']();
 
 				$_configs = new \Pimple();
-				foreach ( $app['couchdbs.options'] as $_name => $_options )
+				foreach ( $app[CouchDbServiceProvider::GroupOptions] as $_name => $_options )
 				{
 					$_configs[$_name] = new Configuration();
 				}
@@ -133,12 +177,15 @@ namespace Kisma\Provider
 				return $_configs;
 			} );
 
-			$app['couchdbs.event_manager'] = $app->share( function () use ( $app )
+			/**
+			 * Group event manager
+			 */
+			$app[CouchDbServiceProvider::Options_GroupPrefix . '.event_manager'] = $app->share( function () use ( $app )
 			{
-				$app['couchdbs.options.initializer']();
+				$app[CouchDbServiceProvider::ServiceInitializer]();
 
 				$_managers = new \Pimple();
-				foreach ( $app['couchdbs.options'] as $_name => $_options )
+				foreach ( $app[CouchDbServiceProvider::GroupOptions] as $_name => $_options )
 				{
 					$_managers[$_name] = new EventManager();
 				}
@@ -147,43 +194,36 @@ namespace Kisma\Provider
 			} );
 
 			// shortcuts for the "first" DB
-			$app['couchdb'] = $app->share( function() use ( $app )
+			$app[CouchDbServiceProvider::Options_Prefix] = $app->share( function() use ( $app )
 			{
-				$_dbs = $app['couchdbs'];
+				$_dbs = $app[CouchDbServiceProvider::Options_GroupPrefix];
 
-				return $_dbs[$app['couchdbs.default']];
+				return $_dbs[$app[CouchDbServiceProvider::DefaultGroupOptions]];
 			} );
 
 			//	Shortcut to client
 			$app['couchdb.client'] = $app->share( function() use( $app )
 			{
-				return $app['couchdb']->getCouchDBClient();
+				return $app[CouchDbServiceProvider::Options_Prefix]->getCouchDBClient();
 			} );
 
-			//	Shortcut to dbname
-			$app['couchdb.client'] = $app->share( function() use( $app )
-			{
-				return $app['couchdb']->getCouchDBClient();
-			} );
-
+			//	Configuration
 			$app['couchdb.config'] = $app->share( function() use ( $app )
 			{
-				$_dbs = $app['couchdbs.config'];
+				$_dbs = $app[CouchDbServiceProvider::Options_GroupPrefix . '.config'];
 
-				return $_dbs[$app['couchdbs.default']];
+				return $_dbs[$app[CouchDbServiceProvider::DefaultGroupOptions]];
 			} );
 
+			/**
+			 * Single event manager
+			 */
 			$app['couchdb.event_manager'] = $app->share( function() use ( $app )
 			{
 				$_dbs = $app['couchdbs.event_manager'];
 
-				return $_dbs[$app['couchdbs.default']];
+				return $_dbs[$app[CouchDbServiceProvider::DefaultGroupOptions]];
 			} );
-
-			if ( isset( $app['couchdb.common.class_path'] ) )
-			{
-				$app['autoloader']->registerNamespace( 'Doctrine\\Common', $app['couchdb.common.class_path'] );
-			}
 		}
 	}
 }

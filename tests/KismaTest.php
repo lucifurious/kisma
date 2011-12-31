@@ -21,40 +21,6 @@ class KismaTest extends TestCase
 	protected function setUp()
 	{
 		$this->object = new Kisma();
-
-		$this->object->register(
-			new Provider\CouchDbServiceProvider(),
-			array(
-				'couchdb.options' => array(
-					'dbname' => '_users',
-					'host' => 'teledini.gna.me',
-					'user' => 'sinker',
-					'password' => 'sinker',
-				),
-			)
-		);
-
-		$this->object->register(
-			new Provider\CouchDbQueueServiceProvider(),
-			array(
-				'couchdb.options' => array(
-					'host' => 'teledini.gna.me',
-					'user' => 'sinker',
-					'password' => 'sinker',
-				),
-
-				'couchdb.options.queues' => array(
-					'feed_google_inbound',
-					'feed_google_outbound',
-					'feed_yahoo_inbound',
-					'feed_yahoo_inbound',
-					'feed_facebook_inbound',
-					'feed_plaxo_inbound',
-					'feed_plaxo_outbound',
-					'feed_linkedin_inbound',
-				),
-			)
-		);
 	}
 
 	/**
@@ -65,10 +31,23 @@ class KismaTest extends TestCase
 	{
 	}
 
-	public function testInitialize()
+	public function testCouchDbServiceProvider()
 	{
-		$_databases = $this->object['couchdb.client']->allDocs();
-		$this->assertNull( $_databases, 'All databases returned null: ' . print_r( $_databases, true ) );
+		$app = $this->object;
+
+		$app->register( new Provider\CouchDbServiceProvider(), array(
+				Provider\CouchDbServiceProvider::Options => array(
+					'host' => 'teledini.gna.me', 'port' => 5984, 'user' => 'sinker', 'password' => 'sinker',
+				),
+			) );
+
+		$app->register( new Provider\CouchDbQueueServiceProvider(), array(
+				//	The queue name
+				Provider\CouchDbQueueServiceProvider::Option_QueueName => 'test_queue',
+			) );
+
+		$_client = $app[\Kisma\Provider\CouchDbQueueServiceProvider::Queues]['test_queue'];
+		$_result = $_client->createDesignDocument();
 	}
 
 //	/**

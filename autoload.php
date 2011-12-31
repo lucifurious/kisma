@@ -1,7 +1,7 @@
 <?php
 if ( false === class_exists( 'Symfony\Component\ClassLoader\UniversalClassLoader', false ) )
 {
-	require_once __DIR__ . '/vendor/Silex/autoload.php';
+	require_once __DIR__ . '/vendor/silex/autoload.php';
 }
 
 use Symfony\Component\ClassLoader\UniversalClassLoader;

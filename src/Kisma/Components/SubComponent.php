@@ -65,8 +65,6 @@ abstract class SubComponent extends \Pimple implements \Kisma\IKisma, \Kisma\ICo
 	 */
 	public function __construct( $options = array() )
 	{
-		parent::__construct();
-
 		foreach ( $options as $_key => $_value )
 		{
 			$this[$_key] = $_value;
