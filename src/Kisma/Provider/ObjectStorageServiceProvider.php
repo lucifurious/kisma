@@ -67,7 +67,7 @@ namespace Kisma\Provider
 	 * @method setInfo( $data )
 	 * @method \boolean valid()
 	 */
-	class ObjectStorageServiceProvider extends \Kisma\Components\ServiceProvider implements \Countable, \Iterator, \Serializable, \ArrayAccess
+	class ObjectStorageServiceProvider extends \Kisma\Components\SilexServiceProvider implements \Countable, \Iterator, \Serializable, \ArrayAccess
 	{
 		//*************************************************************************
 		//* Private Members

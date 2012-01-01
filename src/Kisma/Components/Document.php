@@ -30,7 +30,7 @@ namespace Kisma\Components;
 	 *
 	 * @property \stdClass $document
 	 */
-	class Document extends Component
+	class Document extends SubComponent
 	{
 		//*************************************************************************
 		//* Private Members 

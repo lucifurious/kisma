@@ -147,7 +147,7 @@ namespace Kisma\Components;
 				{
 					if ( false === $this->_autoSetId )
 					{
-						throw new \Teledini\Exceptions\StorageException( 'Required document field "_id" missing.' );
+						throw new \Kisma\StorageException( 'Required document field "_id" missing.' );
 					}
 
 					$this->_document->_id = $this->_db->get( '//_uuids?count=1' )->body->uuids[0];

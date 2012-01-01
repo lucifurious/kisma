@@ -16,214 +16,208 @@
  * @since		 v1.0.0
  * @filesource
  */
-namespace Kisma\Provider
+namespace Kisma\Provider;
+
+//*************************************************************************
+//* Aliases
+//*************************************************************************
+
+use Kisma\Components as Components;
+use Doctrine\CouchDB\CouchDBClient;
+use Doctrine\ODM\CouchDB\Configuration;
+use Doctrine\ODM\CouchDB\DocumentManager;
+use Doctrine\Common\EventManager;
+
+//*************************************************************************
+//* Requirements
+//*************************************************************************
+
+/**
+ * CouchDbServiceProvider
+ * A provider that wraps the CouchDbClient library for working with a CouchDb instance
+ */
+class CouchDbServiceProvider extends Components\SilexServiceProvider
 {
 	//*************************************************************************
-	//* Aliases
-	//*************************************************************************
-
-	use Silex\ServiceProviderInterface;
-	use Doctrine\CouchDB\CouchDBClient;
-	use Doctrine\ODM\CouchDB\Configuration;
-	use Doctrine\ODM\CouchDB\DocumentManager;
-	use Doctrine\Common\EventManager;
-
-	//*************************************************************************
-	//* Requirements
+	//* Constants
 	//*************************************************************************
 
 	/**
-	 * CouchDbServiceProvider
-	 * A provider that wraps the CouchDbClient library for working with a CouchDb instance
+	 * @var string Our options prefix
 	 */
-	class CouchDbServiceProvider implements ServiceProviderInterface
+	const Options_Prefix = 'couchdb';
+	/**
+	 * @var string Our group options prefix
+	 */
+	const Options_GroupPrefix = 'couchdbs';
+	/**
+	 * @var string Our group options prefix
+	 */
+	const GroupOptions = 'couchdbs.options';
+	/**
+	 * @var string The name of our options element
+	 */
+	const Options = 'couchdb.options';
+	/**
+	 * @var string The name of our options element
+	 */
+	const DefaultOptions = 'couchdb.default_options';
+	/**
+	 * @var string The name of our group options default
+	 */
+	const DefaultGroupOptions = 'couchdbs.default';
+	/**
+	 * @var string The name of our initializer method
+	 */
+	const ServiceInitializer = 'couchdbs.options.initializer';
+
+	//*************************************************************************
+	//* Public Methods
+	//*************************************************************************
+
+	/**
+	 * Registers the service with Silex
+	 *
+	 * @param \Silex\Application $app
+	 */
+	public function register( \Silex\Application $app )
 	{
-		//*************************************************************************
-		//* Constants
-		//*************************************************************************
-
 		/**
-		 * @var string Our options prefix
+		 * Service Initializer
 		 */
-		const Options_Prefix = 'couchdb';
-		/**
-		 * @var string Our group options prefix
-		 */
-		const Options_GroupPrefix = 'couchdbs';
-		/**
-		 * @var string Our group options prefix
-		 */
-		const GroupOptions = 'couchdbs.options';
-		/**
-		 * @var string The name of our options element
-		 */
-		const Options = 'couchdb.options';
-		/**
-		 * @var string The name of our options element
-		 */
-		const DefaultOptions = 'couchdb.default_options';
-		/**
-		 * @var string The name of our group options default
-		 */
-		const DefaultGroupOptions = 'couchdbs.default';
-		/**
-		 * @var string The name of our initializer method
-		 */
-		const ServiceInitializer = 'couchdbs.options.initializer';
-
-		//*************************************************************************
-		//* Public Methods
-		//*************************************************************************
-
-		/**
-		 * Registers the service with Silex
-		 *
-		 * @param \Silex\Application $app
-		 */
-		public function register( \Silex\Application $app )
+		$app[CouchDbServiceProvider::ServiceInitializer] = $app->protect( function () use ( $app )
 		{
-			/**
-			 * Service Initializer
-			 */
-			$app[CouchDbServiceProvider::ServiceInitializer] = $app->protect( function () use ( $app )
+			static $_initialized = false;
+
+			if ( $_initialized )
 			{
-				static $_initialized = false;
+				return;
+			}
 
-				if ( $_initialized )
-				{
-					return;
-				}
+			$_initialized = true;
 
-				$_initialized = true;
+			//	Set the default options
+			$app[CouchDbServiceProvider::DefaultOptions] = array(
+				'dbname' => null,
+				'host' => 'localhost',
+				'port' => 5984,
+				'user' => null,
+				'password' => null,
+				'logging' => false,
+			);
 
-				//	Set the default options
-				$app[CouchDbServiceProvider::DefaultOptions] = array(
-					'dbname' => null,
-					'host' => 'localhost',
-					'port' => 5984,
-					'user' => null,
-					'password' => null,
-					'logging' => false,
+			//	Register our paths
+			$app['autoloader']->registerNamespaces( array(
+				'Doctrine\\Common' => $app['base_path'] . '/vendor/doctrine-common/lib',
+				'Doctrine\\CouchDB' => $app['base_path'] . '/vendor/couchdb_odm/lib',
+				'Doctrine\\ODM' => $app['base_path'] . '/vendor/couchdb_odm/lib',
+			) );
+
+			if ( !isset( $app[CouchDbServiceProvider::GroupOptions] ) )
+			{
+				$app[CouchDbServiceProvider::GroupOptions] = array(
+					'default' => isset( $app[CouchDbServiceProvider::Options] ) ?
+						$app[CouchDbServiceProvider::Options] : array()
 				);
+			}
 
-				//	Register our paths
-				$app['autoloader']->registerNamespaces( array(
-						'Doctrine\\Common' => $app['base_path'] . '/vendor/doctrine-common/lib',
-						'Doctrine\\CouchDB' => $app['base_path'] . '/vendor/couchdb_odm/lib',
-						'Doctrine\\ODM' => $app['base_path'] . '/vendor/couchdb_odm/lib',
-					) );
+			$_couchOptions = $app[CouchDbServiceProvider::GroupOptions];
 
-				if ( !isset( $app[CouchDbServiceProvider::GroupOptions] ) )
+			foreach ( $_couchOptions as $_name => &$_options )
+			{
+				$_options = array_replace( $app[CouchDbServiceProvider::DefaultOptions], $_options );
+
+				if ( !isset( $app[CouchDbServiceProvider::DefaultGroupOptions] ) )
 				{
-					$app[CouchDbServiceProvider::GroupOptions] =
-						array(
-							'default' => isset( $app[CouchDbServiceProvider::Options] ) ?
-								$app[CouchDbServiceProvider::Options] : array()
-						);
+					$app[CouchDbServiceProvider::DefaultGroupOptions] = $_name;
+				}
+			}
+			$app[CouchDbServiceProvider::GroupOptions] = $_couchOptions;
+		} );
+
+		$app[CouchDbServiceProvider::Options_GroupPrefix] = $app->share( function () use ( $app )
+		{
+			$app[CouchDbServiceProvider::ServiceInitializer]();
+
+			$_dbs = new \Pimple();
+			foreach ( $app[CouchDbServiceProvider::GroupOptions] as $_name => $_options )
+			{
+				if ( $_name === $app[CouchDbServiceProvider::DefaultGroupOptions] )
+				{
+					// we use shortcuts here in case the default has been overriden
+					$_config = $app[CouchDbServiceProvider::Options_Prefix . '.config'];
+					$_manager = $app[CouchDbServiceProvider::Options_Prefix . '.event_manager'];
+				}
+				else
+				{
+					$_config = $app[CouchDbServiceProvider::Options_GroupPrefix . '.config'][$_name];
+					$_manager = $app[CouchDbServiceProvider::Options_GroupPrefix . '.event_manager'][$_name];
 				}
 
-				$_couchOptions = $app[CouchDbServiceProvider::GroupOptions];
+				$_dbs[$_name] = DocumentManager::create( $_options, $_config, $_manager );
+			}
 
-				foreach ( $_couchOptions as $_name => &$_options )
-				{
-					$_options = array_replace( $app[CouchDbServiceProvider::DefaultOptions], $_options );
+			return $_dbs;
+		} );
 
-					if ( !isset( $app[CouchDbServiceProvider::DefaultGroupOptions] ) )
-					{
-						$app[CouchDbServiceProvider::DefaultGroupOptions] = $_name;
-					}
-				}
-				$app[CouchDbServiceProvider::GroupOptions] = $_couchOptions;
-			} );
+		//	Group configuration
+		$app[CouchDbServiceProvider::Options_GroupPrefix . '.config'] = $app->share( function () use ( $app )
+		{
+			$app[CouchDbServiceProvider::GroupOptions . '.initializer']();
 
-			$app[CouchDbServiceProvider::Options_GroupPrefix] = $app->share( function () use ( $app )
+			$_configs = new \Pimple();
+			foreach ( $app[CouchDbServiceProvider::GroupOptions] as $_name => $_options )
 			{
-				$app[CouchDbServiceProvider::ServiceInitializer]();
+				$_configs[$_name] = new Configuration();
+			}
 
-				$_dbs = new \Pimple();
-				foreach ( $app[CouchDbServiceProvider::GroupOptions] as $_name => $_options )
-				{
-					if ( $_name === $app[CouchDbServiceProvider::DefaultGroupOptions] )
-					{
-						// we use shortcuts here in case the default has been overriden
-						$_config = $app[CouchDbServiceProvider::Options_Prefix . '.config'];
-						$_manager = $app[CouchDbServiceProvider::Options_Prefix . '.event_manager'];
-					}
-					else
-					{
-						$_config = $app[CouchDbServiceProvider::Options_GroupPrefix . '.config'][$_name];
-						$_manager = $app[CouchDbServiceProvider::Options_GroupPrefix . '.event_manager'][$_name];
-					}
+			return $_configs;
+		} );
 
-					$_dbs[$_name] = DocumentManager::create( $_options, $_config, $_manager );
-				}
+		//	Group events
+		$app[CouchDbServiceProvider::Options_GroupPrefix . '.event_manager'] = $app->share( function () use ( $app )
+		{
+			$app[CouchDbServiceProvider::ServiceInitializer]();
 
-				return $_dbs;
-			} );
-
-			/**
-			 * Group configuration
-			 */
-			$app[CouchDbServiceProvider::Options_GroupPrefix . '.config'] = $app->share( function () use ( $app )
+			$_managers = new \Pimple();
+			foreach ( $app[CouchDbServiceProvider::GroupOptions] as $_name => $_options )
 			{
-				$app[CouchDbServiceProvider::GroupOptions . '.initializer']();
+				$_managers[$_name] = new EventManager();
+			}
 
-				$_configs = new \Pimple();
-				foreach ( $app[CouchDbServiceProvider::GroupOptions] as $_name => $_options )
-				{
-					$_configs[$_name] = new Configuration();
-				}
+			return $_managers;
+		} );
 
-				return $_configs;
-			} );
+		//	Shortcuts for the "first" DB
+		$app[CouchDbServiceProvider::Options_Prefix] = $app->share( function() use ( $app )
+		{
+			$_dbs = $app[CouchDbServiceProvider::Options_GroupPrefix];
 
-			/**
-			 * Group event manager
-			 */
-			$app[CouchDbServiceProvider::Options_GroupPrefix . '.event_manager'] = $app->share( function () use ( $app )
-			{
-				$app[CouchDbServiceProvider::ServiceInitializer]();
+			return $_dbs[$app[CouchDbServiceProvider::DefaultGroupOptions]];
+		} );
 
-				$_managers = new \Pimple();
-				foreach ( $app[CouchDbServiceProvider::GroupOptions] as $_name => $_options )
-				{
-					$_managers[$_name] = new EventManager();
-				}
+		//	Shortcut to first db's client
+		$app['couchdb.client'] = $app->share( function() use( $app )
+		{
+			return $app[CouchDbServiceProvider::Options_Prefix]->getCouchDBClient();
+		} );
 
-				return $_managers;
-			} );
+		//	Configuration
+		$app['couchdb.config'] = $app->share( function() use ( $app )
+		{
+			$_dbs = $app[CouchDbServiceProvider::Options_GroupPrefix . '.config'];
 
-			// shortcuts for the "first" DB
-			$app[CouchDbServiceProvider::Options_Prefix] = $app->share( function() use ( $app )
-			{
-				$_dbs = $app[CouchDbServiceProvider::Options_GroupPrefix];
+			return $_dbs[$app[CouchDbServiceProvider::DefaultGroupOptions]];
+		} );
 
-				return $_dbs[$app[CouchDbServiceProvider::DefaultGroupOptions]];
-			} );
+		/**
+		 * Single event manager
+		 */
+		$app['couchdb.event_manager'] = $app->share( function() use ( $app )
+		{
+			$_dbs = $app['couchdbs.event_manager'];
 
-			//	Shortcut to client
-			$app['couchdb.client'] = $app->share( function() use( $app )
-			{
-				return $app[CouchDbServiceProvider::Options_Prefix]->getCouchDBClient();
-			} );
-
-			//	Configuration
-			$app['couchdb.config'] = $app->share( function() use ( $app )
-			{
-				$_dbs = $app[CouchDbServiceProvider::Options_GroupPrefix . '.config'];
-
-				return $_dbs[$app[CouchDbServiceProvider::DefaultGroupOptions]];
-			} );
-
-			/**
-			 * Single event manager
-			 */
-			$app['couchdb.event_manager'] = $app->share( function() use ( $app )
-			{
-				$_dbs = $app['couchdbs.event_manager'];
-
-				return $_dbs[$app[CouchDbServiceProvider::DefaultGroupOptions]];
-			} );
-		}
+			return $_dbs[$app[CouchDbServiceProvider::DefaultGroupOptions]];
+		} );
 	}
 }

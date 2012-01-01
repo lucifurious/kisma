@@ -62,6 +62,7 @@ abstract class Component extends SubComponent implements IAspectable, IReactor
 	//*************************************************************************
 	//* Default/Magic Methods
 	//*************************************************************************
+
 	public function __construct( $options = array() )
 	{
 		//	Initialize our aspects array

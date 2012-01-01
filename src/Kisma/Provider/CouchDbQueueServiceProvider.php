@@ -40,6 +40,14 @@ namespace Kisma\Provider
 		 * @var string Our queue array
 		 */
 		const Queues = 'couchdb.queues';
+		/**
+		 * @var string
+		 */
+		const PendingViewName = 'pending';
+		/**
+		 * @var int
+		 */
+		const DefaultMaxItems = 1;
 
 		//*************************************************************************
 		//* Private Members
@@ -128,13 +136,100 @@ namespace Kisma\Provider
 			}
 			catch ( \Doctrine\CouchDB\HTTP\HTTPException $_ex )
 			{
-				if ( 404 != $_ex->getCode())
+				if ( 404 != $_ex->getCode() )
 				{
 					throw $_ex;
 				}
 
 				$this->_client->createDatabase( $this->_queueName );
 			}
+		}
+
+		/**
+		 * Get work items from the queue
+		 * The descending param is used to get LIFO (if true) or FIFO (if false) behavior.
+		 *
+		 * @param int  $maxItems
+		 * @param bool $fifo
+		 * @param bool $useLocks If true, a lock will be added to the queue item
+		 *
+		 * @return array|false
+		 */
+		public function dequeue( $maxItems = self::DefaultMaxItems, $fifo = true, $useLocks = false )
+		{
+			$_queueItems = array();
+
+			Log::debug( 'Requesting pending view: ' . self::PendingViewName );
+
+			$_query = $this->getClient()->createViewQuery( 'document', self::PendingViewName, null );
+			$_query->setLimit( $maxItems );
+			$_query->setIncludeDocs( true );
+			$_query->setDescending( $fifo );
+
+			$_pendingMessages = $_query->execute();
+
+			Log::debug( 'View results: ' . $_pendingMessages );
+
+			//	Build doc array non-locked
+			foreach ( $_pendingMessages as $_message )
+			{
+				//	Add successful lock to work item list
+				$_queueItems[] = new CouchDbQueueItem( array( 'document' => $_message ) );
+			}
+
+			//	Return queue item(s)
+			return empty( $_queueItems ) ? false : $_queueItems;
+		}
+
+		/**
+		 * Adds a work item to the queue
+		 *
+		 * @param string $id
+		 * @param mixed  $feedData Any kind of info you want to pass the dequeuer process
+		 * @param int	$expireTime How long to keep this guy around. -1 = until deleted@internal param int $timeToLive
+		 *
+		 * @return mixed The id of the message
+		 */
+		public function enqueue( $id = null, $feedData = null, $expireTime = -1 )
+		{
+			//	Create an id
+			$_id = $this->createKey();
+
+			$_item = new CouchDbQueueItem( array(
+				'id' => $_id, 'feed_data' => $feedData, 'expire_time' => $expireTime,
+			) );
+
+			//	See if this key is already in the queue...
+			/** @var $_response \Doctrine\CouchDB\HTTP\Response */
+			$_response = $this->getClient()->findDocument( $_id );
+
+			if ( 404 == $_response->status )
+			{
+				$_document = $_item->getDocument();
+			}
+			else if ( 200 != $_response->status )
+			{
+				throw new \Kisma\StorageException( 'Unexpected CouchDb response.', $_response->status, null, $_response );
+			}
+			else
+			{
+				$_document = $_response->body;
+				Log::debug( 'Found prior queue item, _rev: ' . $_document->_rev );
+			}
+
+			//	Doc exists, read and update...
+			$_document->update_time = microtime( true );
+			$_document->feed_data = $_item->getFeedData();
+
+			$_response = $this->getClient()->putDocument( $_document, $_id, $_document->_rev );
+
+			if ( isset( $_response->body ) && \Kisma\Utility\Scalar::in( $_response->status, 200, 201 ) )
+			{
+				Log::debug( 'Document queued: ' . print_r( $_response->body, true ) );
+				return $_response->body->rev;
+			}
+
+			return false;
 		}
 
 		/**
@@ -163,7 +258,7 @@ namespace Kisma\Provider
 		public function createKey( $id = null, $salt = null )
 		{
 			//	Start with the _id
-			$_key = $id;
+			$_key = $id ?: $this->_queueName . microtime( true );
 
 			//	Encrypt first
 			if ( null !== $salt && false !== $this->_encryptKeys )
