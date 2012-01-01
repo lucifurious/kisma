@@ -30,7 +30,7 @@ namespace Kisma\Components;
 	 *
 	 * @property \stdClass $document
 	 */
-	class Document extends SubComponent
+	class Document extends Seed
 	{
 		//*************************************************************************
 		//* Private Members 
@@ -60,7 +60,9 @@ namespace Kisma\Components;
 
 		/**
 		 * Checks if a document property is set
+		 *
 		 * @param string $property
+		 *
 		 * @return boolean
 		 */
 		public function __isset( $property )
@@ -75,7 +77,9 @@ namespace Kisma\Components;
 
 		/**
 		 * Unsets a document property
+		 *
 		 * @param string $property
+		 *
 		 * @return \Kisma\Components\Document
 		 */
 		public function __unset( $property )
@@ -94,7 +98,9 @@ namespace Kisma\Components;
 
 		/**
 		 * Gets a property from the document
+		 *
 		 * @param string $property
+		 *
 		 * @return mixed
 		 */
 		public function __get( $property )
@@ -124,8 +130,10 @@ namespace Kisma\Components;
 
 		/**
 		 * Sets a property within the document
+		 *
 		 * @param string $property
-		 * @param mixed $value
+		 * @param mixed  $value
+		 *
 		 * @return Document
 		 */
 		public function __set( $property, $value )
@@ -160,13 +168,25 @@ namespace Kisma\Components;
 			return $_obj;
 		}
 
+		/**
+		 * @return array
+		 */
+		public function __sleep()
+		{
+			return array(
+				'document',
+			);
+		}
+
 		//*************************************************************************
 		//* Properties
 		//*************************************************************************
 
 		/**
 		 * Set the current document. Calling with no parameters resets the object
+		 *
 		 * @param array|\stdClass $document
+		 *
 		 * @return \Kisma\Components\Document
 		 */
 		public function setDocument( $document = null )

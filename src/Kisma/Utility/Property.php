@@ -23,7 +23,7 @@ namespace Kisma\Utility;
  * Property
  * Provides property manipulation routines
  */
-class Property implements \Kisma\IUtility
+class Property extends \Kisma\Components\Seed implements \Kisma\IUtility
 {
 	//*************************************************************************
 	//* Public Methods 
@@ -61,10 +61,10 @@ class Property implements \Kisma\IUtility
 	/**
 	 * @static
 	 *
-	 * @param \Kisma\Components\SubComponent $object
-	 * @param string						 $propertyName
-	 * @param \Kisma\AccessorMode|int		$access
-	 * @param mixed|null					 $valueOrDefault The "Set" value or default value for "Get"
+	 * @param \Kisma\Components\Seed				$object
+	 * @param string								$propertyName
+	 * @param \Kisma\AccessorMode|string			$access
+	 * @param mixed|null							$valueOrDefault The "Set" value or default value for "Get"
 	 *
 	 * @return mixed
 	 */
@@ -95,10 +95,10 @@ class Property implements \Kisma\IUtility
 	 *
 	 * @static
 	 *
-	 * @param Components\SubComponent|array|object $object
-	 * @param string                               $propertyName
-	 * @param int                                  $access
-	 * @param mixed|null                           $valueOrDefault
+	 * @param Components\Seed|array|object		 $object
+	 * @param string							   $propertyName
+	 * @param int								  $access
+	 * @param mixed|null						   $valueOrDefault
 	 *
 	 * @return bool
 	 */

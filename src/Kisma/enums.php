@@ -134,6 +134,9 @@ namespace Kisma
 		//* Constants
 		//*************************************************************************
 
+		/**
+		 * Default value
+		 */
 		const __default = self::Normal;
 
 		/**
@@ -153,6 +156,13 @@ namespace Kisma
 	 */
 	class HashSeed extends \Kisma\KismaEnum
 	{
+		//*************************************************************************
+		//* Constants
+		//*************************************************************************
+
+		/**
+		 * Default value
+		 */
 		const __default = self::All;
 
 		/**
@@ -305,22 +315,14 @@ namespace Kisma
 		/**
 		 * @const int Individual log entry levels
 		 */
-		const Emergency = 0;
-		const Alert = 1;
-		const Critical = 2;
-		const Error = 3;
-		const Warning = 4;
-		const Notice = 5;
-		const Info = 6;
-		const Debug = 7;
-		const User = 8;
-
-		/**
-		 * @const int Log level modifiers  */
-		const Auth = 0x20;
-		const Syslog = 0x28;
-		const AuthPriv = 0x50;
-
+		const Emergency = 'emerg';
+		const Alert = 'alert';
+		const Critical = 'crit';
+		const Error = 'err';
+		const Warning = 'warn';
+		const Notice = 'notice';
+		const Info = 'info';
+		const Debug = 'debug';
 	}
 
 	/**
@@ -422,5 +424,5 @@ namespace Kisma
 		const GreaterThanOrEqualTo = 0xffff0005;
 		const LessThanOrEqualTo = 0xffff0009;
 	}
-	
+
 }

@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Framework event class
+ * Service event class
  *
  * Kisma(tm) : PHP Nanoframework (http://github.com/Pogostick/kisma/)
  * Copyright 2009-2011, Jerry Ablan/Pogostick, LLC., All Rights Reserved
@@ -20,28 +20,23 @@
 namespace Kisma\Event;
 
 /**
- * ApplicationEvent
- * Contains the events triggered by an application
+ * ServiceEvent
+ * Contains the events triggered by a service
  */
-class ApplicationEvent extends KismaEvent
+class ServiceEvent extends KismaEvent
 {
 	//*************************************************************************
 	//* Class Constants
 	//*************************************************************************
 
 	/**
-	 * Triggered as application initialization begins
-	 * dispatching
-	 *
 	 * @var string
 	 */
-	const Initialize = 'initialize';
+	const AfterServiceCall = 'after_service_call';
 
 	/**
-	 * The TERMINATE is triggered when the application is ending
-	 *
 	 * @var string
 	 */
-	const Terminate = 'terminate';
+	const BeforeServiceCall = 'before_service_call';
 
 }

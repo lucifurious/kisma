@@ -33,41 +33,13 @@ namespace Kisma\Utility
 	/**
 	 * Transform
 	 */
-	class Transform extends \Kisma\Components\SubComponent implements \Kisma\IUtility
+	class Transform extends \Kisma\Components\Seed implements \Kisma\IUtility
 	{
-		//*************************************************************************
-		//* Public Methods
-		//*************************************************************************
-
-		/**
-		 * Converts a separator delimited string to camel case
-		 *
-		 * @param string $string
-		 * @param string $separator
-		 * @param boolean $preserveWhiteSpace
-		 * @return string
-		 */
-		public static function camelize( $string, $separator = '_', $preserveWhiteSpace = false )
-		{
-			$_newString = ucwords( str_replace( $separator, ' ', $string ) );
-			return ( false === $preserveWhiteSpace ? str_replace( ' ', '', $_newString ) : $_newString );
-		}
-
-		/**
-		 * Converts a camel-cased word to a delimited lowercase string
-		 *
-		 * @param string $string
-		 * @return string
-		 */
-		public static function decamelize( $string )
-		{
-			return strtolower( preg_replace( "/([a-z])([A-Z])/", "\\1_\\2", $string ) );
-		}
-
 		/**
 		 * Dynamically generates the object from the properties of the given object
 		 *
 		 * @param $object
+		 *
 		 * @return \stdClass
 		 */
 		public static function toObject( $object )
@@ -154,9 +126,10 @@ namespace Kisma\Utility
 
 		/**
 		 * @param string|\DOMDocument|\SimpleXMLElement $xmlText
-		 * @param string $version
-		 * @param string $encoding
-		 * @param int|null $options Options to pass on to DOMDocument::loadXML()
+		 * @param string                                $version
+		 * @param string                                $encoding
+		 * @param int|null                              $options Options to pass on to DOMDocument::loadXML()
+		 *
 		 * @return array|bool
 		 */
 		public static function xmlToArray2( $xmlText, $version = '1.0', $encoding = 'utf-8', $options = null )
@@ -203,7 +176,9 @@ namespace Kisma\Utility
 
 		/**
 		 * @static
+		 *
 		 * @param \SimpleXMLElement $xmlNode
+		 *
 		 * @return array|bool
 		 */
 		protected static function _xmlNodeToArray( $xmlNode )
@@ -243,9 +218,11 @@ namespace Kisma\Utility
 
 		/**
 		 * @static
+		 *
 		 * @param string $xmlString
 		 * @param string $encoding
-		 * @param bool $includeAttributes
+		 * @param bool   $includeAttributes
+		 *
 		 * @return array
 		 */
 		public static function xmlToArray3( $xmlString, $encoding = 'utf-8', $includeAttributes = true )
@@ -316,9 +293,11 @@ namespace Kisma\Utility
 
 		/**
 		 * @static
+		 *
 		 * @param string $xml
 		 * @param string $encoding
-		 * @param bool $includeAttributes
+		 * @param bool   $includeAttributes
+		 *
 		 * @return array
 		 * @todo Make this faster
 		 */
@@ -352,8 +331,8 @@ namespace Kisma\Utility
 				/**
 				 * @var string $tag
 				 * @var string $type
-				 * @var int $level
-				 * @var array $attributes
+				 * @var int    $level
+				 * @var array  $attributes
 				 */
 				unset ( $attributes, $value );
 
@@ -398,8 +377,7 @@ namespace Kisma\Utility
 						else
 						{
 							$current[$tag] = array(
-								$current[$tag],
-								$result
+								$current[$tag], $result
 							);
 							$repeated_tag_index[$tag . '_' . $level] = 2;
 							if ( isset ( $current[$tag . '_attr'] ) )
@@ -440,8 +418,7 @@ namespace Kisma\Utility
 						else
 						{
 							$current[$tag] = array(
-								$current[$tag],
-								$result
+								$current[$tag], $result
 							);
 							$repeated_tag_index[$tag . '_' . $level] = 1;
 
@@ -455,7 +432,8 @@ namespace Kisma\Utility
 
 								if ( $attributes_data )
 								{
-									$current[$tag][$repeated_tag_index[$tag . '_' . $level] . '_attr'] = $attributes_data;
+									$current[$tag][$repeated_tag_index[$tag . '_' . $level] . '_attr'] =
+										$attributes_data;
 								}
 							}
 
@@ -487,7 +465,9 @@ namespace Kisma\Utility
 		 * Down and dirty object to array function
 		 *
 		 * @static
+		 *
 		 * @param object $object
+		 *
 		 * @return array
 		 */
 		public static function objectToArray( $object )
@@ -500,8 +480,7 @@ namespace Kisma\Utility
 			if ( is_array( $object ) )
 			{
 				return array_map( array(
-					'\\Kisma\\Utility\\Transform',
-					'objectToArray'
+					'\\Kisma\\Utility\\Transform', 'objectToArray'
 				), $object );
 			}
 
@@ -513,7 +492,9 @@ namespace Kisma\Utility
 		 * Down and dirty array to object function
 		 *
 		 * @static
+		 *
 		 * @param array $array
+		 *
 		 * @return object
 		 */
 		public static function arrayToObject( $array )
@@ -521,8 +502,7 @@ namespace Kisma\Utility
 			if ( is_array( $array ) )
 			{
 				return (object)array_map( array(
-					'\\Kisma\\Utility\\Transform',
-					'arrayToObject'
+					'\\Kisma\\Utility\\Transform', 'arrayToObject'
 				), $array );
 			}
 
@@ -566,7 +546,9 @@ namespace Kisma\Utility
 
 					foreach ( $source[$_bogusKey] as $_attributeKey => $_attributeValue )
 					{
-						$_attributes[$_attributeKey] = is_array( $_attributeValue ) ? self::_normalizeAttributes( $_attributeValue ) : $_attributeValue;
+						$_attributes[$_attributeKey] =
+							is_array( $_attributeValue ) ? self::_normalizeAttributes( $_attributeValue ) :
+								$_attributeValue;
 					}
 
 					//	Remove bogus entry
@@ -582,8 +564,7 @@ namespace Kisma\Utility
 						//	Get old value and move into an array
 						$_value = $source[$_key];
 						$_result[$_key] = array(
-							'@attributes' => $_attributes,
-							$_value,
+							'@attributes' => $_attributes, $_value,
 						);
 					}
 				}

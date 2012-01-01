@@ -1,361 +1,342 @@
 <?php
 /**
- * Log.php
+ * @file
+ * A generic log helper
+ *
  * Kisma(tm) : PHP Nanoframework (http://github.com/Pogostick/kisma/)
- * Copyright 2011, Pogostick, LLC. (http://www.pogostick.com/)
+ * Copyright 2009-2011, Jerry Ablan/Pogostick, LLC., All Rights Reserved
  *
- * Dual licensed under the MIT License and the GNU General Public License (GPL) Version 2.
- * See {@link http://github.com/Pogostick/kisma/licensing/} for complete information.
+ * @copyright Copyright (c) 2009-2011 Jerry Ablan/Pogostick, LLC.
+ * @license http://github.com/Pogostick/Kisma/blob/master/LICENSE
  *
- * @copyright Copyright 2011, Pogostick, LLC. (http://www.pogostick.com/)
- * @link http://github.com/Pogostick/kisma/ Kisma(tm)
- * @license http://github.com/Pogostick/kisma/licensing/
  * @author Jerry Ablan <kisma@pogostick.com>
- * @category Kisma_Utility
+ * @category Utilities
  * @package kisma.utility
- * @namespace \Kisma\Utility
- * @since v1.0.0
- * @filesource
+ * @since 1.0.0
+ *
+ * @ingroup utilities
  */
 
-//*************************************************************************
-//* Namespace Declarations
-//*************************************************************************
+namespace Kisma\Utility;
+
+//	Aliases
+use Kisma\K;
+use Kisma\Components as Components;
 
 /**
- * @namespace Kisma\Utility
+ * Log
+ * It's better than bad! It's GOOD! All kids love Log!
  */
-namespace Kisma\Utility
+class Log extends Components\Seed implements \Kisma\IUtility
 {
-	//	Aliases
-	use \Kisma\Components as Components;
+	//********************************************************************************
+	//* Private Members
+	//********************************************************************************
 
 	/**
-	 * Log
-	 * It's better than bad! It's GOOD! All kids love Log!
+	 * @var boolean If true, all applicable log entries will be echoed to STDOUT as well as logged
 	 */
-	class Log extends Components\SubComponent implements \Kisma\IUtility
+	protected static $_echoData = false;
+	/**
+	 * @var string Prepended to each log entry before writing.
+	 */
+	protected static $_prefix = null;
+	/**
+	 * @var integer The current indent level
+	 */
+	protected static $_currentIndent = 0;
+	/**
+	 * @var array The strings to watch for at the beginning of a log line to control the indenting
+	 */
+	protected static $_indentTokens = array(
+		true => '>>', false => '<<',
+	);
+	/**
+	 * @var string
+	 */
+	protected static $_defaultLevelIndicator = ' ';
+	/**
+	 * @var array
+	 */
+	protected static $_levelIndicators = array(
+		\Kisma\LogLevel::Info => '*',
+		\Kisma\LogLevel::Notice => '?',
+		\Kisma\LogLevel::Warning => '-',
+		\Kisma\LogLevel::Error => '!',
+	);
+
+	//********************************************************************************
+	//* Public Methods
+	//********************************************************************************
+
+	/**
+	 * Creates any log entry
+	 *
+	 * @param string $message The message to send to the log
+	 * @param string $logLevel
+	 *
+	 * @return bool
+	 */
+	public static function log( $message, $logLevel = \Kisma\LogLevel::Info )
 	{
-		//********************************************************************************
-		//* Private Members
-		//********************************************************************************
+		//	Get the indent, if any
+		$_unindent = ( 0 > ( $_newIndent = self::_processMessage( $message ) ) );
 
-		/**
-		 * @var boolean If true, all applicable log entries will be echoed to STDOUT as well as logged
-		 */
-		protected static $_echoData = false;
-		/**
-		 * @var string Prepended to each log entry before writing.
-		 */
-		protected static $_prefix = null;
-		/**
-		 * @var integer The current indent level
-		 */
-		protected static $_currentIndent = 0;
-		/**
-		 * @var array The strings to watch for at the beginning of a log line to control the indenting
-		 */
-		protected static $_indentTokens = array(
-			true => '>>',
-			false => '<<',
-		);
-		/**
-		 * @var string
-		 */
-		protected static $_defaultLevelIndicator = ' ';
-		/**
-		 * @var array
-		 */
-		protected static $_levelIndicators = array(
-			\Kisma\LogLevel::Info => '*',
-			\Kisma\LogLevel::Notice => '?',
-			\Kisma\LogLevel::Warning => '-',
-			\Kisma\LogLevel::Error => '!',
-		);
+		$_indicator = K::o( self::$_levelIndicators, $logLevel, self::$_defaultLevelIndicator );
+		$_logEntry = self::$_prefix . $message;
 
-		//********************************************************************************
-		//* Public Methods
-		//********************************************************************************
-
-		/**
-		 * Creates any log entry
-		 *
-		 * @param string $message The message to send to the log
-		 * @param string $tag|null A string that represents the object logging the message. If null,
-		 * the calling method will be used.
-		 * @param int $logLevel The severity of the message
-		 * @return bool
-		 */
-		public static function log( $message, $tag = null, $logLevel = \Kisma\LogLevel::Info )
+		if ( self::$_echoData )
 		{
-			if ( null === $tag )
+			echo K::log( $_logEntry, $logLevel, true );
+			flush();
+		}
+
+		//	Indent...
+		$_tempIndent = self::$_currentIndent;
+
+		if ( $_unindent )
+		{
+			$_tempIndent--;
+		}
+
+		if ( $_tempIndent < 0 )
+		{
+			$_tempIndent = 0;
+		}
+
+		$_logEntry = str_repeat( '  ', $_tempIndent ) . $_indicator . ' ' . $message;
+
+		K::log( $_logEntry, $logLevel );
+
+		//	Set indent level...
+		self::$_currentIndent += $_newIndent;
+
+		//	Anything over a warning returns false so you can chain
+		return ( \Kisma\LogLevel::Warning > $logLevel );
+	}
+
+	/**
+	 * Creates an 'info' log entry
+	 *
+	 * @param string $message The message to send to the log
+	 * the calling method will be used.
+	 *
+	 * @return bool
+	 */
+	public static function info( $message )
+	{
+		return self::log( $message, \Kisma\LogLevel::Info );
+	}
+
+	/**
+	 * Creates an 'error' log entry
+	 *
+	 * @param string $message The message to send to the log
+	 *
+	 * @return bool
+	 */
+	public static function error( $message )
+	{
+		return self::log( $message, \Kisma\LogLevel::Error );
+	}
+
+	/**
+	 * Creates a 'warning' log entry
+	 *
+	 * @param string $message The message to send to the log
+	 *
+	 * @return bool
+	 */
+	public static function warning( $message )
+	{
+		return self::log( $message, \Kisma\LogLevel::Warning );
+	}
+
+	/**
+	 * Alias of the 'debug' level
+	 *
+	 * @param string $message The message to send to the log
+	 *
+	 * @return bool
+	 */
+	public static function trace( $message )
+	{
+		return self::debug( $message );
+	}
+
+	/**
+	 * Creates a 'debug' log entry
+	 *
+	 * @param string $message The message to send to the log
+	 *
+	 * @return bool
+	 */
+	public static function debug( $message )
+	{
+		return self::log( $message, \Kisma\LogLevel::Debug );
+	}
+
+	/**
+	 * Safely decrements the current indent level
+	 *
+	 * @param int $howMuch
+	 */
+	public static function decrementIndent( $howMuch = 1 )
+	{
+		self::$_currentIndent -= $howMuch;
+
+		if ( self::$_currentIndent < 0 )
+		{
+			self::$_currentIndent = 0;
+		}
+	}
+
+	/**
+	 * Returns the name of the method that made the call
+	 *
+	 * @return string
+	 */
+	protected static function _getCallingMethod()
+	{
+		$_backTrace = debug_backtrace();
+		$_caller = count( $_backTrace ) - 1;
+		$_function = K::o( $_backTrace[$_caller], 'method', K::o( $_backTrace[$_caller], 'function' ) );
+		$_class = K::o( $_backTrace[$_caller], 'class' );
+
+		$_callingMethod = ( null !== $_class ? $_class . K::o( $_backTrace[$_caller], 'type' ) : null ) . $_function;
+
+		return str_replace( array( '::', 'kisma.' ), array( '.', 'k.' ), Inflector::untag( $_callingMethod ) );
+	}
+
+	//*************************************************************************
+	//* Protected Methods
+	//*************************************************************************
+
+	/**
+	 * Processes the indent level for the messages
+	 *
+	 * @param string $message
+	 *
+	 * @return integer The indent difference AFTER this message
+	 */
+	protected static function _processMessage( &$message )
+	{
+		$_newIndent = 0;
+
+		foreach ( self::$_indentTokens as $_key => $_token )
+		{
+			if ( $_token == substr( $message, 0, strlen( $_token ) ) )
 			{
-				$tag = self::_getCallingMethod();
-			}
-
-			//	Get the indent, if any
-			$_unindent = ( 0 > ( $_newIndent = self::_processMessage( $message ) ) );
-
-			$_indicator = \K::o( self::$_levelIndicators, $logLevel, self::$_defaultLevelIndicator );
-			$_logEntry = self::$_prefix . $message;
-
-			if ( self::$_echoData )
-			{
-				echo \K::log( $_logEntry, $tag, $logLevel, true );
-				flush();
-			}
-
-			//	Indent...
-			$_tempIndent = self::$_currentIndent;
-
-			if ( $_unindent )
-			{
-				$_tempIndent--;
-			}
-
-			if ( $_tempIndent < 0 )
-			{
-				$_tempIndent = 0;
-			}
-
-			$_logEntry = str_repeat( '  ', $_tempIndent ) . $_indicator . ' ' . $message;
-
-			\K::log( $_logEntry, $tag, $logLevel );
-
-			//	Set indent level...
-			self::$_currentIndent += $_newIndent;
-
-			//	Anything over a warning returns false so you can chain
-			return ( \Kisma\LogLevel::Warning > $logLevel );
-		}
-
-		/**
-		 * Creates an 'info' log entry
-		 *
-		 * @param string $message The message to send to the log
-		 * @param string $tag|null A string that represents the object logging the message. If null,
-		 * the calling method will be used.
-		 * @return bool
-		 */
-		public static function info( $message, $tag = null )
-		{
-			return self::log( $message, $tag, \Kisma\LogLevel::Info );
-		}
-
-		/**
-		 * Creates an 'error' log entry
-		 *
-		 * @param string $message The message to send to the log
-		 * @param string $tag|null A string that represents the object logging the message. If null,
-		 * the calling method will be used.
-		 * @return bool
-		 */
-		public static function error( $message, $tag = null )
-		{
-			return self::log( $message, $tag, \Kisma\LogLevel::Error );
-		}
-
-		/**
-		 * Creates a 'warning' log entry
-		 *
-		 * @param string $message The message to send to the log
-		 * @param string $tag|null A string that represents the object logging the message. If null,
-		 * the calling method will be used.
-		 * @return bool
-		 */
-		public static function warning( $message, $tag = null )
-		{
-			return self::log( $message, $tag, \Kisma\LogLevel::Warning );
-		}
-
-		/**
-		 * Alias of the 'debug' level
-		 *
-		 * @param string $message The message to send to the log
-		 * @param string $tag|null A string that represents the object logging the message. If null,
-		 * the calling method will be used.
-		 * @return bool
-		 */
-		public static function trace( $message, $tag = null )
-		{
-			return self::debug( $message, $tag );
-		}
-
-		/**
-		 * Creates a 'debug' log entry
-		 *
-		 * @param string $message The message to send to the log
-		 * @param string $tag|null A string that represents the object logging the message. If null,
-		 * the calling method will be used.
-		 * @return bool
-		 */
-		public static function debug( $message, $tag = null )
-		{
-			return self::log( $message, $tag, \Kisma\LogLevel::Debug );
-		}
-
-		/**
-		 * Safely decrements the current indent level
-		 * @param int $howMuch
-		 */
-		public static function decrementIndent( $howMuch = 1 )
-		{
-			self::$_currentIndent -= $howMuch;
-
-			if ( self::$_currentIndent < 0 )
-			{
-				self::$_currentIndent = 0;
+				$_newIndent = ( false === $_key ? -1 : 1 );
+				$message = substr( $message, strlen( self::$_indentTokens[true] ) );
 			}
 		}
 
-		/**
-		 * Returns the name of the method that made the call
-		 * @param integer $logLevel The level of the call
-		 * @return string
-		 */
-		protected static function _getCallingMethod()
-		{
-			$_backTrace = debug_backtrace();
-			$_caller = count( $_backTrace ) - 1;
-			$_function = \K::o( $_backTrace[$_caller], 'method', \K::o( $_backTrace[$_caller], 'function' ) );
-			$_class = \K::o( $_backTrace[$_caller], 'class' );
+		return $_newIndent;
+	}
 
-			$_callingMethod =
-				( null !== $_class
-					?
-					$_class . \K::o( $_backTrace[$_caller], 'type' )
-					:
-					null
-				) . $_function;
+	/**
+	 * @static
+	 *
+	 * @param $currentIndent
+	 */
+	public static function setCurrentIndent( $currentIndent = 0 )
+	{
+		self::$_currentIndent = $currentIndent;
+	}
 
-			return str_replace( array( '::', 'kisma.' ), array( '.', 'k.' ), \K::untag( $_callingMethod ) );
-		}
+	/**
+	 * @static
+	 * @return int
+	 */
+	public static function getCurrentIndent()
+	{
+		return self::$_currentIndent;
+	}
 
-		//*************************************************************************
-		//* Protected Methods 
-		//*************************************************************************
+	/**
+	 * @param string $defaultLevelIndicator
+	 */
+	public static function setDefaultLevelIndicator( $defaultLevelIndicator = '.' )
+	{
+		self::$_defaultLevelIndicator = $defaultLevelIndicator;
+	}
 
-		/**
-		 * Processes the indent level for the messages
-		 * @param string $message
-		 * @return integer The indent difference AFTER this message
-		 */
-		protected static function _processMessage( &$message )
-		{
-			$_newIndent = 0;
+	/**
+	 * @return string
+	 */
+	public static function getDefaultLevelIndicator()
+	{
+		return self::$_defaultLevelIndicator;
+	}
 
-			foreach ( self::$_indentTokens as $_key => $_token )
-			{
-				if ( $_token == substr( $message, 0, strlen( $_token ) ) )
-				{
-					$_newIndent = ( false === $_key ? -1 : 1 );
-					$message = substr( $message, strlen( self::$_indentTokens[true] ) );
-				}
-			}
+	/**
+	 * @static
+	 *
+	 * @param $echoData
+	 */
+	public static function setEchoData( $echoData = false )
+	{
+		self::$_echoData = $echoData;
+	}
 
-			return $_newIndent;
-		}
+	/**
+	 * @static
+	 * @return bool
+	 */
+	public static function getEchoData()
+	{
+		return self::$_echoData;
+	}
 
-		/**
-		 * @static
-		 * @param $currentIndent
-		 */
-		public static function setCurrentIndent( $currentIndent = 0 )
-		{
-			self::$_currentIndent = $currentIndent;
-		}
+	/**
+	 * @param array $logLevelIndicators
+	 */
+	public static function setLevelIndicators( $logLevelIndicators )
+	{
+		self::$_levelIndicators = $logLevelIndicators;
+	}
 
-		/**
-		 * @static
-		 * @return int
-		 */
-		public static function getCurrentIndent()
-		{
-			return self::$_currentIndent;
-		}
+	/**
+	 * @return array
+	 */
+	public static function getLevelIndicators()
+	{
+		return self::$_levelIndicators;
+	}
 
-		/**
-		 * @param string $defaultLevelIndicator
-		 */
-		public static function setDefaultLevelIndicator( $defaultLevelIndicator = '.' )
-		{
-			self::$_defaultLevelIndicator = $defaultLevelIndicator;
-		}
+	/**
+	 * @static
+	 *
+	 * @param $prefix
+	 */
+	public static function setPrefix( $prefix = null )
+	{
+		self::$_prefix = $prefix;
+	}
 
-		/**
-		 * @return string
-		 */
-		public static function getDefaultLevelIndicator()
-		{
-			return self::$_defaultLevelIndicator;
-		}
+	/**
+	 * @static
+	 * @return null|string
+	 */
+	public static function getPrefix()
+	{
+		return self::$_prefix;
+	}
 
-		/**
-		 * @static
-		 * @param $echoData
-		 */
-		public static function setEchoData( $echoData = false )
-		{
-			self::$_echoData = $echoData;
-		}
+	/**
+	 * @param array $indentTokens
+	 */
+	public static function setIndentTokens( $indentTokens )
+	{
+		self::$_indentTokens = $indentTokens;
+	}
 
-		/**
-		 * @static
-		 * @return bool
-		 */
-		public static function getEchoData()
-		{
-			return self::$_echoData;
-		}
-
-		/**
-		 * @param array $logLevelIndicators
-		 */
-		public static function setLevelIndicators( $logLevelIndicators )
-		{
-			self::$_levelIndicators = $logLevelIndicators;
-		}
-
-		/**
-		 * @return array
-		 */
-		public static function getLevelIndicators()
-		{
-			return self::$_levelIndicators;
-		}
-
-		/**
-		 * @static
-		 * @param $prefix
-		 */
-		public static function setPrefix( $prefix = null )
-		{
-			self::$_prefix = $prefix;
-		}
-
-		/**
-		 * @static
-		 * @return null|string
-		 */
-		public static function getPrefix()
-		{
-			return self::$_prefix;
-		}
-
-		/**
-		 * @param array $indentTokens
-		 */
-		public static function setIndentTokens( $indentTokens )
-		{
-			self::$_indentTokens = $indentTokens;
-		}
-
-		/**
-		 * @return array
-		 */
-		public static function getIndentTokens()
-		{
-			return self::$_indentTokens;
-		}
+	/**
+	 * @return array
+	 */
+	public static function getIndentTokens()
+	{
+		return self::$_indentTokens;
 	}
 }

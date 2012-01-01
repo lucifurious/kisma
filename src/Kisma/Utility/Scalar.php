@@ -34,20 +34,6 @@ namespace Kisma\Utility
 	class Scalar implements \Kisma\IUtility
 	{
 		/**
-		 * Given an XML document, convert it to an array.
-		 *
-		 * @static
-		 *
-		 * @param $xml
-		 *
-		 * @return array
-		 */
-		public static function xmlToArray( $xml )
-		{
-
-		}
-
-		/**
 		 * Takes a list of things and returns them in an array as the values. Keys are maintained.
 		 *
 		 * @param ...

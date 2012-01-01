@@ -19,14 +19,6 @@
 
 namespace Kisma\Components;
 
-//*************************************************************************
-//* Aliases 
-//*************************************************************************
-
-//*************************************************************************
-//* Requirements 
-//*************************************************************************
-
 /**
  * DesignDocument
  */
@@ -59,8 +51,7 @@ class DesignDocument implements \Doctrine\CouchDB\View\DesignDocument
 	public function getData()
 	{
 		return array(
-			'language' => 'javascript',
-			'views' => array(
+			'language' => 'javascript', 'views' => array(
 				'by_create_time' => array(
 					'map' => 'function(doc) {emit(doc.create_time,null);}',
 				),

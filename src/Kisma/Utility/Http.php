@@ -25,7 +25,7 @@ namespace Kisma\Utility
 	 * Http
 	 * A generic HTTP class
 	 */
-	class Http extends \Kisma\Components\SubComponent implements \Kisma\IUtility
+	class Http extends \Kisma\Components\Seed implements \Kisma\IUtility
 	{
 		//*************************************************************************
 		//* Private Members

@@ -37,7 +37,7 @@ namespace Kisma\Extensions\Davenport
 	 * @property string $pendingViewName
 	 * @property string $lockedViewName
 	 */
-	class Queue extends \Kisma\Components\SubComponent
+	class Queue extends \Kisma\Components\Seed
 	{
 		//*************************************************************************
 		//* Constants

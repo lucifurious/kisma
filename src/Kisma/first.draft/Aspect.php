@@ -35,7 +35,7 @@ namespace Kisma\Components
 	 * @property-read \Kisma\Components\Component $linker
 	 * @property-read string $aspectName
 	 */
-	abstract class Aspect extends SubComponent implements \Kisma\IAspect
+	abstract class Aspect extends Seed implements \Kisma\IAspect
 	{
 		//********************************************************************************
 		//* Properties

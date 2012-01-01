@@ -29,7 +29,7 @@ use Silex\Application;
  * SilexServiceProvider
  * A base for Kisma Silex Service Providers
  */
-abstract class SilexServiceProvider extends SubComponent implements \Silex\ServiceProviderInterface
+abstract class SilexServiceProvider extends Service implements \Silex\ServiceProviderInterface
 {
 	//	Like the goggles, does nothing.
 }

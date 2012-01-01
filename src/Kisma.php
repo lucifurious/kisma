@@ -32,8 +32,8 @@ require_once __DIR__ . '/Kisma/enums.php';
 
 use \Silex;
 use \Kisma\Event;
-use \Kisma\Event\Listener\ApplicationListener;
 use \Kisma\Provider;
+use \Kisma\Utility;
 
 /**
  * The Kisma bootstrap loader
@@ -84,7 +84,26 @@ class Kisma extends \Silex\Application
 	/**
 	 * @var string
 	 */
-	const ExceptionHandler = 'exception_handler';
+	const ErrorHandler = 'error_handler';
+	/**
+	 * @var string System logger
+	 */
+	const Logger = 'monolog';
+	/**
+	 * @var string Twig service
+	 */
+	const Twig = 'twig';
+
+	//*************************************************************************
+	//* Private Members
+	//*************************************************************************
+
+	/**
+	 * This object
+	 *
+	 * @var \Kisma\Kisma
+	 */
+	public static $_app = null;
 
 	//*************************************************************************
 	//* Public Methods
@@ -97,16 +116,17 @@ class Kisma extends \Silex\Application
 	{
 		parent::__construct();
 
+		//	Save me
+		self::$_app = $this;
+
+		//	Set base path
 		$this['base_path'] = __DIR__ . '/..';
 
 		//	Add our event handler
-		$this[self::Dispatcher]->addSubscriber( new ApplicationListener() );
+		Utility\Events::subscribe( $this );
 
 		//	Dispatch initialize...
-		$this[self::Dispatcher]->dispatch(
-			Event\ApplicationEvent::INITIALIZE,
-			new Event\ApplicationEvent( $this )
-		);
+		$this->dispatch( Event\ApplicationEvent::Initialize );
 	}
 
 	/**
@@ -114,35 +134,102 @@ class Kisma extends \Silex\Application
 	 */
 	function __destruct()
 	{
-		//	Dispatch terminator...
-		$this[self::Dispatcher]->dispatch(
-			Event\ApplicationEvent::TERMINATE,
-			new Event\ApplicationEvent( $this )
-		);
+		$this->dispatch( \Kisma\Event\ApplicationEvent::Terminate );
 	}
+
+	/**
+	 * Dispatches an application event
+	 *
+	 * @param string								   $eventName
+	 * @param \Symfony\Component\EventDispatcher\Event $event
+	 */
+	public function dispatch( $eventName, $event = null )
+	{
+		if ( null === $event )
+		{
+			$event = new Event\ApplicationEvent( $this );
+		}
+
+		self::app( self::Dispatcher )->dispatch( $eventName, $event );
+	}
+
+	/**
+	 * Renders a Twig template view
+	 *
+	 * @param string $viewFile The name of the view file to render
+	 * @param array  $payload The data to pass to the view
+	 * @param bool   $returnString
+	 *
+	 * @return string
+	 */
+	public function render( $viewFile, $payload = array(), $returnString = false )
+	{
+		$_output = $this['twig']->render( $viewFile, $payload );
+
+		if ( false !== $returnString )
+		{
+			return $_output;
+		}
+
+		echo $_output;
+	}
+
+	//*************************************************************************
+	//* Event Handlers
+	//*************************************************************************
 
 	/**
 	 * Called after this application is constructed and is ready to begin
 	 *
 	 * @return bool
 	 */
-	public function initialize()
+	public function onInitialize()
 	{
+		$_self = $this;
+
+		//	Add our required namespaces
+		$this[self::Autoloader]->registerNamespaces( array(
+			'Kisma' => __DIR__, 'SilexExtension' => __DIR__ . '/../vendor/silex-extension/src'
+		) );
+
 		//@todo	Read configuration file...
 		$this[self::AppConfig] = $this->share( function ()
 		{
 			return new \Kisma\Provider\AppConfigServiceProvider();
 		} );
 
-		//	Add our required namespaces
-		$this[self::Autoloader]->registerNamespaces(
-			array(
-				'Kisma' => __DIR__,
-				'SilexExtension' => __DIR__ . '/../vendor/silex-extension/src'
-			) );
-
 		//	Some initialization
 		$this['is_cli'] = ( 'cli' == php_sapi_name() );
+
+		//	Set up error handling
+		$this[self::ErrorHandler] = $this->protect( function() use ( $_self )
+		{
+			\set_error_handler( function( $code, $message ) use ( $_self )
+			{
+				Kisma::app( self::Dispatcher )
+					->dispatch( 'error', new \Kisma\Event\ErrorEvent( $_self, $code, $message ) );
+			} );
+
+			\set_exception_handler( function( $exception ) use ( $_self )
+			{
+				Kisma::app( self::Dispatcher )->dispatch( 'error', new \Kisma\Event\ErrorEvent( $_self, $exception ) );
+			} );
+
+			return new \Kisma\Components\ErrorHandler( self::app() );
+		} );
+
+		$_logPath = isset( $this['app.config.log_path'] ) ? $this['app.config.log_path'] : $this['base_path'];
+		$_logFileName =
+			$_logPath . '/' . ( isset( $this['app.config.log_file_name'] ) ? $this['app.config.log_file_name'] :
+				'kisma.log' );
+
+		$this->register( new \Silex\Provider\MonologServiceProvider(), array(
+			'monolog.logfile' => $_logFileName,
+			'monolog.class_path' => $this['base_path'] . '/vendor/silex/vendor/monolog/src',
+			'monolog.name' => isset( $this['app.config.app_name'] ) ? $this['app.config.app_name'] : 'kisma',
+		) );
+
+		self::log( 'Initialization complete.' );
 
 		return true;
 	}
@@ -150,9 +237,11 @@ class Kisma extends \Silex\Application
 	/**
 	 * Called when the app is ending :(
 	 */
-	public function terminate()
+	public function onTerminate()
 	{
-		//	Do stuff
+		//	Restore error handlers
+		\restore_error_handler();
+		\restore_exception_handler();
 	}
 
 	//*************************************************************************
@@ -326,6 +415,43 @@ class Kisma extends \Silex\Application
 	public static function uo( &$options = array(), $key )
 	{
 		return self::o( $options, $key, null, true );
+	}
+
+	/**
+	 * @static
+	 *
+	 * @param string|null $service
+	 *
+	 * @return \Silex\Application|\Kisma\Kisma|\Symfony\Component\EventDispatcher\EventDispatcher|\Silex\ServiceProviderInterface|\Silex\ControllerProviderInterface
+	 */
+	public static function app( $service = null )
+	{
+		if ( null === $service )
+		{
+			return self::$_app;
+		}
+
+		return self::$_app[$service];
+	}
+
+	/**
+	 * @static
+	 *
+	 * @param string $message
+	 * @param string $level
+	 * @param bool   $echo
+	 */
+	public static function log( $message, $level = LogLevel::Info, $echo = false )
+	{
+		$_logger = self::app( self::Logger );
+
+		/** @var $_logger \Monolog\Logger */
+		if ( false !== $echo )
+		{
+			echo $message;
+		}
+
+		$_logger->{$level}( $message );
 	}
 
 }

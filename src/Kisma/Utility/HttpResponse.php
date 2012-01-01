@@ -17,11 +17,17 @@
  */
 namespace Kisma\Utility
 {
+	//*************************************************************************
+	//* Aliases
+	//*************************************************************************
+
+	use Kisma\K;
+
 	/**
 	 * HttpResponse
 	 * A response to an HTTP request
 	 */
-	class HttpResponse extends \Kisma\Components\SubComponent
+	class HttpResponse extends \Kisma\Components\Seed
 	{
 		//*************************************************************************
 		//* Private Members
@@ -54,15 +60,16 @@ namespace Kisma\Utility
 
 		/**
 		 * Constructor
+		 *
 		 * @param array $options
 		 */
 		public function __construct( $options = array() )
 		{
-			$this->_code = \K::o( $options, 'code' );
-			$this->_body = \K::o( $options, 'body' );
-			$this->_headers = \K::o( $options, 'headers', array() );
-			$this->_info = \K::o( $options, 'info' );
-			$this->_url = \K::o( $this->_info, 'url' );
+			$this->_code = K::o( $options, 'code' );
+			$this->_body = K::o( $options, 'body' );
+			$this->_headers = K::o( $options, 'headers', array() );
+			$this->_info = K::o( $options, 'info' );
+			$this->_url = K::o( $this->_info, 'url' );
 		}
 
 		//*************************************************************************
@@ -71,6 +78,7 @@ namespace Kisma\Utility
 
 		/**
 		 * @param string $body
+		 *
 		 * @return \Kisma\Utility\HttpResponse
 		 */
 		public function setBody( $body )
@@ -89,6 +97,7 @@ namespace Kisma\Utility
 
 		/**
 		 * @param int $code
+		 *
 		 * @return \Kisma\Utility\HttpResponse
 		 */
 		public function setCode( $code )
@@ -107,6 +116,7 @@ namespace Kisma\Utility
 
 		/**
 		 * @param array $headers
+		 *
 		 * @return \Kisma\Utility\HttpResponse
 		 */
 		public function setHeaders( $headers )
@@ -125,6 +135,7 @@ namespace Kisma\Utility
 
 		/**
 		 * @param array $info
+		 *
 		 * @return \Kisma\Utility\HttpResponse
 		 */
 		public function setInfo( $info )
@@ -143,6 +154,7 @@ namespace Kisma\Utility
 
 		/**
 		 * @param string $url
+		 *
 		 * @return \Kisma\Utility\HttpResponse
 		 */
 		public function setUrl( $url )

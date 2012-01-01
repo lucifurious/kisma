@@ -39,7 +39,7 @@ namespace Kisma\Extensions\Davenport\Utility
 	/**
 	 * CouchHelper
 	 */
-	class CouchHelper extends \Kisma\Components\SubComponent implements \Kisma\IUtility
+	class CouchHelper extends \Kisma\Components\Seed implements \Kisma\IUtility
 	{
 		//*************************************************************************
 		//* Public Methods 

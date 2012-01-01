@@ -29,16 +29,12 @@ namespace Kisma\Components
 	 * @property int $serviceType The type of service provided by this object
 	 * @property string $serviceName The name of this service
 	 */
-	abstract class Service extends Component implements \Kisma\IComponentService
+	abstract class Service extends Seed implements \Kisma\IComponentService
 	{
 		//********************************************************************************
 		//* Private Members
 		//********************************************************************************
 
-		/**
-		 * @var \Kisma\ServiceType The type of service provided by this object
-		 */
-		protected $_serviceType = \Kisma\ServiceType::Generic;
 		/**
 		 * @var string The name of this service
 		 */
@@ -49,20 +45,22 @@ namespace Kisma\Components
 		//*************************************************************************
 
 		/**
-		 * @param \Kisma\Components\Event $event
+		 * @param \Kisma\Event\ServiceEvent $event
+		 *
 		 * @return bool
 		 */
-		public function onBeforeServiceCall( $event )
+		public function onBeforeServiceCall( \Kisma\Event\ServiceEvent $event )
 		{
 			//	Default implementation
 			return true;
 		}
 
 		/**
-		 * @param \Kisma\Components\Event $event
+		 * @param \Kisma\Event\ServiceEvent $event
+		 *
 		 * @return bool
 		 */
-		public function onAfterServiceCall( $event )
+		public function onAfterServiceCall( \Kisma\Event\ServiceEvent $event )
 		{
 			//	Default implementation
 			return true;
@@ -73,25 +71,8 @@ namespace Kisma\Components
 		//********************************************************************************
 
 		/**
-		 * @param \Kisma\ServiceType $serviceType
-		 * @return \Kisma\Components\Service
-		 */
-		protected function _setServiceType( $serviceType )
-		{
-			$this->_serviceType = $serviceType;
-			return $this;
-		}
-
-		/**
-		 * @return \Kisma\ServiceType
-		 */
-		public function getServiceType()
-		{
-			return $this->_serviceType;
-		}
-
-		/**
 		 * @param string $serviceName
+		 *
 		 * @return \Kisma\Components\Service
 		 */
 		public function setServiceName( $serviceName )

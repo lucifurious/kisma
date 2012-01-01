@@ -347,7 +347,7 @@ interface IProvider extends IComponent
 /**
  *
  */
-interface IModel extends IComponent
+interface IModel extends IComponent, \ArrayAccess
 {
 }
 
