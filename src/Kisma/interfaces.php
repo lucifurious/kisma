@@ -252,30 +252,6 @@ interface IReactor extends IKisma
  */
 interface IAspect extends IConfigurable, IObservable
 {
-	/**
-	 * Link to a parent component
-	 *
-	 * @param \Kisma\Components\Component $linker
-	 *
-	 * @return \Kisma\Components\Aspect
-	 */
-	public function link( \Kisma\Components\Component $linker );
-
-	/**
-	 * Unlinks the aspect from a $linker
-	 *
-	 * @param \Kisma\Components\Component $linker
-	 *
-	 * @return \Kisma\Components\Aspect
-	 */
-	public function unlink( \Kisma\Components\Component $linker );
-
-	/**
-	 * Returns the currently linked parent
-	 *
-	 * @return Components\Component
-	 */
-	public function getLinker();
 }
 
 /**

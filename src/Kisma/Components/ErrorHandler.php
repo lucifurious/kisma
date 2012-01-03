@@ -26,12 +26,8 @@ use Kisma\Utility as Utility;
  * ErrorHandler
  * Generic error handler
  */
-class ErrorHandler extends Seed
+class ErrorHandler extends Seed implements \Kisma\IReactor
 {
-	//*************************************************************************
-	//* Constants
-	//*************************************************************************
-
 	//*************************************************************************
 	//* Private Members
 	//*************************************************************************
@@ -39,19 +35,19 @@ class ErrorHandler extends Seed
 	/**
 	 * @var int
 	 */
-	protected $_backtraceLines = 10;
+	protected static $_backtraceLines = 10;
 	/**
 	 * @var int
 	 */
-	protected $_sourceLines = 25;
+	protected static $_sourceLines = 25;
 	/**
 	 * @var string
 	 */
-	protected $_viewRoute;
+	protected static $_viewRoute;
 	/**
 	 * @var string|\Exception
 	 */
-	protected $_error;
+	protected static $_error;
 
 	//*************************************************************************
 	//* Public Methods
@@ -62,12 +58,12 @@ class ErrorHandler extends Seed
 	 *
 	 * @param \Kisma\Event\ErrorEvent $event
 	 */
-	public function onError( $event )
+	public static function onError( $event )
 	{
-		$_trace = $event->getTrace( false, $this->_backtraceLines );
-		$_traceText = $this->_cleanTrace( $_trace, 3 );
+		$_trace = $event->getTrace( false, self::$_backtraceLines );
+		$_traceText = self::_cleanTrace( $_trace, 3 );
 
-		$this->_error = array(
+		self::$_error = array(
 			'code' => $event->getCode(),
 			'type' => $event->getTypeString(),
 			'message' => $event->getMessage(),
@@ -77,7 +73,7 @@ class ErrorHandler extends Seed
 			'traces' => $_trace,
 		);
 
-		\Kisma\K::app( 'renderer' )->render( '_error', $this->_error );
+		\Kisma\Kisma::app()->renderError( self::$_error );
 	}
 
 	/**
@@ -85,12 +81,12 @@ class ErrorHandler extends Seed
 	 *
 	 * @param \Kisma\Event\ErrorEvent $event
 	 */
-	public function onException( $event )
+	public static function onException( $event )
 	{
 		/** @var $_exception \Exception */
-		$_exception = $event->getTarget();
+		$_exception = $event->getException();
 
-		$this->_error = array(
+		self::$_error = array(
 			'code' => $event->getCode(),
 			'type' => $event->getTypeString(),
 			'message' => $event->getMessage(),
@@ -98,9 +94,14 @@ class ErrorHandler extends Seed
 			'line' => $event->getLine(),
 			'trace' => $_exception->getTraceAsString(),
 			'traces' => $event->getTrace(),
+			'source' => self::_getCodeLines( $event->getFile(), $event->getLine(), self::$_sourceLines ),
 		);
 
-		\Kisma\K::app( 'renderer' )->render( '_exception', $this->_error );
+		$_app = \Kisma\Kisma::app();
+
+		\Kisma\Kisma::log( self::$_error['message'] . ' (' . self::$_error['code'] . ')', \Kisma\LogLevel::Error );
+
+		\Kisma\Kisma::app()->renderError( self::$_error );
 	}
 
 	//*************************************************************************
@@ -115,7 +116,7 @@ class ErrorHandler extends Seed
 	 *
 	 * @return null|string
 	 */
-	protected function _cleanTrace( array &$trace, $skipLines = null )
+	protected static function _cleanTrace( array &$trace, $skipLines = null )
 	{
 		$_traceText = null;
 
@@ -140,7 +141,7 @@ class ErrorHandler extends Seed
 			}
 			else
 			{
-				$_traceText = $_code['function'];
+				$_traceText .= $_code['function'];
 			}
 
 			$_traceText .= '()' . PHP_EOL;
@@ -149,4 +150,43 @@ class ErrorHandler extends Seed
 		return $_traceText;
 	}
 
+	/**
+	 * @param string $fileName
+	 * @param int	$line
+	 * @param int	$maxLines
+	 *
+	 * @return string
+	 */
+	protected static function _getCodeLines( $fileName, $line, $maxLines )
+	{
+		$_lineNumber = $line - 1;
+
+		if ( $_lineNumber < 0 || false === ( $_source = @file( $fileName ) ) )
+		{
+			return null;
+		}
+
+		if ( $_lineNumber >= ( $_lineCount = count( $_source ) ) )
+		{
+			return null;
+		}
+
+		$_result = null;
+
+		$_halfLines = (int)( $maxLines / 2 );
+		$_beginLine = $_lineNumber - $_halfLines > 0 ? $_lineNumber - $_halfLines : 0;
+		$_endLine = $_lineNumber + $_halfLines < $_lineCount ? $_lineNumber + $_halfLines : $_lineCount - 1;
+
+		for ( $_i = $_beginLine; $_i <= $_endLine; $_i++ )
+		{
+			$_line = trim( str_replace( array( "\r", "\t", "\n" ), '  ', $_source[$_i] ) );
+
+			if ( !empty( $_line ) )
+			{
+				$_result .= $_source[$_i];
+			}
+		}
+
+		return $_result;
+	}
 }

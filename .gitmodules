@@ -10,3 +10,9 @@
 [submodule "vendor/doctrine-common"]
 	path = vendor/doctrine-common
 	url = git://github.com/doctrine/common.git
+[submodule "vendor/twig"]
+	path = vendor/twig
+	url = git://github.com/fabpot/Twig.git
+[submodule "vendor/bootstrap"]
+	path = vendor/bootstrap
+	url = git://github.com/twitter/bootstrap.git

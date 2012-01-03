@@ -182,4 +182,39 @@ class Property extends \Kisma\Components\Seed implements \Kisma\IUtility
 		throw new $_class( 'Property "' . get_called_class() . '"."' . $name . '" is ' . $_reason . '.', $type );
 	}
 
+	/**
+	 * @param object		   $object The target object
+	 * @param string|array	 $property Single property name or an array of KVPs
+	 * @param mixed|null	   $value The single property value or null
+	 * @param bool             $required If true, undefined properties throw exceptions
+	 *
+	 * @return object The object being set
+	 */
+	public static function set( $object, $property, $value = null, $required = false )
+	{
+		if ( !is_array( $property ) )
+		{
+			$property = array( $property => $value );
+		}
+
+		foreach ( $property as $_key => $_value )
+		{
+			try
+			{
+				Property::property( $object, $property, \Kisma\AccessorMode::Set, $value );
+			}
+			catch ( \Kisma\UndefinedPropertyException $_ex )
+			{
+				if ( true === $required )
+				{
+					throw $_ex;
+				}
+
+				//	Ignored...
+			}
+		}
+
+		return $object;
+	}
+
 }

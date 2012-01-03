@@ -26,6 +26,15 @@ namespace Kisma\Utility;
 class Events implements \Kisma\IUtility
 {
 	//*************************************************************************
+	//* Constants
+	//*************************************************************************
+
+	/**
+	 * @var string The default event handler signature
+	 */
+	const DefaultEventHandlerSignature = 'on';
+
+	//*************************************************************************
 	//* Public Methods 
 	//*************************************************************************
 
@@ -38,7 +47,7 @@ class Events implements \Kisma\IUtility
 	 *
 	 * @return
 	 */
-	public static function subscribe( $object, $listeners = null, $signature = 'on' )
+	public static function subscribe( $object, $listeners = null, $signature = self::DefaultEventHandlerSignature )
 	{
 		if ( null === ( $_listeners = $listeners ) )
 		{
@@ -77,7 +86,7 @@ class Events implements \Kisma\IUtility
 	 *
 	 * @return array
 	 */
-	public static function discover( $object, $signature = 'on' )
+	public static function discover( $object, $signature = self::DefaultEventHandlerSignature )
 	{
 		$_listeners = array();
 

@@ -104,20 +104,7 @@ abstract class Seed implements \Kisma\IKisma, \Kisma\IConfigurable, \Countable, 
 	 */
 	public function setOption( $name, $value = null )
 	{
-		try
-		{
-			Property::property( $this->_options, $name, \Kisma\AccessorMode::Set, $value );
-		}
-		catch ( \Kisma\UndefinedPropertyException $_ex )
-		{
-			if ( true === $this->_propertiesRequired )
-			{
-				throw $_ex;
-			}
-
-			//	Ignored...
-		}
-
+		Property::set( $this->_options, $name, $value, $this->_propertiesRequired );
 		return $this;
 	}
 

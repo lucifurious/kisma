@@ -33,7 +33,9 @@ require_once __DIR__ . '/Kisma/enums.php';
 use \Silex;
 use \Kisma\Event;
 use \Kisma\Provider;
-use \Kisma\Utility;
+use \Kisma\Utility\Property;
+use \Kisma\Utility\Events;
+use \Kisma\Utility\Option;
 
 /**
  * The Kisma bootstrap loader
@@ -49,6 +51,10 @@ class Kisma extends \Silex\Application
 	//* Constants
 	//*************************************************************************
 
+	/**
+	 * @var string The version number of Kisma
+	 */
+	const Version = '1.0.0alpha';
 	/**
 	 * @var string
 	 */
@@ -103,7 +109,11 @@ class Kisma extends \Silex\Application
 	 *
 	 * @var \Kisma\Kisma
 	 */
-	public static $_app = null;
+	protected static $_app = null;
+	/**
+	 * @var string The web root path
+	 */
+	protected $_webRoot = null;
 
 	//*************************************************************************
 	//* Public Methods
@@ -111,19 +121,36 @@ class Kisma extends \Silex\Application
 
 	/**
 	 * Construct our app and set our event handler
+	 *
+	 * @param array $options
 	 */
-	public function __construct()
+	public function __construct( $options = array() )
 	{
-		parent::__construct();
-
 		//	Save me
 		self::$_app = $this;
 
-		//	Set base path
-		$this['base_path'] = __DIR__ . '/..';
+		//	Call poppa
+		parent::__construct();
 
-		//	Add our event handler
-		Utility\Events::subscribe( $this );
+		//	Some initialization
+		$this['base_path'] = realpath( __DIR__ . '/../' );
+		$this['system_view_path'] = realpath( __DIR__ . '/Kisma/Views' );
+		$this['vendor_path'] = realpath( __DIR__ . '/../vendor' );
+		$this['is_cli'] = ( 'cli' == php_sapi_name() );
+
+		//	Add our required namespaces
+		$this[self::Autoloader]->registerNamespaces(
+			array(
+				'Kisma' => __DIR__,
+				'SilexExtension' => __DIR__ . '/../vendor/silex-extension/src'
+			)
+		);
+
+		//	Set any configuration options that are passed in...
+		$this->_loadConfiguration( $options );
+
+		//	Auto-subscribe for my handlers
+		Events::subscribe( $this );
 
 		//	Dispatch initialize...
 		$this->dispatch( Event\ApplicationEvent::Initialize );
@@ -164,7 +191,13 @@ class Kisma extends \Silex\Application
 	 */
 	public function render( $viewFile, $payload = array(), $returnString = false )
 	{
-		$_output = $this['twig']->render( $viewFile, $payload );
+		if ( !isset( $this['twig'] ) )
+		{
+			//	No twig? No go...
+			return;
+		}
+
+		$_output = $this['twig']->render( $viewFile, $this->_getBaseRenderPayload( $payload ) );
 
 		if ( false !== $returnString )
 		{
@@ -172,6 +205,175 @@ class Kisma extends \Silex\Application
 		}
 
 		echo $_output;
+	}
+
+	/**
+	 * Renders an error
+	 *
+	 * @param array $error
+	 */
+	public function renderError( $error = array() )
+	{
+		$_errorTemplate = self::app( 'error_template', '_error.twig' );
+
+		$this->render(
+			$_errorTemplate,
+			array(
+				'page_title' => 'Error',
+				'error' => $error,
+				'page_header' => 'Something has gone awry...',
+				'page_header_small' => 'Not cool. :(',
+				'topbar' => array(
+					'brand' => 'Kisma v' . self::Version,
+					'items' => array(
+						array(
+							'title' => 'Kisma on GitHub!',
+							'href' => 'http://github.com/Pogostick/Kisma/',
+							'target' => '_blank',
+							'active' => 'active',
+						),
+					),
+				),
+			)
+		);
+	}
+
+	/**
+	 * Returns an array of standard values passed to all views
+	 *
+	 * @param array $additional
+	 *
+	 * @return array
+	 */
+	protected function _getBaseRenderPayload( $additional = array() )
+	{
+		$_payload = array(
+			'app_name' => $this['app.config.app_name'],
+			'app_root' => $this['app.config.app_root'],
+			'app_version' => $this->app( 'app.config.app_version', 'Kisma Framework v ' . self::Version ),
+			'page_date' => date( 'Y-m-d H:i:s' ),
+			'vendor_path' => $this['vendor_path'],
+		);
+
+		return array_merge( $_payload, $additional );
+	}
+
+	/**
+	 * @static
+	 *
+	 * @param string|null $service
+	 * @param null		$defaultValue
+	 *
+	 * @return \Silex\Application|\Kisma\Kisma|\Symfony\Component\EventDispatcher\EventDispatcher|\Silex\ServiceProviderInterface|\Silex\ControllerProviderInterface
+	 */
+	public static function app( $service = null, $defaultValue = null )
+	{
+		if ( null === $service )
+		{
+			return self::$_app;
+		}
+
+		if ( null !== $defaultValue && !isset( self::$_app[$service] ) )
+		{
+			return $defaultValue;
+		}
+
+		return self::$_app[$service];
+	}
+
+	//*************************************************************************
+	//* Private Methods
+	//*************************************************************************
+
+	/**
+	 * Registers all the controllers found with Silex
+	 */
+	protected function _registerControllers()
+	{
+		$_controllerPath =
+			isset( $this['app.config.controller_path'] ) ? $this['app.config.controller_path'] : '/controllers';
+		$_path = rtrim( \Kisma\Kisma::app( 'app.config.app_root' ), '/' ) . $_controllerPath;
+
+		//	Get the list of directories within the controller path
+		$_directory = \dir( $_path );
+
+		/** @var $_entry string */
+		while ( false !== ( $_entry = $_directory->read() ) )
+		{
+			$_entryPath = $_path . '/' . $_entry;
+
+			//	Skip the dirs and unreadables
+			if ( !is_file( $_entryPath ) || !is_readable( $_entryPath ) )
+			{
+				continue;
+			}
+
+			require_once $_entryPath;
+
+			$_route =
+				lcfirst( Utility\Inflector::camelize( str_ireplace( 'Controller.php', null,
+					basename( $_entryPath ) ) ) );
+			$_class = str_ireplace( '.php', null, basename( $_entryPath ) );
+
+			$this->mount( '/' . $_route, new $_class() );
+		}
+
+		//	If there is a default route, set it up as well.
+		if ( isset( $this['app.config.default_controller'] ) )
+		{
+			$this->match( '/', function( \Silex\Application $app, \Symfony\Component\HttpFoundation\Request $request )
+			{
+				$this->redirect( '/' . $app['app.config.default_controller'] );
+			} );
+		}
+	}
+
+	/**
+	 * @param array $options
+	 */
+	protected function _loadConfiguration( $options = array() )
+	{
+		if ( is_array( $options ) && !empty( $options ) )
+		{
+			foreach ( $options as $_key => $_value )
+			{
+				$this[$_key] = $_value;
+			}
+		}
+
+		//	Load all files in the app config directory
+		if ( isset( $this['app.config.app_root'] ) )
+		{
+			$_configs = glob( $this['app.config.app_root'] . self::app( 'app.config.config_path', '/config' ) . '/*' );
+
+			foreach ( $_configs as $_config )
+			{
+				$_baseName = str_ireplace( '.php', null, basename( $_config ) );
+				$this[$_baseName] = include( $_config );
+
+				//	If there are any items, add to individual settings
+				if ( isset( $this[$_baseName] ) && !empty( $this[$_baseName] ) )
+				{
+					foreach ( $this[$_baseName] as $_key => $_value )
+					{
+						//	Don't prepend config name to '@' prefixed keys
+						if ( '@' == $_key[0] )
+						{
+							$_key = ltrim( $_key, '@' );
+							$this[$_key] = $_value;
+
+							//	Remove from config-level
+							unset( $this[$_baseName][$_key] );
+						}
+						//	Append key name to base name and save
+						else
+						{
+							$this[$_baseName . '.' . $_key] = $_value;
+						}
+					}
+				}
+			}
+		}
 	}
 
 	//*************************************************************************
@@ -187,47 +389,48 @@ class Kisma extends \Silex\Application
 	{
 		$_self = $this;
 
-		//	Add our required namespaces
-		$this[self::Autoloader]->registerNamespaces( array(
-			'Kisma' => __DIR__, 'SilexExtension' => __DIR__ . '/../vendor/silex-extension/src'
-		) );
-
-		//@todo	Read configuration file...
-		$this[self::AppConfig] = $this->share( function ()
-		{
-			return new \Kisma\Provider\AppConfigServiceProvider();
-		} );
-
-		//	Some initialization
-		$this['is_cli'] = ( 'cli' == php_sapi_name() );
-
-		//	Set up error handling
-		$this[self::ErrorHandler] = $this->protect( function() use ( $_self )
-		{
-			\set_error_handler( function( $code, $message ) use ( $_self )
-			{
-				Kisma::app( self::Dispatcher )
-					->dispatch( 'error', new \Kisma\Event\ErrorEvent( $_self, $code, $message ) );
-			} );
-
-			\set_exception_handler( function( $exception ) use ( $_self )
-			{
-				Kisma::app( self::Dispatcher )->dispatch( 'error', new \Kisma\Event\ErrorEvent( $_self, $exception ) );
-			} );
-
-			return new \Kisma\Components\ErrorHandler( self::app() );
-		} );
-
-		$_logPath = isset( $this['app.config.log_path'] ) ? $this['app.config.log_path'] : $this['base_path'];
-		$_logFileName =
-			$_logPath . '/' . ( isset( $this['app.config.log_file_name'] ) ? $this['app.config.log_file_name'] :
-				'kisma.log' );
+		$this['app.config.log_path'] = $_logPath = self::app( 'app.config.log_path', $this['base_path'] );
+		$_logFileName = $_logPath . '/' . self::app( 'app.config.log_file_name', 'web.app.log' );
 
 		$this->register( new \Silex\Provider\MonologServiceProvider(), array(
 			'monolog.logfile' => $_logFileName,
-			'monolog.class_path' => $this['base_path'] . '/vendor/silex/vendor/monolog/src',
+			'monolog.class_path' => $this['vendor_path'] . '/silex/vendor/monolog/src',
 			'monolog.name' => isset( $this['app.config.app_name'] ) ? $this['app.config.app_name'] : 'kisma',
 		) );
+
+		//	Initialize the view renderer
+		if ( false === $this['is_cli'] )
+		{
+			$this[self::Autoloader]->registerPrefix( 'Twig', __DIR__ . '/../vendor/twig/lib' );
+
+			$this->register( new \Silex\Provider\TwigServiceProvider(), array(
+				'twig.path' => array(
+					$this['app.config.app_root'] . '/views',
+					$this['system_view_path'],
+				),
+				'twig.class_path' => $this['vendor_path'] . '/silex/vendor/twig/lib',
+			) );
+		}
+
+		\set_error_handler( function( $code, $message ) use ( $_self )
+		{
+			\Kisma\Components\ErrorHandler::onError( new \Kisma\Event\ErrorEvent( $_self, $code, $message ) );
+		} );
+
+		\set_exception_handler( function( $exception ) use ( $_self )
+		{
+			\Kisma\Components\ErrorHandler::onException( new \Kisma\Event\ErrorEvent( $_self, $exception ) );
+		} );
+
+		//	Set up error handling
+		$this->error( function( $exception, $code ) use ( $_self )
+		{
+			\Kisma\Components\ErrorHandler::onException( new \Kisma\Event\ErrorEvent( $_self, $exception ) );
+		} );
+
+		echo $this['xyz'];
+
+		$this->_registerControllers();
 
 		self::log( 'Initialization complete.' );
 
@@ -245,7 +448,7 @@ class Kisma extends \Silex\Application
 	}
 
 	//*************************************************************************
-	//* Array/Option Methods
+	//* Array/Option Helpers
 	//*************************************************************************
 
 	/**
@@ -260,7 +463,7 @@ class Kisma extends \Silex\Application
 	 */
 	public static function getOption( &$options = array(), $key, $defaultValue = null, $unsetValue = false )
 	{
-		return self::o( $options, $key, $defaultValue, $unsetValue );
+		return Option::o( $options, $key, $defaultValue, $unsetValue );
 	}
 
 	/**
@@ -277,65 +480,7 @@ class Kisma extends \Silex\Application
 	 */
 	public static function o( &$options = array(), $key, $defaultValue = null, $unsetValue = false )
 	{
-		$_originalKey = $key;
-
-		//	Set the default value
-		$_newValue = $defaultValue;
-
-		//	Get array value if it exists
-		if ( is_array( $options ) )
-		{
-			//	Check for the original key too
-			if ( isset( $options[$_originalKey] ) )
-			{
-				$key = $_originalKey;
-			}
-
-			if ( isset( $options[$key] ) )
-			{
-				$_newValue = $options[$key];
-
-				if ( $unsetValue )
-				{
-					unset( $options[$key] );
-				}
-			}
-
-			//	Set it in the array if not an unsetter...
-			if ( !$unsetValue )
-			{
-				$options[$key] = $_newValue;
-			}
-		}
-		//	Also now handle accessible object properties
-		else if ( is_object( $options ) )
-		{
-			if ( property_exists( $options, $_originalKey ) )
-			{
-				$key = $_originalKey;
-			}
-
-			if ( property_exists( $options, $key ) )
-			{
-				if ( isset( $options->$key ) )
-				{
-					$_newValue = $options->$key;
-
-					if ( $unsetValue )
-					{
-						unset( $options->$key );
-					}
-				}
-
-				if ( !$unsetValue )
-				{
-					$options->$key = $_newValue;
-				}
-			}
-		}
-
-		//	Return...
-		return $_newValue;
+		return Option::o( $options, $key, $defaultValue, $unsetValue );
 	}
 
 	/**
@@ -351,7 +496,7 @@ class Kisma extends \Silex\Application
 	 */
 	public static function oo( &$options = array(), $key, $subKey, $defaultValue = null, $unsetValue = false )
 	{
-		return self::o( self::o( $options, $key, array() ), $subKey, $defaultValue, $unsetValue );
+		return Option::o( Option::o( $options, $key, array() ), $subKey, $defaultValue, $unsetValue );
 	}
 
 	/**
@@ -365,7 +510,7 @@ class Kisma extends \Silex\Application
 	 */
 	public static function setOption( &$options = array(), $key, $value = null )
 	{
-		return self::so( $options, $key, $value );
+		return Option::so( $options, $key, $value );
 	}
 
 	/**
@@ -379,16 +524,7 @@ class Kisma extends \Silex\Application
 	 */
 	public static function so( &$options = array(), $key, $value = null )
 	{
-		if ( is_array( $options ) )
-		{
-			return $options[$key] = $value;
-		}
-		else if ( is_object( $options ) )
-		{
-			return $options->$key = $value;
-		}
-
-		return null;
+		return Option::so( $options, $key, $value );
 	}
 
 	/**
@@ -401,7 +537,7 @@ class Kisma extends \Silex\Application
 	 */
 	public static function unsetOption( &$options = array(), $key )
 	{
-		return self::uo( $options, $key );
+		return Option::uo( $options, $key );
 	}
 
 	/**
@@ -414,25 +550,12 @@ class Kisma extends \Silex\Application
 	 */
 	public static function uo( &$options = array(), $key )
 	{
-		return self::o( $options, $key, null, true );
+		return Option::o( $options, $key, null, true );
 	}
 
-	/**
-	 * @static
-	 *
-	 * @param string|null $service
-	 *
-	 * @return \Silex\Application|\Kisma\Kisma|\Symfony\Component\EventDispatcher\EventDispatcher|\Silex\ServiceProviderInterface|\Silex\ControllerProviderInterface
-	 */
-	public static function app( $service = null )
-	{
-		if ( null === $service )
-		{
-			return self::$_app;
-		}
-
-		return self::$_app[$service];
-	}
+	//*************************************************************************
+	//* Logging Helper
+	//*************************************************************************
 
 	/**
 	 * @static
@@ -443,15 +566,24 @@ class Kisma extends \Silex\Application
 	 */
 	public static function log( $message, $level = LogLevel::Info, $echo = false )
 	{
-		$_logger = self::app( self::Logger );
+		error_log( $message . PHP_EOL );
+
+		$_app = self::app();
 
 		/** @var $_logger \Monolog\Logger */
-		if ( false !== $echo )
+		if ( !isset( $_app[self::Logger] ) || false !== $echo )
 		{
-			echo $message;
+			error_log( $message . PHP_EOL );
+
+			echo $message . ( self::app( 'is_cli', false ) ? PHP_EOL : '<br/>' );
+
+			if ( !$_logger )
+			{
+				return;
+			}
 		}
 
-		$_logger->{$level}( $message );
+		$_app[self::Logger]->{$level}( $message );
 	}
 
 }

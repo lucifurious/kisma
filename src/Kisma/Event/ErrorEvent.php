@@ -76,13 +76,13 @@ class ErrorEvent extends KismaEvent
 	//*************************************************************************
 
 	/**
-	 * @param \Kisma\Components\Seed																$target
-	 * @param int|\Exception|\Symfony\Component\HttpKernel\Exception\HttpExceptionInterface		 $code
-	 * @param string																				$message
-	 * @param string																				$fileName
-	 * @param string																				$lineNumber
+	 * @param object $target
+	 * @param mixed  $code
+	 * @param string $message
+	 * @param string $fileName
+	 * @param string $lineNumber
 	 */
-	public function __construct( \Kisma\Components\Seed $target, $code, $message = null, $fileName = null, $lineNumber = null )
+	public function __construct( $target, $code, $message = null, $fileName = null, $lineNumber = null )
 	{
 		parent::__construct( $target );
 
@@ -135,7 +135,7 @@ class ErrorEvent extends KismaEvent
 			E_RECOVERABLE_ERROR => 'Recoverable Error'
 		);
 
-		return \K::o( $_types, $this->_code, 'Unknown Error Type (' . $this->_code . ')' );
+		return \Kisma\Utility\Option::o( $_types, $this->_code, 'Unknown Error Type (' . $this->_code . ')' );
 	}
 
 	/**
@@ -188,7 +188,7 @@ class ErrorEvent extends KismaEvent
 	{
 		if ( null === $this->_exception )
 		{
-			return debug_backtrace( $returnObject, $traceLimit );
+			return debug_backtrace( $returnObject );
 		}
 
 		return $this->_exception->getTrace();

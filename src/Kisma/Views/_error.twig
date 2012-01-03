@@ -1,0 +1,21 @@
+{% extends 'bootstrap/_bootstrap_container_one_column.twig' %}
+
+{% block all_content %}
+
+<h2>{{ error.type }}</h2>
+
+<p class="message">
+	{{ error.message }}
+</p>
+
+<div class="source">
+	<h2>This Is Not My Beautiful Code!</h2>
+<div class="file">{{ error.file }} ({{error.line}})</div>
+{% if error.source %}<pre class="prettyprint">{{ error.source }}</pre>{% endif %}
+</div>
+
+<div class="traces">
+	<h2>How Did We Get Here?</h2>
+</div>
+
+{%endblock%}

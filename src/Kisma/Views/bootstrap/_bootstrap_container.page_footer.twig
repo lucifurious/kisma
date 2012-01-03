@@ -1,0 +1,9 @@
+<footer>
+	{% if footer_content %}
+		{{ footer_content }}
+	{% else %}
+		<div>
+			<span class="pull-left">Page rendered at: {{ page_date }}</span><span class="pull-right">{{ app_version }}</span>
+		</div>
+	{% endif %}
+</footer>

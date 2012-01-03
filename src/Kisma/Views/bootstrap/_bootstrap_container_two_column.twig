@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+{% block html_head %}
+{% include "bootstrap/_bootstrap_container.html_head.twig" %}
+{% endblock %}
+
+<body onload="prettyPrint()">
+
+{% block topbar %}
+{% include 'bootstrap/_bootstrap_container.topbar.twig' %}
+{% endblock %}
+
+
+<div class="container">
+
+	<div class="content">
+
+		{% if page_header %}
+		{% block page_header %}
+		{% include 'bootstrap/_bootstrap_container.page_header.twig' %}
+		{% endblock %}
+		{% endif %}
+
+		<div class="row">
+			<div class="span10">
+				{% block main_content %}
+				<h2>{{ main_content_title }}</h2>
+				{{ main_content }}
+				{% endblock %}
+			</div>
+			<div class="span4">
+				{% block secondary_content %}
+				<h3>{{secondary_content_title}}</h3>
+				{{ secondary_content }}
+				{% endblock %}
+			</div>
+		</div>
+
+		{% block footer %}
+		{% include 'bootstrap/_bootstrap_container.page_footer.twig' %}
+		{% endblock %}
+
+	</div>
+</div>
+</body>
+</html>
