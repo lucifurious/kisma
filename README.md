@@ -39,44 +39,44 @@ Requirements
 Metrics
 ==============
 
-![](http://github.com/pogostick/kisma/raw/master/jdepend.png) 
+![](https://github.com/Pogostick/Kisma/raw/master/assets/jdepend.png) 
+
 
 <pre>
-Directories:                                         14
-Files:                                               39
+Directories:                                          5
+Files:                                               44
 
-Lines of Code (LOC):                               8394
-  Cyclomatic Complexity / Lines of Code:           0.07
-Comment Lines of Code (CLOC):                      4649
-Non-Comment Lines of Code (NCLOC):                 3745
+Lines of Code (LOC):                               9799
+  Cyclomatic Complexity / Lines of Code:           0.08
+Comment Lines of Code (CLOC):                      5031
+Non-Comment Lines of Code (NCLOC):                 4768
 
-Namespaces:                                          11
-Interfaces:                                          37
-Classes:                                             72
-  Abstract:                                           8 (11.11%)
-  Concrete:                                          64 (88.89%)
-  Average Class Length (NCLOC):                      60
-Methods:                                            343
+Namespaces:                                           5
+Interfaces:                                          40
+Classes:                                             79
+  Abstract:                                           6 (7.59%)
+  Concrete:                                          73 (92.41%)
+  Average Class Length (NCLOC):                      69
+Methods:                                            313
   Scope:
-    Non-Static:                                     266 (77.55%)
-    Static:                                          77 (22.45%)
+    Non-Static:                                     215 (68.69%)
+    Static:                                          98 (31.31%)
   Visibility:
-    Public:                                         285 (83.09%)
-    Non-Public:                                      58 (16.91%)
-  Average Method Length (NCLOC):                     12
-  Cyclomatic Complexity / Number of Methods:       1.72
+    Public:                                         274 (87.54%)
+    Non-Public:                                      39 (12.46%)
+  Average Method Length (NCLOC):                     17
+  Cyclomatic Complexity / Number of Methods:       2.23
 
-Anonymous Functions:                                  1
+Anonymous Functions:                                 28
 Functions:                                            0
 
-Constants:                                          203
-  Global constants:                                   1
-  Class constants:                                  202
+Constants:                                          249
+  Global constants:                                   0
+  Class constants:                                  249
+
+Tests:
+  Classes:                                            1
+  Methods:                                            0
 </pre>
 
-![](http://github.com/pogostick/kisma/raw/master/pyramid.png) 
-
-Namespace Diagram
-=================
-
-![](http://github.com/pogostick/kisma/raw/master/Kisma.png) 
+![](https://github.com/Pogostick/Kisma/raw/master/assets/pyramid.png) 
