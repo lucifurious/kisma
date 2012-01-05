@@ -19,3 +19,9 @@
 [submodule "vendor/SyntaxHighlighter"]
 	path = vendor/SyntaxHighlighter
 	url = git://github.com/alexgorbatchev/SyntaxHighlighter.git
+[submodule "vendor/silex-extensions"]
+	path = vendor/silex-extensions
+	url = git://github.com/fate/Silex-Extensions.git
+[submodule "vendor/assetic"]
+	path = vendor/assetic
+	url = git://github.com/kriswallsmith/assetic.git
