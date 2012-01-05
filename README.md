@@ -39,7 +39,8 @@ Requirements
 Metrics
 ==============
 
-![](http://github.com/pogostick/kisma/blob/master/jdepend.png) 
+![](https://github.com/Pogostick/Kisma/blob/master/assets/jdepend.png) 
+
 
 <pre>
 Directories:                                          5
@@ -78,9 +79,9 @@ Tests:
   Methods:                                            0
 </pre>
 
-![](http://github.com/pogostick/kisma/blob/master/pyramid.png) 
+![](https://github.com/Pogostick/Kisma/blob/master/assets/pyramid.png) 
 
 Namespace Diagram
 =================
 
-![](http://github.com/pogostick/kisma/raw/master/Kisma.png) 
+![](https://github.com/Pogostick/Kisma/blob/master/assets/Kisma.png) 
