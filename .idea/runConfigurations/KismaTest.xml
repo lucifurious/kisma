@@ -1,0 +1,8 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="KismaTest" type="PHPUnitRunConfigurationType" factoryName="PHPUnit" class="KismaTest" path="$PROJECT_DIR$/tests/KismaTest.php">
+    <TestRunner bootstrap="$PROJECT_DIR$/tests/bootstrap.php" class="KismaTest" file="$PROJECT_DIR$/tests/KismaTest.php" scope="Class" />
+    <RunnerSettings RunnerId="PhpUnitDebugRunner" />
+    <ConfigurationWrapper RunnerId="PhpUnitDebugRunner" />
+    <method />
+  </configuration>
+</component>

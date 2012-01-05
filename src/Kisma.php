@@ -99,6 +99,10 @@ class Kisma extends \Silex\Application
 	 * @var string Twig service
 	 */
 	const Twig = 'twig';
+	/**
+	 * @var string The Assetic asset manager
+	 */
+	const AssetManager = 'asset_manager';
 
 	//*************************************************************************
 	//* Private Members
@@ -110,10 +114,6 @@ class Kisma extends \Silex\Application
 	 * @var \Kisma\Kisma
 	 */
 	protected static $_app = null;
-	/**
-	 * @var string The web root path
-	 */
-	protected $_webRoot = null;
 
 	//*************************************************************************
 	//* Public Methods
@@ -135,14 +135,13 @@ class Kisma extends \Silex\Application
 		//	Some initialization
 		$this['base_path'] = realpath( __DIR__ . '/../' );
 		$this['system_view_path'] = realpath( __DIR__ . '/Kisma/Views' );
-		$this['vendor_path'] = realpath( __DIR__ . '/../vendor' );
+		$this['vendor_path'] = $_vendorPath = realpath( __DIR__ . '/../vendor' );
 		$this['is_cli'] = ( 'cli' == php_sapi_name() );
 
 		//	Add our required namespaces
 		$this[self::Autoloader]->registerNamespaces(
 			array(
 				'Kisma' => __DIR__,
-				'SilexExtension' => __DIR__ . '/../vendor/silex-extension/src'
 			)
 		);
 
@@ -205,37 +204,6 @@ class Kisma extends \Silex\Application
 		}
 
 		echo $_output;
-	}
-
-	/**
-	 * Renders an error
-	 *
-	 * @param array $error
-	 */
-	public function renderError( $error = array() )
-	{
-		$_errorTemplate = self::app( 'error_template', '_error.twig' );
-
-		$this->render(
-			$_errorTemplate,
-			array(
-				'page_title' => 'Error',
-				'error' => $error,
-				'page_header' => 'Something has gone awry...',
-				'page_header_small' => 'Not cool. :(',
-				'topbar' => array(
-					'brand' => 'Kisma v' . self::Version,
-					'items' => array(
-						array(
-							'title' => 'Kisma on GitHub!',
-							'href' => 'http://github.com/Pogostick/Kisma/',
-							'target' => '_blank',
-							'active' => 'active',
-						),
-					),
-				),
-			)
-		);
 	}
 
 	/**
@@ -316,15 +284,31 @@ class Kisma extends \Silex\Application
 			$_class = str_ireplace( '.php', null, basename( $_entryPath ) );
 
 			$this->mount( '/' . $_route, new $_class() );
+
+			//	Add to view path
+			$this['twig.loader.filesystem']->addPath( $this['app.config.app_root'] . $this['app.config.view_path'] . '/' . $_route );
 		}
 
 		//	If there is a default route, set it up as well.
 		if ( isset( $this['app.config.default_controller'] ) )
 		{
-			$this->match( '/', function( \Silex\Application $app, \Symfony\Component\HttpFoundation\Request $request )
+			$this->match( '/', function( \Silex\Application $app )
 			{
-				$this->redirect( '/' . $app['app.config.default_controller'] );
+				$app->redirect( '/' . $app['app.config.default_controller'] );
 			} );
+		}
+
+		//	And asset manager if we're not cli...
+		if ( !$this['is_cli'] )
+		{
+			//			$this[self::Autoloader]->registerNamespace( 'Assetic', $this['vendor_path'] . '/assetic/src' );
+			//
+			//			$this->register(
+			//				new \Kisma\Components\AssetManager(),
+			//				array(
+			//					'assetic.options' => $this['app.config.assetic.options']
+			//				)
+			//			);
 		}
 	}
 
@@ -344,6 +328,8 @@ class Kisma extends \Silex\Application
 		//	Load all files in the app config directory
 		if ( isset( $this['app.config.app_root'] ) )
 		{
+			$this['app.config.app_root'] = realpath( $this['app.config.app_root'] );
+
 			$_configs = glob( $this['app.config.app_root'] . self::app( 'app.config.config_path', '/config' ) . '/*' );
 
 			foreach ( $_configs as $_config )
@@ -403,32 +389,52 @@ class Kisma extends \Silex\Application
 		{
 			$this[self::Autoloader]->registerPrefix( 'Twig', __DIR__ . '/../vendor/twig/lib' );
 
-			$this->register( new \Silex\Provider\TwigServiceProvider(), array(
-				'twig.path' => array(
-					$this['app.config.app_root'] . '/views',
-					$this['system_view_path'],
-				),
-				'twig.class_path' => $this['vendor_path'] . '/silex/vendor/twig/lib',
-			) );
+			$_twigOptions = self::app( 'twig.options', array() );
+
+			if ( empty( $_twigOptions ) )
+			{
+				$_basePath = $this['app.config.app_root'];
+				$_viewPath = $_basePath . $this['app.config.view_path'];
+
+				$_twigOptions = array(
+					'twig.path' => array(
+						$_viewPath,
+						$this['system_view_path'],
+					),
+					'twig.options' => array(
+						'cache' => $this['app.config.app_root'] . '/cache',
+					),
+				);
+			}
+
+			if ( !isset( $_twigOptions['twig.class_path'] ) )
+			{
+				$_twigOptions['twig.class_path'] = $this['vendor_path'] . '/twig/lib';
+			}
+
+			$this->register( new \Silex\Provider\TwigServiceProvider(), $_twigOptions );
 		}
 
 		\set_error_handler( function( $code, $message ) use ( $_self )
 		{
 			\Kisma\Components\ErrorHandler::onError( new \Kisma\Event\ErrorEvent( $_self, $code, $message ) );
+			return false;
 		} );
 
 		\set_exception_handler( function( $exception ) use ( $_self )
 		{
 			\Kisma\Components\ErrorHandler::onException( new \Kisma\Event\ErrorEvent( $_self, $exception ) );
+			return false;
 		} );
 
 		//	Set up error handling
 		$this->error( function( $exception, $code ) use ( $_self )
 		{
 			\Kisma\Components\ErrorHandler::onException( new \Kisma\Event\ErrorEvent( $_self, $exception ) );
+			return false;
 		} );
 
-		echo $this['xyz'];
+		//		echo $this['xyz'];
 
 		$this->_registerControllers();
 

@@ -2,13 +2,13 @@
 <html lang="en">
 
 {% block html_head %}
-{% include "bootstrap/_bootstrap_container.html_head.twig" %}
+{% include "layouts/_master.html_head.twig" %}
 {% endblock %}
 
 <body>
 
 {% block topbar %}
-{% include 'bootstrap/_bootstrap_container.topbar.twig' %}
+{% include 'layouts/_master.topbar.twig' %}
 {% endblock %}
 
 <div class="container">
@@ -17,7 +17,7 @@
 
 		{% if page_header %}
 		{% block page_header %}
-		{% include 'bootstrap/_bootstrap_container.page_header.twig' %}
+		{% include 'layouts/_master.page_header.twig' %}
 		{% endblock %}
 		{% endif %}
 
@@ -32,14 +32,13 @@
 	</div>
 
 	{% block footer %}
-	{% include 'bootstrap/_bootstrap_container.page_footer.twig' %}
+	{% include 'layouts/_master.page_footer.twig' %}
 	{% endblock %}
 
 </div>
 {% block page_scripts %}
 <script type="text/javascript">
 	$(function(){
-
 	});
 </script>
 {% endblock %}

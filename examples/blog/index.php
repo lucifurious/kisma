@@ -27,5 +27,7 @@ $_app = new \Kisma\Kisma(
 	)
 );
 
+$_app['debug'] = true;
+
 //	Start!
 $_app->run();

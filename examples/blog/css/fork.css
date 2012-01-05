@@ -1,0 +1,38 @@
+@import "compass";
+
+#github {
+  left: -65px;
+  height: 30px;
+  top: 40px;
+  position: absolute;
+  text-decoration: none;
+  width: 250px;
+  @include rotate(-45deg);
+  span {
+    background: black;
+    color: white;
+    font-size: 14px;
+    left: 0;
+    padding: 5px 0;
+    position: absolute;
+    text-align: center;
+    width: 250px;
+    @include box-shadow(rgba(black, 0.2) 1px 1px 10px);
+    // If you’re using Compass < 0.11 use this:
+    // @include box-shadow(rgba(black, 0.2), 1px, 1px, 10px);
+    @include transition(opacity, 1s);
+    &:last-child {
+      /* this is the backside */
+      background: red;
+      opacity: 0;
+    }
+  }
+  :hover span {
+    &:first-child {
+      opacity: 0;
+    }
+    &:last-child {
+      opacity: 1;
+    }
+  }
+}
