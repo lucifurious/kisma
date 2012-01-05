@@ -80,8 +80,3 @@ Tests:
 </pre>
 
 ![](https://github.com/Pogostick/Kisma/raw/master/assets/pyramid.png) 
-
-Namespace Diagram
-=================
-
-![](https://github.com/Pogostick/Kisma/raw/master/assets/Kisma.png) 
