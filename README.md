@@ -53,10 +53,10 @@ Non-Comment Lines of Code (NCLOC):                 4768
 
 Namespaces:                                           5
 Interfaces:                                          40
-Classes:                                             79
-  Abstract:                                           6 (7.59%)
-  Concrete:                                          73 (92.41%)
-  Average Class Length (NCLOC):                      69
+Classes:                                             80
+  Abstract:                                           6 (7.50%)
+  Concrete:                                          74 (92.50%)
+  Average Class Length (NCLOC):                      68
 Methods:                                            313
   Scope:
     Non-Static:                                     215 (68.69%)
@@ -73,10 +73,6 @@ Functions:                                            0
 Constants:                                          249
   Global constants:                                   0
   Class constants:                                  249
-
-Tests:
-  Classes:                                            1
-  Methods:                                            0
 </pre>
 
 ![](https://github.com/Pogostick/Kisma/raw/master/assets/pyramid.png) 
