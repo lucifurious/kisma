@@ -43,36 +43,36 @@ Metrics
 
 
 <pre>
-Directories:                                          5
+Directories:                                          6
 Files:                                               44
 
-Lines of Code (LOC):                               9799
+Lines of Code (LOC):                               9641
   Cyclomatic Complexity / Lines of Code:           0.08
-Comment Lines of Code (CLOC):                      5031
-Non-Comment Lines of Code (NCLOC):                 4768
+Comment Lines of Code (CLOC):                      4974
+Non-Comment Lines of Code (NCLOC):                 4667
 
-Namespaces:                                           5
-Interfaces:                                          40
+Namespaces:                                           6
+Interfaces:                                          41
 Classes:                                             80
   Abstract:                                           6 (7.50%)
   Concrete:                                          74 (92.50%)
-  Average Class Length (NCLOC):                      68
-Methods:                                            313
+  Average Class Length (NCLOC):                      66
+Methods:                                            295
   Scope:
-    Non-Static:                                     215 (68.69%)
-    Static:                                          98 (31.31%)
+    Non-Static:                                     204 (69.15%)
+    Static:                                          91 (30.85%)
   Visibility:
-    Public:                                         274 (87.54%)
-    Non-Public:                                      39 (12.46%)
-  Average Method Length (NCLOC):                     17
-  Cyclomatic Complexity / Number of Methods:       2.23
+    Public:                                         255 (86.44%)
+    Non-Public:                                      40 (13.56%)
+  Average Method Length (NCLOC):                     18
+  Cyclomatic Complexity / Number of Methods:       2.27
 
-Anonymous Functions:                                 28
+Anonymous Functions:                                 27
 Functions:                                            0
 
-Constants:                                          249
+Constants:                                          255
   Global constants:                                   0
-  Class constants:                                  249
+  Class constants:                                  255
 </pre>
 
 ![](https://github.com/Pogostick/Kisma/raw/master/assets/pyramid.png) 
