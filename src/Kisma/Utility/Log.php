@@ -82,7 +82,7 @@ class Log extends Components\Seed implements \Kisma\IUtility
 		//	Get the indent, if any
 		$_unindent = ( 0 > ( $_newIndent = self::_processMessage( $message ) ) );
 
-		$_indicator = K::o( self::$_levelIndicators, $logLevel, self::$_defaultLevelIndicator );
+		$_indicator = Option::o( self::$_levelIndicators, $logLevel, self::$_defaultLevelIndicator );
 		$_logEntry = self::$_prefix . $message;
 
 		if ( self::$_echoData )
@@ -200,10 +200,10 @@ class Log extends Components\Seed implements \Kisma\IUtility
 	{
 		$_backTrace = debug_backtrace();
 		$_caller = count( $_backTrace ) - 1;
-		$_function = K::o( $_backTrace[$_caller], 'method', K::o( $_backTrace[$_caller], 'function' ) );
-		$_class = K::o( $_backTrace[$_caller], 'class' );
+		$_function = Option::o( $_backTrace[$_caller], 'method', Option::o( $_backTrace[$_caller], 'function' ) );
+		$_class = Option::o( $_backTrace[$_caller], 'class' );
 
-		$_callingMethod = ( null !== $_class ? $_class . K::o( $_backTrace[$_caller], 'type' ) : null ) . $_function;
+		$_callingMethod = ( null !== $_class ? $_class . Option::o( $_backTrace[$_caller], 'type' ) : null ) . $_function;
 
 		return str_replace( array( '::', 'kisma.' ), array( '.', 'k.' ), Inflector::untag( $_callingMethod ) );
 	}

@@ -118,11 +118,53 @@ abstract class Seed implements \Kisma\IKisma, \Kisma\IConfigurable, \Countable, 
 
 	/**
 	 * @param string						   $eventName
-	 * @param \Kisma\Event\KismaEvent|null     $event
+	 * @param \Kisma\Event\KismaEvent|null	 $event
 	 */
 	public function dispatch( $eventName, $event = null )
 	{
 		\Kisma\K::app( 'dispatcher' )->dispatch( $eventName, $event ? : new \Kisma\Event\ComponentEvent( $this ) );
+	}
+
+	/**
+	 * Loads an array into properties if they exist.
+	 *
+	 * @param object|array $options
+	 * @param bool		 $mergeOptions If false, this object's options will be cleared first
+	 *
+	 * @return void
+	 */
+	public function setOptions( $options = array(), $mergeOptions = true )
+	{
+		//	Create our hash...
+		$this->_objectId = spl_object_hash( $this );
+
+		//	Catch null input, non-traversable, or empty options
+		if ( null === $options || !( $options instanceof \Traversable ) || empty( $options ) )
+		{
+			$options = array();
+		}
+
+		//	Set our own options and work from there
+		if ( true !== $mergeOptions || !is_array( $options ) )
+		{
+			//	Overwrite the options...
+			$this->_options = $options;
+		}
+		else
+		{
+			//	Merge the options...
+			$this->_options = array_merge( $this->_options, $options );
+		}
+
+		//	Loop through, set...
+		foreach ( $this->_options as $_key => $_value )
+		{
+			$this->setOption( $_key, $_value );
+		}
+
+		$this->_count = count( $this->_options );
+
+		return $this;
 	}
 
 	//*************************************************************************
@@ -223,48 +265,6 @@ abstract class Seed implements \Kisma\IKisma, \Kisma\IConfigurable, \Countable, 
 	//*************************************************************************
 	//* Properties
 	//*************************************************************************
-
-	/**
-	 * Loads an array into properties if they exist.
-	 *
-	 * @param object|array $options
-	 * @param bool		 $mergeOptions If false, this object's options will be cleared first
-	 *
-	 * @return void
-	 */
-	public function setOptions( $options = array(), $mergeOptions = true )
-	{
-		//	Create our hash...
-		$this->_objectId = spl_object_hash( $this );
-
-		//	Catch null input, non-traversable, or empty options
-		if ( null === $options || !( $options instanceof \Traversable ) || empty( $options ) )
-		{
-			$options = array();
-		}
-
-		//	Set our own options and work from there
-		if ( true !== $mergeOptions || !is_array( $options ) )
-		{
-			//	Overwrite the options...
-			$this->_options = $options;
-		}
-		else
-		{
-			//	Merge the options...
-			$this->_options = array_merge( $this->_options, $options );
-		}
-
-		//	Loop through, set...
-		foreach ( $this->_options as $_key => $_value )
-		{
-			$this->setOption( $_key, $_value );
-		}
-
-		$this->_count = count( $this->_options );
-
-		return $this;
-	}
 
 	/**
 	 * @param int $count

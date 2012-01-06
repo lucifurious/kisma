@@ -15,160 +15,159 @@
  * @since		 v1.0.0
  * @filesource
  */
-namespace Kisma\Utility
+namespace Kisma\Utility;
+
+//*************************************************************************
+//* Aliases
+//*************************************************************************
+
+use Kisma\K;
+
+/**
+ * HttpResponse
+ * A response to an HTTP request
+ */
+class HttpResponse extends \Kisma\Components\Seed
 {
 	//*************************************************************************
-	//* Aliases
+	//* Private Members
 	//*************************************************************************
 
-	use Kisma\K;
+	/**
+	 * @var int
+	 */
+	protected $_code;
+	/**
+	 * @var string
+	 */
+	protected $_body;
+	/**
+	 * @var array
+	 */
+	protected $_headers;
+	/**
+	 * @var array
+	 */
+	protected $_info;
+	/**
+	 * @var string
+	 */
+	protected $_url;
+
+	//*************************************************************************
+	//* Public Methods
+	//*************************************************************************
 
 	/**
-	 * HttpResponse
-	 * A response to an HTTP request
+	 * Constructor
+	 *
+	 * @param array $options
 	 */
-	class HttpResponse extends \Kisma\Components\Seed
+	public function __construct( $options = array() )
 	{
-		//*************************************************************************
-		//* Private Members
-		//*************************************************************************
+		$this->_code = Option::o( $options, 'code' );
+		$this->_body = Option::o( $options, 'body' );
+		$this->_headers = Option::o( $options, 'headers', array() );
+		$this->_info = Option::o( $options, 'info' );
+		$this->_url = Option::o( $this->_info, 'url' );
+	}
 
-		/**
-		 * @var int
-		 */
-		protected $_code;
-		/**
-		 * @var string
-		 */
-		protected $_body;
-		/**
-		 * @var array
-		 */
-		protected $_headers;
-		/**
-		 * @var array
-		 */
-		protected $_info;
-		/**
-		 * @var string
-		 */
-		protected $_url;
+	//*************************************************************************
+	//* Properties
+	//*************************************************************************
 
-		//*************************************************************************
-		//* Public Methods
-		//*************************************************************************
+	/**
+	 * @param string $body
+	 *
+	 * @return \Kisma\Utility\HttpResponse
+	 */
+	public function setBody( $body )
+	{
+		$this->_body = $body;
+		return $this;
+	}
 
-		/**
-		 * Constructor
-		 *
-		 * @param array $options
-		 */
-		public function __construct( $options = array() )
-		{
-			$this->_code = K::o( $options, 'code' );
-			$this->_body = K::o( $options, 'body' );
-			$this->_headers = K::o( $options, 'headers', array() );
-			$this->_info = K::o( $options, 'info' );
-			$this->_url = K::o( $this->_info, 'url' );
-		}
+	/**
+	 * @return string
+	 */
+	public function getBody()
+	{
+		return $this->_body;
+	}
 
-		//*************************************************************************
-		//* Properties
-		//*************************************************************************
+	/**
+	 * @param int $code
+	 *
+	 * @return \Kisma\Utility\HttpResponse
+	 */
+	public function setCode( $code )
+	{
+		$this->_code = $code;
+		return $this;
+	}
 
-		/**
-		 * @param string $body
-		 *
-		 * @return \Kisma\Utility\HttpResponse
-		 */
-		public function setBody( $body )
-		{
-			$this->_body = $body;
-			return $this;
-		}
+	/**
+	 * @return int
+	 */
+	public function getCode()
+	{
+		return $this->_code;
+	}
 
-		/**
-		 * @return string
-		 */
-		public function getBody()
-		{
-			return $this->_body;
-		}
+	/**
+	 * @param array $headers
+	 *
+	 * @return \Kisma\Utility\HttpResponse
+	 */
+	public function setHeaders( $headers )
+	{
+		$this->_headers = $headers;
+		return $this;
+	}
 
-		/**
-		 * @param int $code
-		 *
-		 * @return \Kisma\Utility\HttpResponse
-		 */
-		public function setCode( $code )
-		{
-			$this->_code = $code;
-			return $this;
-		}
+	/**
+	 * @return array
+	 */
+	public function getHeaders()
+	{
+		return $this->_headers;
+	}
 
-		/**
-		 * @return int
-		 */
-		public function getCode()
-		{
-			return $this->_code;
-		}
+	/**
+	 * @param array $info
+	 *
+	 * @return \Kisma\Utility\HttpResponse
+	 */
+	public function setInfo( $info )
+	{
+		$this->_info = $info;
+		return $this;
+	}
 
-		/**
-		 * @param array $headers
-		 *
-		 * @return \Kisma\Utility\HttpResponse
-		 */
-		public function setHeaders( $headers )
-		{
-			$this->_headers = $headers;
-			return $this;
-		}
+	/**
+	 * @return array
+	 */
+	public function getInfo()
+	{
+		return $this->_info;
+	}
 
-		/**
-		 * @return array
-		 */
-		public function getHeaders()
-		{
-			return $this->_headers;
-		}
+	/**
+	 * @param string $url
+	 *
+	 * @return \Kisma\Utility\HttpResponse
+	 */
+	public function setUrl( $url )
+	{
+		$this->_url = $url;
+		return $this;
+	}
 
-		/**
-		 * @param array $info
-		 *
-		 * @return \Kisma\Utility\HttpResponse
-		 */
-		public function setInfo( $info )
-		{
-			$this->_info = $info;
-			return $this;
-		}
-
-		/**
-		 * @return array
-		 */
-		public function getInfo()
-		{
-			return $this->_info;
-		}
-
-		/**
-		 * @param string $url
-		 *
-		 * @return \Kisma\Utility\HttpResponse
-		 */
-		public function setUrl( $url )
-		{
-			$this->_url = $url;
-			return $this;
-		}
-
-		/**
-		 * @return string
-		 */
-		public function getUrl()
-		{
-			return $this->_url;
-		}
+	/**
+	 * @return string
+	 */
+	public function getUrl()
+	{
+		return $this->_url;
 	}
 }

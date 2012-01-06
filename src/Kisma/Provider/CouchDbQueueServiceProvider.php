@@ -205,23 +205,24 @@ namespace Kisma\Provider
 
 			if ( 404 == $_response->status )
 			{
-				$_document = $_item->getDocument();
+				$_document = $_item;
 			}
-			else if ( 200 != $_response->status )
+			else if ( 200 == $_response->status )
 			{
-				throw new \Kisma\StorageException( 'Unexpected CouchDb response.', $_response->status, null, $_response );
+				$_document = new \Kisma\Container\CouchDbQueueItem( $_response->body );
+
+				Log::debug( 'Found prior queue item, _rev: ' . $_document->getRev() );
 			}
 			else
 			{
-				$_document = $_response->body;
-				Log::debug( 'Found prior queue item, _rev: ' . $_document->_rev );
+				throw new \Kisma\StorageException( 'Unexpected CouchDb response.', $_response->status, null, $_response );
 			}
 
 			//	Doc exists, read and update...
-			$_document->update_time = microtime( true );
-			$_document->feed_data = $_item->getFeedData();
+			$_document->update_time = date( 'c' );
 
-			$_response = $this->getClient()->putDocument( $_document, $_id, $_document->_rev );
+			//	Write it out and update
+			$_response = $this->getClient()->putDocument( $_document->getFields(), $_id, $_document->getRev() );
 
 			if ( isset( $_response->body ) && \Kisma\Utility\Scalar::in( $_response->status, 200, 201 ) )
 			{
@@ -242,9 +243,12 @@ namespace Kisma\Provider
 		public function createQueue( $name )
 		{
 			//	Create and return a new queue
-			return new Queue( array(
-				'queueName' => $name, 'queueService' => $this,
-			) );
+			return new Queue(
+				array(
+					'queueName' => $name,
+					'queueService' => $this,
+				)
+			);
 		}
 
 		/**
@@ -258,7 +262,7 @@ namespace Kisma\Provider
 		public function createKey( $id = null, $salt = null )
 		{
 			//	Start with the _id
-			$_key = $id ?: $this->_queueName . microtime( true );
+			$_key = $id ? : $this->_queueName . microtime( true );
 
 			//	Encrypt first
 			if ( null !== $salt && false !== $this->_encryptKeys )

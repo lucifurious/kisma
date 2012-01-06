@@ -75,7 +75,7 @@ abstract class Controller extends Seed implements \Silex\ControllerProviderInter
 		//	Set up a route for each discovered action...
 		foreach ( $this->_discoverActions() as $_action => $_method )
 		{
-			$_route = '/' . $_action; //$this->_controllerName . '/' . $_action;
+			$_route = '/' . $_action;
 
 			$_controllers->match( $_route,
 				function( Application $app, Request $request ) use( $_action, $_method, $_tag )
@@ -90,7 +90,7 @@ abstract class Controller extends Seed implements \Silex\ControllerProviderInter
 		}
 
 		//	Set up a default route
-		if ( !empty( $this->_defaultAction ) )
+		if ( !empty( $this->_defaultAction ) && !empty( $this->_controllerName ) )
 		{
 			$_route = '/' . $this->_controllerName . '/' . $this->_defaultAction;
 

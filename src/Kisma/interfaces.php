@@ -234,9 +234,16 @@ interface IConfigurable extends IOptions
 }
 
 /**
+ * Defines a container class
+ */
+interface IContainer extends IKisma
+{
+}
+
+/**
  * Defines a data model class
  */
-interface IDataModel extends IKisma
+interface IDataModel extends IContainer
 {
 }
 

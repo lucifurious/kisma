@@ -88,9 +88,11 @@ namespace Kisma\Provider
 		 */
 		public function register( \Kisma\Kisma $app )
 		{
-			$app['db.object'] = $app->share( function() use ( $app )
+			$_this = $this;
+
+			$app['db.object'] = $app->share( function() use ( $app, $_this )
 			{
-				return new self( $app['db.config'] );
+				return $_this;
 			} );
 		}
 

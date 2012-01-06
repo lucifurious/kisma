@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Model event class
+ * A generic Kisma event class
  *
  * Kisma(tm) : PHP Nanoframework (http://github.com/Pogostick/kisma/)
  * Copyright 2009-2011, Jerry Ablan/Pogostick, LLC., All Rights Reserved
@@ -20,47 +20,21 @@
 namespace Kisma\Event;
 
 /**
- * ModelEvent
- * Contains the events triggered by a model
+ * KismaEvent
+ * Wrapper for an event triggered within Kisma
+ *
+ * @property-read \Kisma\Components\Seed $target
  */
-class ModelEvent extends KismaEvent
+class ContainerEvent extends KismaEvent
 {
 	//*************************************************************************
 	//* Class Constants
 	//*************************************************************************
 
 	/**
-	 * @var string
+	 * @var string Triggered with the contents of the container are modified
 	 */
-	const AfterValidate = 'after_validate';
-	/**
-	 * @var string
-	 */
-	const BeforeValidate = 'before_validate';
-	/**
-	 * @var string
-	 */
-	const AfterFind = 'after_find';
-	/**
-	 * @var string
-	 */
-	const BeforeFind = 'before_find';
-	/**
-	 * @var string
-	 */
-	const AfterSave = 'after_save';
-	/**
-	 * @var string
-	 */
-	const BeforeSave = 'before_save';
-	/**
-	 * @var string
-	 */
-	const BeforeDelete = 'before_delete';
-	/**
-	 * @var string
-	 */
-	const AfterDelete = 'after_delete';
+	const ContentsModified = 'contents_modified';
 
 	//*************************************************************************
 	//* Private Members
@@ -69,27 +43,45 @@ class ModelEvent extends KismaEvent
 	/**
 	 * @var mixed
 	 */
-	protected $_response;
+	protected $_property;
+	/**
+	 * @var mixed
+	 */
+	protected $_value;
 
 	/**
-	 * @param	  $target
-	 * @param null $response
+	 * @param mixed  $target
+	 * @param string $property
+	 * @param mixed  $value
 	 *
 	 * @internal param mixed|null $result
 	 */
-	public function __construct( $target, $response = null )
+	public function __construct( $target, $property = null, $value = null )
 	{
 		parent::__construct( $target );
 
-		$this->_response = $response;
+		$this->_property = $property;
+		$this->_value = $value;
+	}
+
+	//*************************************************************************
+	//* Properties
+	//*************************************************************************
+
+	/**
+	 * @return mixed
+	 */
+	public function getValue()
+	{
+		return $this->_value;
 	}
 
 	/**
 	 * @return mixed
 	 */
-	public function getResponse()
+	public function getProperty()
 	{
-		return $this->_response;
+		return $this->_property;
 	}
 
 }

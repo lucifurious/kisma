@@ -31,7 +31,7 @@ use Kisma\Utility;
  * @property mixed $feedData
  * @property mixed $lock
  */
-class CouchDbQueueItem extends \Kisma\Components\Document
+class CouchDbQueueItem extends \Kisma\Container\CouchDbDocument
 {
 	//*************************************************************************
 	//* Public Methods
@@ -45,22 +45,25 @@ class CouchDbQueueItem extends \Kisma\Components\Document
 	public function __construct( $options = array() )
 	{
 		//	Set our default fields
-		if ( null !== ( $this->_document->_id = K::o( $options, '_id', null, true ) ) )
+		if ( null !== ( $_id = Option::o( $options, '_id', null, true ) ) )
 		{
-			if ( null !== ( $_rev = K::o( $options, '_rev', null, true ) ) )
+			$this->setId( $_id );
+
+			if ( null !== ( $_rev = Option::o( $options, '_rev', null, true ) ) )
 			{
-				$this->_document->_rev = $_rev;
+				$this->setRev( $_rev );
 			}
 		}
 		else
 		{
-			$this->setDocument( K::o( $options, 'document', null, true ) );
+			$this->setFields( Option::o( $options, 'document', null, true ) );
 		}
 
-		$this->_document->create_time = K::o( $options, 'create_time', microtime( true ), true );
-		$this->_document->expire_time = K::o( $options, 'expire_time', -1, true );
-		$this->_document->update_time = K::o( $options, 'update_time', null, true );
-		$this->_document->feed_data = K::o( $options, 'feed_data', null, true );
+		$this->create_time = Option::o( $options, 'create_time', date( 'c' ), true );
+		$this->expire_time = Option::o( $options, 'expire_time', -1, true );
+		$this->update_time = Option::o( $options, 'update_time', null, true );
+
+		$this->feed_data = Option::o( $options, 'feed_data', null, true );
 
 		parent::__construct( $options );
 	}
@@ -68,63 +71,6 @@ class CouchDbQueueItem extends \Kisma\Components\Document
 	//*************************************************************************
 	//* Properties
 	//*************************************************************************
-
-	/**
-	 * @param $create_time
-	 *
-	 * @return CouchDbQueueItem
-	 */
-	public function setCreateTime( $create_time )
-	{
-		$this->create_time = $create_time ? : microtime( true );
-		return $this;
-	}
-
-	/**
-	 * @return int
-	 */
-	public function getCreateTime()
-	{
-		return $this->create_time;
-	}
-
-	/**
-	 * @param $feedData
-	 *
-	 * @return CouchDbQueueItem
-	 */
-	public function setFeedData( $feedData = null )
-	{
-		$this->_document->feed_data = $feedData;
-		return $this;
-	}
-
-	/**
-	 * @return \stdClass
-	 */
-	public function getFeedData()
-	{
-		return $this->_document->feed_data;
-	}
-
-	/**
-	 * @param $expire_time
-	 *
-	 * @return CouchDbQueueItem
-	 */
-	public function setExpireTime( $expire_time = -1 )
-	{
-		$this->expire_time = $expire_time;
-		return $this;
-	}
-
-	/**
-	 * @return int
-	 */
-	public function getExpireTime()
-	{
-		return $this->expire_time;
-	}
 
 	/**
 	 * @param $lock

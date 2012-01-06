@@ -237,7 +237,7 @@ namespace Kisma\Utility
 
 			foreach ( $_xml as $_value )
 			{
-				if ( \K::in( $_value['type'], 'open', 'complete' ) )
+				if ( Scalar::in( $_value['type'], 'open', 'complete' ) )
 				{
 					if ( !array_key_exists( $_value['level'], $_levels ) )
 					{
