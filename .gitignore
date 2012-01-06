@@ -1,2 +1,4 @@
 kisma.log
 examples/blog/app/cache/
+.gitignore
+build/certs/
