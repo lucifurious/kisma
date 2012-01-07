@@ -6,8 +6,8 @@
         <entryData>
           <resourceRoots>
             <path value="file://$PROJECT_DIR$/Kisma" />
-            <path value="file://$PROJECT_DIR$/examples/blog" />
             <path value="file://$PROJECT_DIR$/src" />
+            <path value="file://$PROJECT_DIR$/examples/blog" />
           </resourceRoots>
         </entryData>
       </entry>

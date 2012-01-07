@@ -36,6 +36,7 @@ use \Kisma\Provider;
 use \Kisma\Utility\Property;
 use \Kisma\Utility\Events;
 use \Kisma\Utility\Option;
+use \Kisma\Utility\Http;
 
 /**
  * The Kisma bootstrap loader
@@ -294,7 +295,8 @@ class Kisma extends \Silex\Application
 		{
 			$this->match( '/', function( \Silex\Application $app )
 			{
-				$app->redirect( '/' . $app['app.config.default_controller'] );
+				$_redirectUri = '/' . $app['app.config.default_controller'];
+				Http::redirect( $_redirectUri );
 			} );
 		}
 

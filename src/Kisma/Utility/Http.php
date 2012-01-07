@@ -57,7 +57,7 @@ class Http extends \Kisma\Components\Seed implements \Kisma\IUtility
 	//*************************************************************************
 
 	/**
-	 * @param string     $url
+	 * @param string	 $url
 	 * @param array|null $options
 	 *
 	 * @return bool|mixed
@@ -68,9 +68,9 @@ class Http extends \Kisma\Components\Seed implements \Kisma\IUtility
 	}
 
 	/**
-	 * @param string                           $url
+	 * @param string						   $url
 	 * @param array|\stdClass|\stdClass[]|null $payload
-	 * @param array|null                       $options
+	 * @param array|null					   $options
 	 *
 	 * @return bool|mixed
 	 */
@@ -80,7 +80,7 @@ class Http extends \Kisma\Components\Seed implements \Kisma\IUtility
 	}
 
 	/**
-	 * @param string     $url
+	 * @param string	 $url
 	 * @param array|null $payload
 	 * @param array|null $options
 	 *
@@ -92,7 +92,7 @@ class Http extends \Kisma\Components\Seed implements \Kisma\IUtility
 	}
 
 	/**
-	 * @param string     $url
+	 * @param string	 $url
 	 * @param array|null $payload
 	 * @param array|null $options
 	 *
@@ -104,7 +104,7 @@ class Http extends \Kisma\Components\Seed implements \Kisma\IUtility
 	}
 
 	/**
-	 * @param string     $url
+	 * @param string	 $url
 	 * @param array|null $payload
 	 * @param array|null $options
 	 *
@@ -116,7 +116,7 @@ class Http extends \Kisma\Components\Seed implements \Kisma\IUtility
 	}
 
 	/**
-	 * @param string     $url
+	 * @param string	 $url
 	 * @param array|null $payload
 	 * @param array|null $options
 	 *
@@ -128,7 +128,7 @@ class Http extends \Kisma\Components\Seed implements \Kisma\IUtility
 	}
 
 	/**
-	 * @param string     $url
+	 * @param string	 $url
 	 * @param array|null $payload
 	 * @param array|null $options
 	 *
@@ -140,10 +140,29 @@ class Http extends \Kisma\Components\Seed implements \Kisma\IUtility
 	}
 
 	/**
+	 * @param string $redirectUri
+	 * @param int	$redirectCode
+	 * @param bool   $instaKill
+	 */
+	public static function redirect( $redirectUri = '/', $redirectCode = 302, $instaKill = false )
+	{
+		header( 'Location: ' . $redirectUri, null, $redirectCode );
+
+		if ( false !== $instaKill )
+		{
+			die();
+		}
+	}
+
+	//*************************************************************************
+	//* Private Methods
+	//*************************************************************************
+
+	/**
 	 * @param \Kisma\HttpMethod|string $method
-	 * @param string                   $url
-	 * @param array                    $payload
-	 * @param array                    $options
+	 * @param string				   $url
+	 * @param array					$payload
+	 * @param array					$options
 	 *
 	 * @return bool|mixed
 	 */

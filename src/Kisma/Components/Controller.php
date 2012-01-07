@@ -67,42 +67,40 @@ abstract class Controller extends Seed implements \Silex\ControllerProviderInter
 	 */
 	public function connect( Application $app )
 	{
+		$_defaultRoute = null;
 		$_controllers = new \Silex\ControllerCollection();
+		$_actions = $this->_discoverActions();
 		$_tag = 'controller.' . $this->_controllerName;
 
-		$app[$_tag] = $this;
-
 		//	Set up a route for each discovered action...
-		foreach ( $this->_discoverActions() as $_action => $_method )
+		foreach ( $_actions as $_action => $_method )
 		{
 			$_route = '/' . $_action;
 
 			$_controllers->match( $_route,
 				function( Application $app, Request $request ) use( $_action, $_method, $_tag )
 				{
-					if ( !method_exists( $app[$_tag], $_method ) )
-					{
-						throw new \Symfony\Component\HttpKernel\Exception\HttpException( 404, 'Request "' . $_action . '" not found.' );
-					}
-
-					return $app[$_tag]->{$_method}( $app, $request );
+					return call_user_func( array( $app[$_tag], $_method ), $app, $request );
 				} );
-		}
-
-		//	Set up a default route
-		if ( !empty( $this->_defaultAction ) && !empty( $this->_controllerName ) )
-		{
-			$_route = '/' . $this->_controllerName . '/' . $this->_defaultAction;
-
-			$_controllers->match( '/', function( Application $app, Request $request ) use( $_route )
-			{
-				return $app->redirect( $_route );
-
-			} );
 		}
 
 		//	Return the collection...
 		return $_controllers;
+	}
+
+	/**
+	 * @param string $name
+	 * @param array  $arguments
+	 */
+	public function __call( $name, $arguments )
+	{
+		if ( isset( $this->_defaultAction ) )
+		{
+			\Kisma\Utility\Http::redirect( $this->_controllerName . '/' . $this->_defaultAction );
+			return;
+		}
+
+		throw new \Symfony\Component\HttpKernel\Exception\HttpException( 404 );
 	}
 
 	/**
