@@ -8,15 +8,16 @@
 <body>
 
 {% block topbar %}
+{% if topbar is defined %}
 {% include '_master.topbar.twig' %}
+{% endif %}
 {% endblock %}
-
 
 <div class="container">
 
 	<div class="content">
 
-		{% if page_header %}
+		{% if page_header is defined %}
 		{% block page_header %}
 		{% include '_master.page_header.twig' %}
 		{% endblock %}

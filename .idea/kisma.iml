@@ -6,6 +6,7 @@
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
       <excludeFolder url="file://$MODULE_DIR$/doc" />
+      <excludeFolder url="file://$MODULE_DIR$/examples/blog/vendor" />
       <excludeFolder url="file://$MODULE_DIR$/src/Kisma/first.draft/Aspects/Reactors" />
     </content>
     <orderEntry type="inheritedJdk" />

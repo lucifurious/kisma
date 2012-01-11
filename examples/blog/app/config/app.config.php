@@ -78,4 +78,14 @@ return array(
 
 	//	The view path (defaults to /views)
 	'view_path' => '/views',
+
+	//	Our database
+	'@couchdbs.options' => array(
+		'db.blog' => array(
+			'host' => 'teledini.gna.me',
+			'dbname' => 'kisma_examples_blog_posts',
+			'user' => 'sinker',
+			'password' => 'sinker',
+		),
+	),
 );

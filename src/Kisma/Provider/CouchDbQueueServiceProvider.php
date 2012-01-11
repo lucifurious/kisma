@@ -22,7 +22,7 @@ namespace Kisma\Provider
 	 * CouchDbQueueServiceProvider
 	 * A provider that wraps the CouchDbClient library for working with a CouchDb instance
 	 */
-	class CouchDbQueueServiceProvider extends \Kisma\Components\Seed implements \Silex\ServiceProviderInterface
+	class CouchDbQueueServiceProvider extends \Kisma\Components\SilexServiceProvider
 	{
 		//*************************************************************************
 		//* Constants

@@ -220,4 +220,6 @@ class CouchDbServiceProvider extends Components\SilexServiceProvider
 			return $_dbs[$app[CouchDbServiceProvider::DefaultGroupOptions]];
 		} );
 	}
+
+
 }

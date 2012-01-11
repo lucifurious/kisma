@@ -53,6 +53,8 @@ abstract class Controller extends Seed implements \Silex\ControllerProviderInter
 	 * @todo implement
 	 */
 	protected $_routes = null;
+	/** @var mixed The current database */
+	protected $_db = null;
 
 	//*************************************************************************
 	//* Public Methods
@@ -72,35 +74,32 @@ abstract class Controller extends Seed implements \Silex\ControllerProviderInter
 		$_actions = $this->_discoverActions();
 		$_tag = 'controller.' . $this->_controllerName;
 
+		$app[$_tag] = $this;
+
 		//	Set up a route for each discovered action...
 		foreach ( $_actions as $_action => $_method )
 		{
-			$_route = '/' . $_action;
+			//	Build the route, along with default if specified...
+			$_route = ( '/' != $_action ? '/' . $_action : '/' );
 
 			$_controllers->match( $_route,
 				function( Application $app, Request $request ) use( $_action, $_method, $_tag )
 				{
-					return call_user_func( array( $app[$_tag], $_method ), $app, $request );
+					$app[$_tag]->dispatch( \Kisma\Event\ControllerEvent::BeforeAction,
+						new \Kisma\Event\ControllerEvent( $app[$_tag] ) );
+
+					$_result = call_user_func( array( $app[$_tag], $_method ), $app, $request );
+
+					$app[$_tag]->dispatch( \Kisma\Event\ControllerEvent::AfterAction,
+						new \Kisma\Event\ControllerEvent( $app[$_tag], $_result ) );
+
+					return $_result;
+
 				} );
 		}
 
 		//	Return the collection...
 		return $_controllers;
-	}
-
-	/**
-	 * @param string $name
-	 * @param array  $arguments
-	 */
-	public function __call( $name, $arguments )
-	{
-		if ( isset( $this->_defaultAction ) )
-		{
-			\Kisma\Utility\Http::redirect( $this->_controllerName . '/' . $this->_defaultAction );
-			return;
-		}
-
-		throw new \Symfony\Component\HttpKernel\Exception\HttpException( 404 );
 	}
 
 	/**
@@ -126,6 +125,12 @@ abstract class Controller extends Seed implements \Silex\ControllerProviderInter
 					lcfirst( \Kisma\Utility\Inflector::camelize( str_ireplace( 'Action', null, $_method->name ) ) );
 
 				$_actions[$_routeName] = $_method->name;
+
+				//	Add a default action/route to the discovered list if wanted
+				if ( !empty( $this->_defaultAction ) && 0 == strcasecmp( $this->_defaultAction, $_routeName ) )
+				{
+					$_actions['/'] = $_method->name;
+				}
 			}
 		}
 

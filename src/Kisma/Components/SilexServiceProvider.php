@@ -32,4 +32,11 @@ use Silex\Application;
 abstract class SilexServiceProvider extends Service implements \Silex\ServiceProviderInterface
 {
 	//	Like the goggles, does nothing.
+
+	//*************************************************************************
+	//* Event Handlers
+	//*************************************************************************
+
+
+
 }

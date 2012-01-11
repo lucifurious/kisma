@@ -5,6 +5,13 @@
 
 {% block all_content %}
 <h1>Welcome to the Blog Example!</h1>
+<div id="posts">
+	{% if blogs.results is defined and blogs.results|length > 0 %}
+	{% for post in blogs.results %}
+		ID: {{ post['id'] }} :: {{ post['seq'] }}<BR/>
+	{% endfor %}
+	{% endif %}
+</div>
 {% endblock %}
 
 

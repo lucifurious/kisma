@@ -65,7 +65,7 @@ class ErrorHandler extends Seed implements \Kisma\IReactor
 	public static function onError( $event )
 	{
 		$_trace = $event->getTrace( false, self::$_backtraceLines );
-		$_traceText = self::_cleanTrace( $_trace );
+		$_traceText = self::_cleanTrace( $_trace, 3 );
 
 		self::$_error = array(
 			'code' => $event->getCode(),
@@ -92,7 +92,7 @@ class ErrorHandler extends Seed implements \Kisma\IReactor
 		/** @var $_exception \Exception */
 		$_exception = $event->getException();
 		$_trace = $_exception->getTrace();
-		$_traceText = self::_cleanTrace( $_trace );
+		$_traceText = self::_cleanTrace( $_trace, 3 );
 
 		self::$_error = array(
 			'code' => $_exception->getCode(),

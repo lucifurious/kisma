@@ -2,7 +2,70 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/vendors/bootstrap" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/examples/blog/css/bootstrap" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/examples/blog/vendor/SyntaxHighlighter" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/examples/blog/vendor/assetic" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/examples/blog/vendor/bootstrap" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/examples/blog/vendor/couchdb_odm" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/examples/blog/vendor/couchdb_odm/lib/vendor/Symfony/Component/Console" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/examples/blog/vendor/couchdb_odm/lib/vendor/Symfony/Component/Yaml" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/examples/blog/vendor/couchdb_odm/lib/vendor/doctrine-common" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/examples/blog/vendor/couchdb_odm/lib/vendor/doctrine-common/lib/vendor/doctrine-build-common" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/examples/blog/vendor/doctrine-common" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/examples/blog/vendor/doctrine-common/lib/vendor/doctrine-build-common" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/examples/blog/vendor/silex" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/examples/blog/vendor/silex-extensions" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/examples/blog/vendor/silex/vendor/Symfony/Component/BrowserKit" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/examples/blog/vendor/silex/vendor/Symfony/Component/ClassLoader" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/examples/blog/vendor/silex/vendor/Symfony/Component/CssSelector" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/examples/blog/vendor/silex/vendor/Symfony/Component/DomCrawler" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/examples/blog/vendor/silex/vendor/Symfony/Component/EventDispatcher" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/examples/blog/vendor/silex/vendor/Symfony/Component/Finder" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/examples/blog/vendor/silex/vendor/Symfony/Component/HttpFoundation" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/examples/blog/vendor/silex/vendor/Symfony/Component/HttpKernel" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/examples/blog/vendor/silex/vendor/Symfony/Component/Process" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/examples/blog/vendor/silex/vendor/Symfony/Component/Routing" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/examples/blog/vendor/silex/vendor/doctrine-common" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/examples/blog/vendor/silex/vendor/doctrine-common/lib/vendor/doctrine-build-common" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/examples/blog/vendor/silex/vendor/doctrine-dbal" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/examples/blog/vendor/silex/vendor/doctrine-dbal/lib/vendor/Symfony/Component/Console" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/examples/blog/vendor/silex/vendor/doctrine-dbal/lib/vendor/doctrine-common" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/examples/blog/vendor/silex/vendor/monolog" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/examples/blog/vendor/silex/vendor/pimple" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/examples/blog/vendor/silex/vendor/twig" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/examples/blog/vendor/twig" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/tests/fig-standards" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/vendor/SyntaxHighlighter" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/vendor/assetic" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/vendor/bootstrap" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/vendor/couchdb_odm" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/vendor/couchdb_odm/lib/vendor/Symfony/Component/Console" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/vendor/couchdb_odm/lib/vendor/Symfony/Component/Yaml" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/vendor/couchdb_odm/lib/vendor/doctrine-common" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/vendor/couchdb_odm/lib/vendor/doctrine-common/lib/vendor/doctrine-build-common" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/vendor/doctrine-common" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/vendor/doctrine-common/lib/vendor/doctrine-build-common" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/vendor/silex" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/vendor/silex-extensions" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/vendor/silex/vendor/Symfony/Component/BrowserKit" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/vendor/silex/vendor/Symfony/Component/ClassLoader" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/vendor/silex/vendor/Symfony/Component/CssSelector" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/vendor/silex/vendor/Symfony/Component/DomCrawler" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/vendor/silex/vendor/Symfony/Component/EventDispatcher" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/vendor/silex/vendor/Symfony/Component/Finder" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/vendor/silex/vendor/Symfony/Component/HttpFoundation" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/vendor/silex/vendor/Symfony/Component/HttpKernel" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/vendor/silex/vendor/Symfony/Component/Process" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/vendor/silex/vendor/Symfony/Component/Routing" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/vendor/silex/vendor/doctrine-common" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/vendor/silex/vendor/doctrine-common/lib/vendor/doctrine-build-common" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/vendor/silex/vendor/doctrine-dbal" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/vendor/silex/vendor/doctrine-dbal/lib/vendor/Symfony/Component/Console" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/vendor/silex/vendor/doctrine-dbal/lib/vendor/doctrine-common" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/vendor/silex/vendor/monolog" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/vendor/silex/vendor/pimple" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/vendor/silex/vendor/twig" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/vendor/twig" vcs="Git" />
   </component>
 </project>
 

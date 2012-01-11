@@ -23,7 +23,7 @@ namespace Kisma;
 //* Requirements
 //*************************************************************************
 
-require_once __DIR__ . '/../vendor/silex.phar';
+require_once __DIR__ . '/../vendor/silex/silex.phar';
 require_once __DIR__ . '/Kisma/enums.php';
 
 //*************************************************************************
@@ -55,7 +55,7 @@ class Kisma extends \Silex\Application
 	/**
 	 * @var string The version number of Kisma
 	 */
-	const Version = '1.0.0alpha';
+	const Version = '1.0.0-RC1';
 	/**
 	 * @var string
 	 */
@@ -282,9 +282,12 @@ class Kisma extends \Silex\Application
 			$_route =
 				lcfirst( Utility\Inflector::camelize( str_ireplace( 'Controller.php', null,
 					basename( $_entryPath ) ) ) );
+
 			$_class = str_ireplace( '.php', null, basename( $_entryPath ) );
 
 			$this->mount( '/' . $_route, new $_class() );
+
+			\Kisma\Utility\Log::trace( print_r( $this['routes'], true ) );
 
 			//	Add to view path
 			$this['twig.loader.filesystem']->addPath( $this['app.config.app_root'] . $this['app.config.view_path'] . '/' . $_route );
@@ -295,8 +298,8 @@ class Kisma extends \Silex\Application
 		{
 			$this->match( '/', function( \Silex\Application $app )
 			{
-				$_redirectUri = '/' . $app['app.config.default_controller'];
-				Http::redirect( $_redirectUri );
+				$_redirectUri = '/' . $app['app.config.default_controller'] . '/';
+				return $app->redirect( $_redirectUri );
 			} );
 		}
 
@@ -332,7 +335,7 @@ class Kisma extends \Silex\Application
 		{
 			$this['app.config.app_root'] = realpath( $this['app.config.app_root'] );
 
-			$_configs = glob( $this['app.config.app_root'] . self::app( 'app.config.config_path', '/config' ) . '/*' );
+			$_configs = glob( $this['app.config.app_root'] . self::app( 'app.config.config_path', '/config' ) . '/*.php' );
 
 			foreach ( $_configs as $_config )
 			{

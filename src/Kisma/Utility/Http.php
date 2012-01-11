@@ -144,7 +144,7 @@ class Http extends \Kisma\Components\Seed implements \Kisma\IUtility
 	 * @param int	$redirectCode
 	 * @param bool   $instaKill
 	 */
-	public static function redirect( $redirectUri = '/', $redirectCode = 302, $instaKill = false )
+	public static function redirect( $redirectUri = '/', $redirectCode = 302, $instaKill = true )
 	{
 		header( 'Location: ' . $redirectUri, null, $redirectCode );
 

@@ -25,7 +25,7 @@ namespace Kisma\Event;
  *
  * @property-read \Kisma\Components\Seed $target
  */
-abstract class KismaEvent extends \Symfony\Component\EventDispatcher\Event
+abstract class KismaEvent extends \Symfony\Component\EventDispatcher\Event implements \Kisma\IContainer
 {
 	//*************************************************************************
 	//* Private Members

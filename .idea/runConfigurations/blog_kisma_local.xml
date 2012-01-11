@@ -1,6 +1,8 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="blog.kisma.local" type="PhpWebAppRunConfigurationType" factoryName="PHP Web Application" browser="FIREFOX" server_name="blog.kisma.local">
+    <RunnerSettings RunnerId="PhpRunner" />
     <RunnerSettings RunnerId="PhpWebAppDebugRunner" />
+    <ConfigurationWrapper RunnerId="PhpRunner" />
     <ConfigurationWrapper RunnerId="PhpWebAppDebugRunner" />
     <method />
   </configuration>
