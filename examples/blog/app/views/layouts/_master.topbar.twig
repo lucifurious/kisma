@@ -2,7 +2,7 @@
 	<div class="fill">
 		<div class="container">
 			<a class="brand" href="#">{{ topbar.brand }}</a>
-			{% if topbar.items is defined | length > 0 %}
+			{% if topbar.items | length > 0 %}
 			<ul class="nav">
 				{% for item in topbar.items %}
 				<li class="{{item.active}}"><a href="{{ item.href }}"

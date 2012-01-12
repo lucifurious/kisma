@@ -63,6 +63,10 @@ class Kisma extends \Silex\Application
 	/**
 	 * @var string
 	 */
+	const ViewConfig = 'view.config';
+	/**
+	 * @var string
+	 */
 	const Autoloader = 'autoloader';
 	/**
 	 * @var string
@@ -183,7 +187,7 @@ class Kisma extends \Silex\Application
 	/**
 	 * Renders a Twig template view
 	 *
-	 * @param string $viewFile The name of the view file to render
+	 * @param string $viewFile The name of the view file or view tag to render
 	 * @param array  $payload The data to pass to the view
 	 * @param bool   $returnString
 	 *
@@ -197,7 +201,7 @@ class Kisma extends \Silex\Application
 			return;
 		}
 
-		$_output = $this['twig']->render( $viewFile, $this->_getBaseRenderPayload( $payload ) );
+		$_output = $this['twig']->render( $viewFile, $this->_getBaseRenderPayload( $viewFile, $payload ) );
 
 		if ( false !== $returnString )
 		{
@@ -214,8 +218,21 @@ class Kisma extends \Silex\Application
 	 *
 	 * @return array
 	 */
-	protected function _getBaseRenderPayload( $additional = array() )
+	protected function _getBaseRenderPayload( $viewFile = null, $additional = array() )
 	{
+		$additional = array_merge(
+			$additional,
+			self::app( 'view.defaults', array() )
+		);
+
+		if ( null !== $viewFile )
+		{
+			$additional = array_merge(
+				$additional,
+				self::app( self::ViewConfig . '.' . $viewFile, array() )
+			);
+		}
+
 		$_payload = array(
 			'app_name' => $this['app.config.app_name'],
 			'app_root' => $this['app.config.app_root'],
@@ -233,7 +250,7 @@ class Kisma extends \Silex\Application
 	 * @param string|null $service
 	 * @param null		$defaultValue
 	 *
-	 * @return \Silex\Application|\Kisma\Kisma|\Symfony\Component\EventDispatcher\EventDispatcher|\Silex\ServiceProviderInterface|\Silex\ControllerProviderInterface
+	 * @return \Silex\Application|\Kisma\Kisma|\Symfony\Component\EventDispatcher\EventDispatcher|\Silex\ServiceProviderInterface|\Silex\ControllerProviderInterface|array
 	 */
 	public static function app( $service = null, $defaultValue = null )
 	{
