@@ -33,6 +33,7 @@ require_once __DIR__ . '/Kisma/enums.php';
 use \Silex;
 use \Kisma\Event;
 use \Kisma\Provider;
+use \Kisma\Utility\FileSystem;
 use \Kisma\Utility\Property;
 use \Kisma\Utility\Events;
 use \Kisma\Utility\Option;
@@ -119,6 +120,15 @@ class Kisma extends \Silex\Application
 	 * @var \Kisma\Kisma
 	 */
 	protected static $_app = null;
+	/**
+	 * @var array This app's namespace map
+	 */
+	protected $_namespace = null;
+
+	/**
+	 * @var string The namespace root
+	 */
+	protected $_namespaceName = null;
 
 	//*************************************************************************
 	//* Public Methods
@@ -133,22 +143,10 @@ class Kisma extends \Silex\Application
 	{
 		//	Save me
 		self::$_app = $this;
+		$this[AppConfig::BasePath] = __DIR__;
 
 		//	Call poppa
 		parent::__construct();
-
-		//	Some initialization
-		$this['base_path'] = realpath( __DIR__ . '/../' );
-		$this['system_view_path'] = realpath( __DIR__ . '/Kisma/Views' );
-		$this['vendor_path'] = $_vendorPath = realpath( __DIR__ . '/../vendor' );
-		$this['is_cli'] = ( 'cli' == php_sapi_name() );
-
-		//	Add our required namespaces
-		$this[self::Autoloader]->registerNamespaces(
-			array(
-				'Kisma' => __DIR__,
-			)
-		);
 
 		//	Set any configuration options that are passed in...
 		$this->_loadConfiguration( $options );
@@ -163,9 +161,9 @@ class Kisma extends \Silex\Application
 	/**
 	 * Destructor chosen!
 	 */
-	function __destruct()
+	public function __destruct()
 	{
-		$this->dispatch( \Kisma\Event\ApplicationEvent::Terminate );
+		$this->dispatch( Event\ApplicationEvent::Terminate );
 	}
 
 	/**
@@ -212,39 +210,6 @@ class Kisma extends \Silex\Application
 	}
 
 	/**
-	 * Returns an array of standard values passed to all views
-	 *
-	 * @param array $additional
-	 *
-	 * @return array
-	 */
-	protected function _getBaseRenderPayload( $viewFile = null, $additional = array() )
-	{
-		$additional = array_merge(
-			$additional,
-			self::app( 'view.defaults', array() )
-		);
-
-		if ( null !== $viewFile )
-		{
-			$additional = array_merge(
-				$additional,
-				self::app( self::ViewConfig . '.' . $viewFile, array() )
-			);
-		}
-
-		$_payload = array(
-			'app_name' => $this['app.config.app_name'],
-			'app_root' => $this['app.config.app_root'],
-			'app_version' => $this->app( 'app.config.app_version', 'Kisma Framework v ' . self::Version ),
-			'page_date' => date( 'Y-m-d H:i:s' ),
-			'vendor_path' => $this['vendor_path'],
-		);
-
-		return array_merge( $_payload, $additional );
-	}
-
-	/**
 	 * @static
 	 *
 	 * @param string|null $service
@@ -259,7 +224,7 @@ class Kisma extends \Silex\Application
 			return self::$_app;
 		}
 
-		if ( null !== $defaultValue && !isset( self::$_app[$service] ) )
+		if ( !isset( self::$_app[$service] ) )
 		{
 			return $defaultValue;
 		}
@@ -267,121 +232,33 @@ class Kisma extends \Silex\Application
 		return self::$_app[$service];
 	}
 
-	//*************************************************************************
-	//* Private Methods
-	//*************************************************************************
-
 	/**
-	 * Registers all the controllers found with Silex
+	 * @param string $message
+	 * @param string $level
+	 * @param bool   $echo
+	 *
+	 * @return
 	 */
-	protected function _registerControllers()
+	public static function log( $message, $level = LogLevel::Info, $echo = false )
 	{
-		$_controllerPath =
-			isset( $this['app.config.controller_path'] ) ? $this['app.config.controller_path'] : '/controllers';
-		$_path = rtrim( \Kisma\Kisma::app( 'app.config.app_root' ), '/' ) . $_controllerPath;
+		error_log( $message . PHP_EOL );
 
-		//	Get the list of directories within the controller path
-		$_directory = \dir( $_path );
+		$_app = self::app();
 
-		/** @var $_entry string */
-		while ( false !== ( $_entry = $_directory->read() ) )
+		/** @var $_logger \Monolog\Logger */
+		if ( !isset( $_app[self::Logger] ) || false !== $echo )
 		{
-			$_entryPath = $_path . '/' . $_entry;
+			error_log( $message . PHP_EOL );
 
-			//	Skip the dirs and unreadables
-			if ( !is_file( $_entryPath ) || !is_readable( $_entryPath ) )
+			echo $message . ( self::app( 'is_cli', false ) ? PHP_EOL : '<br/>' );
+
+			if ( !$_logger )
 			{
-				continue;
-			}
-
-			require_once $_entryPath;
-
-			$_route =
-				lcfirst( Utility\Inflector::camelize( str_ireplace( 'Controller.php', null,
-					basename( $_entryPath ) ) ) );
-
-			$_class = str_ireplace( '.php', null, basename( $_entryPath ) );
-
-			$this->mount( '/' . $_route, new $_class() );
-
-			\Kisma\Utility\Log::trace( print_r( $this['routes'], true ) );
-
-			//	Add to view path
-			$this['twig.loader.filesystem']->addPath( $this['app.config.app_root'] . $this['app.config.view_path'] . '/' . $_route );
-		}
-
-		//	If there is a default route, set it up as well.
-		if ( isset( $this['app.config.default_controller'] ) )
-		{
-			$this->match( '/', function( \Silex\Application $app )
-			{
-				$_redirectUri = '/' . $app['app.config.default_controller'] . '/';
-				return $app->redirect( $_redirectUri );
-			} );
-		}
-
-		//	And asset manager if we're not cli...
-		if ( !$this['is_cli'] )
-		{
-			//			$this[self::Autoloader]->registerNamespace( 'Assetic', $this['vendor_path'] . '/assetic/src' );
-			//
-			//			$this->register(
-			//				new \Kisma\Components\AssetManager(),
-			//				array(
-			//					'assetic.options' => $this['app.config.assetic.options']
-			//				)
-			//			);
-		}
-	}
-
-	/**
-	 * @param array $options
-	 */
-	protected function _loadConfiguration( $options = array() )
-	{
-		if ( is_array( $options ) && !empty( $options ) )
-		{
-			foreach ( $options as $_key => $_value )
-			{
-				$this[$_key] = $_value;
+				return;
 			}
 		}
 
-		//	Load all files in the app config directory
-		if ( isset( $this['app.config.app_root'] ) )
-		{
-			$this['app.config.app_root'] = realpath( $this['app.config.app_root'] );
-
-			$_configs = glob( $this['app.config.app_root'] . self::app( 'app.config.config_path', '/config' ) . '/*.php' );
-
-			foreach ( $_configs as $_config )
-			{
-				$_baseName = str_ireplace( '.php', null, basename( $_config ) );
-				$this[$_baseName] = include( $_config );
-
-				//	If there are any items, add to individual settings
-				if ( isset( $this[$_baseName] ) && !empty( $this[$_baseName] ) )
-				{
-					foreach ( $this[$_baseName] as $_key => $_value )
-					{
-						//	Don't prepend config name to '@' prefixed keys
-						if ( '@' == $_key[0] )
-						{
-							$_key = ltrim( $_key, '@' );
-							$this[$_key] = $_value;
-
-							//	Remove from config-level
-							unset( $this[$_baseName][$_key] );
-						}
-						//	Append key name to base name and save
-						else
-						{
-							$this[$_baseName . '.' . $_key] = $_value;
-						}
-					}
-				}
-			}
-		}
+		$_app[self::Logger]->{$level}( $message );
 	}
 
 	//*************************************************************************
@@ -397,8 +274,9 @@ class Kisma extends \Silex\Application
 	{
 		$_self = $this;
 
-		$this['app.config.log_path'] = $_logPath = self::app( 'app.config.log_path', $this['base_path'] );
-		$_logFileName = $_logPath . '/' . self::app( 'app.config.log_file_name', 'web.app.log' );
+		$_logPath = self::app( 'app.config.log_path', __DIR__, '/logs' );
+		$_logFileName =
+			FileSystem::makePath( $_logPath, self::app( 'app.config.log_file_name', 'web.app.log' ), false );
 
 		$this->register( new \Silex\Provider\MonologServiceProvider(), array(
 			'monolog.logfile' => $_logFileName,
@@ -409,14 +287,13 @@ class Kisma extends \Silex\Application
 		//	Initialize the view renderer
 		if ( false === $this['is_cli'] )
 		{
-			$this[self::Autoloader]->registerPrefix( 'Twig', __DIR__ . '/../vendor/twig/lib' );
+			$this[self::Autoloader]->registerPrefix( 'Twig', $this['vendor_path'] . '/twig/lib' );
 
 			$_twigOptions = self::app( 'twig.options', array() );
 
 			if ( empty( $_twigOptions ) )
 			{
-				$_basePath = $this['app.config.app_root'];
-				$_viewPath = $_basePath . $this['app.config.view_path'];
+				$_viewPath = $this['app.config.view_path'];
 
 				$_twigOptions = array(
 					'twig.path' => array(
@@ -424,7 +301,7 @@ class Kisma extends \Silex\Application
 						$this['system_view_path'],
 					),
 					'twig.options' => array(
-						'cache' => $this['app.config.app_root'] . '/cache',
+						'cache' => $this['app.config.namespace_root'] . '/cache',
 					),
 				);
 			}
@@ -468,7 +345,8 @@ class Kisma extends \Silex\Application
 	/**
 	 * Called when the app is ending :(
 	 */
-	public function onTerminate()
+	public
+	function onTerminate()
 	{
 		//	Restore error handlers
 		\restore_error_handler();
@@ -476,36 +354,245 @@ class Kisma extends \Silex\Application
 	}
 
 	//*************************************************************************
-	//* Logging Helper
+	//* Private Methods
 	//*************************************************************************
 
 	/**
-	 * @static
+	 * Returns an array of standard values passed to all views
 	 *
-	 * @param string $message
-	 * @param string $level
-	 * @param bool   $echo
+	 * @param null  $viewFile
+	 * @param array $additional
+	 *
+	 * @return array
 	 */
-	public static function log( $message, $level = LogLevel::Info, $echo = false )
+	protected function _getBaseRenderPayload( $viewFile = null, $additional = array() )
 	{
-		error_log( $message . PHP_EOL );
+		$additional = array_merge(
+			$additional,
+			self::app( 'view.defaults', array() )
+		);
 
-		$_app = self::app();
-
-		/** @var $_logger \Monolog\Logger */
-		if ( !isset( $_app[self::Logger] ) || false !== $echo )
+		if ( null !== $viewFile )
 		{
-			error_log( $message . PHP_EOL );
+			$additional = array_merge(
+				$additional,
+				self::app( self::ViewConfig . '.' . $viewFile, array() )
+			);
+		}
 
-			echo $message . ( self::app( 'is_cli', false ) ? PHP_EOL : '<br/>' );
+		$_payload = array(
+			'app_name' => $this['app.config.app_name'],
+			'app_root' => $this['app.config.app_root'],
+			'app_version' => $this->app( 'app.config.app_version', 'Kisma Framework v ' . self::Version ),
+			'page_date' => date( 'Y-m-d H:i:s' ),
+			'vendor_path' => $this['vendor_path'],
+		);
 
-			if ( !$_logger )
+		return array_merge( $_payload, $additional );
+	}
+
+	/**
+	 * Registers all the controllers found with Silex
+	 */
+	protected function _registerControllers()
+	{
+		$_appRoot =
+			FileSystem::makePath( self::app( 'app.config.app_root', current( $this->_namespace ) ? : getcwd() ),
+				$this->_namespaceName );
+
+		$_controllerPath = self::app( 'app.config.controller_path' );
+		$_viewPath = self::app( 'app.config.view_path' );
+
+		//	Get the list of directories within the controller path
+		$_directory = \dir( $_controllerPath );
+
+		/** @var $_entry string */
+		while ( $_directory && false !== ( $_entry = $_directory->read() ) )
+		{
+			$_entryPath = $_controllerPath . '/' . $_entry;
+
+			//	Skip the dirs and unread-ables
+			if ( !is_file( $_entryPath ) || !is_readable( $_entryPath ) )
 			{
-				return;
+				continue;
+			}
+
+			require_once $_entryPath;
+
+			$_route =
+				lcfirst( Utility\Inflector::camelize( str_ireplace( 'Controller.php', null,
+					basename( $_entryPath ) ) ) );
+
+			$_class =
+				key( $this->_namespace ) . '\\Controllers\\' . str_ireplace( '.php', null, basename( $_entryPath ) );
+			//			$_mirror = new \ReflectionClass( $_class );
+			//			$_class = $_mirror->getName();
+
+			$this->mount( '/' . $_route, new $_class() );
+
+			\Kisma\Utility\Log::trace( print_r( $this['routes'], true ) );
+
+			//	Add to view path
+			$this['twig.loader.filesystem']->addPath( FileSystem::makePath( $_viewPath, $_route ) );
+		}
+
+		//	If there is a default route, set it up as well.
+		if ( isset( $this['app.config.default_controller'] ) )
+		{
+			$this->match( '/', function( \Silex\Application $app )
+			{
+				$_redirectUri = '/' . $app['app.config.default_controller'] . '/';
+				return $app->redirect( $_redirectUri );
+			} );
+		}
+
+		//	And asset manager if we're not cli...
+		if ( !$this['is_cli'] )
+		{
+			//			$this[self::Autoloader]->registerNamespace( 'Assetic', $this['vendor_path'] . '/assetic/src' );
+			//
+			//			$this->register(
+			//				new \Kisma\Components\AssetManager(),
+			//				array(
+			//					'assetic.options' => $this['app.config.assetic.options']
+			//				)
+			//			);
+		}
+	}
+
+	/**
+	 * @param array $options
+	 */
+	protected function _loadConfiguration( $options = array() )
+	{
+		//	Add our namespace
+		$this[self::Autoloader]->registerNamespace( 'Kisma', __DIR__ );
+
+		//	Load the options...
+		if ( is_array( $options ) && !empty( $options ) )
+		{
+			foreach ( $options as $_key => $_value )
+			{
+				$this[$_key] = $_value;
 			}
 		}
 
-		$_app[self::Logger]->{$level}( $message );
+		//	Some system-level option initialization
+		$this['system_view_path'] = realpath( __DIR__ . '/Kisma/Views' );
+		$this['vendor_path'] = $_vendorPath = realpath( __DIR__ . '/../vendor' );
+		$this['is_cli'] = ( 'cli' == php_sapi_name() );
+
+		//	Load all files in the app config directory
+		$_appRoot = realpath( self::app( 'app.config.app_root' ) );
+		$this->_namespaceName = self::app( 'app.config.app_namespace' );
+		$this['app.config.namespace_root'] = $_namespaceRoot = FileSystem::makePath( $_appRoot, $this->_namespaceName );
+
+		$this['app.config.config_path'] = $_configPath = FileSystem::makePath(
+			$_namespaceRoot,
+			self::app( 'app.config.config_path', '/config' )
+		);
+
+		if ( false === $_configPath )
+		{
+			throw new BogusPropertyException( 'Configuration path not specified or invalid. Set "config_path" in your app.config.php file.' );
+		}
+
+		$_configGlob = $_configPath . '/*.php';
+		$_configs = glob( $_configGlob );
+
+		//	Loop through the configs we found...
+		foreach ( $_configs as $_config )
+		{
+			$_baseName = str_ireplace( '.php', null, basename( $_config ) );
+			$this[$_baseName] = include( $_config );
+
+			//	If there are any items, add to individual settings
+			if ( isset( $this[$_baseName] ) && !empty( $this[$_baseName] ) && is_array( $this[$_baseName] ) )
+			{
+				foreach ( $this[$_baseName] as $_key => $_value )
+				{
+					$_cleanKey = strtolower( trim( $_key ) );
+
+					//	Pre-config directory manipulation
+					switch ( $_cleanKey )
+					{
+						//	Load up the namespace
+						case 'namespace':
+							//	Register our namespace
+							$this['app.config.namespace'] = $this->_namespace = $_value;
+
+							if ( empty( $this->_namespace ) )
+							{
+								throw new BogusPropertyException( 'You must specify the "namespace" option in your configuration.' );
+							}
+
+							if ( !is_array( $this->_namespace ) || !is_string( key( $this->_namespace ) ) || !is_dir( current( $this->_namespace ) ) )
+							{
+								throw new BogusPropertyException( 'The "namespace" option must be an array of <namespace> => </path/to/ns> mappings.' );
+							}
+
+							$this['autoloader']->registerNamespaces( $this->_namespace );
+							break;
+
+						//	Make full paths from relatives...
+						case '_path' == substr( $_key, strlen( $_key ) - 5 ):
+							if ( !empty( $_value ) && '/' !== $_value[0] )
+							{
+								$_value = FileSystem::makePath( $_namespaceRoot, $_value );
+							}
+							break;
+					}
+
+					//	Don't prepend config name to '@' prefixed keys
+					if ( '@' == $_key[0] )
+					{
+						$_key = ltrim( $_key, '@' );
+						$this[$_key] = $_value;
+
+						//	Remove from config-level
+						unset( $this[$_baseName][$_key] );
+					}
+					//	Append key name to base name and save
+					else
+					{
+						$this[$_baseName . '.' . $_key] = $_value;
+					}
+				}
+			}
+		}
+
+		//	Check application paths (Controllers, Models, & Views)...
+		if ( !isset( $this['app.config.view_path'] ) )
+		{
+			$this['app.config.view_path'] = $_configPath = FileSystem::makePath(
+				$_namespaceRoot,
+				'Views'
+			);
+		}
+
+		if ( !isset( $this['app.config.document_path'] ) )
+		{
+			$this['app.config.document_path'] = $_configPath = FileSystem::makePath(
+				$_namespaceRoot,
+				'Document'
+			);
+		}
+
+		if ( !isset( $this['app.config.model_path'] ) )
+		{
+			$this['app.config.model_path'] = $_configPath = FileSystem::makePath(
+				$_namespaceRoot,
+				'Models'
+			);
+		}
+
+		if ( !isset( $this['app.config.controller_path'] ) )
+		{
+			$this['app.config.controller_path'] = $_configPath = FileSystem::makePath(
+				$_namespaceRoot,
+				'Controllers'
+			);
+		}
 	}
 
 }

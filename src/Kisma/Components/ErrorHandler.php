@@ -19,8 +19,9 @@
 
 namespace Kisma\Components;
 
-use Kisma\Event as Event;
-use Kisma\Utility as Utility;
+use \Kisma\AppConfig;
+use \Kisma\Event as Event;
+use \Kisma\Utility as Utility;
 
 /**
  * ErrorHandler
@@ -163,7 +164,7 @@ class ErrorHandler extends Seed implements \Kisma\IReactor
 	protected static function _cleanTrace( array &$trace, $skipLines = null, $basePath = null )
 	{
 		$_trace = array();
-		$_basePath = $basePath ? : \Kisma\Kisma::app( 'base_path' );
+		$_basePath = $basePath ?: \Kisma\Kisma::app( AppConfig::BasePath );
 
 		//	Skip some lines
 		if ( !empty( $skipLines ) && count( $trace ) > $skipLines )

@@ -16,12 +16,13 @@
  * @filesource
  */
 
+namespace ExampleBlog\Controllers;
+
 use Kisma\K;
 use Kisma\Components;
+use ExampleBlog\Document\BlogPost;
 use Silex\Application;
-use Silex\ControllerProviderInterface;
 use Symfony\Component\HttpFoundation\Request;
-use \Doctrine\CouchDB\HTTP\HTTPException;
 
 /**
  * BlogController
@@ -38,17 +39,25 @@ class BlogController extends \Kisma\Components\Controller
 	 */
 	const DatabaseName = 'kisma_examples_blog_posts';
 
+	//*************************************************************************
+	//* Private Members
+	//*************************************************************************
+
 	/**
 	 * @var \Doctrine\CouchDB\CouchDBClient
 	 */
 	protected $_client = null;
+	/**
+	 * @var \Doctrine\ODM\CouchDB\DocumentManager
+	 */
+	protected $_documentManager = null;
 
 	//*************************************************************************
 	//* Event Handlers
 	//*************************************************************************
 
 	/**
-	 * @param Kisma\Event\ControllerEvent $event
+	 * @param \Kisma\Event\ControllerEvent $event
 	 *
 	 * @return bool
 	 */
@@ -57,7 +66,9 @@ class BlogController extends \Kisma\Components\Controller
 		//	Open zee db...
 		\Kisma\Kisma::app()->register( new \Kisma\Provider\CouchDbServiceProvider() );
 		$_app = \Kisma\Kisma::app();
-		$this->_client = $_app['couchdbs']['db.blog']->getCouchDBClient();
+
+		$this->_documentManager = $_app['couchdbs']['db.blog'];
+		$this->_client = $this->_documentManager->getCouchDBClient();
 
 		return parent::onBeforeAction( $event );
 	}
@@ -87,7 +98,7 @@ class BlogController extends \Kisma\Components\Controller
 			}
 		}
 
-		require_once __DIR__ . '/../models/BlogPost.php';
+		require_once __DIR__ . '/../Document/BlogPost.php';
 
 		$_blog = new BlogPost();
 		$_blog->title = 'Welcome to the blog!';
@@ -110,6 +121,9 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean fermentum vehicu
 Curabitur a eros arcu. Mauris malesuada vestibulum commodo. Sed scelerisque orci in est porta pulvinar. Nulla fermentum faucibus feugiat. Maecenas vitae est erat, at suscipit arcu. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Donec sed libero sit amet tellus pretium elementum. Pellentesque lacinia erat tempus sem interdum viverra. Donec placerat congue nulla, eu fermentum ligula rhoncus ut. Sed tincidunt accumsan ligula, nec tincidunt urna scelerisque vitae. Proin porttitor bibendum mi at rhoncus.
 </p>
 HTML;
+
+		$this->_documentManager->persist( $_blog );
+		$this->_documentManager->flush();
 
 		$_data = array(
 			'blogs' => $this->_client->allDocs( 25 ),
@@ -148,6 +162,42 @@ HTML;
 	public function createAction( Application $app, Request $request )
 	{
 		\Kisma\Utility\Log::info( 'Action create called.' );
+	}
+
+	/**
+	 * @param \Doctrine\CouchDB\CouchDBClient $client
+	 * @return \BlogController
+	 */
+	public function setClient( $client )
+	{
+		$this->_client = $client;
+		return $this;
+	}
+
+	/**
+	 * @return \Doctrine\CouchDB\CouchDBClient
+	 */
+	public function getClient()
+	{
+		return $this->_client;
+	}
+
+	/**
+	 * @param \Doctrine\ODM\CouchDB\DocumentManager $documentManager
+	 * @return \BlogController
+	 */
+	public function setDocumentManager( $documentManager )
+	{
+		$this->_documentManager = $documentManager;
+		return $this;
+	}
+
+	/**
+	 * @return \Doctrine\ODM\CouchDB\DocumentManager
+	 */
+	public function getDocumentManager()
+	{
+		return $this->_documentManager;
 	}
 
 }

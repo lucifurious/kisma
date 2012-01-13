@@ -59,25 +59,34 @@
  */
 
 return array(
+	//	The name of the application
 	'app_name' => 'Example Blog',
 
-	//	The root of the application codebase
-	'app_root' => __DIR__ . '/../',
-
-	//	Where log files will go
-	'log_path' => __DIR__ . '/../logs',
+	//	The namespace mapping for the autoloader
+	'namespace' => array(
+		'ExampleBlog' => __DIR__ . '/..',
+	),
 
 	//	The name of our log file
 	'log_file_name' => 'blog.log',
 
-	//	The controller path (defaults to /controllers)
-	'controller_path' => '/controllers',
+	//	Where log files will go
+	'log_path' => 'logs',
+
+	//	The controller path (defaults to /Controllers)
+	'controller_path' => 'Controllers',
+
+	//	The models path (defaults to /Models)
+	'model_path' => 'Models',
+
+	//	The documents path for CouchDB mappings (defaults to /Document)
+	'document_path' => 'Document',
+
+	//	The view path (defaults to /Views)
+	'view_path' => 'Views',
 
 	//	The default controller for the site
 	'default_controller' => 'blog',
-
-	//	The view path (defaults to /views)
-	'view_path' => '/views',
 
 	//	Our database
 	'@couchdbs.options' => array(

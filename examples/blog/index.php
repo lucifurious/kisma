@@ -20,13 +20,15 @@
 //	Include the Kisma bootstrap
 require_once __DIR__ . '/../../src/Kisma.php';
 
-//	Let it begin!
+//	Initialize Kisma
 $_app = new \Kisma\Kisma(
 	array(
-		'app.config.app_root' => __DIR__ . '/app',
+		'app.config.app_root' => __DIR__,
+		'app.config.app_namespace' => 'ExampleBlog',
 	)
 );
 
+//	A little debug joy
 $_app['debug'] = true;
 
 //	Start!

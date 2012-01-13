@@ -22,11 +22,12 @@ namespace Kisma\Provider;
 //* Aliases
 //*************************************************************************
 
-use Kisma\Components as Components;
-use Doctrine\CouchDB\CouchDBClient;
-use Doctrine\ODM\CouchDB\Configuration;
-use Doctrine\ODM\CouchDB\DocumentManager;
-use Doctrine\Common\EventManager;
+use \Kisma\Components as Components;
+use \Kisma\AppConfig;
+use \Doctrine\CouchDB\CouchDBClient;
+use \Doctrine\ODM\CouchDB\Configuration;
+use \Doctrine\ODM\CouchDB\DocumentManager;
+use \Doctrine\Common\EventManager;
 
 //*************************************************************************
 //* Requirements
@@ -108,9 +109,9 @@ class CouchDbServiceProvider extends Components\SilexServiceProvider
 
 			//	Register our paths
 			$app['autoloader']->registerNamespaces( array(
-				'Doctrine\\Common' => $app['base_path'] . '/vendor/doctrine-common/lib',
-				'Doctrine\\CouchDB' => $app['base_path'] . '/vendor/couchdb_odm/lib',
-				'Doctrine\\ODM' => $app['base_path'] . '/vendor/couchdb_odm/lib',
+				'Doctrine\\Common' => $app['vendor_path'] . '/couchdb_odm/lib/vendor/doctrine-common/lib',
+				'Doctrine\\ODM' => $app['vendor_path'] . '/couchdb_odm/lib',
+				'Doctrine\\CouchDB' => $app['vendor_path'] . '/couchdb_odm/lib',
 			) );
 
 			if ( !isset( $app[CouchDbServiceProvider::GroupOptions] ) )
@@ -165,10 +166,15 @@ class CouchDbServiceProvider extends Components\SilexServiceProvider
 		{
 			$app[CouchDbServiceProvider::GroupOptions . '.initializer']();
 
+			$_documentPath = $app['app.config.document_path'];
+
 			$_configs = new \Pimple();
 			foreach ( $app[CouchDbServiceProvider::GroupOptions] as $_name => $_options )
 			{
-				$_configs[$_name] = new Configuration();
+				$_config = new \Doctrine\ODM\CouchDB\Configuration();
+				$_metadataDriver = $_config->newDefaultAnnotationDriver( isset( $_options['document_path'] ) ? $_options['document_path'] : $_documentPath );
+				$_config->setMetadataDriverImpl( $_metadataDriver );
+				$_configs[$_name] = $_config;
 			}
 
 			return $_configs;
@@ -192,7 +198,6 @@ class CouchDbServiceProvider extends Components\SilexServiceProvider
 		$app[CouchDbServiceProvider::Options_Prefix] = $app->share( function() use ( $app )
 		{
 			$_dbs = $app[CouchDbServiceProvider::Options_GroupPrefix];
-
 			return $_dbs[$app[CouchDbServiceProvider::DefaultGroupOptions]];
 		} );
 
@@ -206,7 +211,6 @@ class CouchDbServiceProvider extends Components\SilexServiceProvider
 		$app['couchdb.config'] = $app->share( function() use ( $app )
 		{
 			$_dbs = $app[CouchDbServiceProvider::Options_GroupPrefix . '.config'];
-
 			return $_dbs[$app[CouchDbServiceProvider::DefaultGroupOptions]];
 		} );
 
@@ -216,10 +220,8 @@ class CouchDbServiceProvider extends Components\SilexServiceProvider
 		$app['couchdb.event_manager'] = $app->share( function() use ( $app )
 		{
 			$_dbs = $app['couchdbs.event_manager'];
-
 			return $_dbs[$app[CouchDbServiceProvider::DefaultGroupOptions]];
 		} );
 	}
-
 
 }

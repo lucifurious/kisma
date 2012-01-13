@@ -7,9 +7,6 @@
 [submodule "vendor/couchdb_odm"]
 	path = vendor/couchdb_odm
 	url = git://github.com/doctrine/couchdb-odm.git
-[submodule "vendor/doctrine-common"]
-	path = vendor/doctrine-common
-	url = git://github.com/doctrine/common.git
 [submodule "vendor/twig"]
 	path = vendor/twig
 	url = git://github.com/fabpot/Twig.git
@@ -19,9 +16,6 @@
 [submodule "vendor/SyntaxHighlighter"]
 	path = vendor/SyntaxHighlighter
 	url = https://github.com/alexgorbatchev/SyntaxHighlighter.git
-[submodule "vendor/silex-extensions"]
-	path = vendor/silex-extensions
-	url = git://github.com/fate/Silex-Extensions.git
 [submodule "vendor/assetic"]
 	path = vendor/assetic
 	url = git://github.com/kriswallsmith/assetic.git
