@@ -3,3 +3,4 @@ examples/blog/app/cache/
 .gitignore
 build/certs/
 vendor.old/
+vendor/silex.original/
