@@ -16,7 +16,6 @@
  *
  * @ingroup silex
  */
-
 namespace Kisma\Components;
 
 //*************************************************************************
@@ -31,12 +30,32 @@ use Silex\Application;
  */
 abstract class SilexServiceProvider extends Service implements \Silex\ServiceProviderInterface
 {
-	//	Like the goggles, does nothing.
+	//*************************************************************************
+	//* Private Members
+	//*************************************************************************
+
+	/**
+	 * @var string
+	 */
+	protected $_serviceName;
 
 	//*************************************************************************
 	//* Event Handlers
 	//*************************************************************************
 
+	/**
+	 * @param $serviceName
+	 *
+	 * @return \Kisma\Components\SilexServiceProvider
+	 */
+	public function setServiceName( $serviceName )
+	{
+		$this->_serviceName = $serviceName;
+		return $this;
+	}
 
-
+	public function getServiceName()
+	{
+		return $this->_serviceName;
+	}
 }

@@ -104,7 +104,7 @@ abstract class Seed implements \Kisma\IKisma, \Kisma\IConfigurable, \Countable, 
 	 */
 	public function setOption( $name, $value = null )
 	{
-		Property::set( $this->_options, $name, $value, $this->_propertiesRequired );
+		Property::set( $this, $name, $value, $this->_propertiesRequired );
 		return $this;
 	}
 
@@ -139,7 +139,7 @@ abstract class Seed implements \Kisma\IKisma, \Kisma\IConfigurable, \Countable, 
 		$this->_objectId = spl_object_hash( $this );
 
 		//	Catch null input, non-traversable, or empty options
-		if ( null === $options || !( $options instanceof \Traversable ) || empty( $options ) )
+		if ( empty( $options ) || ( !is_array( $options) && !( $options instanceof \Traversable ) ) )
 		{
 			$options = array();
 		}

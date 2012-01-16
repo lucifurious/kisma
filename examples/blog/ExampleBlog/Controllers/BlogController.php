@@ -38,6 +38,10 @@ class BlogController extends \Kisma\Components\Controller
 	 * @var string
 	 */
 	const DatabaseName = 'kisma_examples_blog_posts';
+	/**
+	 * @var string
+	 */
+	const DocumentName = 'ExampleBlog\\Document\\BlogPost';
 
 	//*************************************************************************
 	//* Private Members
@@ -51,6 +55,27 @@ class BlogController extends \Kisma\Components\Controller
 	 * @var \Doctrine\ODM\CouchDB\DocumentManager
 	 */
 	protected $_documentManager = null;
+	/**
+	 * @var string
+	 */
+	protected $_documentName = null;
+
+	//*************************************************************************
+	//* Public Methods
+	//*************************************************************************
+
+	/**
+	 * @param array $options
+	 */
+	public function __construct( $options = array() )
+	{
+		parent::__construct( $options );
+
+		if ( null === $this->_documentName )
+		{
+			$this->_documentName = self::DocumentName;
+		}
+	}
 
 	//*************************************************************************
 	//* Event Handlers
@@ -98,38 +123,12 @@ class BlogController extends \Kisma\Components\Controller
 			}
 		}
 
-		require_once __DIR__ . '/../Document/BlogPost.php';
+		$_docs = $this->_client->allDocs( 25 );
 
-		$_blog = new BlogPost();
-		$_blog->title = 'Welcome to the blog!';
-		$_blog->author = 'kisma_dude';
-		$_blog->postDate = date( 'c' );
-		$_blog->body = <<<HTML
-<p>
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse ullamcorper sapien vitae ligula placerat elementum. Pellentesque accumsan pellentesque eros sed facilisis. Phasellus pulvinar nulla non dolor scelerisque vitae mollis lacus adipiscing. Curabitur tristique tempor dolor quis tincidunt. Vestibulum placerat accumsan varius. Duis ultricies vestibulum hendrerit. Morbi porttitor tincidunt velit, eget rutrum lacus convallis egestas. Fusce tristique sagittis magna, vel porta mauris commodo pretium. Aliquam fermentum ullamcorper nulla. Etiam est turpis, sodales a semper vitae, fringilla quis nisl. Nam rhoncus velit tortor, et tristique nibh. Pellentesque iaculis, nisl malesuada sollicitudin blandit, purus est eleifend ipsum, quis vestibulum eros ante a sapien. Fusce turpis tellus, eleifend eget aliquet accumsan, imperdiet eu dui. Vivamus ac urna vel nibh tincidunt pellentesque ut sed enim. Maecenas aliquet ultricies magna a dictum. Sed varius, lorem vel consequat fermentum, purus ligula venenatis sem, in sollicitudin lorem felis non ipsum.
-</p>
-<p>
-Fusce pellentesque elementum elit, quis tincidunt eros semper ut. Aliquam erat volutpat. Nam vel nisi purus. Nulla egestas eros eu augue vestibulum lacinia. Nunc mauris nisi, pulvinar a vestibulum eu, ultrices non metus. Mauris sit amet suscipit nunc. Integer mi justo, ultricies sit amet porta id, feugiat nec dolor. Aliquam vel nibh eget sem elementum dapibus. Nam in facilisis erat. Pellentesque libero nulla, rutrum sed interdum ut, ultrices ut sem. Curabitur sodales lobortis mi id feugiat. Fusce hendrerit cursus magna ac tincidunt. Sed egestas lacinia sodales.
-</p>
-<p>
-Nunc placerat tortor eget metus suscipit id porta diam dignissim. Donec et consequat odio. Nullam nec ipsum et tortor consequat vulputate nec id mi. Morbi fringilla lectus a tellus euismod at posuere lorem tempor. Curabitur sit amet metus non lacus aliquet hendrerit. Suspendisse pretium, augue non eleifend tempor, quam nibh molestie mauris, in dignissim leo diam vitae sem. Integer sagittis sagittis placerat.
-</p>
-<p>
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean fermentum vehicula felis vitae aliquet. Sed commodo commodo elit, vel tempor neque vestibulum vitae. Praesent ullamcorper pellentesque molestie. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Integer nulla purus, ornare a viverra commodo, interdum nec lorem. Sed pharetra nisl in odio consectetur laoreet.
-</p>
-<p>
-Curabitur a eros arcu. Mauris malesuada vestibulum commodo. Sed scelerisque orci in est porta pulvinar. Nulla fermentum faucibus feugiat. Maecenas vitae est erat, at suscipit arcu. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Donec sed libero sit amet tellus pretium elementum. Pellentesque lacinia erat tempus sem interdum viverra. Donec placerat congue nulla, eu fermentum ligula rhoncus ut. Sed tincidunt accumsan ligula, nec tincidunt urna scelerisque vitae. Proin porttitor bibendum mi at rhoncus.
-</p>
-HTML;
-
-		$this->_documentManager->persist( $_blog );
-		$this->_documentManager->flush();
-
+		/**  */
 		$_data = array(
-			'blogs' => $this->_client->allDocs( 25 ),
+			'blogs' => ( 200 == $_docs->status ) ? $_docs->body : array(),
 		);
-
-		\Kisma\Utility\Log::trace( 'Data = ' . print_r( $_data, true ) );
 
 		$app->render(
 			'blog/index.twig',
@@ -150,9 +149,63 @@ HTML;
 	 * @param \Silex\Application|\Kisma\Kisma						$app
 	 * @param \Symfony\Component\HttpFoundation\Request			  $request
 	 */
+	protected function _edit( Application $app, Request $request )
+	{
+		$_model = new BlogPost();
+
+		if ( isset( $_POST, $_POST['BlogPost'] ) )
+		{
+			$_payload = $_POST['BlogPost'];
+			$_id = \Kisma\Utility\FilterInput::get( INPUT_GET, 'id', null, FILTER_SANITIZE_STRING );
+
+			if ( empty( $_id ) )
+			{
+				$_model = new BlogPost();
+				$_model->postDate = date( 'c' );
+			}
+			else
+			{
+				$_response = $this->_documentManager->find( $this->_documentName, $_id );
+
+				if ( 200 == $_response->status )
+				{
+					$_model = new BlogPost( $_response->body );
+				}
+			}
+
+			foreach ( $_payload as $_key => $_value )
+			{
+				$_model->{$_key} = $_value;
+			}
+
+			$this->_documentManager->persist( $_model );
+			$this->_documentManager->flush();
+		}
+
+		$_editor = new \Kisma\Components\Widget\CkEditorWidget(
+			array(
+				'id' => 'BlogPost_body',
+				'name' => 'BlogPost[body]',
+			)
+		);
+
+		//	Render the editor
+		$app->render(
+			'edit.twig',
+			array(
+				'post' => $_model,
+				'ckeditor' => $_editor->render( null, true ),
+			)
+		);
+	}
+
+	/**
+	 * @param \Silex\Application|\Kisma\Kisma						$app
+	 * @param \Symfony\Component\HttpFoundation\Request			  $request
+	 */
 	public function updateAction( Application $app, Request $request )
 	{
-		\Kisma\Utility\Log::info( 'Action update called.' );
+		return $this->_edit( $app, $request );
 	}
 
 	/**
@@ -161,11 +214,16 @@ HTML;
 	 */
 	public function createAction( Application $app, Request $request )
 	{
-		\Kisma\Utility\Log::info( 'Action create called.' );
+		return $this->_edit( $app, $request );
 	}
+
+	//*************************************************************************
+	//* Properties
+	//*************************************************************************
 
 	/**
 	 * @param \Doctrine\CouchDB\CouchDBClient $client
+	 *
 	 * @return \BlogController
 	 */
 	public function setClient( $client )
@@ -184,6 +242,7 @@ HTML;
 
 	/**
 	 * @param \Doctrine\ODM\CouchDB\DocumentManager $documentManager
+	 *
 	 * @return \BlogController
 	 */
 	public function setDocumentManager( $documentManager )

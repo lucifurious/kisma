@@ -38,6 +38,7 @@ use \Kisma\Utility\Property;
 use \Kisma\Utility\Events;
 use \Kisma\Utility\Option;
 use \Kisma\Utility\Http;
+use Monolog;
 
 /**
  * The Kisma bootstrap loader
@@ -199,7 +200,15 @@ class Kisma extends \Silex\Application
 			return;
 		}
 
-		$_output = $this['twig']->render( $viewFile, $this->_getBaseRenderPayload( $viewFile, $payload ) );
+		$_payload = $this->_getBaseRenderPayload( $viewFile, $payload );
+		$_renderEvent = new \Kisma\Event\RenderEvent( $this, $viewFile, $_payload );
+		$this->dispatch( \Kisma\Event\RenderEvent::BeforeRender, $_renderEvent );
+
+		$_renderEvent->setOutput(
+			$_output = $this['twig']->render( $viewFile, $_payload )
+		);
+
+		$this->dispatch( \Kisma\Event\RenderEvent::AfterRender, $_renderEvent );
 
 		if ( false !== $returnString )
 		{
@@ -274,17 +283,11 @@ class Kisma extends \Silex\Application
 	{
 		$_self = $this;
 
-		$_logPath = self::app( 'app.config.log_path', __DIR__, '/logs' );
-		$_logFileName =
-			FileSystem::makePath( $_logPath, self::app( 'app.config.log_file_name', 'web.app.log' ), false );
+		$this->_initializeLogging();
 
-		$this->register( new \Silex\Provider\MonologServiceProvider(), array(
-			'monolog.logfile' => $_logFileName,
-			'monolog.class_path' => $this['vendor_path'] . '/silex/vendor/monolog/src',
-			'monolog.name' => isset( $this['app.config.app_name'] ) ? $this['app.config.app_name'] : 'kisma',
-		) );
-
+		//
 		//	Initialize the view renderer
+		//
 		if ( false === $this['is_cli'] )
 		{
 			$this[self::Autoloader]->registerPrefix( 'Twig', $this['vendor_path'] . '/twig/lib' );
@@ -311,9 +314,24 @@ class Kisma extends \Silex\Application
 				$_twigOptions['twig.class_path'] = $this['vendor_path'] . '/twig/lib';
 			}
 
-			$this->register( new \Silex\Provider\TwigServiceProvider(), $_twigOptions );
+			//	Register Twig
+			$this['twig'] = $this->share( function() use( $_twigOptions )
+			{
+				new \Silex\Provider\TwigServiceProvider( $_twigOptions );
+			} );
+
+			//
+			//	Initialize widget service
+			//
+			$this['widget'] = $this->share( function ()
+			{
+				return new \Kisma\Provider\WidgetServiceProvider( self::app( 'widget.options', array() ) );
+			} );
 		}
 
+		//
+		//	Set error handlers
+		//
 		\set_error_handler( function( $code, $message ) use ( $_self )
 		{
 			\Kisma\Components\ErrorHandler::onError( new \Kisma\Event\ErrorEvent( $_self, $code, $message ) );
@@ -326,15 +344,18 @@ class Kisma extends \Silex\Application
 			return false;
 		} );
 
-		//	Set up error handling
+		//
+		//	Tell Silex to let us in on the fun
+		//
 		$this->error( function( $exception, $code ) use ( $_self )
 		{
 			\Kisma\Components\ErrorHandler::onException( new \Kisma\Event\ErrorEvent( $_self, $exception ) );
 			return false;
 		} );
 
-		//		echo $this['xyz'];
-
+		//
+		//	Finally, register any controllers we can find
+		//
 		$this->_registerControllers();
 
 		self::log( 'Initialization complete.' );
@@ -356,6 +377,50 @@ class Kisma extends \Silex\Application
 	//*************************************************************************
 	//* Private Methods
 	//*************************************************************************
+
+	/**
+	 * Initialize logging
+	 *
+	 * @todo enable/disable with option
+	 */
+	public function _initializeLogging()
+	{
+		$_logFileName = FileSystem::makePath(
+			$_logPath = self::app( 'app.config.log_path', __DIR__, '/logs' ),
+			self::app( 'app.config.log_file_name', 'web.app.log' ),
+			false
+		);
+
+		$_monologOptions = self::app( 'monolog.options', array() );
+
+		$_streams = Option::get( $_monologOptions, 'streams', array() );
+
+		if ( !empty( $_streams ) )
+		{
+			foreach ( $_streams as $_streamName => $_stream )
+			{
+
+			}
+		}
+			array(
+				'monolog.logfile' => $_logFileName,
+				'monolog.class_path' => $this['vendor_path'] . '/silex/vendor/monolog/src',
+				'monolog.name' => isset( $this['app.config.app_name'] ) ? $this['app.config.app_name'] : 'kisma',
+			)
+		);
+
+		$app['monolog'] = $this->share( function() use( $_monologOptions )
+		{
+			/** @var $_monolog \Monolog\Logger */
+			$_monolog = new \Silex\Provider\MonologServiceProvider( $_monologOptions );
+
+			if ( false !== Option::get( $_monologOptions, 'fire_php', false ) )
+			{
+				$_firePhp = new \Monolog\Handler\FirePHPHandler();
+				$_monolog->pushHandler( $_firePhp );
+			}
+		} );
+	}
 
 	/**
 	 * Returns an array of standard values passed to all views
@@ -386,6 +451,7 @@ class Kisma extends \Silex\Application
 			'app_version' => $this->app( 'app.config.app_version', 'Kisma Framework v ' . self::Version ),
 			'page_date' => date( 'Y-m-d H:i:s' ),
 			'vendor_path' => $this['vendor_path'],
+			'topbar' => self::app( 'app.config.topbar' ),
 		);
 
 		return array_merge( $_payload, $additional );

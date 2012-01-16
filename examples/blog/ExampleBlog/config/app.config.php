@@ -64,10 +64,27 @@ return array(
 
 	//	The namespace mapping for the autoloader
 	'namespace' => array(
-		'ExampleBlog' => __DIR__ . '/..',
+		'ExampleBlog' => __DIR__ . '/../..',
 	),
 
 	//	The name of our log file
+	'@monolog.options' => array(
+
+		//	Log streams
+		'streams' => array(
+			'application' => array(
+				'log_path' => '',
+				'file_name' => '',
+			),
+		),
+
+		//	Handlers
+		'handlers' => array(
+			'fire_php' => true,
+		),
+	),
+
+		//	Streams
 	'log_file_name' => 'blog.log',
 
 	//	Where log files will go

@@ -201,7 +201,7 @@ class Property extends \Kisma\Components\Seed implements \Kisma\IUtility
 		{
 			try
 			{
-				Property::property( $object, $property, \Kisma\AccessorMode::Set, $value );
+				Property::property( $object, $_key, \Kisma\AccessorMode::Set, $value );
 			}
 			catch ( \Kisma\UndefinedPropertyException $_ex )
 			{

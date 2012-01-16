@@ -31,7 +31,7 @@ class __TwigTemplate_4bdc702b84bd362a82543cb978a3e07a extends Twig_Template
                 echo "\"
 \t\t\t\t\t";
                 // line 9
-                if ($this->getAttribute($this->getContext($context, "item"), "target")) {
+                if ($this->getAttribute($this->getContext($context, "item", true), "target", array(), "any", true, true)) {
                     echo "target=\"";
                     echo twig_escape_filter($this->env, $this->getAttribute($this->getContext($context, "item"), "target"), "html", null, true);
                     echo "\"";

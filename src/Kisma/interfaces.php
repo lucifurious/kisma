@@ -398,6 +398,13 @@ interface IComponentService extends IService, IComponent
 }
 
 /**
+ * Indicates that the component provides access to a widget service
+ */
+interface IWidgetService extends IComponentService
+{
+}
+
+/**
  * This identifies an object as a streamable object
  */
 interface IStreamable extends IComponent

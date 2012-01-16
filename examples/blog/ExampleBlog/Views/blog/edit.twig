@@ -1,0 +1,44 @@
+{% extends 'layouts/_master_one_column.twig' %}
+
+{% block all_content %}
+<h1>{% if post.title %}{{ post.title }}{%else%}New Entry{%endif%}
+	<small><a href="/" id="cancel-edit">Cancel</a></small>
+</h1>
+<div id="post">
+	<form class="form-blog-post" method="POST" action="/blog/update">
+		<input type="hidden" name="BlogPost[id]" id="BlogPost_id" value="{{ post.id }}" />
+
+		<div class="clearfix well">
+			<fieldset>
+
+				<div class="clearfix">
+					<label for="BlogPost_title">Title</label>
+
+					<div class="input">
+						<input type="text" name="BlogPost[title]" id="BlogPost_title" value="{{ post.title }}"
+							placeholder="Blog title" />
+					</div>
+				</div>
+
+				<div class="clearfix">
+					<label for="BlogPost_body">Blog Contents</label>
+
+					<div class="input">
+						<textarea class="ckeditor" rows="20" cols="80" name="BlogPost[body]" id="BlogPost_body"
+							value="{{ post.body }}" placeholder="Blog entry"></textarea>
+					</div>
+				</div>
+
+			</fieldset>
+
+			<div class="actions centered">
+				<button type="submit" class="btn primary">Save</button>
+				<span class="loading-message"></span>
+			</div>
+
+		</div>
+	</form>
+
+</div>{{ ckeditor|raw }}{% endblock %}
+
+

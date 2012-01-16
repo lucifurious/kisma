@@ -10,10 +10,12 @@
       <w>autoloader</w>
       <w>bitmask</w>
       <w>blogs</w>
+      <w>ckeditor</w>
       <w>couchdb</w>
       <w>couchdbs</w>
       <w>debuggable</w>
       <w>endcode</w>
+      <w>endraw</w>
       <w>errno</w>
       <w>faux</w>
       <w>filesource</w>

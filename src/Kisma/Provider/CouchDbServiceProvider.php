@@ -22,12 +22,13 @@ namespace Kisma\Provider;
 //* Aliases
 //*************************************************************************
 
-use \Kisma\Components as Components;
-use \Kisma\AppConfig;
-use \Doctrine\CouchDB\CouchDBClient;
-use \Doctrine\ODM\CouchDB\Configuration;
-use \Doctrine\ODM\CouchDB\DocumentManager;
-use \Doctrine\Common\EventManager;
+use Kisma\Components as Components;
+use Kisma\AppConfig;
+use Doctrine\CouchDB\CouchDBClient;
+use Doctrine\ODM\CouchDB\Configuration;
+use Doctrine\ODM\CouchDB\DocumentManager;
+use Doctrine\ODM\CouchDB\Mapping\Annotations\Document;
+use Doctrine\Common\EventManager;
 
 //*************************************************************************
 //* Requirements
@@ -107,12 +108,32 @@ class CouchDbServiceProvider extends Components\SilexServiceProvider
 				'logging' => false,
 			);
 
+			$_doctrinePath = $app['vendor_path'] . '/couchdb_odm/lib/vendor/doctrine-common/lib';
+			require_once $_doctrinePath . '/Doctrine/Common/ClassLoader.php';
+
+			$_loader = new \Doctrine\Common\ClassLoader( 'Doctrine\Common', $_doctrinePath );
+			$_loader->register();
+
+			$_loader = new \Doctrine\Common\ClassLoader( 'Doctrine\ORM', $_doctrinePath );
+			$_loader->register();
+
 			//	Register our paths
 			$app['autoloader']->registerNamespaces( array(
-				'Doctrine\\Common' => $app['vendor_path'] . '/couchdb_odm/lib/vendor/doctrine-common/lib',
+				'Doctrine\\Common' => $_doctrinePath,
 				'Doctrine\\ODM' => $app['vendor_path'] . '/couchdb_odm/lib',
+				'Doctrine\\ODM\\CouchDB' => $app['vendor_path'] . '/couchdb_odm/lib/CouchDB',
 				'Doctrine\\CouchDB' => $app['vendor_path'] . '/couchdb_odm/lib',
 			) );
+
+			\Doctrine\Common\Annotations\AnnotationRegistry::registerAutoloadNamespaces(
+				array(
+					'Kisma' => __DIR__,
+					'Doctrine\\Common' => $_doctrinePath,
+					'Doctrine\\ODM' => $app['vendor_path'] . '/couchdb_odm/lib',
+					'Doctrine\\ODM\\CouchDB' => $app['vendor_path'] . '/couchdb_odm/lib/CouchDB',
+					'Doctrine\\CouchDB' => $app['vendor_path'] . '/couchdb_odm/lib',
+				)
+			);
 
 			if ( !isset( $app[CouchDbServiceProvider::GroupOptions] ) )
 			{
@@ -172,7 +193,9 @@ class CouchDbServiceProvider extends Components\SilexServiceProvider
 			foreach ( $app[CouchDbServiceProvider::GroupOptions] as $_name => $_options )
 			{
 				$_config = new \Doctrine\ODM\CouchDB\Configuration();
-				$_metadataDriver = $_config->newDefaultAnnotationDriver( isset( $_options['document_path'] ) ? $_options['document_path'] : $_documentPath );
+				$_metadataDriver =
+					$_config->newDefaultAnnotationDriver( isset( $_options['document_path'] ) ?
+						$_options['document_path'] : $_documentPath );
 				$_config->setMetadataDriverImpl( $_metadataDriver );
 				$_configs[$_name] = $_config;
 			}

@@ -64,15 +64,30 @@ return array(
 	'@view.defaults' => array(
 		'page_header' => 'The Kisma Blog',
 		'page_header_small' => 'The rantings of a lunatic geek...',
+
 		'topbar' => array(
 			'brand' => 'Kisma',
+
 			'items' => array(
+
 				array(
 					'active' => true,
-					'href' => '#',
-					'target' => null,
+					'href' => '/',
 					'title' => 'Home',
-				)
+				),
+
+				array(
+					'active' => false,
+					'href' => '/blog/admin',
+					'title' => 'Posts',
+				),
+
+				array(
+					'active' => false,
+					'href' => '/blog/create',
+					'title' => 'New',
+				),
+
 			),
 		),
 	),

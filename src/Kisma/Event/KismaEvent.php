@@ -34,12 +34,12 @@ abstract class KismaEvent extends \Symfony\Component\EventDispatcher\Event imple
 	/**
 	 * The object where this event was thrown
 	 *
-	 * @var \Kisma\Components\Seed|\Silex\Application
+	 * @var \Kisma\Components\Seed|\Silex\Application|array
 	 */
 	protected $_target;
 
 	/**
-	 * @param \Kisma\Components\Seed|\Silex\Application $target The event in which the event occurred
+	 * @param array|\Kisma\Components\Seed|\Silex\Application $target The event in which the event occurred
 	 */
 	public function __construct( $target )
 	{
