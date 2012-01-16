@@ -315,18 +315,12 @@ class Kisma extends \Silex\Application
 			}
 
 			//	Register Twig
-			$this['twig'] = $this->share( function() use( $_twigOptions )
-			{
-				new \Silex\Provider\TwigServiceProvider( $_twigOptions );
-			} );
+			$this->register( new \Silex\Provider\TwigServiceProvider(), $_twigOptions );
+			\Kisma\Utility\Log::trace( 'Twig registered' );
 
-			//
-			//	Initialize widget service
-			//
-			$this['widget'] = $this->share( function ()
-			{
-				return new \Kisma\Provider\WidgetServiceProvider( self::app( 'widget.options', array() ) );
-			} );
+			//	Register widget service
+			$this->register( new \Kisma\Provider\WidgetServiceProvider(), self::app( 'widget.options', array() ) );
+			\Kisma\Utility\Log::trace( 'Widget services registered' );
 		}
 
 		//
@@ -383,7 +377,7 @@ class Kisma extends \Silex\Application
 	 *
 	 * @todo enable/disable with option
 	 */
-	public function _initializeLogging()
+	protected function _initializeLogging()
 	{
 		$_logFileName = FileSystem::makePath(
 			$_logPath = self::app( 'app.config.log_path', __DIR__, '/logs' ),
@@ -391,17 +385,8 @@ class Kisma extends \Silex\Application
 			false
 		);
 
-		$_monologOptions = self::app( 'monolog.options', array() );
-
-		$_streams = Option::get( $_monologOptions, 'streams', array() );
-
-		if ( !empty( $_streams ) )
-		{
-			foreach ( $_streams as $_streamName => $_stream )
-			{
-
-			}
-		}
+		$_monologOptions = array_merge(
+			self::app( 'monolog.options', array() ),
 			array(
 				'monolog.logfile' => $_logFileName,
 				'monolog.class_path' => $this['vendor_path'] . '/silex/vendor/monolog/src',
@@ -409,17 +394,18 @@ class Kisma extends \Silex\Application
 			)
 		);
 
-		$app['monolog'] = $this->share( function() use( $_monologOptions )
-		{
-			/** @var $_monolog \Monolog\Logger */
-			$_monolog = new \Silex\Provider\MonologServiceProvider( $_monologOptions );
+		$this->register( new \Silex\Provider\MonologServiceProvider(), array(
+			'monolog.logfile' => $_logFileName,
+			'monolog.class_path' => $this['vendor_path'] . '/silex/vendor/monolog/src',
+			'monolog.name' => isset( $this['app.config.app_name'] ) ? $this['app.config.app_name'] : 'kisma',
+		) );
 
-			if ( false !== Option::get( $_monologOptions, 'fire_php', false ) )
-			{
-				$_firePhp = new \Monolog\Handler\FirePHPHandler();
-				$_monolog->pushHandler( $_firePhp );
-			}
-		} );
+		if ( false !== Option::get( $_monologOptions, 'fire_php', false ) )
+		{
+			$_firePhp = new \Monolog\Handler\FirePHPHandler();
+			$this['monolog']->pushHandler( $_firePhp );
+			\Kisma\Utility\Log::debug( 'FirePHP handler registered.' );
+		}
 	}
 
 	/**
@@ -491,12 +477,8 @@ class Kisma extends \Silex\Application
 
 			$_class =
 				key( $this->_namespace ) . '\\Controllers\\' . str_ireplace( '.php', null, basename( $_entryPath ) );
-			//			$_mirror = new \ReflectionClass( $_class );
-			//			$_class = $_mirror->getName();
 
 			$this->mount( '/' . $_route, new $_class() );
-
-			\Kisma\Utility\Log::trace( print_r( $this['routes'], true ) );
 
 			//	Add to view path
 			$this['twig.loader.filesystem']->addPath( FileSystem::makePath( $_viewPath, $_route ) );

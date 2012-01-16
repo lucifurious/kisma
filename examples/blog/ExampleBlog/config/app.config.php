@@ -59,6 +59,11 @@
  */
 
 return array(
+
+	//*************************************************************************
+	//* Application-level Options
+	//*************************************************************************
+
 	//	The name of the application
 	'app_name' => 'Example Blog',
 
@@ -68,23 +73,6 @@ return array(
 	),
 
 	//	The name of our log file
-	'@monolog.options' => array(
-
-		//	Log streams
-		'streams' => array(
-			'application' => array(
-				'log_path' => '',
-				'file_name' => '',
-			),
-		),
-
-		//	Handlers
-		'handlers' => array(
-			'fire_php' => true,
-		),
-	),
-
-		//	Streams
 	'log_file_name' => 'blog.log',
 
 	//	Where log files will go
@@ -105,7 +93,11 @@ return array(
 	//	The default controller for the site
 	'default_controller' => 'blog',
 
-	//	Our database
+	//*************************************************************************
+	//* Kisma/Silex Global Options
+	//*************************************************************************
+
+	//	Databases
 	'@couchdbs.options' => array(
 		'db.blog' => array(
 			'host' => 'teledini.gna.me',
@@ -113,5 +105,15 @@ return array(
 			'user' => 'sinker',
 			'password' => 'sinker',
 		),
+	),
+
+	//	Logging
+	'@monolog.options' => array(
+		'fire_php' => true,
+	),
+
+	//	Widget options
+	'@widget.options' => array(
+
 	),
 );

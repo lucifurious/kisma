@@ -1,3 +1,21 @@
 div.input textarea {
 	width: auto;
 }
+
+img.kisma-logo-icon {
+	width: 24px;
+	height: 24px;
+}
+
+img.kisma-logo-32 {
+	width: 32px;
+	height: 32px;
+	vertical-align: text-bottom;
+	margin: 0 10px 0 0;
+	padding-bottom: 4px;
+}
+
+img.kisma-logo-small {
+	width: 48px;
+	height: 48px;
+}
