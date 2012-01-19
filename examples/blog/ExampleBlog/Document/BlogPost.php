@@ -17,23 +17,16 @@
  */
 namespace ExampleBlog\Document;
 
-use Doctrine\ODM\CouchDB\Mapping\Annotations\Document;
-use Doctrine\Common\Annotations\Annotation;
+use Kisma\Container\CouchDb\Document;
 
 /**
  * @Document @Table(name="kisma_examples_blog_posts")
  */
-class BlogPost extends \Kisma\Components\Seed
+class BlogPost extends Document
 {
 	//*************************************************************************
 	//* Public Members
 	//*************************************************************************
-
-	/** @Id */
-	public $id;
-
-	/** @Version */
-	public $version;
 
 	/** @Field(type="string") */
 	public $title;
@@ -49,8 +42,5 @@ class BlogPost extends \Kisma\Components\Seed
 
 	/** @Field(type="string") */
 	public $postDate;
-
-	/** @Attachments */
-	public $attachments;
 
 }

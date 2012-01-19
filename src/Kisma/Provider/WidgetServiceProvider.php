@@ -28,7 +28,7 @@ use Silex\Application;
 /**
  * WidgetServiceProvider
  */
-class WidgetServiceProvider extends \Kisma\Components\SilexServiceProvider
+class WidgetServiceProvider extends SilexServiceProvider
 {
 	//*************************************************************************
 	//* Class Constants 

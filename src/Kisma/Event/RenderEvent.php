@@ -39,6 +39,27 @@ class RenderEvent extends KismaEvent
 	 */
 	const BeforeRender = 'before_render';
 
+	//*************************************************************************
+	//* Private Methods
+	//*************************************************************************
+
+	/**
+	 * @var null|string
+	 */
+	protected $_viewFile;
+	/**
+	 * @var null|string
+	 */
+	protected $_payload;
+	/**
+	 * @var null|string
+	 */
+	protected $_output;
+
+	//*************************************************************************
+	//* Public Methods
+	//*************************************************************************
+
 	/**
 	 * @param \Kisma\Components\Seed|\Silex\Application|array $target
 	 * @param string|null									 $viewFile

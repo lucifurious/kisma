@@ -23,12 +23,12 @@ namespace Kisma\Provider\CouchDb;
 //* Aliases 
 //*************************************************************************
 
-use Kisma\Provider\CouchDb\Document\Session;
+use Kisma\Container\CouchDb\Session;
 
 /**
  * SessionServiceProvider
  */
-class SessionServiceProvider extends \Kisma\Components\SilexServiceProvider
+class SessionServiceProvider extends SilexServiceProvider
 {
 	//*************************************************************************
 	//* Class Constants
@@ -37,7 +37,7 @@ class SessionServiceProvider extends \Kisma\Components\SilexServiceProvider
 	/**
 	 * @const string The name of our session table
 	 */
-	const DocumentName = 'Kisma\\Provider\\CouchDb\\Document\\Session';
+	const DocumentName = 'Kisma\\Container\\CouchDb\\Session';
 	/**
 	 * @const string The prefix for our cookies
 	 */
@@ -156,11 +156,11 @@ class SessionServiceProvider extends \Kisma\Components\SilexServiceProvider
 
 		if ( 404 == $_response->status )
 		{
-			$_session = new Kisma\Provider\CouchDb\Document\Session();
+			$_session = new Kisma\Container\CouchDb\Session();
 		}
 		else
 		{
-			$_session = new Kisma\Provider\CouchDb\Document\Session( $_response->body );
+			$_session = new Kisma\Container\CouchDb\Session( $_response->body );
 		}
 
 		$_session->data = $data;

@@ -26,7 +26,7 @@ use Kisma\Components as Components;
 use Kisma\AppConfig;
 use Doctrine\CouchDB\CouchDBClient;
 use Doctrine\ODM\CouchDB\Configuration;
-use Doctrine\ODM\CouchDB\DocumentManager;
+use Kisma\Provider\CouchDb\DocumentManager;
 use Doctrine\ODM\CouchDB\Mapping\Annotations\Document;
 use Doctrine\Common\EventManager;
 
@@ -38,7 +38,7 @@ use Doctrine\Common\EventManager;
  * CouchDbServiceProvider
  * A provider that wraps the CouchDbClient library for working with a CouchDb instance
  */
-class CouchDbServiceProvider extends Components\SilexServiceProvider
+class CouchDbServiceProvider extends SilexServiceProvider
 {
 	//*************************************************************************
 	//* Constants
@@ -108,31 +108,24 @@ class CouchDbServiceProvider extends Components\SilexServiceProvider
 				'logging' => false,
 			);
 
-			$_doctrinePath = $app['vendor_path'] . '/couchdb_odm/lib/vendor/doctrine-common/lib';
-			require_once $_doctrinePath . '/Doctrine/Common/ClassLoader.php';
-
-			$_loader = new \Doctrine\Common\ClassLoader( 'Doctrine\Common', $_doctrinePath );
-			$_loader->register();
-
-			$_loader = new \Doctrine\Common\ClassLoader( 'Doctrine\ORM', $_doctrinePath );
-			$_loader->register();
-
 			//	Register our paths
 			$app['autoloader']->registerNamespaces( array(
-				'Doctrine\\Common' => $_doctrinePath,
+				'Doctrine\\Common' => $app['vendor_path'] . '/couchdb_odm/lib/vendor/doctrine-common/lib',
 				'Doctrine\\ODM' => $app['vendor_path'] . '/couchdb_odm/lib',
 				'Doctrine\\ODM\\CouchDB' => $app['vendor_path'] . '/couchdb_odm/lib/CouchDB',
 				'Doctrine\\CouchDB' => $app['vendor_path'] . '/couchdb_odm/lib',
 			) );
 
+			//	Register namespaces with Doctrine as well
+			foreach ( $app['autoloader']->getNamespaces() as $_namespace => $_path )
+			{
+				$_loader = new \Doctrine\Common\ClassLoader( $_namespace, $_path );
+				$_loader->register();
+				unset( $_loader );
+			}
+
 			\Doctrine\Common\Annotations\AnnotationRegistry::registerAutoloadNamespaces(
-				array(
-					'Kisma' => __DIR__,
-					'Doctrine\\Common' => $_doctrinePath,
-					'Doctrine\\ODM' => $app['vendor_path'] . '/couchdb_odm/lib',
-					'Doctrine\\ODM\\CouchDB' => $app['vendor_path'] . '/couchdb_odm/lib/CouchDB',
-					'Doctrine\\CouchDB' => $app['vendor_path'] . '/couchdb_odm/lib',
-				)
+				$app['autoloader']->getNamespaces()
 			);
 
 			if ( !isset( $app[CouchDbServiceProvider::GroupOptions] ) )

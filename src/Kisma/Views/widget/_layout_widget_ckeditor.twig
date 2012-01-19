@@ -15,10 +15,15 @@
  *
  * @ingroup framework
 #}
+
 <script type="text/javascript" src="/scripts/ckeditor/ckeditor.js"></script>
 <script type="text/javascript" src="/scripts/ckeditor/adapters/jquery.js"></script>
 <script type="text/javascript">
-$(function(){
-	$('textarea.ckeditor').ckeditor({toolbar:'Basic'});
-});
+	$(function() {
+		CKEDITOR.replace(
+			'BlogPost_body',
+			{
+				toolbar : 'Basic'
+			});
+	});
 </script>

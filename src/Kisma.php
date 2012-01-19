@@ -116,16 +116,13 @@ class Kisma extends \Silex\Application
 	//*************************************************************************
 
 	/**
-	 * This object
-	 *
-	 * @var \Kisma\Kisma
+	 * @var \Silex\Application The $app
 	 */
 	protected static $_app = null;
 	/**
 	 * @var array This app's namespace map
 	 */
 	protected $_namespace = null;
-
 	/**
 	 * @var string The namespace root
 	 */
@@ -142,18 +139,18 @@ class Kisma extends \Silex\Application
 	 */
 	public function __construct( $options = array() )
 	{
-		//	Save me
-		self::$_app = $this;
-		$this[AppConfig::BasePath] = __DIR__;
+		//	Save me, or passed in $app
+		self::$_app = ( isset( $options, $options['app'] ) ? $options['app'] : $this );
+		self::$_app[AppConfig::BasePath] = __DIR__;
 
 		//	Call poppa
 		parent::__construct();
 
 		//	Set any configuration options that are passed in...
-		$this->_loadConfiguration( $options );
+		self::$_app->_loadConfiguration( $options );
 
 		//	Auto-subscribe for my handlers
-		Events::subscribe( $this );
+		Events::subscribe( self::$_app );
 
 		//	Dispatch initialize...
 		$this->dispatch( Event\ApplicationEvent::Initialize );
@@ -177,10 +174,10 @@ class Kisma extends \Silex\Application
 	{
 		if ( null === $event )
 		{
-			$event = new Event\ApplicationEvent( $this );
+			$event = new Event\ApplicationEvent( self::$_app );
 		}
 
-		self::app( self::Dispatcher )->dispatch( $eventName, $event );
+		self::$_app[self::Dispatcher]->dispatch( $eventName, $event );
 	}
 
 	/**
@@ -194,18 +191,18 @@ class Kisma extends \Silex\Application
 	 */
 	public function render( $viewFile, $payload = array(), $returnString = false )
 	{
-		if ( !isset( $this['twig'] ) )
+		if ( !isset( self::$_app['twig'] ) )
 		{
 			//	No twig? No go...
 			return;
 		}
 
 		$_payload = $this->_getBaseRenderPayload( $viewFile, $payload );
-		$_renderEvent = new \Kisma\Event\RenderEvent( $this, $viewFile, $_payload );
+		$_renderEvent = new \Kisma\Event\RenderEvent( self::$_app, $viewFile, $_payload );
 		$this->dispatch( \Kisma\Event\RenderEvent::BeforeRender, $_renderEvent );
 
 		$_renderEvent->setOutput(
-			$_output = $this['twig']->render( $viewFile, $_payload )
+			$_output = self::$_app['twig']->render( $viewFile, $_payload )
 		);
 
 		$this->dispatch( \Kisma\Event\RenderEvent::AfterRender, $_renderEvent );
@@ -252,10 +249,8 @@ class Kisma extends \Silex\Application
 	{
 		error_log( $message . PHP_EOL );
 
-		$_app = self::app();
-
 		/** @var $_logger \Monolog\Logger */
-		if ( !isset( $_app[self::Logger] ) || false !== $echo )
+		if ( !isset( self::$_app[self::Logger] ) || false !== $echo )
 		{
 			error_log( $message . PHP_EOL );
 
@@ -267,7 +262,7 @@ class Kisma extends \Silex\Application
 			}
 		}
 
-		$_app[self::Logger]->{$level}( $message );
+		self::$_app[self::Logger]->{$level}( $message );
 	}
 
 	//*************************************************************************
@@ -281,47 +276,51 @@ class Kisma extends \Silex\Application
 	 */
 	public function onInitialize()
 	{
-		$_self = $this;
-
 		$this->_initializeLogging();
 
 		//
 		//	Initialize the view renderer
 		//
-		if ( false === $this['is_cli'] )
+		if ( false === self::$_app['is_cli'] )
 		{
-			$this[self::Autoloader]->registerPrefix( 'Twig', $this['vendor_path'] . '/twig/lib' );
+			self::$_app[self::Autoloader]->registerPrefix( 'Twig', self::$_app['vendor_path'] . '/twig/lib' );
 
 			$_twigOptions = self::app( 'twig.options', array() );
 
 			if ( empty( $_twigOptions ) )
 			{
-				$_viewPath = $this['app.config.view_path'];
+				$_viewPath = self::$_app['app.config.view_path'];
 
 				$_twigOptions = array(
 					'twig.path' => array(
 						$_viewPath,
-						$this['system_view_path'],
+						self::$_app['system_view_path'],
 					),
 					'twig.options' => array(
-						'cache' => $this['app.config.namespace_root'] . '/cache',
+						'cache' => self::$_app['app.config.namespace_root'] . '/cache',
 					),
 				);
 			}
 
 			if ( !isset( $_twigOptions['twig.class_path'] ) )
 			{
-				$_twigOptions['twig.class_path'] = $this['vendor_path'] . '/twig/lib';
+				$_twigOptions['twig.class_path'] = self::$_app['vendor_path'] . '/twig/lib';
 			}
 
 			//	Register Twig
-			$this->register( new \Silex\Provider\TwigServiceProvider(), $_twigOptions );
+			self::$_app->register( new \Silex\Provider\TwigServiceProvider(), $_twigOptions );
 			\Kisma\Utility\Log::trace( 'Twig registered' );
 
 			//	Register widget service
-			$this->register( new \Kisma\Provider\WidgetServiceProvider(), self::app( 'widget.options', array() ) );
+			self::$_app->register(
+				new \Kisma\Provider\WidgetServiceProvider(),
+				self::app( 'widget.options', array() )
+			);
+
 			\Kisma\Utility\Log::trace( 'Widget services registered' );
 		}
+
+		$_self = self::$_app;
 
 		//
 		//	Set error handlers
@@ -341,7 +340,7 @@ class Kisma extends \Silex\Application
 		//
 		//	Tell Silex to let us in on the fun
 		//
-		$this->error( function( $exception, $code ) use ( $_self )
+		self::$_app->error( function( $exception, $code ) use ( $_self )
 		{
 			\Kisma\Components\ErrorHandler::onException( new \Kisma\Event\ErrorEvent( $_self, $exception ) );
 			return false;
@@ -360,8 +359,7 @@ class Kisma extends \Silex\Application
 	/**
 	 * Called when the app is ending :(
 	 */
-	public
-	function onTerminate()
+	public function onTerminate()
 	{
 		//	Restore error handlers
 		\restore_error_handler();
@@ -389,21 +387,23 @@ class Kisma extends \Silex\Application
 			self::app( 'monolog.options', array() ),
 			array(
 				'monolog.logfile' => $_logFileName,
-				'monolog.class_path' => $this['vendor_path'] . '/silex/vendor/monolog/src',
-				'monolog.name' => isset( $this['app.config.app_name'] ) ? $this['app.config.app_name'] : 'kisma',
+				'monolog.class_path' => self::$_app['vendor_path'] . '/silex/vendor/monolog/src',
+				'monolog.name' => isset( self::$_app['app.config.app_name'] ) ? self::$_app['app.config.app_name'] :
+					'kisma',
 			)
 		);
 
-		$this->register( new \Silex\Provider\MonologServiceProvider(), array(
+		self::$_app->register( new \Silex\Provider\MonologServiceProvider(), array(
 			'monolog.logfile' => $_logFileName,
-			'monolog.class_path' => $this['vendor_path'] . '/silex/vendor/monolog/src',
-			'monolog.name' => isset( $this['app.config.app_name'] ) ? $this['app.config.app_name'] : 'kisma',
+			'monolog.class_path' => self::$_app['vendor_path'] . '/silex/vendor/monolog/src',
+			'monolog.name' => isset( self::$_app['app.config.app_name'] ) ? self::$_app['app.config.app_name'] :
+				'kisma',
 		) );
 
 		if ( false !== Option::get( $_monologOptions, 'fire_php', false ) )
 		{
 			$_firePhp = new \Monolog\Handler\FirePHPHandler();
-			$this['monolog']->pushHandler( $_firePhp );
+			self::$_app['monolog']->pushHandler( $_firePhp );
 			\Kisma\Utility\Log::debug( 'FirePHP handler registered.' );
 		}
 	}
@@ -432,11 +432,11 @@ class Kisma extends \Silex\Application
 		}
 
 		$_payload = array(
-			'app_name' => $this['app.config.app_name'],
-			'app_root' => $this['app.config.app_root'],
+			'app_name' => self::$_app['app.config.app_name'],
+			'app_root' => self::$_app['app.config.app_root'],
 			'app_version' => $this->app( 'app.config.app_version', 'Kisma Framework v ' . self::Version ),
 			'page_date' => date( 'Y-m-d H:i:s' ),
-			'vendor_path' => $this['vendor_path'],
+			'vendor_path' => self::$_app['vendor_path'],
 			'topbar' => self::app( 'app.config.topbar' ),
 		);
 
@@ -448,10 +448,6 @@ class Kisma extends \Silex\Application
 	 */
 	protected function _registerControllers()
 	{
-		$_appRoot =
-			FileSystem::makePath( self::app( 'app.config.app_root', current( $this->_namespace ) ? : getcwd() ),
-				$this->_namespaceName );
-
 		$_controllerPath = self::app( 'app.config.controller_path' );
 		$_viewPath = self::app( 'app.config.view_path' );
 
@@ -471,23 +467,28 @@ class Kisma extends \Silex\Application
 
 			require_once $_entryPath;
 
-			$_route =
-				lcfirst( Utility\Inflector::camelize( str_ireplace( 'Controller.php', null,
-					basename( $_entryPath ) ) ) );
+			$_route = lcfirst(
+				Utility\Inflector::camelize(
+					str_ireplace( 'Controller.php',
+						null,
+						basename( $_entryPath )
+					)
+				)
+			);
 
 			$_class =
 				key( $this->_namespace ) . '\\Controllers\\' . str_ireplace( '.php', null, basename( $_entryPath ) );
 
-			$this->mount( '/' . $_route, new $_class() );
+			self::$_app->mount( '/' . $_route, new $_class() );
 
 			//	Add to view path
-			$this['twig.loader.filesystem']->addPath( FileSystem::makePath( $_viewPath, $_route ) );
+			self::$_app['twig.loader.filesystem']->addPath( FileSystem::makePath( $_viewPath, $_route ) );
 		}
 
 		//	If there is a default route, set it up as well.
-		if ( isset( $this['app.config.default_controller'] ) )
+		if ( isset( self::$_app['app.config.default_controller'] ) )
 		{
-			$this->match( '/', function( \Silex\Application $app )
+			self::$_app->match( '/', function( \Silex\Application $app )
 			{
 				$_redirectUri = '/' . $app['app.config.default_controller'] . '/';
 				return $app->redirect( $_redirectUri );
@@ -495,16 +496,17 @@ class Kisma extends \Silex\Application
 		}
 
 		//	And asset manager if we're not cli...
-		if ( !$this['is_cli'] )
+		//@todo integrate assetic asset management
+		if ( !self::$_app['is_cli'] )
 		{
-			//			$this[self::Autoloader]->registerNamespace( 'Assetic', $this['vendor_path'] . '/assetic/src' );
-			//
-			//			$this->register(
-			//				new \Kisma\Components\AssetManager(),
-			//				array(
-			//					'assetic.options' => $this['app.config.assetic.options']
-			//				)
-			//			);
+//			self::$_app[self::Autoloader]->registerNamespace( 'Assetic', self::$_app['vendor_path'] . '/assetic/src' );
+//
+//			self::$_app->register(
+//				new \Kisma\Provider\AssetManagerServiceProvider(),
+//				array(
+//					'assetic.options' => self::app( 'app.config.assetic.options', array() ),
+//				)
+//			);
 		}
 	}
 
@@ -514,28 +516,28 @@ class Kisma extends \Silex\Application
 	protected function _loadConfiguration( $options = array() )
 	{
 		//	Add our namespace
-		$this[self::Autoloader]->registerNamespace( 'Kisma', __DIR__ );
+		self::$_app[self::Autoloader]->registerNamespace( 'Kisma', __DIR__ );
 
 		//	Load the options...
 		if ( is_array( $options ) && !empty( $options ) )
 		{
 			foreach ( $options as $_key => $_value )
 			{
-				$this[$_key] = $_value;
+				self::$_app[$_key] = $_value;
 			}
 		}
 
 		//	Some system-level option initialization
-		$this['system_view_path'] = realpath( __DIR__ . '/Kisma/Views' );
-		$this['vendor_path'] = $_vendorPath = realpath( __DIR__ . '/../vendor' );
-		$this['is_cli'] = ( 'cli' == php_sapi_name() );
+		self::$_app['system_view_path'] = realpath( __DIR__ . '/Kisma/Views' );
+		self::$_app['vendor_path'] = $_vendorPath = realpath( __DIR__ . '/../vendor' );
+		self::$_app['is_cli'] = ( 'cli' == php_sapi_name() );
 
 		//	Load all files in the app config directory
 		$_appRoot = realpath( self::app( 'app.config.app_root' ) );
-		$this->_namespaceName = self::app( 'app.config.app_namespace' );
-		$this['app.config.namespace_root'] = $_namespaceRoot = FileSystem::makePath( $_appRoot, $this->_namespaceName );
+		self::$_app->_namespaceName = self::app( 'app.config.app_namespace' );
+		self::$_app['app.config.namespace_root'] = $_namespaceRoot = FileSystem::makePath( $_appRoot, $this->_namespaceName );
 
-		$this['app.config.config_path'] = $_configPath = FileSystem::makePath(
+		self::$_app['app.config.config_path'] = $_configPath = FileSystem::makePath(
 			$_namespaceRoot,
 			self::app( 'app.config.config_path', '/config' )
 		);
@@ -552,12 +554,12 @@ class Kisma extends \Silex\Application
 		foreach ( $_configs as $_config )
 		{
 			$_baseName = str_ireplace( '.php', null, basename( $_config ) );
-			$this[$_baseName] = include( $_config );
+			self::$_app[$_baseName] = include( $_config );
 
 			//	If there are any items, add to individual settings
-			if ( isset( $this[$_baseName] ) && !empty( $this[$_baseName] ) && is_array( $this[$_baseName] ) )
+			if ( isset( self::$_app[$_baseName] ) && !empty( self::$_app[$_baseName] ) && is_array( self::$_app[$_baseName] ) )
 			{
-				foreach ( $this[$_baseName] as $_key => $_value )
+				foreach ( self::$_app[$_baseName] as $_key => $_value )
 				{
 					$_cleanKey = strtolower( trim( $_key ) );
 
@@ -567,7 +569,7 @@ class Kisma extends \Silex\Application
 						//	Load up the namespace
 						case 'namespace':
 							//	Register our namespace
-							$this['app.config.namespace'] = $this->_namespace = $_value;
+							self::$_app['app.config.namespace'] = $this->_namespace = $_value;
 
 							if ( empty( $this->_namespace ) )
 							{
@@ -579,7 +581,7 @@ class Kisma extends \Silex\Application
 								throw new BogusPropertyException( 'The "namespace" option must be an array of <namespace> => </path/to/ns> mappings.' );
 							}
 
-							$this['autoloader']->registerNamespaces( $this->_namespace );
+							self::$_app['autoloader']->registerNamespaces( $this->_namespace );
 							break;
 
 						//	Make full paths from relatives...
@@ -595,48 +597,48 @@ class Kisma extends \Silex\Application
 					if ( '@' == $_key[0] )
 					{
 						$_key = ltrim( $_key, '@' );
-						$this[$_key] = $_value;
+						self::$_app[$_key] = $_value;
 
 						//	Remove from config-level
-						unset( $this[$_baseName][$_key] );
+						unset( self::$_app[$_baseName][$_key] );
 					}
 					//	Append key name to base name and save
 					else
 					{
-						$this[$_baseName . '.' . $_key] = $_value;
+						self::$_app[$_baseName . '.' . $_key] = $_value;
 					}
 				}
 			}
 		}
 
 		//	Check application paths (Controllers, Models, & Views)...
-		if ( !isset( $this['app.config.view_path'] ) )
+		if ( !isset( self::$_app['app.config.view_path'] ) )
 		{
-			$this['app.config.view_path'] = $_configPath = FileSystem::makePath(
+			self::$_app['app.config.view_path'] = $_configPath = FileSystem::makePath(
 				$_namespaceRoot,
 				'Views'
 			);
 		}
 
-		if ( !isset( $this['app.config.document_path'] ) )
+		if ( !isset( self::$_app['app.config.document_path'] ) )
 		{
-			$this['app.config.document_path'] = $_configPath = FileSystem::makePath(
+			self::$_app['app.config.document_path'] = $_configPath = FileSystem::makePath(
 				$_namespaceRoot,
 				'Document'
 			);
 		}
 
-		if ( !isset( $this['app.config.model_path'] ) )
+		if ( !isset( self::$_app['app.config.model_path'] ) )
 		{
-			$this['app.config.model_path'] = $_configPath = FileSystem::makePath(
+			self::$_app['app.config.model_path'] = $_configPath = FileSystem::makePath(
 				$_namespaceRoot,
 				'Models'
 			);
 		}
 
-		if ( !isset( $this['app.config.controller_path'] ) )
+		if ( !isset( self::$_app['app.config.controller_path'] ) )
 		{
-			$this['app.config.controller_path'] = $_configPath = FileSystem::makePath(
+			self::$_app['app.config.controller_path'] = $_configPath = FileSystem::makePath(
 				$_namespaceRoot,
 				'Controllers'
 			);
