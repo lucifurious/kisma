@@ -624,7 +624,7 @@ class Kisma extends \Silex\Application
 		{
 			self::$_app['app.config.document_path'] = $_configPath = FileSystem::makePath(
 				$_namespaceRoot,
-				'Document'
+				'Documents'
 			);
 		}
 

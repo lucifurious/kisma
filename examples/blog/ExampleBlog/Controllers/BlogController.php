@@ -41,7 +41,7 @@ class BlogController extends \Kisma\Components\Controller
 	/**
 	 * @var string
 	 */
-	const DocumentName = 'ExampleBlog\\Document\\BlogPost';
+	const DocumentName = 'ExampleBlog\\Documents\\BlogPost';
 
 	//*************************************************************************
 	//* Private Members

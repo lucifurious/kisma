@@ -33,7 +33,7 @@ use Doctrine\Common\Annotations\Annotation;
  * @property mixed $locked
  * @property string $version
  */
-class QueueItem extends \Kisma\Components\Seed
+class QueueItem extends \Kisma\Container\CouchDb\Document
 {
 	//*************************************************************************
 	//* Constants
@@ -42,7 +42,7 @@ class QueueItem extends \Kisma\Components\Seed
 	/**
 	 * @var string The "name" of this document
 	 */
-	const DocumentName = 'Kisma\\Provider\\CouchDb\\Document\\QueueItem';
+	const DocumentName = 'Kisma\\Container\\CouchDb\\QueueItem';
 
 	//*************************************************************************
 	//* Document Fields

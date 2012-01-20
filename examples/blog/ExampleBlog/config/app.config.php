@@ -84,8 +84,8 @@ return array(
 	//	The models path (defaults to /Models)
 	'model_path' => 'Models',
 
-	//	The documents path for CouchDB mappings (defaults to /Document)
-	'document_path' => 'Document',
+	//	The documents path for CouchDB mappings (defaults to /Documents)
+	'document_path' => 'Documents',
 
 	//	The view path (defaults to /Views)
 	'view_path' => 'Views',
