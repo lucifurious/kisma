@@ -558,6 +558,8 @@ class Kisma extends \Silex\Application
 				self::app( 'app.config.config_path', '/config' )
 			);
 
+		\Kisma\Utility\Log::trace( 'Config Path: ' . $_configPath );
+
 		if ( false === $_configPath )
 		{
 			throw new BogusPropertyException( 'Configuration path not specified or invalid. Set "config_path" in your app.config.php file.' );

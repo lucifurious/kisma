@@ -55,6 +55,10 @@ abstract class Controller extends Seed implements \Silex\ControllerProviderInter
 	protected $_routes = null;
 	/** @var mixed The current database */
 	protected $_db = null;
+	/**
+	 * @var bool True if request was a post vs. get
+	 */
+	protected $_isPost = false;
 
 	//*************************************************************************
 	//* Public Methods
@@ -85,13 +89,19 @@ abstract class Controller extends Seed implements \Silex\ControllerProviderInter
 			$_controllers->match( $_route,
 				function( Application $app, Request $request ) use( $_action, $_method, $_tag )
 				{
-					$app[$_tag]->dispatch( \Kisma\Event\ControllerEvent::BeforeAction,
-						new \Kisma\Event\ControllerEvent( $app[$_tag] ) );
+					$app[$_tag]->
+						setIsPost( ( \Kisma\HttpMethod::Post == $request->getMethod() ) )->
+						dispatch(
+						\Kisma\Event\ControllerEvent::BeforeAction,
+						new \Kisma\Event\ControllerEvent( $app[$_tag] )
+					);
 
 					$_result = call_user_func( array( $app[$_tag], $_method ), $app, $request );
 
-					$app[$_tag]->dispatch( \Kisma\Event\ControllerEvent::AfterAction,
-						new \Kisma\Event\ControllerEvent( $app[$_tag], $_result ) );
+					$app[$_tag]->dispatch(
+						\Kisma\Event\ControllerEvent::AfterAction,
+						new \Kisma\Event\ControllerEvent( $app[$_tag], $_result )
+					);
 
 					return $_result;
 
@@ -238,6 +248,71 @@ abstract class Controller extends Seed implements \Silex\ControllerProviderInter
 	public function getRoutes()
 	{
 		return $this->_routes;
+	}
+
+	/**
+	 * @param boolean $isPost
+	 *
+	 * @return \Kisma\Components\Controller
+	 */
+	public function setIsPost( $isPost )
+	{
+		$this->_isPost = $isPost;
+		return $this;
+	}
+
+	/**
+	 * @return boolean
+	 */
+	public function getIsPost()
+	{
+		return $this->_isPost;
+	}
+
+	/**
+	 * @return boolean
+	 */
+	public function isPost()
+	{
+		return $this->_isPost;
+	}
+
+	/**
+	 * @param mixed $db
+	 *
+	 * @return \Kisma\Components\Controller
+	 */
+	public function setDb( $db )
+	{
+		$this->_db = $db;
+		return $this;
+	}
+
+	/**
+	 * @return mixed
+	 */
+	public function getDb()
+	{
+		return $this->_db;
+	}
+
+	/**
+	 * @param string $defaultAction
+	 *
+	 * @return \Kisma\Components\Controller
+	 */
+	public function setDefaultAction( $defaultAction )
+	{
+		$this->_defaultAction = $defaultAction;
+		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getDefaultAction()
+	{
+		return $this->_defaultAction;
 	}
 
 }
