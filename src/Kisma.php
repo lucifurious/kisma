@@ -57,7 +57,7 @@ class Kisma extends \Silex\Application
 	/**
 	 * @var string The version number of Kisma
 	 */
-	const Version = '1.0.0-RC1';
+	const Version = '1.0.0-RC2';
 	/**
 	 * @var string
 	 */
@@ -141,7 +141,7 @@ class Kisma extends \Silex\Application
 	{
 		//	Save me, or passed in $app
 		self::$_app = ( isset( $options, $options['app'] ) ? $options['app'] : $this );
-		self::$_app[AppConfig::BasePath] = __DIR__;
+		self::$_app[K::BasePath] = __DIR__;
 
 		//	Call poppa
 		parent::__construct();
@@ -250,7 +250,7 @@ class Kisma extends \Silex\Application
 		error_log( $message . PHP_EOL );
 
 		/** @var $_logger \Monolog\Logger */
-		if ( !isset( self::$_app[self::Logger] ) || false !== $echo )
+		if ( !isset( self::$_app[K::Logger] ) || false !== $echo )
 		{
 			error_log( $message . PHP_EOL );
 
@@ -262,7 +262,7 @@ class Kisma extends \Silex\Application
 			}
 		}
 
-		self::$_app[self::Logger]->{$level}( $message );
+		self::$_app[K::Logger]->{$level}( $message );
 	}
 
 	//*************************************************************************
@@ -283,7 +283,7 @@ class Kisma extends \Silex\Application
 		//
 		if ( false === self::$_app['is_cli'] )
 		{
-			self::$_app[self::Autoloader]->registerPrefix( 'Twig', self::$_app['vendor_path'] . '/twig/lib' );
+			self::$_app[K::Autoloader]->registerPrefix( 'Twig', self::$_app['vendor_path'] . '/twig/lib' );
 
 			$_twigOptions = self::app( 'twig.options', array() );
 
@@ -309,7 +309,8 @@ class Kisma extends \Silex\Application
 
 			//	Register Twig
 			self::$_app->register( new \Silex\Provider\TwigServiceProvider(), $_twigOptions );
-			\Kisma\Utility\Log::trace( 'Twig registered' );
+
+			\Kisma\Utility\Log::trace( 'Twig service registered' );
 
 			//	Register widget service
 			self::$_app->register(
@@ -317,7 +318,7 @@ class Kisma extends \Silex\Application
 				self::app( 'widget.options', array() )
 			);
 
-			\Kisma\Utility\Log::trace( 'Widget services registered' );
+			\Kisma\Utility\Log::trace( 'Widget service registered' );
 		}
 
 		$_self = self::$_app;
@@ -351,7 +352,7 @@ class Kisma extends \Silex\Application
 		//
 		$this->_registerControllers();
 
-		self::log( 'Initialization complete.' );
+		\Kisma\Utility\Log::trace( 'onInitialize() complete' );
 
 		return true;
 	}
@@ -476,37 +477,47 @@ class Kisma extends \Silex\Application
 				)
 			);
 
-			$_class =
-				key( $this->_namespace ) . '\\Controllers\\' . str_ireplace( '.php', null, basename( $_entryPath ) );
+			//	Was a class name specified?
+			if ( null === ( $_class = Option::get( self::app( 'app.config.controllers', array() ), 'class' ) ) )
+			{
+				//	Nope, build it.
+				$_class =
+					key( $this->_namespace ) . '\\Controllers\\' . str_ireplace( '.php', null,
+						basename( $_entryPath ) );
+			}
 
+			//	Mount the route binding this class
 			self::$_app->mount( '/' . $_route, new $_class() );
 
-			//	Add to view path
+			//	Make a view path and tell Twig
 			self::$_app['twig.loader.filesystem']->addPath( FileSystem::makePath( $_viewPath, $_route ) );
 		}
 
 		//	If there is a default route, set it up as well.
 		if ( isset( self::$_app['app.config.default_controller'] ) )
 		{
-			self::$_app->match( '/', function( \Silex\Application $app )
-			{
-				$_redirectUri = '/' . $app['app.config.default_controller'] . '/';
-				return $app->redirect( $_redirectUri );
-			} );
+			self::$_app->match(
+				'/',
+				function( \Silex\Application $app )
+				{
+					$_redirectUri = '/' . $app['app.config.default_controller'] . '/';
+					return $app->redirect( $_redirectUri );
+				}
+			);
 		}
 
 		//	And asset manager if we're not cli...
 		//@todo integrate assetic asset management
 		if ( !self::$_app['is_cli'] )
 		{
-//			self::$_app[self::Autoloader]->registerNamespace( 'Assetic', self::$_app['vendor_path'] . '/assetic/src' );
-//
-//			self::$_app->register(
-//				new \Kisma\Provider\AssetManagerServiceProvider(),
-//				array(
-//					'assetic.options' => self::app( 'app.config.assetic.options', array() ),
-//				)
-//			);
+			//			self::$_app[K::Autoloader]->registerNamespace( 'Assetic', self::$_app['vendor_path'] . '/assetic/src' );
+			//
+			//			self::$_app->register(
+			//				new \Kisma\Provider\AssetManagerServiceProvider(),
+			//				array(
+			//					'assetic.options' => self::app( 'app.config.assetic.options', array() ),
+			//				)
+			//			);
 		}
 	}
 
@@ -516,7 +527,7 @@ class Kisma extends \Silex\Application
 	protected function _loadConfiguration( $options = array() )
 	{
 		//	Add our namespace
-		self::$_app[self::Autoloader]->registerNamespace( 'Kisma', __DIR__ );
+		self::$_app[K::Autoloader]->registerNamespace( 'Kisma', __DIR__ );
 
 		//	Load the options...
 		if ( is_array( $options ) && !empty( $options ) )
@@ -535,12 +546,17 @@ class Kisma extends \Silex\Application
 		//	Load all files in the app config directory
 		$_appRoot = realpath( self::app( 'app.config.app_root' ) );
 		self::$_app->_namespaceName = self::app( 'app.config.app_namespace' );
-		self::$_app['app.config.namespace_root'] = $_namespaceRoot = FileSystem::makePath( $_appRoot, $this->_namespaceName );
+		self::$_app['app.config.namespace_root'] = $_namespaceRoot =
+			FileSystem::makePath(
+				$_appRoot,
+				$this->_namespaceName
+			);
 
-		self::$_app['app.config.config_path'] = $_configPath = FileSystem::makePath(
-			$_namespaceRoot,
-			self::app( 'app.config.config_path', '/config' )
-		);
+		self::$_app['app.config.config_path'] = $_configPath =
+			FileSystem::makePath(
+				$_namespaceRoot,
+				self::app( 'app.config.config_path', '/config' )
+			);
 
 		if ( false === $_configPath )
 		{
@@ -651,6 +667,6 @@ class Kisma extends \Silex\Application
  * K
  * An alias to the Kisma base
  */
-class K extends Kisma implements AppConfig
+class K extends \Kisma\Kisma implements AppConfig
 {
 }
