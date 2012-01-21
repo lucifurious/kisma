@@ -23,7 +23,7 @@ namespace Kisma;
 //* Requirements
 //*************************************************************************
 
-require_once __DIR__ . '/../vendor/silex/silex.phar';
+require_once dirname( __DIR__ ) . '/vendor/silex/silex.phar';
 require_once __DIR__ . '/Kisma/enums.php';
 
 //*************************************************************************
