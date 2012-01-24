@@ -276,7 +276,7 @@ class SessionServiceProvider extends SilexServiceProvider
 	 */
 	protected static function _checkExistingSession()
 	{
-		$_sessionId = \K::o( $_COOKIE, self::CookiePrefix . 'session_id', null, false, true );
+		$_sessionId = K::o( $_COOKIE, self::CookiePrefix . 'session_id', null, false, true );
 
 		return $_sessionId ? : false;
 	}
@@ -294,7 +294,7 @@ class SessionServiceProvider extends SilexServiceProvider
 	 */
 	public static function get( $key, $defaultValue = null, $unsetValue = false, $noTag = false )
 	{
-		$_value = \K::o( $_SESSION, $key, $defaultValue, $unsetValue, $noTag );
+		$_value = K::o( $_SESSION, $key, $defaultValue, $unsetValue, $noTag );
 		return is_string( $_value ) && false !== @unserialize( $_value ) ? unserialize( $_value ) : $_value;
 	}
 
@@ -310,7 +310,7 @@ class SessionServiceProvider extends SilexServiceProvider
 	 */
 	public static function set( $key, $value = null )
 	{
-		return \K::so( $_SESSION, $key, is_scalar( $value ) ? $value : serialize( $value ) );
+		return K::so( $_SESSION, $key, is_scalar( $value ) ? $value : serialize( $value ) );
 	}
 
 	/**

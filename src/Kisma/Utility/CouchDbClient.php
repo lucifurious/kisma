@@ -316,7 +316,7 @@ class CouchDbClient extends Http
 	 *
 	 * @return mixed
 	 */
-	public function copy( $fromId, $targetId, $targetRev = null )
+	public function copyById( $fromId, $targetId, $targetRev = null )
 	{
 		return $this->_httpRequest( \Kisma\HttpMethod::Copy, $fromId, array(), array(
 			CURLOPT_HTTPHEADER => 'Destination: ' . $targetId . ( $targetRev ? '?rev=' . $targetRev : null ),

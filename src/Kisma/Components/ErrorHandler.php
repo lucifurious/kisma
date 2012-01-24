@@ -80,7 +80,13 @@ class ErrorHandler extends Seed implements \Kisma\IReactor
 			'start_line' => self::$_startLine,
 		);
 
-		self::renderError();
+		try
+		{
+			self::renderError();
+		}
+		catch ( Exception $_ex )
+		{
+		}
 	}
 
 	/**
@@ -115,7 +121,6 @@ class ErrorHandler extends Seed implements \Kisma\IReactor
 		}
 		catch ( Exception $_ex )
 		{
-			//
 		}
 	}
 
@@ -124,11 +129,19 @@ class ErrorHandler extends Seed implements \Kisma\IReactor
 	 */
 	public static function renderError()
 	{
+		//	Don't render errors if error_handler is set to false
+		if ( false === \Kisma\Kisma::app( 'app.config.error_handler' ) )
+		{
+			return;
+		}
+
 		$_errorTemplate = \Kisma\Kisma::app( 'error_template', '_error.twig' );
 
 		\Kisma\Kisma::app()->render(
 			$_errorTemplate,
 			array(
+				'base_path' => \Kisma\Kisma::app( AppConfig::BasePath ),
+				'app_root' => \Kisma\Kisma::app( 'app.config.app_root' ),
 				'page_title' => 'Error',
 				'error' => self::$_error,
 				'page_header' => 'Something has gone awry...',
@@ -164,7 +177,7 @@ class ErrorHandler extends Seed implements \Kisma\IReactor
 	protected static function _cleanTrace( array &$trace, $skipLines = null, $basePath = null )
 	{
 		$_trace = array();
-		$_basePath = $basePath ?: \Kisma\Kisma::app( AppConfig::BasePath );
+		$_basePath = $basePath ? : \Kisma\Kisma::app( AppConfig::BasePath );
 
 		//	Skip some lines
 		if ( !empty( $skipLines ) && count( $trace ) > $skipLines )

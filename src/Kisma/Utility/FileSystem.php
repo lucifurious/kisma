@@ -58,6 +58,7 @@ class FileSystem extends Seed implements \Kisma\IUtility
 
 		if ( $_validate && !is_dir( $_path = realpath( $_path ) ) )
 		{
+			Log::error( 'Path "' . $_path . '" invalid.' );
 			return false;
 		}
 

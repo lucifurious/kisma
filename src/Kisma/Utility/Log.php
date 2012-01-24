@@ -106,7 +106,7 @@ class Log extends Components\Seed implements \Kisma\IUtility
 
 		$_logEntry = str_repeat( '  ', $_tempIndent ) . $_indicator . ' ' . $message;
 
-		K::log( $_logEntry, $logLevel );
+		K::log( $_logEntry, $logLevel, array( 'source' => self::_getCallingMethod() ) );
 
 		//	Set indent level...
 		self::$_currentIndent += $_newIndent;
@@ -199,7 +199,7 @@ class Log extends Components\Seed implements \Kisma\IUtility
 	protected static function _getCallingMethod()
 	{
 		$_backTrace = debug_backtrace();
-		$_caller = count( $_backTrace ) - 1;
+		$_caller = 3;
 		$_function = Option::o( $_backTrace[$_caller], 'method', Option::o( $_backTrace[$_caller], 'function' ) );
 		$_class = Option::o( $_backTrace[$_caller], 'class' );
 
