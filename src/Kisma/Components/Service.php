@@ -88,6 +88,5 @@ namespace Kisma\Components
 		{
 			return $this->_serviceName;
 		}
-
 	}
 }

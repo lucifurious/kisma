@@ -31,12 +31,14 @@ if ( !@class_exists( 'Silex\\Application', false ) )
 
 //	And our base junk
 require_once __DIR__ . '/Kisma/enums.php';
+require_once __DIR__ . '/Kisma/Components/Seed.php';
 
 //*************************************************************************
 //* Aliases
 //*************************************************************************
 
 use Silex\Application;
+use Kisma\Seed;
 use Kisma\Event;
 use Kisma\Provider;
 use Kisma\Utility\FileSystem;
@@ -51,10 +53,9 @@ use Monolog;
  *
  * Contains a few core functions implemented statically to be lightweight and single instance.
  *
- * @property int $debugLevel
- * @property \Pimp $settings
+ * @property bool $helperMode If true, $app isn't owned by me.
  */
-class Kisma extends \Silex\Application
+class Kisma extends \Kisma\Components\Seed
 {
 	//*************************************************************************
 	//* Constants
@@ -122,7 +123,7 @@ class Kisma extends \Silex\Application
 	//*************************************************************************
 
 	/**
-	 * @var \Silex\Application The $app
+	 * @var \Silex\Application|\Kisma\Kisma The $app
 	 */
 	protected static $_app = null;
 	/**
@@ -133,6 +134,14 @@ class Kisma extends \Silex\Application
 	 * @var string The namespace root
 	 */
 	protected $_namespaceName = null;
+	/**
+	 * @var bool If true, features are proxied to Kisma::$_app
+	 */
+	protected $_helperMode = true;
+	/**
+	 * @var bool Indicates the SAPI mode
+	 */
+	protected $_isCli = false;
 
 	//*************************************************************************
 	//* Public Methods
@@ -145,12 +154,30 @@ class Kisma extends \Silex\Application
 	 */
 	public function __construct( $options = array() )
 	{
-		//	Save me, or passed in $app
-		self::$_app = ( isset( $options, $options['app'] ) ? $options['app'] : $this );
-		$this[K::BasePath] = __DIR__;
+		$_startTime = microtime( true );
+		//	Determine our running mode
+		if ( $options instanceof \Silex\Application )
+		{
+			self::$_app = $options;
+			$options = array();
+		}
+		else if ( is_array( $options ) && isset( $options['app'] ) )
+		{
+			self::$_app = $options['app'];
+			unset( $options['app'] );
+		}
+		else
+		{
+			self::$_app = new \Silex\Application();
+			$this->_helperMode = false;
+		}
+
+		//	Add our namespace and path
+		self::$_app[K::Autoloader]->registerNamespace( 'Kisma', __DIR__ );
+		self::$_app[K::BasePath] = __DIR__;
 
 		//	Call poppa
-		parent::__construct();
+		parent::__construct( $options );
 
 		//	Set any configuration options that are passed in...
 		$this->_loadConfiguration( $options );
@@ -160,6 +187,11 @@ class Kisma extends \Silex\Application
 
 		//	Dispatch initialize...
 		$this->dispatch( Event\ApplicationEvent::Initialize );
+
+		$_endTime = microtime( true );
+		\Kisma\Utility\Log::trace( 'Kisma startup achieved in ' . number_format( $_endTime - $_startTime,
+			4 ) . ' seconds' );
+
 	}
 
 	/**
@@ -171,12 +203,31 @@ class Kisma extends \Silex\Application
 	}
 
 	/**
+	 * Routes method calls from me to Silex
+	 *
+	 * @param string	 $name
+	 * @param array|null $arguments
+	 *
+	 * @return mixed
+	 * @throws KismaException
+	 */
+	public function __call( $name, $arguments )
+	{
+		if ( method_exists( self::$_app, $name ) )
+		{
+			return call_user_func_array( array( self::$_app, $name ), $arguments );
+		}
+
+		throw new KismaException( 'Method "' . $name . '" does not exist.' );
+	}
+
+	/**
 	 * Registers multiple services at once
 	 *
 	 * Format of parameters is:
 	 *
 	 *		 array(
-	 *			 [service_class_name] => array( serviceOptions )
+	 *			 [app_key] => array( serviceOptions )
 	 *			 ...
 	 *		 )
 	 *
@@ -221,23 +272,26 @@ class Kisma extends \Silex\Application
 			throw new \InvalidArgumentException( '$services must be an array.' );
 		}
 
-		foreach ( $services as $_serviceClass => $_options )
+		foreach ( $services as $_service )
 		{
-			if ( 2 == count( $_options ) && is_array( $_options[0], $_options[1] ) )
+			foreach ( $_service as $_serviceClass => $_options )
 			{
-				$_classOptions = $_options[0];
-				$_serviceOptions = $_options[1];
-			}
-			else
-			{
-				$_classOptions = $_options;
-			}
+				if ( 2 == count( $_options ) && \Kisma\Utility\Scalar::is_array( $_options[0], $_options[1] ) )
+				{
+					$_classOptions = $_options[0];
+					$_serviceOptions = $_options[1];
+				}
+				else
+				{
+					$_classOptions = $_options;
+				}
 
-			//	Register
-			$this->register(
-				new $_serviceClass( isset( $_classOptions ) ? $_classOptions : null ),
-				isset( $_serviceOptions ) ? $_serviceOptions : array()
-			);
+				//	Register
+				self::$_app->register(
+					new $_serviceClass( isset( $_classOptions ) ? $_classOptions : null ),
+					isset( $_serviceOptions ) ? $_serviceOptions : array()
+				);
+			}
 		}
 	}
 
@@ -249,7 +303,7 @@ class Kisma extends \Silex\Application
 	 */
 	public function dispatch( $eventName, $event = null )
 	{
-		$this[self::Dispatcher]->dispatch(
+		self::$_app[self::Dispatcher]->dispatch(
 			$eventName,
 			$event ? : new Event\ApplicationEvent( self::$_app )
 		);
@@ -266,7 +320,7 @@ class Kisma extends \Silex\Application
 	 */
 	public function render( $viewFile, $payload = array(), $returnString = false )
 	{
-		if ( !isset( $this['twig'] ) )
+		if ( !isset( self::$_app['twig'] ) )
 		{
 			//	No twig? No go...
 			return;
@@ -277,7 +331,7 @@ class Kisma extends \Silex\Application
 		$this->dispatch( \Kisma\Event\RenderEvent::BeforeRender, $_renderEvent );
 
 		$_renderEvent->setOutput(
-			$_output = $this['twig']->render( $viewFile, $_payload )
+			$_output = self::$_app['twig']->render( $viewFile, $_payload )
 		);
 
 		$this->dispatch( \Kisma\Event\RenderEvent::AfterRender, $_renderEvent );
@@ -296,7 +350,7 @@ class Kisma extends \Silex\Application
 	 * @param string|null $service
 	 * @param null		$defaultValue
 	 *
-	 * @return \Silex\Application|\Kisma\Kisma
+	 * @return \Silex\Application|\Kisma\Kisma|mixed
 	 */
 	public static function app( $service = null, $defaultValue = null )
 	{
@@ -328,7 +382,11 @@ class Kisma extends \Silex\Application
 		{
 			error_log( $message . PHP_EOL );
 
-			echo $message . ( self::app( 'is_cli', false ) ? PHP_EOL : '<br/>' );
+			if ( false !== $echo )
+			{
+				echo $message . ( 'cli' == PHP_SAPI ? PHP_EOL : '<br/>' );
+			}
+
 			return;
 		}
 
@@ -351,31 +409,57 @@ class Kisma extends \Silex\Application
 		//
 		//	Initialize the view renderer
 		//
-		if ( false === $this['is_cli'] )
+		if ( 'cli' == PHP_SAPI || !$this->serviceEnabled( 'twig' ) )
 		{
-			$this[K::Autoloader]->registerPrefix( 'Twig', $this['vendor_path'] . '/twig/lib' );
+			\Kisma\Utility\Log::trace( 'Twig service disabled by configuration.' );
+		}
+		else
+		{
+			self::$_app[K::Autoloader]->registerPrefix( 'Twig', self::$_app['vendor_path'] . '/twig/lib' );
 
+			$_viewPath = self::app( 'app.config.view_path' );
+
+			if ( !is_array( $_viewPath ) )
+			{
+				$_viewPath = array(
+					$_viewPath,
+				);
+			}
+
+			$_cachePath = self::app( self::$_app['app.config.cache_path'], '/tmp/_app.twig.cache' );
 			$_twigOptions = self::app( 'twig.options', array() );
 
-			if ( empty( $_twigOptions ) )
+			//	Set some defaults
+			if ( !isset( $_twigOptions['twig.path'] ) )
 			{
-				$_viewPath = $this['app.config.view_path'];
-				$_cachePath = self::app( $this['app.config.cache_path'], '/tmp/_app.twig.cache' );
+				$_twigOptions['twig.path'] = $_viewPath;
+			}
+			else
+			{
+				if ( !isset( $_twigOptions['cache'] ) )
+				{
+					$_twigOptions['cache'] = array(
+						'cache' => '/tmp/_app.twig.cache',
+					);
+				}
+
+				if ( !isset( $_twigOptions['twig.class_path'] ) )
+				{
+					$_twigOptions['twig.class_path'] = self::$_app['vendor_path'] . '/twig/lib';
+				}
 
 				$_twigOptions = array(
-					'twig.path' => array(
-						$_viewPath,
-						$this['system_view_path'],
-					),
+					'twig.path' => $_viewPath,
 					'twig.options' => array(
 						'cache' => $_cachePath,
 					),
 				);
 			}
 
-			if ( !isset( $_twigOptions['twig.class_path'] ) )
+			//	Add system view path if not there
+			if ( !in_array( self::$_app['system_view_path'], $_twigOptions['twig.path'] ) )
 			{
-				$_twigOptions['twig.class_path'] = $this['vendor_path'] . '/twig/lib';
+				$_twigOptions['twig.path'][] = self::$_app['system_view_path'];
 			}
 
 			//	Register Twig
@@ -392,50 +476,43 @@ class Kisma extends \Silex\Application
 			\Kisma\Utility\Log::trace( 'Widget service registered' );
 		}
 
-		$_self = self::$_app;
-
-		//
-		//	Set error handlers
-		//
-		\set_error_handler( function( $code, $message ) use ( $_self )
+		if ( !$this->serviceEnabled( 'error_handler' ) )
 		{
-			\Kisma\Components\ErrorHandler::onError( new \Kisma\Event\ErrorEvent( $_self, $code, $message ) );
-			return false;
-		} );
-
-		\set_exception_handler( function( $exception ) use ( $_self )
+			\Kisma\Utility\Log::trace( 'Error handler service disabled by configuration.' );
+		}
+		else
 		{
-			\Kisma\Components\ErrorHandler::onException( new \Kisma\Event\ErrorEvent( $_self, $exception ) );
-			return false;
-		} );
+			$_self = self::$_app;
 
-		//
-		//	Tell Silex to let us in on the fun
-		//
-		self::$_app->error( function( $exception, $code ) use ( $_self )
-		{
-			\Kisma\Components\ErrorHandler::onException( new \Kisma\Event\ErrorEvent( $_self, $exception ) );
-			return false;
-		} );
+			//
+			//	Tell Silex to let us in on the fun
+			//
+			self::$_app->error(
+				function( $exception, $code ) use ( $_self )
+				{
+					return \Kisma\Components\ErrorHandler::onException( new \Kisma\Event\ErrorEvent( $_self, $exception ) );
+				}
+			);
+		}
 
 		//
 		//	Finally, register any controllers we can find
 		//
 		$this->_registerControllers();
 
-		\Kisma\Utility\Log::trace( 'onInitialize() complete' );
+		//		\Kisma\Utility\Log::trace( 'onInitialize() complete' );
 
 		return true;
 	}
 
 	/**
 	 * Called when the app is ending :(
+	 *
+	 * @return bool
 	 */
 	public function onTerminate()
 	{
-		//	Restore error handlers
-		\restore_error_handler();
-		\restore_exception_handler();
+		return true;
 	}
 
 	//*************************************************************************
@@ -449,8 +526,7 @@ class Kisma extends \Silex\Application
 	 */
 	protected function _initializeLogging()
 	{
-
-		$_appRoot = $this['app.config.app_root'];
+		$_appRoot = self::$_app['app.config.app_root'];
 
 		$_logPath = FileSystem::makePath(
 			$_appRoot,
@@ -468,23 +544,23 @@ class Kisma extends \Silex\Application
 			self::app( 'monolog.options', array() ),
 			array(
 				'monolog.logfile' => $_logFileName,
-				'monolog.class_path' => realpath( $this['vendor_path'] . '/silex/vendor/monolog/src' ),
-				'monolog.name' => isset( $this['app.config.app_name'] ) ? $this['app.config.app_name'] :
+				'monolog.class_path' => realpath( self::$_app['vendor_path'] . '/silex/vendor/monolog/src' ),
+				'monolog.name' => isset( self::$_app['app.config.app_name'] ) ? self::$_app['app.config.app_name'] :
 					'kisma',
 			)
 		);
 
 		self::$_app->register( new \Silex\Provider\MonologServiceProvider(), array(
 			'monolog.logfile' => $_logFileName,
-			'monolog.class_path' => realpath( $this['vendor_path'] . '/silex/vendor/monolog/src' ),
-			'monolog.name' => isset( $this['app.config.app_name'] ) ? $this['app.config.app_name'] :
+			'monolog.class_path' => realpath( self::$_app['vendor_path'] . '/silex/vendor/monolog/src' ),
+			'monolog.name' => isset( self::$_app['app.config.app_name'] ) ? self::$_app['app.config.app_name'] :
 				'kisma',
 		) );
 
 		if ( false !== Option::get( $_monologOptions, 'fire_php', false ) )
 		{
 			$_firePhp = new \Monolog\Handler\FirePHPHandler();
-			$this['monolog']->pushHandler( $_firePhp );
+			self::$_app['monolog']->pushHandler( $_firePhp );
 			\Kisma\Utility\Log::debug( 'FirePHP handler registered.' );
 		}
 	}
@@ -513,11 +589,11 @@ class Kisma extends \Silex\Application
 		}
 
 		$_payload = array(
-			'app_name' => $this['app.config.app_name'],
-			'app_root' => $this['app.config.app_root'],
-			'app_version' => $this->app( 'app.config.app_version', 'Kisma Framework v ' . self::Version ),
+			'app_name' => self::$_app['app.config.app_name'],
+			'app_root' => self::$_app['app.config.app_root'],
+			'app_version' => self::$_app->app( 'app.config.app_version', 'Kisma Framework v ' . self::Version ),
 			'page_date' => date( 'Y-m-d H:i:s' ),
-			'vendor_path' => $this['vendor_path'],
+			'vendor_path' => self::$_app['vendor_path'],
 			'topbar' => self::app( 'app.config.topbar' ),
 		);
 
@@ -526,9 +602,17 @@ class Kisma extends \Silex\Application
 
 	/**
 	 * Registers all the controllers found with Silex
+	 *
+	 * @return bool
 	 */
 	protected function _registerControllers()
 	{
+		if ( !$this->serviceEnabled( 'auto_discover_controllers' ) )
+		{
+			\Kisma\Utility\Log::trace( 'Controller discovery disabled by configuration.' );
+			return false;
+		}
+
 		$_controllerPattern = self::app( 'app.config.controller_pattern', 'Controller.php' );
 		$_controllerPath = self::app( 'app.config.controller_path' );
 		$_viewPath = self::app( 'app.config.view_path' );
@@ -579,22 +663,22 @@ class Kisma extends \Silex\Application
 			self::$_app->mount( '/' . $_route, new $_class() );
 
 			//	Make a view path and tell Twig
-			if ( !isset( $this['app.config.route_view_path'] ) )
+			if ( !isset( self::$_app['app.config.route_view_path'] ) )
 			{
-				$this['app.config.route_view_path'] = array();
+				self::$_app['app.config.route_view_path'] = array();
 			}
 
 			$_routeViewPath = FileSystem::makePath( $_viewPath, $_route, false );
 
 			if ( is_dir( $_routeViewPath ) )
 			{
-				$this['app.config.route_view_path'][$_route] = $_routeViewPath;
-				$this['twig.loader.filesystem']->addPath( $_routeViewPath );
+				self::$_app['app.config.route_view_path'][$_route] = $_routeViewPath;
+				self::$_app['twig.loader.filesystem']->addPath( $_routeViewPath );
 			}
 		}
 
 		//	If there is a default route, set it up as well.
-		if ( isset( $this['app.config.default_controller'] ) )
+		if ( isset( self::$_app['app.config.default_controller'] ) )
 		{
 			self::$_app->match(
 				'/',
@@ -608,9 +692,9 @@ class Kisma extends \Silex\Application
 
 		//	And asset manager if we're not cli...
 		//@todo integrate assetic asset management
-		if ( !$this['is_cli'] )
+		if ( 'cli' != PHP_SAPI )
 		{
-			//			$this[K::Autoloader]->registerNamespace( 'Assetic', $this['vendor_path'] . '/assetic/src' );
+			//			self::$_app[K::Autoloader]->registerNamespace( 'Assetic', self::$_app['vendor_path'] . '/assetic/src' );
 			//
 			//			self::$_app->register(
 			//				new \Kisma\Provider\AssetManagerServiceProvider(),
@@ -619,6 +703,7 @@ class Kisma extends \Silex\Application
 			//				)
 			//			);
 		}
+		return true;
 	}
 
 	/**
@@ -626,35 +711,34 @@ class Kisma extends \Silex\Application
 	 */
 	protected function _loadConfiguration( $options = array() )
 	{
-		//	Add our namespace
-		$this[K::Autoloader]->registerNamespace( 'Kisma', __DIR__ );
-
 		//	Load the options...
 		if ( is_array( $options ) && !empty( $options ) )
 		{
 			foreach ( $options as $_key => $_value )
 			{
-				$this[$_key] = $_value;
+				self::$_app[$_key] = $_value;
 			}
 		}
 
 		//	Some system-level option initialization
-		$this['system_view_path'] = realpath( __DIR__ . '/Kisma/Views' );
-		$this['vendor_path'] = $_vendorPath = realpath( __DIR__ . '/../vendor' );
-		$this['is_cli'] = ( 'cli' == php_sapi_name() );
+		self::$_app['system_view_path'] = realpath( __DIR__ . '/Kisma/Views' );
+		self::$_app['vendor_path'] = $_vendorPath = realpath( __DIR__ . '/../vendor' );
+		$this->_isCli = ( 'cli' == PHP_SAPI );
 
 		//	Load all files in the app config directory
 		$_appRoot = realpath( self::app( 'app.config.app_root' ) );
 		$this->_namespaceName = self::app( 'app.config.app_namespace' );
 
-		$this['app.config.config_path'] = $_configPath =
-			FileSystem::makePath( self::app( 'app.config.config_path', '/config' ) );
-
-		if ( false === $_configPath )
+		$_configPath = self::app( 'app.config.config_path', '/config' );
+		//		self::$_app['app.config.config_path'] =
+		//			FileSystem::makePath( self::app( 'app.config.config_path', '/config' ) );
+		//
+		if ( empty( $_configPath ) )
 		{
 			throw new BogusPropertyException( 'Configuration path not specified or invalid. Set "config_path" in your app.config.php file.' );
 		}
 
+		self::$_app['app.config.config_path'] = $_configPath;
 		$_configFilePattern = self::app( 'app.config.config_file_pattern', '/*.config.php' );
 		$_configGlob = $_configPath . $_configFilePattern;
 		$_configs = @\glob( $_configGlob );
@@ -663,12 +747,12 @@ class Kisma extends \Silex\Application
 		foreach ( $_configs as $_config )
 		{
 			$_baseName = str_ireplace( '.php', null, basename( $_config ) );
-			$this[$_baseName] = include( $_config );
+			self::$_app[$_baseName] = include( $_config );
 
 			//	If there are any items, add to individual settings
-			if ( isset( $this[$_baseName] ) && !empty( $this[$_baseName] ) && is_array( $this[$_baseName] ) )
+			if ( isset( self::$_app[$_baseName] ) && !empty( self::$_app[$_baseName] ) && is_array( self::$_app[$_baseName] ) )
 			{
-				foreach ( $this[$_baseName] as $_key => $_value )
+				foreach ( self::$_app[$_baseName] as $_key => $_value )
 				{
 					$_cleanKey = strtolower( trim( $_key ) );
 
@@ -678,7 +762,7 @@ class Kisma extends \Silex\Application
 						//	Load up the namespace
 						case 'namespace':
 							//	Register our namespace
-							$this['app.config.namespace'] = $this->_namespace = $_value;
+							self::$_app['app.config.namespace'] = $this->_namespace = $_value;
 
 							if ( empty( $this->_namespace ) )
 							{
@@ -690,8 +774,8 @@ class Kisma extends \Silex\Application
 								throw new BogusPropertyException( 'The "namespace" option must be an array of <namespace> => </path/to/ns> mappings.' );
 							}
 
-							$this['autoloader']->registerNamespaces( $this->_namespace );
-							$this['app.config.namespace_root'] =
+							self::$_app['autoloader']->registerNamespaces( $this->_namespace );
+							self::$_app['app.config.namespace_root'] =
 								FileSystem::makePath( current( $this->_namespace ), $this->_namespaceName );
 							break;
 
@@ -699,7 +783,7 @@ class Kisma extends \Silex\Application
 						case '_path' == substr( $_key, strlen( $_key ) - 5 ):
 							if ( !empty( $_value ) && '/' !== $_value[0] )
 							{
-								$_value = FileSystem::makePath( $this['app.config.namespace_root'], $_value );
+								$_value = FileSystem::makePath( self::$_app['app.config.namespace_root'], $_value );
 							}
 							break;
 					}
@@ -708,56 +792,75 @@ class Kisma extends \Silex\Application
 					if ( '@' == $_key[0] )
 					{
 						$_key = ltrim( $_key, '@' );
-						$this[$_key] = $_value;
+						self::$_app[$_key] = $_value;
 
 						//	Remove from config-level
-						$_config = $this[$_baseName];
+						$_config = self::$_app[$_baseName];
 						unset( $_config[$_key] );
-						$this[$_baseName] = $_config;
+						self::$_app[$_baseName] = $_config;
 					}
 					//	Append key name to base name and save
 					else
 					{
-						$this[$_baseName . '.' . $_key] = $_value;
+						self::$_app[$_baseName . '.' . $_key] = $_value;
 					}
 				}
 			}
 		}
 
 		//	Check application paths (Controllers, Models, & Views)...
-		if ( !isset( $this['app.config.view_path'] ) )
+		if ( !isset( self::$_app['app.config.view_path'] ) )
 		{
-			$this['app.config.view_path'] = $_configPath = FileSystem::makePath(
-				$this['app.config.namespace_root'],
+			self::$_app['app.config.view_path'] = $_configPath = FileSystem::makePath(
+				self::$_app['app.config.namespace_root'],
 				'Views'
 			);
 		}
 
-		if ( !isset( $this['app.config.document_path'] ) )
+		if ( !isset( self::$_app['app.config.document_path'] ) )
 		{
-			$this['app.config.document_path'] = $_configPath = FileSystem::makePath(
-				$this['app.config.namespace_root'],
+			self::$_app['app.config.document_path'] = $_configPath = FileSystem::makePath(
+				self::$_app['app.config.namespace_root'],
 				'Documents'
 			);
 		}
 
-		if ( !isset( $this['app.config.model_path'] ) )
+		if ( !isset( self::$_app['app.config.model_path'] ) )
 		{
-			$this['app.config.model_path'] = $_configPath = FileSystem::makePath(
-				$this['app.config.namespace_root'],
+			self::$_app['app.config.model_path'] = $_configPath = FileSystem::makePath(
+				self::$_app['app.config.namespace_root'],
 				'Models'
 			);
 		}
 
-		if ( !isset( $this['app.config.controller_path'] ) )
+		if ( !isset( self::$_app['app.config.controller_path'] ) )
 		{
-			$this['app.config.controller_path'] = $_configPath = FileSystem::makePath(
-				$this['app.config.namespace_root'],
+			self::$_app['app.config.controller_path'] = $_configPath = FileSystem::makePath(
+				self::$_app['app.config.namespace_root'],
 				'Controllers'
 			);
 		}
 	}
 
+	/**
+	 * @return boolean
+	 */
+	public function getHelperMode()
+	{
+		return $this->_helperMode;
+	}
+
+	/**
+	 * Returns if a service is enabled. Services are enabled by default unless explicitly set to "false"
+	 *
+	 * @param string $serviceName
+	 *
+	 * @return bool
+	 */
+	public function serviceEnabled( $serviceName )
+	{
+		return ( false !== $this->app( 'app.config.service.enable.' . $serviceName, true ) );
+	}
 }
 
 /**

@@ -29,6 +29,29 @@ use Kisma\Kisma;
 class Scalar implements \Kisma\IUtility
 {
 	/**
+	 * Multi-argument is_array helper
+	 *
+	 * @static
+	 *
+	 * @param mixed $possibleArray
+	 * @param mixed|null $_ [optional]
+	 *
+	 * @return bool
+	 */
+	public static function is_array( $possibleArray, $_ = null )
+	{
+		foreach ( func_get_args() as $_argument )
+		{
+			if ( !is_array( $_argument ) )
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	/**
 	 * Takes a list of things and returns them in an array as the values. Keys are maintained.
 	 *
 	 * @param ...

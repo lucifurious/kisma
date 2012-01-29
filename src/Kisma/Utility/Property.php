@@ -59,12 +59,10 @@ class Property extends \Kisma\Components\Seed implements \Kisma\IUtility
 	}
 
 	/**
-	 * @static
-	 *
-	 * @param \Kisma\Components\Seed				$object
-	 * @param string								$propertyName
-	 * @param \Kisma\AccessorMode|string			$access
-	 * @param mixed|null							$valueOrDefault The "Set" value or default value for "Get"
+	 * @param \Kisma\Components\Seed					  $object
+	 * @param string									  $propertyName
+	 * @param string									  $access
+	 * @param mixed|null								  $valueOrDefault
 	 *
 	 * @return mixed
 	 */
@@ -75,19 +73,12 @@ class Property extends \Kisma\Components\Seed implements \Kisma\IUtility
 			//	Try object first. Squelch undefineds...
 			return self::property( $object, $propertyName, $access, $valueOrDefault );
 		}
-			//	Ignore undefined properties. Another aspect may have it
+			//	Ignore undefined properties. Another object may have it
 		catch ( \Kisma\UndefinedPropertyException $_ex )
 		{
 			//	Ignored
+			return false;
 		}
-		catch ( PropertyException $_ex )
-		{
-			//	Rethrow other property exceptions
-			throw $_ex;
-		}
-
-		//	No clue what they're talking about
-		throw new \Kisma\UndefinedPropertyException( 'The property "' . $propertyName . '" is undefined.', \Kisma\AccessorMode::Undefined );
 	}
 
 	/**
@@ -186,7 +177,7 @@ class Property extends \Kisma\Components\Seed implements \Kisma\IUtility
 	 * @param object		   $object The target object
 	 * @param string|array	 $property Single property name or an array of KVPs
 	 * @param mixed|null	   $value The single property value or null
-	 * @param bool             $required If true, undefined properties throw exceptions
+	 * @param bool			 $required If true, undefined properties throw exceptions
 	 *
 	 * @return object The object being set
 	 */

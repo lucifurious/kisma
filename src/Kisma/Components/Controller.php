@@ -89,23 +89,25 @@ abstract class Controller extends Seed implements \Silex\ControllerProviderInter
 			$_controllers->match( $_route,
 				function( Application $app, Request $request ) use( $_action, $_method, $_tag )
 				{
-					$app[$_tag]->
-						setIsPost( ( \Kisma\HttpMethod::Post == $request->getMethod() ) )->
-						dispatch(
-						\Kisma\Event\ControllerEvent::BeforeAction,
-						new \Kisma\Event\ControllerEvent( $app[$_tag] )
-					);
+					$_event = new \Kisma\Event\ControllerEvent( $app[$_tag] );
 
-					$_result = call_user_func( array( $app[$_tag], $_method ), $app, $request );
+					$app[$_tag]->setIsPost(
+						( \Kisma\HttpMethod::Post == $request->getMethod() )
+					)->dispatch( \Kisma\Event\ControllerEvent::BeforeAction, $_event );
+
+					$_event->setResult(
+						$_result = call_user_func( array( $app[$_tag], $_method ), $app, $request )
+					);
 
 					$app[$_tag]->dispatch(
 						\Kisma\Event\ControllerEvent::AfterAction,
-						new \Kisma\Event\ControllerEvent( $app[$_tag], $_result )
+						$_event
 					);
 
 					return $_result;
 
-				} );
+				}
+			);
 		}
 
 		//	Return the collection...
@@ -145,7 +147,8 @@ abstract class Controller extends Seed implements \Silex\ControllerProviderInter
 		}
 
 		$this->_controllerName =
-			lcfirst( \Kisma\Utility\Inflector::camelize( str_ireplace( 'Controller', null,
+			lcfirst( \Kisma\Utility\Inflector::camelize( str_ireplace( array( 'ControllerProvider', 'Controller' ),
+				null,
 				$_mirror->getShortName() ) ) );
 
 		return $this->_actions = $_actions;

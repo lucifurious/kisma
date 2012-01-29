@@ -19,6 +19,7 @@
 
 namespace Kisma\Components;
 
+use \Kisma\K;
 use \Kisma\AppConfig;
 use \Kisma\Event as Event;
 use \Kisma\Utility as Utility;
@@ -53,6 +54,10 @@ class ErrorHandler extends Seed implements \Kisma\IReactor
 	 * @var int
 	 */
 	protected static $_startLine;
+	/**
+	 * @var bool Logs notices instead of generated error
+	 */
+	protected static $_ignoreNotices = true;
 
 	//*************************************************************************
 	//* Public Methods
@@ -62,11 +67,18 @@ class ErrorHandler extends Seed implements \Kisma\IReactor
 	 * Event handler for a generic error
 	 *
 	 * @param \Kisma\Event\ErrorEvent $event
+	 *
+	 * @return bool
 	 */
 	public static function onError( $event )
 	{
 		$_trace = $event->getTrace( false, self::$_backtraceLines );
 		$_traceText = self::_cleanTrace( $_trace, 3 );
+
+		if ( E_NOTICE == $event->getCode() )
+		{
+			return false;
+		}
 
 		self::$_error = array(
 			'code' => $event->getCode(),
@@ -80,26 +92,26 @@ class ErrorHandler extends Seed implements \Kisma\IReactor
 			'start_line' => self::$_startLine,
 		);
 
-		try
-		{
-			self::renderError();
-		}
-		catch ( Exception $_ex )
-		{
-		}
+		return self::renderError();
 	}
 
 	/**
 	 * Handles the exception.
 	 *
 	 * @param \Kisma\Event\ErrorEvent $event
+	 *
+	 * @return bool
 	 */
 	public static function onException( $event )
 	{
-		/** @var $_exception \Exception */
 		$_exception = $event->getException();
 		$_trace = $_exception->getTrace();
 		$_traceText = self::_cleanTrace( $_trace, 3 );
+
+		if ( E_NOTICE == $event->getCode() )
+		{
+			return false;
+		}
 
 		self::$_error = array(
 			'code' => $_exception->getCode(),
@@ -113,57 +125,70 @@ class ErrorHandler extends Seed implements \Kisma\IReactor
 			'start_line' => self::$_startLine,
 		);
 
-		\Kisma\Kisma::log( self::$_error['message'] . ' (' . self::$_error['code'] . ')', \Kisma\LogLevel::Error );
+		K::log( self::$_error['message'] . ' (' . self::$_error['code'] . ')', \Kisma\LogLevel::Error );
 
-		try
-		{
-			self::renderError();
-		}
-		catch ( Exception $_ex )
-		{
-		}
+		return self::renderError();
 	}
 
 	/**
 	 * Renders an error
+	 *
+	 * @return bool
 	 */
 	public static function renderError()
 	{
-		//	Don't render errors if error_handler is set to false
-		if ( false === \Kisma\Kisma::app( 'app.config.error_handler' ) )
+		$_app = K::app();
+
+		//	Don't render errors if error handling or Twig are disabled, or if our app is naked Silex.
+		if ( !( $_app instanceof \Kisma\Kisma ) || !$_app->serviceEnabled( 'error_handler' ) || !$_app->serviceEnabled( 'twig' ) )
 		{
-			return;
+			return false;
 		}
 
-		$_errorTemplate = \Kisma\Kisma::app( 'error_template', '_error.twig' );
+		try
+		{
+			$_errorTemplate = K::app( 'error_template', '_error.twig' );
 
-		\Kisma\Kisma::app()->render(
-			$_errorTemplate,
-			array(
-				'base_path' => \Kisma\Kisma::app( AppConfig::BasePath ),
-				'app_root' => \Kisma\Kisma::app( 'app.config.app_root' ),
-				'page_title' => 'Error',
-				'error' => self::$_error,
-				'page_header' => 'Something has gone awry...',
-				'page_header_small' => 'Not cool. :(',
-				'topbar' => array(
-					'brand' => 'Kisma v' . \Kisma\Kisma::Version,
-					'items' => array(
-						array(
-							'title' => 'Kisma on GitHub!',
-							'href' => 'http://github.com/Pogostick/Kisma/',
-							'target' => '_blank',
-							'active' => 'active',
+			$_app->render(
+				$_errorTemplate,
+				array(
+					'base_path' => \Kisma\Kisma::app( AppConfig::BasePath ),
+					'app_root' => \Kisma\Kisma::app( 'app.config.app_root' ),
+					'page_title' => 'Error',
+					'error' => self::$_error,
+					'page_header' => 'Something has gone awry...',
+					'page_header_small' => 'Not cool. :(',
+					'topbar' => array(
+						'brand' => 'Kisma v' . \Kisma\Kisma::Version,
+						'items' => array(
+							array(
+								'title' => 'Kisma on GitHub!',
+								'href' => 'http://github.com/Pogostick/Kisma/',
+								'target' => '_blank',
+								'active' => 'active',
+							),
 						),
 					),
-				),
-			)
-		);
+				)
+			);
+
+			return true;
+		}
+		catch ( Exception $_ex )
+		{
+			if ( isset( $_app['logger'] ) )
+			{
+				$_app['logger']->addError( 'Exception during rendering of error: ' . var_export( self::$_error,
+					true ) );
+			}
+		}
+
+		return false;
 	}
 
-	//*************************************************************************
-	//* Private Methods
-	//*************************************************************************
+//*************************************************************************
+//* Private Methods
+//*************************************************************************
 
 	/**
 	 * Cleans up a trace array

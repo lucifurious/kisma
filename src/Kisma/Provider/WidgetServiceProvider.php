@@ -70,10 +70,11 @@ class WidgetServiceProvider extends SilexServiceProvider
 
 	/**
 	 * @param \Kisma\Event\RenderEvent $event
+	 * @return bool
 	 */
 	public function onRender( $event )
 	{
-
+		return true;
 	}
 
 	//*************************************************************************

@@ -199,7 +199,7 @@ class Log extends Components\Seed implements \Kisma\IUtility
 	protected static function _getCallingMethod()
 	{
 		$_backTrace = debug_backtrace();
-		$_caller = 3;
+		$_caller = 4;
 		$_function = Option::o( $_backTrace[$_caller], 'method', Option::o( $_backTrace[$_caller], 'function' ) );
 		$_class = Option::o( $_backTrace[$_caller], 'class' );
 

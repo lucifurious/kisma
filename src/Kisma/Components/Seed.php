@@ -20,6 +20,7 @@
 namespace Kisma\Components;
 
 use Kisma\Event;
+use Kisma\Utility as Utility;
 use Kisma\Utility\Property;
 
 /**
@@ -81,7 +82,7 @@ abstract class Seed implements \Kisma\IKisma, \Kisma\IConfigurable, \Countable, 
 		$this->setOptions( $options, true );
 
 		//	Initialize event system
-		\Kisma\Utility\Events::subscribe( $this );
+		Utility\Events::subscribe( $this );
 
 		//	Fire the initialize event
 		$this->dispatch( Event\ComponentEvent::AfterConstruct );
@@ -139,7 +140,7 @@ abstract class Seed implements \Kisma\IKisma, \Kisma\IConfigurable, \Countable, 
 		$this->_objectId = spl_object_hash( $this );
 
 		//	Catch null input, non-traversable, or empty options
-		if ( empty( $options ) || ( !is_array( $options) && !( $options instanceof \Traversable ) ) )
+		if ( empty( $options ) || ( !is_array( $options ) && !( $options instanceof \Traversable ) ) )
 		{
 			$options = array();
 		}
@@ -260,6 +261,67 @@ abstract class Seed implements \Kisma\IKisma, \Kisma\IConfigurable, \Countable, 
 	public function onBeforeDestruct( \Kisma\Event\ComponentEvent $event )
 	{
 		return true;
+	}
+
+	//*************************************************************************
+	//* Private Methods
+	//*************************************************************************
+
+	/**
+	 * Serializer
+	 * Dynamically generates the object from the properties of the current object.
+	 * Properties must have a "getter" to be included.
+	 *
+	 * @return \stdClass
+	 */
+	public function toObject()
+	{
+		$_obj = new \stdClass();
+
+		$_me = new \ReflectionObject( $this );
+		$_properties = $_me->getProperties( \ReflectionProperty::IS_PROTECTED );
+
+		if ( !empty( $_properties ) )
+		{
+			$_myClass = __CLASS__;
+
+			foreach ( $_properties as $_property )
+			{
+				//	Only want our own properties, not the base class
+				if ( isset( $_property->class ) )
+				{
+					$_class = new \ReflectionClass( $_property->class );
+
+					if ( !empty( $_class ) && !$_class->isSubclassOf( $_myClass ) )
+					{
+						continue;
+					}
+
+					unset( $_class );
+				}
+
+				try
+				{
+					$_propertyName = ltrim( $_property->name, '_' );
+
+					if ( !Property::checkProperty( $this, $_propertyName ) )
+					{
+						//	No getter, skipping you!
+						continue;
+					}
+
+					//	Set the property value
+					Property::set( $this, $_propertyName );
+				}
+				catch ( \Exception $_ex )
+				{
+					//	Just ignore, not a valid property if we can't read it with a getter
+				}
+			}
+		}
+
+		//	Return our object
+		return $_obj;
 	}
 
 	//*************************************************************************

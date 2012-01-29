@@ -39,4 +39,34 @@ class ControllerEvent extends KismaEvent
 	 */
 	const BeforeAction = 'before_action';
 
+	//*************************************************************************
+	//* Private Members
+	//*************************************************************************
+
+	/**
+	 * @var mixed The result of the event
+	 */
+	protected $_result = null;
+
+	//*************************************************************************
+	//* Properties
+	//*************************************************************************
+
+	/**
+	 * @param mixed $result
+	 * @return \Kisma\Event\ControllerEvent
+	 */
+	public function setResult( $result )
+	{
+		$this->_result = $result;
+		return $this;
+	}
+
+	/**
+	 * @return mixed
+	 */
+	public function getResult()
+	{
+		return $this->_result;
+	}
 }
