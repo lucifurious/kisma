@@ -20,16 +20,16 @@ This framework is NOT designed for ultra-fast performance (but it isn't slow eit
 * Usable from any other framework
 * Use built-in PHP library calls whenever possible for speed.
 
-It is important to mention that I changed the direction of the project in late 2011. After using Silex for a time, I felt that it could be a very interesting core for Kisma as it already did many things that I was doing or going to do. So I shifted the focus of Kisma to be a framework that sits on top of Silex.
+It is important to mention that I changed the direction of the project in late 2011. After using [Silex](http://github.com/fabpot/Silex) for a time, I felt that it could be a very interesting core for Kisma as it already did many things that I was doing or going to do. So I shifted the focus of Kisma to be a framework that sits on top of Silex.
 
-Silex does a lot of things really well. However, it makes your code look like shit. I hate that. Being very anal about the way my code presents itself, I couldn't fathom delivering Silex-style code to clients. This led to where Kisma stands today.
+[Silex](http://github.com/fabpot/Silex) does a lot of things really well. However, it makes your code look like shit. I hate that. Being very anal about the way my code presents itself, I couldn't fathom delivering [Silex](http://github.com/fabpot/Silex)-style code to clients. This led to where Kisma stands today.
 
 I will be working on more documentation soon. 
 
 Features
 ========
 
-* Provides many useful features that make working with Silex a breeze!
+* Provides many useful features that make working with [Silex](http://github.com/fabpot/Silex) a breeze!
 * Quicker to code repetitive tasks
 * All setters return $this for easy chaining
 * Easy to configure
