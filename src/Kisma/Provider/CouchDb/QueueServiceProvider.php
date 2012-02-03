@@ -18,13 +18,15 @@
  */
 namespace Kisma\Provider\CouchDb;
 
+use Kisma\Container\CouchDb\QueueItem;
 use Kisma\Provider\CouchDb\Document;
+use Kisma\Provider\SilexServiceProvider;
 
 /**
  * QueueServiceProvider
  * A provider that wraps the CouchDbClient library for working with a CouchDb instance
  */
-class QueueServiceProvider extends \Kisma\Components\SilexServiceProvider
+class QueueServiceProvider extends SilexServiceProvider
 {
 	//*************************************************************************
 	//* Constants
@@ -217,7 +219,7 @@ class QueueServiceProvider extends \Kisma\Components\SilexServiceProvider
 		}
 		else if ( 200 == $_response->status )
 		{
-			$_item = new \Kisma\Provider\CouchDb\Document\QueueItem( $_response->body );
+			$_item = new \Kisma\Container\CouchDb\QueueItem( $_response->body );
 			Log::debug( 'Found prior queue item, _rev: ' . $_item->version );
 		}
 		else
@@ -455,7 +457,7 @@ class QueueServiceProvider extends \Kisma\Components\SilexServiceProvider
 	 *
 	 * @return \Kisma\Provider\QueueServiceProvider
 	 */
-	public function setQueueName( $queueName )
+	protected function _setQueueName( $queueName )
 	{
 		$this->_queueName = $queueName;
 		return $this;

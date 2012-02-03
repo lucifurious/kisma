@@ -84,7 +84,7 @@ abstract class Controller extends Seed implements \Silex\ControllerProviderInter
 		foreach ( $_actions as $_action => $_method )
 		{
 			//	Build the route, along with default if specified...
-			$_route = ( '/' != $_action ? '/' . $_action : '/' );
+			$_route = ( '/' != $_action ? '/' . $_action . '/' : '/' );
 
 			$_controllers->match( $_route,
 				function( Application $app, Request $request ) use( $_action, $_method, $_tag )

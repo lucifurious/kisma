@@ -52,8 +52,6 @@ use Monolog;
  * The Kisma bootstrap loader
  *
  * Contains a few core functions implemented statically to be lightweight and single instance.
- *
- * @property bool $helperMode If true, $app isn't owned by me.
  */
 class Kisma extends \Kisma\Components\Seed
 {
@@ -135,10 +133,6 @@ class Kisma extends \Kisma\Components\Seed
 	 */
 	protected $_namespaceName = null;
 	/**
-	 * @var bool If true, features are proxied to Kisma::$_app
-	 */
-	protected $_helperMode = true;
-	/**
 	 * @var bool Indicates the SAPI mode
 	 */
 	protected $_isCli = false;
@@ -155,6 +149,7 @@ class Kisma extends \Kisma\Components\Seed
 	public function __construct( $options = array() )
 	{
 		$_startTime = microtime( true );
+
 		//	Determine our running mode
 		if ( $options instanceof \Silex\Application )
 		{
@@ -169,7 +164,6 @@ class Kisma extends \Kisma\Components\Seed
 		else
 		{
 			self::$_app = new \Silex\Application();
-			$this->_helperMode = false;
 		}
 
 		//	Add our namespace and path
@@ -189,9 +183,10 @@ class Kisma extends \Kisma\Components\Seed
 		$this->dispatch( Event\ApplicationEvent::Initialize );
 
 		$_endTime = microtime( true );
-		\Kisma\Utility\Log::trace( 'Kisma startup achieved in ' . number_format( $_endTime - $_startTime,
-			4 ) . ' seconds' );
 
+		\Kisma\Utility\Log::trace(
+			'Kisma operational velocity achieved in ' . number_format( $_endTime - $_startTime, 4 ) . 's'
+		);
 	}
 
 	/**
@@ -199,6 +194,7 @@ class Kisma extends \Kisma\Components\Seed
 	 */
 	public function __destruct()
 	{
+		//	Trigger the onTerminate event
 		$this->dispatch( Event\ApplicationEvent::Terminate );
 	}
 
@@ -219,6 +215,39 @@ class Kisma extends \Kisma\Components\Seed
 		}
 
 		throw new KismaException( 'Method "' . $name . '" does not exist.' );
+	}
+
+	/**
+	 * Merges an array of data into an app-stored array. App data will
+	 * be overwritten by duplicate keys per the rules of array_merge.
+	 *
+	 * @param string $key
+	 * @param array  $data
+	 *
+	 * @return array The result of the merge
+	 */
+	public function merge( $key, $data = array() )
+	{
+		self::$_app[$key] = $_product = array_merge(
+			(array)self::app( $key, array() ),
+			$data
+		);
+
+		return $_product;
+	}
+
+	/**
+	 * Like merge, appends a string to a previously app-stored string.
+	 * Always appended, never overwritten
+	 *
+	 * @param string $key
+	 * @param string $data
+	 *
+	 * @return array The result of the append
+	 */
+	public function append( $key, $data = null )
+	{
+		return self::$_app[$key] = ( self::app( $key ) . $data );
 	}
 
 	/**
@@ -528,6 +557,17 @@ class Kisma extends \Kisma\Components\Seed
 	{
 		$_appRoot = self::$_app['app.config.app_root'];
 
+		if ( false === ( $_logService = self::app( 'app.config.service.enable.monolog', true ) ) )
+		{
+			\Kisma\Utility\Log::trace( 'Monolog service disabled by configuration.' );
+			return;
+		}
+
+		if ( !is_string( $_logService ) )
+		{
+			$_logService = '\\Silex\\Provider\\MonologServiceProvider';
+		}
+
 		$_logPath = FileSystem::makePath(
 			$_appRoot,
 			self::app( 'app.config.log_path', '/logs' ),
@@ -550,7 +590,7 @@ class Kisma extends \Kisma\Components\Seed
 			)
 		);
 
-		self::$_app->register( new \Silex\Provider\MonologServiceProvider(), array(
+		self::$_app->register( new $_logService(), array(
 			'monolog.logfile' => $_logFileName,
 			'monolog.class_path' => realpath( self::$_app['vendor_path'] . '/silex/vendor/monolog/src' ),
 			'monolog.name' => isset( self::$_app['app.config.app_name'] ) ? self::$_app['app.config.app_name'] :
@@ -843,14 +883,6 @@ class Kisma extends \Kisma\Components\Seed
 	}
 
 	/**
-	 * @return boolean
-	 */
-	public function getHelperMode()
-	{
-		return $this->_helperMode;
-	}
-
-	/**
 	 * Returns if a service is enabled. Services are enabled by default unless explicitly set to "false"
 	 *
 	 * @param string $serviceName
@@ -859,7 +891,7 @@ class Kisma extends \Kisma\Components\Seed
 	 */
 	public function serviceEnabled( $serviceName )
 	{
-		return ( false !== $this->app( 'app.config.service.enable.' . $serviceName, true ) );
+		return ( false !== self::app( 'app.config.service.enable.' . $serviceName, true ) );
 	}
 }
 

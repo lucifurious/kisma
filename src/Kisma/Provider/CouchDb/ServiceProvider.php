@@ -29,6 +29,7 @@ use Doctrine\ODM\CouchDB\Configuration;
 use Doctrine\ODM\CouchDB\DocumentManager;
 use Doctrine\ODM\CouchDB\Mapping\Annotations\Document;
 use Doctrine\Common\EventManager;
+use Silex\Application;
 
 //*************************************************************************
 //* Requirements
@@ -38,7 +39,7 @@ use Doctrine\Common\EventManager;
  * ServiceProvider
  * A provider that wraps the CouchDbClient library for working with a CouchDb instance
  */
-class ServiceProvider extends Components\SilexServiceProvider
+class ServiceProvider extends \Kisma\Provider\SilexServiceProvider
 {
 	//*************************************************************************
 	//* Constants
@@ -82,7 +83,7 @@ class ServiceProvider extends Components\SilexServiceProvider
 	 *
 	 * @param \Silex\Application $app
 	 */
-	public function register( \Silex\Application $app )
+	public function register( Application $app )
 	{
 		/**
 		 * Service Initializer

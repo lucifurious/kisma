@@ -14,22 +14,22 @@
  * @since			v1.0.0
  * @filesource
  */
-namespace Kisma\Container\CouchDb;
+namespace Kisma\Container;
 
 /**
  * Document
- * A base for documents
+ * A base for key => value store documents (i.e. CouchDB, Mongo, etc.)
  *
  * @Document
  * @MappedSuperclass
  *
  * @property string $id
  * @property string $version
- * @property int $create_time
- * @property int $update_time
- * @property int $expire_time
+ * @property int $createTime
+ * @property int $updateTime
+ * @property int $expireTime
  */
-class Document extends \Kisma\Components\Seed
+abstract class Document extends \Kisma\Components\Seed
 {
 	//*************************************************************************
 	//* Private Members
@@ -76,12 +76,64 @@ class Document extends \Kisma\Components\Seed
 		}
 	}
 
+	/**
+	 * @param string $name
+	 * @param mixed  $value
+	 */
+	public function __set( $name, $value )
+	{
+		if ( property_exists( $this, $name ) )
+		{
+			$this->{$name} = $value;
+		}
+	}
+
 	//*************************************************************************
-	//* Event Handlers
+	//* Default Event Handlers
 	//*************************************************************************
 
 	/**
-	 * @param ModelEvent $event
+	 * @param $event
+	 *
+	 * @return bool
+	 */
+	public function onBeforeValidate( $event )
+	{
+		return true;
+	}
+
+	/**
+	 * @param $event
+	 *
+	 * @return bool
+	 */
+	public function onAfterValidate( $event )
+	{
+		return true;
+	}
+
+	/**
+	 * @param $event
+	 *
+	 * @return bool
+	 */
+	public function onBeforeFind( $event )
+	{
+		return true;
+	}
+
+	/**
+	 * @param $event
+	 *
+	 * @return bool
+	 */
+	public function onAfterFind( $event )
+	{
+		return true;
+	}
+
+	/**
+	 * @param $event
 	 *
 	 * @return bool
 	 */
@@ -94,6 +146,36 @@ class Document extends \Kisma\Components\Seed
 			$this->createTime = $this->updateTime;
 		}
 
+		return true;
+	}
+
+	/**
+	 * @param $event
+	 *
+	 * @return bool
+	 */
+	public function onAfterSave( $event )
+	{
+		return true;
+	}
+
+	/**
+	 * @param $event
+	 *
+	 * @return bool
+	 */
+	public function onBeforeDelete( $event )
+	{
+		return true;
+	}
+
+	/**
+	 * @param $event
+	 *
+	 * @return bool
+	 */
+	public function onAfterDelete( $event )
+	{
 		return true;
 	}
 

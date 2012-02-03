@@ -107,7 +107,7 @@ class Property extends \Kisma\Components\Seed implements \Kisma\IUtility
 				{
 					return true;
 				}
-				break;
+				return false;
 
 			case \Kisma\AccessorMode::Get:
 				//	Does a setter exist?
@@ -192,6 +192,12 @@ class Property extends \Kisma\Components\Seed implements \Kisma\IUtility
 		{
 			try
 			{
+				//	If the property is bogus, true the tag version...
+				if ( !Property::property( $object, $_key, \Kisma\AccessorMode::Has ) )
+				{
+					$_key = Inflector::tag( $_key, false, true );
+				}
+
 				Property::property( $object, $_key, \Kisma\AccessorMode::Set, $value );
 			}
 			catch ( \Kisma\UndefinedPropertyException $_ex )

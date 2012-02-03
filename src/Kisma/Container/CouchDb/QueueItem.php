@@ -14,7 +14,7 @@
  * @since			v1.0.0
  * @filesource
  */
-namespace Kisma\Container\Document\CouchDb;
+namespace Kisma\Container\CouchDb;
 
 use Kisma\K;
 use Kisma\Utility;
@@ -33,7 +33,7 @@ use Doctrine\Common\Annotations\Annotation;
  * @property mixed $locked
  * @property string $version
  */
-class QueueItem extends \Kisma\Container\CouchDb\Document
+class QueueItem extends \Kisma\Container\Document
 {
 	//*************************************************************************
 	//* Constants
@@ -42,174 +42,32 @@ class QueueItem extends \Kisma\Container\CouchDb\Document
 	/**
 	 * @var string The "name" of this document
 	 */
-	const DocumentName = 'Kisma\\Container\\CouchDb\\QueueItem';
+	const DocumentName = 'Kisma.Container.CouchDb.QueueItem';
 
 	//*************************************************************************
 	//* Document Fields
 	//*************************************************************************
 
 	/**
-	 * @Id
-	 */
-	protected $_id = null;
-	/**
-	 * @Version
-	 */
-	protected $_version = null;
-	/**
-	 * @Field(type="date")
-	 */
-	protected $_createTime = null;
-	/**
-	 * @Field(type="date")
-	 */
-	protected $_expireTime = -1;
-	/**
-	 * @Field(type="date")
-	 */
-	protected $_updateTime = null;
-	/**
 	 * @Field(type="object")
 	 */
-	protected $_queueData = null;
+	public $queueData = null;
 	/**
 	 * @Field(type="boolean")
 	 */
-	protected $_locked = false;
+	public $locked = false;
 
 	//*************************************************************************
-	//* Properties
+	//* Public Methods
 	//*************************************************************************
 
 	/**
-	 * @param $createTime
-	 *
-	 * @return QueueItem
+	 * @param array $options
 	 */
-	public function setCreateTime( $createTime )
+	public function __construct( $options = array() )
 	{
-		$this->_createTime = $createTime;
-		return $this;
-	}
-
-	/**
-	 * @return null
-	 */
-	public function getCreateTime()
-	{
-		return $this->_createTime;
-	}
-
-	/**
-	 * @param $expireTime
-	 *
-	 * @return QueueItem
-	 */
-	public function setExpireTime( $expireTime )
-	{
-		$this->_expireTime = $expireTime;
-		return $this;
-	}
-
-	/**
-	 * @return int
-	 */
-	public function getExpireTime()
-	{
-		return $this->_expireTime;
-	}
-
-	/**
-	 * @param $id
-	 *
-	 * @return QueueItem
-	 */
-	public function setId( $id )
-	{
-		$this->_id = $id;
-		return $this;
-	}
-
-	/**
-	 * @return null
-	 */
-	public function getId()
-	{
-		return $this->_id;
-	}
-
-	/**
-	 * @param $locked
-	 *
-	 * @return QueueItem
-	 */
-	public function setLocked( $locked )
-	{
-		$this->_locked = $locked;
-		return $this;
-	}
-
-	/**
-	 * @return bool
-	 */
-	public function getLocked()
-	{
-		return $this->_locked;
-	}
-
-	/**
-	 * @param $queueData
-	 *
-	 * @return QueueItem
-	 */
-	public function setQueueData( $queueData )
-	{
-		$this->_queueData = $queueData;
-		return $this;
-	}
-
-	/**
-	 * @return null
-	 */
-	public function getQueueData()
-	{
-		return $this->_queueData;
-	}
-
-	/**
-	 * @param $updateTime
-	 *
-	 * @return QueueItem
-	 */
-	public function setUpdateTime( $updateTime )
-	{
-		$this->_updateTime = $updateTime;
-		return $this;
-	}
-
-	/**
-	 * @return null
-	 */
-	public function getUpdateTime()
-	{
-		return $this->_updateTime;
-	}
-
-	/**
-	 * @param string $version
-	 * @return QueueItem
-	 */
-	public function setVersion( $version )
-	{
-		$this->_version = $version;
-		return $this;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getVersion()
-	{
-		return $this->_version;
+		//	Set our object's name and let 'er go
+		$this->setDocumentName( self::DocumentName );
+		parent::__construct( $options );
 	}
 }

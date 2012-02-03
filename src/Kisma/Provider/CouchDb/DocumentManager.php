@@ -16,8 +16,11 @@
  *
  * @ingroup framework
  */
-
 namespace Kisma\Provider\CouchDb;
+
+//*************************************************************************
+//* Aliases
+//*************************************************************************
 
 use Doctrine\Common\EventManager;
 use Doctrine\Common\Persistence\ObjectManager;
