@@ -2,12 +2,17 @@ Kisma
 ===============================
 Thanks for checking out *Kisma*!
 
+<a href="http://www.jetbrains.com/phpstorm/" style="display:block;alt="PHP IDE with advanced HTML/CSS/JavaScript editor for hardcore web-developers" title="PHP IDE with advanced HTML/CSS/JavaScript editor for hardcore web-developers">
+<span style="margin: 3px 0 0 65px;padding: 0;float: left;font-size: 12px;cursor:pointer;  background-image:none;border:0;color: #fff; font-family: trebuchet ms,arial,sans-serif;font-weight: normal;text-align:left;">Developed with</span><br/>
+![](http://www.jetbrains.com/phpstorm/documentation/phpstorm_banners/phpstorm1/phpstorm468x60_violet.gif)
+</a>
+
 Design Goals
 ============
 
 These are the design goals of Kisma. My main design goal is consistency. Too many frameworks use inconsistent naming conventions, property access, and/or usage.
 
-This framework is NOT designed for ultra-fast performance. While the code is, for the most part, stream-lined and fast, I'm sure there are areas where it could be improved to make it faster. However, I've focused on readability and consistency over speed. Can you use this framework for your web site? Absolutely. Will it handle thousands of requests per second? No clue.
+This framework is NOT designed for ultra-fast performance (but it isn't slow either). While the code is, for the most part, stream-lined and fast, I'm sure there are areas where it could be improved to make it faster. However, I've focused on readability and consistency over speed. Can you use this framework for your web site? Absolutely. Will it handle thousands of requests per second? No clue.
 
 * Fully leverage PHP 5.3, its features such as namespaces. In addition prepare for 5.4 and beyond with fresh code, embracing the DRY KISS.
 * Consistent interface to all objects
@@ -15,9 +20,16 @@ This framework is NOT designed for ultra-fast performance. While the code is, fo
 * Usable from any other framework
 * Use built-in PHP library calls whenever possible for speed.
 
+It is important to mention that I changed the direction of the project in late 2011. After using [Silex](http://github.com/fabpot/Silex) for a time, I felt that it could be a very interesting core for Kisma as it already did many things that I was doing or going to do. So I shifted the focus of Kisma to be a framework that sits on top of Silex.
+
+[Silex](http://github.com/fabpot/Silex) does a lot of things really well. However, it makes your code look like shit. I hate that. Being very anal about the way my code presents itself, I couldn't fathom delivering [Silex](http://github.com/fabpot/Silex)-style code to clients. This led to where Kisma stands today.
+
+I will be working on more documentation soon. 
+
 Features
 ========
 
+* Provides many useful features that make working with [Silex](http://github.com/fabpot/Silex) a breeze!
 * Quicker to code repetitive tasks
 * All setters return $this for easy chaining
 * Easy to configure
