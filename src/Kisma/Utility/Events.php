@@ -41,7 +41,7 @@ class Events implements \Kisma\IUtility
 	/**
 	 * Wires up any event handlers automatically
 	 *
-	 * @param \Kisma\Components\Seed|\Silex\Application         $object
+	 * @param \Kisma\Components\Seed|\Silex\Application		 $object
 	 * @param array|null										$listeners
 	 * @param string											$signature
 	 *
@@ -49,6 +49,14 @@ class Events implements \Kisma\IUtility
 	 */
 	public static function subscribe( $object, $listeners = null, $signature = self::DefaultEventHandlerSignature )
 	{
+		//	No event dispatcher? No subscriptions...
+		/** @var $_dispatcher \Symfony\Component\EventDispatcher\EventDispatcher */
+		if ( null === ( $_dispatcher = \Kisma\K::app( 'dispatcher' ) ) )
+		{
+			return;
+		}
+
+		//	Allow for passed in listeners
 		if ( null === ( $_listeners = $listeners ) )
 		{
 			$_listeners = self::discover( $object, $signature );
@@ -63,15 +71,16 @@ class Events implements \Kisma\IUtility
 		//	And wire them up...
 		foreach ( $_listeners as $_eventName => $_callback )
 		{
-			\Kisma\K::app( 'dispatcher' )
-				->addListener( $_eventName,
+			$_dispatcher->addListener(
+				$_eventName,
 				function( \Symfony\Component\EventDispatcher\Event $event ) use( $_callback )
 				{
 					if ( false === call_user_func( $_callback, $event ) )
 					{
 						$event->stopPropagation();
 					}
-				} );
+				}
+			);
 		}
 	}
 
@@ -96,10 +105,10 @@ class Events implements \Kisma\IUtility
 		//	Check each method for the event handler signature
 		foreach ( $_mirror->getMethods() as $_method )
 		{
-			if ( $_class != $_method->class )
-			{
-				continue;
-			}
+			//			if ( $_class != $_method->class )
+			//			{
+			//				continue;
+			//			}
 
 			$_realMethodName = $_method->name;
 			$_length = strlen( $signature );

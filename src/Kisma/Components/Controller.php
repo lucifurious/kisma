@@ -17,7 +17,7 @@
  */
 namespace Kisma\Components;
 
-use Kisma\K;
+use Kisma\Kisma as K;
 use Silex\Application;
 use Silex\ControllerProviderInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -49,16 +49,22 @@ abstract class Controller extends Seed implements \Silex\ControllerProviderInter
 	 */
 	protected $_controllerName = null;
 	/**
+	 * @var string Storage key for this controller
+	 */
+	protected $_tag = null;
+	/**
 	 * @var null|array The custom routes for this controller
 	 * @todo implement
 	 */
 	protected $_routes = null;
-	/** @var mixed The current database */
-	protected $_db = null;
 	/**
 	 * @var bool True if request was a post vs. get
 	 */
 	protected $_isPost = false;
+	/**
+	 * @var Silex\Application
+	 */
+	protected $_app = null;
 
 	//*************************************************************************
 	//* Public Methods
@@ -73,12 +79,13 @@ abstract class Controller extends Seed implements \Silex\ControllerProviderInter
 	 */
 	public function connect( Application $app )
 	{
+		$_tag = $this->_tag;
 		$_defaultRoute = null;
 		$_controllers = new \Silex\ControllerCollection();
 		$_actions = $this->_discoverActions();
-		$_tag = 'controller.' . $this->_controllerName;
 
-		$app[$_tag] = $this;
+		//	Set the controller into the app
+		$app[$_tag] = $this->setApp( $app );
 
 		//	Set up a route for each discovered action...
 		foreach ( $_actions as $_action => $_method )
@@ -146,10 +153,13 @@ abstract class Controller extends Seed implements \Silex\ControllerProviderInter
 			}
 		}
 
-		$this->_controllerName =
-			lcfirst( \Kisma\Utility\Inflector::camelize( str_ireplace( array( 'ControllerProvider', 'Controller' ),
-				null,
-				$_mirror->getShortName() ) ) );
+		$this->setControllerName(
+			lcfirst(
+				\Kisma\Utility\Inflector::camelize(
+					str_ireplace( array( 'ControllerProvider', 'Controller' ), null, $_mirror->getShortName() )
+				)
+			)
+		);
 
 		return $this->_actions = $_actions;
 	}
@@ -167,6 +177,9 @@ abstract class Controller extends Seed implements \Silex\ControllerProviderInter
 	{
 		$this->_discoverActions();
 
+		$this->_app = K::app();
+		$this->setTag( 'controller.' . $this->_controllerName );
+		$this->_tag = 'controller.' . $this->_controllerName;
 		return parent::onAfterConstruct( $event );
 	}
 
@@ -223,6 +236,7 @@ abstract class Controller extends Seed implements \Silex\ControllerProviderInter
 	public function setControllerName( $controllerName )
 	{
 		$this->_controllerName = $controllerName;
+		$this->_tag = 'controller.' . $controllerName;
 		return $this;
 	}
 
@@ -281,25 +295,6 @@ abstract class Controller extends Seed implements \Silex\ControllerProviderInter
 	}
 
 	/**
-	 * @param mixed $db
-	 *
-	 * @return \Kisma\Components\Controller
-	 */
-	public function setDb( $db )
-	{
-		$this->_db = $db;
-		return $this;
-	}
-
-	/**
-	 * @return mixed
-	 */
-	public function getDb()
-	{
-		return $this->_db;
-	}
-
-	/**
 	 * @param string $defaultAction
 	 *
 	 * @return \Kisma\Components\Controller
@@ -316,6 +311,44 @@ abstract class Controller extends Seed implements \Silex\ControllerProviderInter
 	public function getDefaultAction()
 	{
 		return $this->_defaultAction;
+	}
+
+	/**
+	 * @param \Silex\Application $app
+	 *
+	 * @return \Kisma\Components\Controller
+	 */
+	public function setApp( $app )
+	{
+		$this->_app = $app;
+		return $this;
+	}
+
+	/**
+	 * @return \Silex\Application
+	 */
+	public function getApp()
+	{
+		return $this->_app;
+	}
+
+	/**
+	 * @param string $tag
+	 *
+	 * @return \Kisma\Components\Controller
+	 */
+	public function setTag( $tag )
+	{
+		$this->_tag = $tag;
+		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getTag()
+	{
+		return $this->_tag;
 	}
 
 }

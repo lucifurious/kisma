@@ -19,6 +19,8 @@
 
 namespace Kisma\Utility;
 
+use Kisma\AccessorMode;
+
 /**
  * Property
  * Provides property manipulation routines
@@ -102,14 +104,27 @@ class Property extends \Kisma\Components\Seed implements \Kisma\IUtility
 		switch ( $access )
 		{
 			case \Kisma\AccessorMode::Has:
+				//	Public property?
+				if ( is_object( $object ) )
+				{
+					return property_exists( $object, $_propertyName );
+				}
+
 				//	Is it accessible
 				if ( method_exists( $object, $_getter ) || method_exists( $object, $_setter ) )
 				{
 					return true;
 				}
+
 				return false;
 
 			case \Kisma\AccessorMode::Get:
+				//	Public property?
+				if ( is_object( $object ) && property_exists( $object, $_propertyName ) )
+				{
+					return $object->{$_propertyName};
+				}
+
 				//	Does a setter exist?
 				if ( method_exists( $object, $_getter ) )
 				{
@@ -124,6 +139,13 @@ class Property extends \Kisma\Components\Seed implements \Kisma\IUtility
 				break;
 
 			case \Kisma\AccessorMode::Set:
+				//	Public property?
+				if ( is_object( $object ) && property_exists( $object, $_propertyName ) )
+				{
+					$object->{$_propertyName} = $valueOrDefault;
+					return $object;
+				}
+
 				//	Does a setter exist?
 				if ( method_exists( $object, $_setter ) )
 				{

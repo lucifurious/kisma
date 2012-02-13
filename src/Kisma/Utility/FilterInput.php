@@ -17,14 +17,6 @@
  * @since		 v1.0.0
  * @filesource
  */
-
-//*************************************************************************
-//* Namespace Declarations
-//*************************************************************************
-
-/**
- * @namespace Kisma\Utility
- */
 namespace Kisma\Utility;
 
 /**
@@ -84,7 +76,7 @@ class FilterInput implements \Kisma\IUtility
 		switch ( $type )
 		{
 			case INPUT_REQUEST:
-				return filter_var( Option::o( $_SESSION, $key, $defaultValue ), $filter, $filterOptions );
+				return filter_var( Option::o( $_REQUEST, $key, $defaultValue ), $filter, $filterOptions );
 				break;
 
 			case INPUT_SESSION:

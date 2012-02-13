@@ -42,7 +42,7 @@ namespace Kisma\Utility
 		 *
 		 * @return \stdClass
 		 */
-		public static function toObject( $object )
+		public static function asObject( $object )
 		{
 			if ( null === $object )
 			{
@@ -107,7 +107,7 @@ namespace Kisma\Utility
 
 								if ( !is_scalar( $_propertyValue ) )
 								{
-									$_propertyValue = self::toObject( $_propertyValue );
+									$_propertyValue = self::asObject( $_propertyValue );
 								}
 
 								$_obj->{$_propertyName} = $_propertyValue;

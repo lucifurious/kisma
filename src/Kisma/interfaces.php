@@ -29,37 +29,138 @@ interface AppConfig
 	//*************************************************************************
 
 	/**
+	 * @var string The version number of Kisma
+	 */
+	const Version = '1.0.0-RC3';
+
+	/**
+	 * @const string Kisma's default configuration variable prefix
+	 */
+	const AppConfigPrefix = 'app.config.';
+	/**
+	 * @var string
+	 */
+	const ViewConfigPrefix = 'view.config.';
+	/**
+	 * @const string
+	 */
+	const AppName = 'app_name';
+	/**
+	 * @const string
+	 */
+	const AppNamespace = 'app_namespace';
+	/**
+	 * @const string
+	 */
+	const AppRoot = 'app_root';
+	/**
+	 * @const string
+	 */
+	const AppVersion = 'app_version';
+	/**
+	 * @var string
+	 */
+	const Autoloader = 'autoloader';
+	/**
 	 * @const string Kisma's base path
 	 */
-	const BasePath = 'kisma.base_path';
+	const BasePath = 'base_path';
 	/**
-	 * @const string The default application event class
+	 * @const string
 	 */
-	const DefaultEventClass = 'kisma.components.event';
+	const CachePath = 'cache_path';
 	/**
-	 * @const string The default application event class
+	 * @const string
 	 */
-	const DefaultComponentEventClass = 'kisma.aspects.reactors.component_event';
+	const ConfigPath = 'config_path';
 	/**
-	 * @const string The default service event class
+	 * @const string
 	 */
-	const DefaultServiceEventClass = 'kisma.aspects.reactors.service_event';
+	const ConfigFilePattern = 'config_file_pattern';
 	/**
-	 * @const string The default object storage class
+	 * @const string
 	 */
-	const DefaultObjectStorageClass = 'kisma.aspects.storage.object_storage';
+	const ControllerPath = 'controller_path';
 	/**
-	 * @const string The default CouchDb aspect class
+	 * @const string
 	 */
-	const CouchDbClass = 'kisma.aspects.storage.couch_db';
+	const ControllerPattern = 'controller_pattern';
 	/**
-	 * @const string The default XML transformer
+	 * @const string
 	 */
-	const XmlTransformerClass = 'kisma.aspects.transformers.xml';
+	const Controllers = 'controllers';
 	/**
-	 * @const string The CouchDbServer class
+	 * @const string
 	 */
-	const CouchDbServer = 'kisma.services.remote.couch_db_server';
+	const DefaultController = 'default_controllers';
+	/**
+	 * @const string
+	 */
+	const DocumentPath = 'document_path';
+	/**
+	 * @const string
+	 */
+	const LogPath = 'log_path';
+	/**
+	 * @const string
+	 */
+	const LogFileName = 'log_file_name';
+	/**
+	 * @const string
+	 */
+	const ModelPath = 'model_path';
+	/**
+	 * @const string
+	 */
+	const NamespaceRoot = 'namespace_root';
+	/**
+	 * @var string
+	 */
+	const Routes = 'routes';
+	/**
+	 * @const string
+	 */
+	const TopBar = 'topbar';
+	/**
+	 * @const string
+	 */
+	const ViewPath = 'view_path';
+	/**
+	 * @const string
+	 */
+	const VendorPath = 'vendor_path';
+	/**
+	 * @var string
+	 */
+	const Dispatcher = 'dispatcher';
+	/**
+	 * @var string
+	 */
+	const Resolver = 'resolver';
+	/**
+	 * @var string
+	 */
+	const Kernel = 'kernel';
+	/**
+	 * @var string
+	 */
+	const RequestContext = 'request_context';
+	/**
+	 * @var string
+	 */
+	const ErrorHandler = 'error_handler';
+	/**
+	 * @var string System logger
+	 */
+	const Logger = 'monolog';
+	/**
+	 * @var string Twig service
+	 */
+	const Twig = 'twig';
+	/**
+	 * @var string The Assetic asset manager
+	 */
+	const AssetManager = 'asset_manager';
 }
 
 /**

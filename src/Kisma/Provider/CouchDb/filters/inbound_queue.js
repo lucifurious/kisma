@@ -1,0 +1,1 @@
+function(doc, req) {if ( !doc.providerName || doc.providerName != req.query.provider_name ) { return false; } if ( doc.type && doc.type == 'Kisma.Container.CouchDb.QueueItem' ) {return true;} return false; }

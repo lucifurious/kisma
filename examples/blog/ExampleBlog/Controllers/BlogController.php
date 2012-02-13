@@ -89,7 +89,7 @@ class BlogController extends \Kisma\Components\Controller
 	public function onBeforeAction( \Kisma\Event\ControllerEvent $event )
 	{
 		//	Open zee db...
-		\Kisma\Kisma::app()->register( new \Kisma\Provider\CouchDbServiceProvider() );
+		\Kisma\Kisma::app()->register( new \Kisma\Provider\CouchDb\ServiceProvider() );
 		$_app = \Kisma\Kisma::app();
 
 		$this->_documentManager = $_app['couchdbs']['db.blog'];

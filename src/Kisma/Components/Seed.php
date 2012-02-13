@@ -140,7 +140,7 @@ abstract class Seed implements \Kisma\IKisma, \Kisma\IConfigurable, \Countable, 
 		$this->_objectId = spl_object_hash( $this );
 
 		//	Catch null input, non-traversable, or empty options
-		if ( empty( $options ) || ( !is_array( $options ) && !( $options instanceof \Traversable ) ) )
+		if ( empty( $options ) || ( !is_array( $options ) && !( $options instanceof \Traversable ) && !( $options instanceof \stdClass) ) )
 		{
 			$options = array();
 		}
@@ -149,12 +149,12 @@ abstract class Seed implements \Kisma\IKisma, \Kisma\IConfigurable, \Countable, 
 		if ( true !== $mergeOptions || !is_array( $options ) )
 		{
 			//	Overwrite the options...
-			$this->_options = $options;
+			$this->_options = (array)$options;
 		}
 		else
 		{
 			//	Merge the options...
-			$this->_options = array_merge( $this->_options, $options );
+			$this->_options = array_merge( $this->_options, (array)$options );
 		}
 
 		//	Loop through, set...
@@ -244,21 +244,21 @@ abstract class Seed implements \Kisma\IKisma, \Kisma\IConfigurable, \Countable, 
 	//*************************************************************************
 
 	/**
-	 * @param \Kisma\Event\ComponentEvent $event
+	 * @param \Kisma\Event\KismaEvent $event
 	 *
 	 * @return bool
 	 */
-	public function onAfterConstruct( \Kisma\Event\ComponentEvent $event )
+	public function onAfterConstruct( \Kisma\Event\KismaEvent $event )
 	{
 		return true;
 	}
 
 	/**
-	 * @param \Kisma\Event\ComponentEvent $event
+	 * @param \Kisma\Event\KismaEvent $event
 	 *
 	 * @return bool
 	 */
-	public function onBeforeDestruct( \Kisma\Event\ComponentEvent $event )
+	public function onBeforeDestruct( \Kisma\Event\KismaEvent $event )
 	{
 		return true;
 	}
@@ -279,7 +279,7 @@ abstract class Seed implements \Kisma\IKisma, \Kisma\IConfigurable, \Countable, 
 		$_obj = new \stdClass();
 
 		$_me = new \ReflectionObject( $this );
-		$_properties = $_me->getProperties( \ReflectionProperty::IS_PROTECTED );
+		$_properties = $_me->getProperties( \ReflectionProperty::IS_PUBLIC );
 
 		if ( !empty( $_properties ) )
 		{

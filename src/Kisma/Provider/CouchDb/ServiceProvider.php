@@ -22,14 +22,20 @@ namespace Kisma\Provider\CouchDb;
 //* Aliases
 //*************************************************************************
 
+use Silex\Application;
+
 use Kisma\Components as Components;
 use Kisma\AppConfig;
+use Kisma\Provider\CouchDb\DocumentManager;
+
+use Doctrine\Common as Common;
+use Doctrine\Common\Classloader;
 use Doctrine\CouchDB\CouchDBClient;
 use Doctrine\ODM\CouchDB\Configuration;
-use Doctrine\ODM\CouchDB\DocumentManager;
 use Doctrine\ODM\CouchDB\Mapping\Annotations\Document;
 use Doctrine\Common\EventManager;
-use Silex\Application;
+use Doctrine\CouchDB\HTTP\HTTPException;
+use Doctrine\Common\Annotations\AnnotationRegistry;
 
 //*************************************************************************
 //* Requirements
@@ -52,7 +58,7 @@ class ServiceProvider extends \Kisma\Provider\SilexServiceProvider
 	/**
 	 * @var string Our group options prefix
 	 */
-	const Options_GroupPrefix = 'couchdbs';
+	const Options_GroupKey = 'couchdbs';
 	/**
 	 * @var string Our group options prefix
 	 */
@@ -64,11 +70,11 @@ class ServiceProvider extends \Kisma\Provider\SilexServiceProvider
 	/**
 	 * @var string The name of our options element
 	 */
-	const DefaultOptions = 'couchdb.default_options';
+	const DefaultOptions = 'couchdb.defaults';
 	/**
-	 * @var string The name of our group options default
+	 * @var string The name of our default group options element
 	 */
-	const DefaultGroupOptions = 'couchdbs.default';
+	const DefaultGroupOptions = 'couchdbs.defaults';
 	/**
 	 * @var string The name of our initializer method
 	 */
@@ -100,22 +106,32 @@ class ServiceProvider extends \Kisma\Provider\SilexServiceProvider
 			$_initialized = true;
 
 			//	Set the default options
-			$app[ServiceProvider::DefaultOptions] = array(
-				'dbname' => null,
-				'host' => 'localhost',
-				'port' => 5984,
-				'user' => null,
-				'password' => null,
-				'logging' => false,
-			);
+			if ( !isset( $app[ServiceProvider::DefaultOptions] ) )
+			{
+				if ( isset( $app[ServiceProvider::DefaultGroupOptions] ) )
+				{
+					$app[ServiceProvider::DefaultOptions] = $app[ServiceProvider::DefaultGroupOptions];
+				}
+				else
+				{
+					$app[ServiceProvider::DefaultOptions] = array(
+						'dbname' => null,
+						'host' => 'localhost',
+						'port' => 5984,
+						'user' => null,
+						'password' => null,
+						'logging' => false,
+					);
+				}
+			}
 
 			$_doctrinePath = $app['vendor_path'] . '/couchdb_odm/lib/vendor/doctrine-common/lib';
 			require_once $_doctrinePath . '/Doctrine/Common/ClassLoader.php';
 
-			$_loader = new \Doctrine\Common\ClassLoader( 'Doctrine\Common', $_doctrinePath );
+			$_loader = new ClassLoader( 'Doctrine\Common', $_doctrinePath );
 			$_loader->register();
 
-			$_loader = new \Doctrine\Common\ClassLoader( 'Doctrine\ORM', $_doctrinePath );
+			$_loader = new ClassLoader( 'Doctrine\ORM', $_doctrinePath );
 			$_loader->register();
 
 			//	Register our paths
@@ -126,7 +142,7 @@ class ServiceProvider extends \Kisma\Provider\SilexServiceProvider
 				'Doctrine\\CouchDB' => $app['vendor_path'] . '/couchdb_odm/lib',
 			) );
 
-			\Doctrine\Common\Annotations\AnnotationRegistry::registerAutoloadNamespaces(
+			AnnotationRegistry::registerAutoloadNamespaces(
 				array(
 					'Kisma' => __DIR__,
 					'Doctrine\\Common' => $_doctrinePath,
@@ -139,26 +155,28 @@ class ServiceProvider extends \Kisma\Provider\SilexServiceProvider
 			if ( !isset( $app[ServiceProvider::GroupOptions] ) )
 			{
 				$app[ServiceProvider::GroupOptions] = array(
-					'default' => isset( $app[ServiceProvider::Options] ) ?
-						$app[ServiceProvider::Options] : array()
+					'default' => T::app( ServiceProvider::Options, array() ),
 				);
 			}
 
+			//	Merge the default options with each configured database and save
 			$_couchOptions = $app[ServiceProvider::GroupOptions];
+			$_defaultOptions = $app[ServiceProvider::DefaultOptions];
 
 			foreach ( $_couchOptions as $_name => &$_options )
 			{
-				$_options = array_replace( $app[ServiceProvider::DefaultOptions], $_options );
+				$_options = array_merge( $_defaultOptions, $_options );
 
 				if ( !isset( $app[ServiceProvider::DefaultGroupOptions] ) )
 				{
 					$app[ServiceProvider::DefaultGroupOptions] = $_name;
 				}
 			}
+
 			$app[ServiceProvider::GroupOptions] = $_couchOptions;
 		} );
 
-		$app[ServiceProvider::Options_GroupPrefix] = $app->share( function () use ( $app )
+		$app[ServiceProvider::Options_GroupKey] = $app->share( function () use ( $app )
 		{
 			$app[ServiceProvider::ServiceInitializer]();
 
@@ -173,18 +191,33 @@ class ServiceProvider extends \Kisma\Provider\SilexServiceProvider
 				}
 				else
 				{
-					$_config = $app[ServiceProvider::Options_GroupPrefix . '.config'][$_name];
-					$_manager = $app[ServiceProvider::Options_GroupPrefix . '.event_manager'][$_name];
+					$_config = $app[ServiceProvider::Options_GroupKey . '.config'][$_name];
+					$_manager = $app[ServiceProvider::Options_GroupKey . '.event_manager'][$_name];
 				}
 
-				$_dbs[$_name] = DocumentManager::create( $_options, $_config, $_manager );
+				$_dm = DocumentManager::create( $_options, $_config, $_manager );
+
+				try
+				{
+					$_dm->getCouchDBClient()->getDatabaseInfo( $_options['dbname'] );
+				}
+				catch ( HTTPException $_ex )
+				{
+					if ( 404 == $_ex->getCode() )
+					{
+						//	Create database cuz it's not there
+						$_dm->getCouchDBClient()->createDatabase( $_options['dbname'] );
+					}
+				}
+
+				$_dbs[$_name] = $_dm;
 			}
 
 			return $_dbs;
 		} );
 
 		//	Group configuration
-		$app[ServiceProvider::Options_GroupPrefix . '.config'] = $app->share( function () use ( $app )
+		$app[ServiceProvider::Options_GroupKey . '.config'] = $app->share( function () use ( $app )
 		{
 			$app[ServiceProvider::GroupOptions . '.initializer']();
 
@@ -205,7 +238,7 @@ class ServiceProvider extends \Kisma\Provider\SilexServiceProvider
 		} );
 
 		//	Group events
-		$app[ServiceProvider::Options_GroupPrefix . '.event_manager'] = $app->share( function () use ( $app )
+		$app[ServiceProvider::Options_GroupKey . '.event_manager'] = $app->share( function () use ( $app )
 		{
 			$app[ServiceProvider::ServiceInitializer]();
 
@@ -221,7 +254,7 @@ class ServiceProvider extends \Kisma\Provider\SilexServiceProvider
 		//	Shortcuts for the "first" DB
 		$app[ServiceProvider::Options_Prefix] = $app->share( function() use ( $app )
 		{
-			$_dbs = $app[ServiceProvider::Options_GroupPrefix];
+			$_dbs = $app[ServiceProvider::Options_GroupKey];
 			return $_dbs[$app[ServiceProvider::DefaultGroupOptions]];
 		} );
 
@@ -234,7 +267,7 @@ class ServiceProvider extends \Kisma\Provider\SilexServiceProvider
 		//	Configuration
 		$app['couchdb.config'] = $app->share( function() use ( $app )
 		{
-			$_dbs = $app[ServiceProvider::Options_GroupPrefix . '.config'];
+			$_dbs = $app[ServiceProvider::Options_GroupKey . '.config'];
 			return $_dbs[$app[ServiceProvider::DefaultGroupOptions]];
 		} );
 

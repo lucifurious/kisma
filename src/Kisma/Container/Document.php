@@ -16,20 +16,23 @@
  */
 namespace Kisma\Container;
 
+//*************************************************************************
+//* Aliases
+//*************************************************************************
+
+use Kisma\Utility as Utility;
+
+use Doctrine\CouchDB\View\FolderDesignDocument;
+use Doctrine\ODM\CouchDB\Event as CouchDbEvent;
+use Doctrine\Common\EventSubscriber;
+
 /**
  * Document
- * A base for key => value store documents (i.e. CouchDB, Mongo, etc.)
+ * A base container for key => value store documents (i.e. CouchDB, Mongo, etc.)
  *
- * @Document
- * @MappedSuperclass
- *
- * @property string $id
- * @property string $version
- * @property int $createTime
- * @property int $updateTime
- * @property int $expireTime
+ * @property string $documentName
  */
-abstract class Document extends \Kisma\Components\Seed
+abstract class Document extends \Kisma\Components\Seed implements \Kisma\IContainer
 {
 	//*************************************************************************
 	//* Private Members
@@ -41,142 +44,26 @@ abstract class Document extends \Kisma\Components\Seed
 	protected $_documentName = null;
 
 	//*************************************************************************
-	//* Document Fields
-	//*************************************************************************
-
-	/** @Id */
-	public $id = null;
-
-	/** @Version */
-	public $version = null;
-
-	/** @Attachments */
-	public $attachments;
-
-	/** @Field(type="date") */
-	public $createTime = null;
-
-	/** @Field(type="date") */
-	public $updateTime = null;
-
-	//*************************************************************************
 	//* Public Methods
 	//*************************************************************************
 
 	/**
 	 * @param array $options
+	 *
+	 * @return \Kisma\Container\Document
 	 */
 	public function __construct( $options = array() )
 	{
+		foreach ( $options as $_key => $_value )
+		{
+			if ( property_exists( $this, $_key ) )
+			{
+				Utility\Property::set( $this, $_key, $_value );
+				Utility\Option::unsetOption( $options, $_key );
+			}
+		}
+
 		parent::__construct( $options );
-
-		if ( null === $this->_documentName )
-		{
-			$this->_documentName = str_replace( '\\', '.', \get_class( $this ) );
-		}
-	}
-
-	/**
-	 * @param string $name
-	 * @param mixed  $value
-	 */
-	public function __set( $name, $value )
-	{
-		if ( property_exists( $this, $name ) )
-		{
-			$this->{$name} = $value;
-		}
-	}
-
-	//*************************************************************************
-	//* Default Event Handlers
-	//*************************************************************************
-
-	/**
-	 * @param $event
-	 *
-	 * @return bool
-	 */
-	public function onBeforeValidate( $event )
-	{
-		return true;
-	}
-
-	/**
-	 * @param $event
-	 *
-	 * @return bool
-	 */
-	public function onAfterValidate( $event )
-	{
-		return true;
-	}
-
-	/**
-	 * @param $event
-	 *
-	 * @return bool
-	 */
-	public function onBeforeFind( $event )
-	{
-		return true;
-	}
-
-	/**
-	 * @param $event
-	 *
-	 * @return bool
-	 */
-	public function onAfterFind( $event )
-	{
-		return true;
-	}
-
-	/**
-	 * @param $event
-	 *
-	 * @return bool
-	 */
-	public function onBeforeSave( $event )
-	{
-		$this->updateTime = date( 'c' );
-
-		if ( null === $this->createTime )
-		{
-			$this->createTime = $this->updateTime;
-		}
-
-		return true;
-	}
-
-	/**
-	 * @param $event
-	 *
-	 * @return bool
-	 */
-	public function onAfterSave( $event )
-	{
-		return true;
-	}
-
-	/**
-	 * @param $event
-	 *
-	 * @return bool
-	 */
-	public function onBeforeDelete( $event )
-	{
-		return true;
-	}
-
-	/**
-	 * @param $event
-	 *
-	 * @return bool
-	 */
-	public function onAfterDelete( $event )
-	{
-		return true;
 	}
 
 	//*************************************************************************
@@ -199,7 +86,11 @@ abstract class Document extends \Kisma\Components\Seed
 	 */
 	public function getDocumentName()
 	{
+		if ( null === $this->_documentName )
+		{
+			$this->_documentName = get_class( $this );
+		}
+
 		return $this->_documentName;
 	}
-
 }

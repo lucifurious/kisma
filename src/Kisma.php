@@ -26,6 +26,7 @@ namespace Kisma;
 //	Include Silex if not already
 if ( !@class_exists( 'Silex\\Application', false ) )
 {
+	/** @noinspection PhpIncludeInspection */
 	require_once dirname( __DIR__ ) . '/vendor/silex/silex.phar';
 }
 
@@ -38,14 +39,11 @@ require_once __DIR__ . '/Kisma/Components/Seed.php';
 //*************************************************************************
 
 use Silex\Application;
-use Kisma\Seed;
-use Kisma\Event;
+
 use Kisma\Provider;
-use Kisma\Utility\FileSystem;
-use Kisma\Utility\Property;
-use Kisma\Utility\Events;
-use Kisma\Utility\Option;
-use Kisma\Utility\Http;
+use Kisma\Components as Components;
+use Kisma\Utility as Utility;
+
 use Monolog;
 
 /**
@@ -53,69 +51,8 @@ use Monolog;
  *
  * Contains a few core functions implemented statically to be lightweight and single instance.
  */
-class Kisma extends \Kisma\Components\Seed
+class Kisma extends Components\Seed implements AppConfig
 {
-	//*************************************************************************
-	//* Constants
-	//*************************************************************************
-
-	/**
-	 * @var string The version number of Kisma
-	 */
-	const Version = '1.0.0-RC2';
-	/**
-	 * @var string
-	 */
-	const AppConfig = 'app.config';
-	/**
-	 * @var string
-	 */
-	const ViewConfig = 'view.config';
-	/**
-	 * @var string
-	 */
-	const Autoloader = 'autoloader';
-	/**
-	 * @var string
-	 */
-	const Routes = 'routes';
-	/**
-	 * @var string
-	 */
-	const Controllers = 'controllers';
-	/**
-	 * @var string
-	 */
-	const Dispatcher = 'dispatcher';
-	/**
-	 * @var string
-	 */
-	const Resolver = 'resolver';
-	/**
-	 * @var string
-	 */
-	const Kernel = 'kernel';
-	/**
-	 * @var string
-	 */
-	const RequestContext = 'request_context';
-	/**
-	 * @var string
-	 */
-	const ErrorHandler = 'error_handler';
-	/**
-	 * @var string System logger
-	 */
-	const Logger = 'monolog';
-	/**
-	 * @var string Twig service
-	 */
-	const Twig = 'twig';
-	/**
-	 * @var string The Assetic asset manager
-	 */
-	const AssetManager = 'asset_manager';
-
 	//*************************************************************************
 	//* Private Members
 	//*************************************************************************
@@ -153,10 +90,11 @@ class Kisma extends \Kisma\Components\Seed
 		//	Determine our running mode
 		if ( $options instanceof \Silex\Application )
 		{
-			self::$_app = $options;
-			$options = array();
+			$_args = func_get_args();
+			self::$_app = array_shift( $_args );
+			$options = ( empty( $_args ) ? array() : $_args );
 		}
-		else if ( is_array( $options ) && isset( $options['app'] ) )
+		else if ( is_array( $options ) && isset( $options['app'] ) && $options['app'] instanceof \Silex\Application )
 		{
 			self::$_app = $options['app'];
 			unset( $options['app'] );
@@ -177,14 +115,14 @@ class Kisma extends \Kisma\Components\Seed
 		$this->_loadConfiguration( $options );
 
 		//	Auto-subscribe for my handlers
-		Events::subscribe( self::$_app );
+		Utility\Events::subscribe( self::$_app );
 
 		//	Dispatch initialize...
 		$this->dispatch( Event\ApplicationEvent::Initialize );
 
 		$_endTime = microtime( true );
 
-		\Kisma\Utility\Log::trace(
+		Utility\Log::trace(
 			'Kisma operational velocity achieved in ' . number_format( $_endTime - $_startTime, 4 ) . 's'
 		);
 	}
@@ -305,7 +243,7 @@ class Kisma extends \Kisma\Components\Seed
 		{
 			foreach ( $_service as $_serviceClass => $_options )
 			{
-				if ( 2 == count( $_options ) && \Kisma\Utility\Scalar::is_array( $_options[0], $_options[1] ) )
+				if ( 2 == count( $_options ) && Utility\Scalar::is_array( $_options[0], $_options[1] ) )
 				{
 					$_classOptions = $_options[0];
 					$_serviceOptions = $_options[1];
@@ -357,13 +295,13 @@ class Kisma extends \Kisma\Components\Seed
 
 		$_payload = $this->_getBaseRenderPayload( $viewFile, $payload );
 		$_renderEvent = new \Kisma\Event\RenderEvent( self::$_app, $viewFile, $_payload );
-		$this->dispatch( \Kisma\Event\RenderEvent::BeforeRender, $_renderEvent );
+		$this->dispatch( Event\RenderEvent::BeforeRender, $_renderEvent );
 
 		$_renderEvent->setOutput(
 			$_output = self::$_app['twig']->render( $viewFile, $_payload )
 		);
 
-		$this->dispatch( \Kisma\Event\RenderEvent::AfterRender, $_renderEvent );
+		$this->dispatch( Event\RenderEvent::AfterRender, $_renderEvent );
 
 		if ( false !== $returnString )
 		{
@@ -376,13 +314,20 @@ class Kisma extends \Kisma\Components\Seed
 	/**
 	 * @static
 	 *
-	 * @param string|null $service
-	 * @param null		$defaultValue
+	 * @param string|null       $service
+	 * @param mixed|null		$defaultValue
+	 * @param bool              $setValue If true, $app[$service] will be set to $defaultValue
 	 *
 	 * @return \Silex\Application|\Kisma\Kisma|mixed
 	 */
-	public static function app( $service = null, $defaultValue = null )
+	public static function app( $service = null, $defaultValue = null, $setValue = false )
 	{
+		if ( false !== $setValue )
+		{
+			self::$_app[$service] = $defaultValue;
+			return self::$_app;
+		}
+
 		if ( null === $service )
 		{
 			return self::$_app;
@@ -440,7 +385,7 @@ class Kisma extends \Kisma\Components\Seed
 		//
 		if ( 'cli' == PHP_SAPI || !$this->serviceEnabled( 'twig' ) )
 		{
-			\Kisma\Utility\Log::trace( 'Twig service disabled by configuration.' );
+//			Utility\Log::trace( 'Twig service disabled by configuration.' );
 		}
 		else
 		{
@@ -494,20 +439,20 @@ class Kisma extends \Kisma\Components\Seed
 			//	Register Twig
 			self::$_app->register( new \Silex\Provider\TwigServiceProvider(), $_twigOptions );
 
-			\Kisma\Utility\Log::trace( 'Twig service registered' );
+			Utility\Log::trace( 'Twig service registered' );
 
 			//	Register widget service
 			self::$_app->register(
-				new \Kisma\Provider\WidgetServiceProvider(),
+				new Provider\WidgetServiceProvider(),
 				self::app( 'widget.options', array() )
 			);
 
-			\Kisma\Utility\Log::trace( 'Widget service registered' );
+			Utility\Log::trace( 'Widget service registered' );
 		}
 
 		if ( !$this->serviceEnabled( 'error_handler' ) )
 		{
-			\Kisma\Utility\Log::trace( 'Error handler service disabled by configuration.' );
+//			Utility\Log::trace( 'Error handler service disabled by configuration.' );
 		}
 		else
 		{
@@ -519,7 +464,7 @@ class Kisma extends \Kisma\Components\Seed
 			self::$_app->error(
 				function( $exception, $code ) use ( $_self )
 				{
-					return \Kisma\Components\ErrorHandler::onException( new \Kisma\Event\ErrorEvent( $_self, $exception ) );
+					return Components\ErrorHandler::onException( new \Kisma\Event\ErrorEvent( $_self, $exception ) );
 				}
 			);
 		}
@@ -529,7 +474,7 @@ class Kisma extends \Kisma\Components\Seed
 		//
 		$this->_registerControllers();
 
-		//		\Kisma\Utility\Log::trace( 'onInitialize() complete' );
+		//		Utility\Log::trace( 'onInitialize() complete' );
 
 		return true;
 	}
@@ -559,7 +504,7 @@ class Kisma extends \Kisma\Components\Seed
 
 		if ( false === ( $_logService = self::app( 'app.config.service.enable.monolog', true ) ) )
 		{
-			\Kisma\Utility\Log::trace( 'Monolog service disabled by configuration.' );
+//			Utility\Log::trace( 'Monolog service disabled by configuration.' );
 			return;
 		}
 
@@ -568,7 +513,7 @@ class Kisma extends \Kisma\Components\Seed
 			$_logService = '\\Silex\\Provider\\MonologServiceProvider';
 		}
 
-		$_logPath = FileSystem::makePath(
+		$_logPath = Utility\FileSystem::makePath(
 			$_appRoot,
 			self::app( 'app.config.log_path', '/logs' ),
 			false
@@ -578,7 +523,7 @@ class Kisma extends \Kisma\Components\Seed
 		@@mkdir( $_logPath, 0775, true );
 
 		$_logFileName =
-			FileSystem::makePath( $_logPath, self::app( 'app.config.log_file_name', 'web.app.log' ), false );
+			Utility\FileSystem::makePath( $_logPath, self::app( 'app.config.log_file_name', 'web.app.log' ), false );
 
 		$_monologOptions = array_merge(
 			self::app( 'monolog.options', array() ),
@@ -597,11 +542,11 @@ class Kisma extends \Kisma\Components\Seed
 				'kisma',
 		) );
 
-		if ( false !== Option::get( $_monologOptions, 'fire_php', false ) )
+		if ( false !== Utility\Option::get( $_monologOptions, 'fire_php', false ) )
 		{
 			$_firePhp = new \Monolog\Handler\FirePHPHandler();
 			self::$_app['monolog']->pushHandler( $_firePhp );
-			\Kisma\Utility\Log::debug( 'FirePHP handler registered.' );
+			Utility\Log::debug( 'FirePHP handler registered.' );
 		}
 	}
 
@@ -649,7 +594,7 @@ class Kisma extends \Kisma\Components\Seed
 	{
 		if ( !$this->serviceEnabled( 'auto_discover_controllers' ) )
 		{
-			\Kisma\Utility\Log::trace( 'Controller discovery disabled by configuration.' );
+//			Utility\Log::trace( 'Controller discovery disabled by configuration.' );
 			return false;
 		}
 
@@ -691,7 +636,7 @@ class Kisma extends \Kisma\Components\Seed
 			);
 
 			//	Was a class name specified?
-			if ( empty( $_appControllers ) || null === ( $_class = Option::get( $_appControllers, 'class' ) ) )
+			if ( empty( $_appControllers ) || null === ( $_class = Utility\Option::get( $_appControllers, 'class' ) ) )
 			{
 				//	Nope, build it.
 				$_class =
@@ -708,7 +653,7 @@ class Kisma extends \Kisma\Components\Seed
 				self::$_app['app.config.route_view_path'] = array();
 			}
 
-			$_routeViewPath = FileSystem::makePath( $_viewPath, $_route, false );
+			$_routeViewPath = Utility\FileSystem::makePath( $_viewPath, $_route, false );
 
 			if ( is_dir( $_routeViewPath ) )
 			{
@@ -771,7 +716,7 @@ class Kisma extends \Kisma\Components\Seed
 
 		$_configPath = self::app( 'app.config.config_path', '/config' );
 		//		self::$_app['app.config.config_path'] =
-		//			FileSystem::makePath( self::app( 'app.config.config_path', '/config' ) );
+		//			Utility\FileSystem::makePath( self::app( 'app.config.config_path', '/config' ) );
 		//
 		if ( empty( $_configPath ) )
 		{
@@ -816,14 +761,15 @@ class Kisma extends \Kisma\Components\Seed
 
 							self::$_app['autoloader']->registerNamespaces( $this->_namespace );
 							self::$_app['app.config.namespace_root'] =
-								FileSystem::makePath( current( $this->_namespace ), $this->_namespaceName );
+								Utility\FileSystem::makePath( current( $this->_namespace ), $this->_namespaceName );
 							break;
 
 						//	Make full paths from relatives...
 						case '_path' == substr( $_key, strlen( $_key ) - 5 ):
 							if ( !empty( $_value ) && '/' !== $_value[0] )
 							{
-								$_value = FileSystem::makePath( self::$_app['app.config.namespace_root'], $_value );
+								$_value =
+									Utility\FileSystem::makePath( self::$_app['app.config.namespace_root'], $_value );
 							}
 							break;
 					}
@@ -851,7 +797,7 @@ class Kisma extends \Kisma\Components\Seed
 		//	Check application paths (Controllers, Models, & Views)...
 		if ( !isset( self::$_app['app.config.view_path'] ) )
 		{
-			self::$_app['app.config.view_path'] = $_configPath = FileSystem::makePath(
+			self::$_app['app.config.view_path'] = $_configPath = Utility\FileSystem::makePath(
 				self::$_app['app.config.namespace_root'],
 				'Views'
 			);
@@ -859,7 +805,7 @@ class Kisma extends \Kisma\Components\Seed
 
 		if ( !isset( self::$_app['app.config.document_path'] ) )
 		{
-			self::$_app['app.config.document_path'] = $_configPath = FileSystem::makePath(
+			self::$_app['app.config.document_path'] = $_configPath = Utility\FileSystem::makePath(
 				self::$_app['app.config.namespace_root'],
 				'Documents'
 			);
@@ -867,7 +813,7 @@ class Kisma extends \Kisma\Components\Seed
 
 		if ( !isset( self::$_app['app.config.model_path'] ) )
 		{
-			self::$_app['app.config.model_path'] = $_configPath = FileSystem::makePath(
+			self::$_app['app.config.model_path'] = $_configPath = Utility\FileSystem::makePath(
 				self::$_app['app.config.namespace_root'],
 				'Models'
 			);
@@ -875,7 +821,7 @@ class Kisma extends \Kisma\Components\Seed
 
 		if ( !isset( self::$_app['app.config.controller_path'] ) )
 		{
-			self::$_app['app.config.controller_path'] = $_configPath = FileSystem::makePath(
+			self::$_app['app.config.controller_path'] = $_configPath = Utility\FileSystem::makePath(
 				self::$_app['app.config.namespace_root'],
 				'Controllers'
 			);
@@ -899,6 +845,6 @@ class Kisma extends \Kisma\Components\Seed
  * K
  * An alias to the Kisma base
  */
-class K extends \Kisma\Kisma implements AppConfig
+class K extends \Kisma\Kisma
 {
 }

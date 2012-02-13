@@ -18,9 +18,14 @@
  */
 namespace Kisma\Provider\CouchDb;
 
+use Kisma\Kisma as K;
+use Kisma\Utility as Utility;
 use Kisma\Container\CouchDb\QueueItem;
-use Kisma\Provider\CouchDb\Document;
 use Kisma\Provider\SilexServiceProvider;
+use Kisma\Provider\CouchDb as CouchDb;
+
+use Doctrine\CouchDB\HTTP\HTTPException;
+use Doctrine\CouchDB\HttpClient;
 
 /**
  * QueueServiceProvider
@@ -28,30 +33,18 @@ use Kisma\Provider\SilexServiceProvider;
  */
 class QueueServiceProvider extends SilexServiceProvider
 {
-	//*************************************************************************
-	//* Constants
-	//*************************************************************************
-
-	/**
-	 * @var string The option that holds the queue name
-	 */
-	const Option_QueueName = 'couchdb.queue.options.name';
-	/**
-	 * @var string Our service options
-	 */
-	const Options = 'couchdb.queue.options';
-	/**
-	 * @var string Our queue array
-	 */
-	const Queues = 'couchdb.queues';
 	/**
 	 * @var string
 	 */
-	const PendingViewName = 'pending';
+	const PendingViewName = 'createTime';
 	/**
 	 * @var int
 	 */
 	const DefaultMaxItems = 1;
+	/**
+	 * @var string The key prefix for each queue
+	 */
+	const QueueServiceKeyPrefix = 'queue_service.';
 
 	//*************************************************************************
 	//* Private Members
@@ -74,13 +67,21 @@ class QueueServiceProvider extends SilexServiceProvider
 	 */
 	protected $_hashKeys = true;
 	/**
-	 * @var \Doctrine\CouchDB\CouchDBClient
+	 * @var DocumentManager
 	 */
-	protected $_client = null;
+	protected $_dm = null;
 	/**
-	 * @var \Doctrine\ODM\CouchDB\DocumentManager
+	 * @var string The design document structure
 	 */
-	protected $_documentManager = null;
+	protected $_designPath = '/';
+	/**
+	 * @var string The name of the design document with filters
+	 */
+	protected $_designDocument = 'document';
+	/**
+	 * @var string The name of this feed provider
+	 */
+	protected $_providerName = null;
 
 	//*************************************************************************
 	//* Public Methods
@@ -89,101 +90,52 @@ class QueueServiceProvider extends SilexServiceProvider
 	/**
 	 * Registers the service with Silex
 	 *
-	 * @code
-	 *	//	Example usage:
-	 *	$app->register( new QueueServiceProvider(),
-	 *		 array(
-	 *			 //	Queue name
-	 *			 QueueServiceProvider::Option_QueueName => 'job_queue',
-	 *		)
-	 *	);
-	 *
-	 *	//	Then, use queue name from above to access each queue service:
-	 *	$app['couchdb.queue.<queueName>']->doStuff();
-	 *
-	 *	//	Example:
-	 *	$app['couchdb.queue.job_queue']->enqueue( $queueItem );
-	 * @endcode
-	 *
 	 * @param \Silex\Application $app
+	 *
+	 * @return \Kisma\Provider\CouchDb\QueueServiceProvider
 	 */
 	public function register( \Silex\Application $app )
 	{
 		if ( null === $this->_queueName )
 		{
-			$this->_queueName = $app[self::Option_QueueName];
+			$this->_queueName = \Kisma\Utility\Inflector::tag( get_class( $this ) );
 		}
 
-		$_options = isset( $app[self::Options] ) ? $app[self::Options] : $app[CouchDbServiceProvider::Options];
-		$_options['dbname'] = $this->_queueName;
-
-		$_allOptions =
-			!isset( $app[CouchDbServiceProvider::GroupOptions] ) ? array() :
-				$app[CouchDbServiceProvider::GroupOptions];
-
-		$_allOptions[$this->_queueName] = $_options;
-		$app[CouchDbServiceProvider::GroupOptions] = $_allOptions;
-
-		$app->register( new ServiceProvider(), $_options );
-
-		if ( !isset( $app[self::Queues] ) )
-		{
-			$app[self::Queues] = array();
-		}
-
-		$this->_documentManager = $app[CouchDbServiceProvider::Options_GroupPrefix][$this->_queueName];
-		$this->_client = $this->_documentManager->getCouchDBClient();
-		$_queues = $app[self::Queues];
-		$_queues[$this->_queueName] = $this;
-
-		$app[self::Queues] = $_queues;
-
-		//	Make sure the queue exists!
-		try
-		{
-			$this->_client->getDatabaseInfo( $this->_queueName );
-		}
-		catch ( \Doctrine\CouchDB\HTTP\HTTPException $_ex )
-		{
-			if ( 404 != $_ex->getCode() )
-			{
-				throw $_ex;
-			}
-
-			$this->_client->createDatabase( $this->_queueName );
-		}
+		K::app( self::QueueServiceKeyPrefix . $this->_queueName, $this, true );
 	}
 
 	/**
 	 * Get work items from the queue
 	 * The descending param is used to get LIFO (if true) or FIFO (if false) behavior.
 	 *
+	 * @param int  $since
 	 * @param int  $maxItems
-	 * @param bool $fifo
 	 * @param bool $useLocks If true, a lock will be added to the queue item
 	 *
 	 * @return array|false
 	 */
-	public function dequeue( $maxItems = self::DefaultMaxItems, $fifo = true, $useLocks = false )
+	public function dequeue( $since = 0, $maxItems = self::DefaultMaxItems, $useLocks = false )
 	{
 		$_queueItems = array();
 
-		Log::debug( 'Requesting pending view: ' . self::PendingViewName );
+		Utility\Log::debug( 'Requesting changes...' );
 
-		$_query = $this->getClient()->createViewQuery( 'document', self::PendingViewName, null );
-		$_query->setLimit( $maxItems );
-		$_query->setIncludeDocs( true );
-		$_query->setDescending( $fifo );
+		$_changes = $this->_getFeedChanges( $since );
 
-		$_pendingMessages = $_query->execute();
-
-		Log::debug( 'View results: ' . $_pendingMessages );
+		if ( empty( $_changes ) || !isset( $_changes['results'] ) )
+		{
+			Utility\Log::debug( 'No detected changes in feed.' );
+			return false;
+		}
 
 		//	Build doc array non-locked
-		foreach ( $_pendingMessages as $_message )
+		foreach ( $_changes['results'] as $_message )
 		{
 			//	Add successful lock to work item list
-			$_queueItems[] = new QueueItem( array( 'document' => $_message ) );
+			$_queueItems[] = array(
+				'seq' => $_message['seq'],
+				'id' => $_message['id'],
+			);
 		}
 
 		//	Return queue item(s)
@@ -193,68 +145,53 @@ class QueueServiceProvider extends SilexServiceProvider
 	/**
 	 * Adds a work item to the queue
 	 *
-	 * @param string $id
+	 * @param string $ownerId The owner of this queue item
 	 * @param mixed  $feedData Any kind of info you want to pass the dequeuer process
-	 * @param int	$expireTime How long to keep this guy around. -1 = until deleted@internal param int $timeToLive
+	 * @param int	$expireTime How long to keep this guy around. -1 = until deleted
 	 *
-	 * @return mixed The id of the message
+	 * @return mixed|false The _rev of the saved message, false if unchanged
 	 */
-	public function enqueue( $id = null, $feedData = null, $expireTime = -1 )
+	public function enqueue( $ownerId, $feedData, $expireTime = -1 )
 	{
-		//	Create an id
-		$_id = $this->createKey();
+		//	Look up this item
+		$_repo = $this->_dm->getRepository( QueueItem::DocumentName );
+		$_response = $_repo->findOneBy( array( 'ownerId' => $ownerId ) );
+		$_feedUpdate = null;
 
-		$_response = $this->_documentManager->find( QueueItem::DocumentName, $_id );
-
-		if ( 404 == $_response->status )
+		//	New item
+		if ( empty( $_response ) )
 		{
 			$_item = new QueueItem(
 				array(
-					'id' => $_id,
+					'ownerId' => $ownerId,
 					'queueData' => $feedData,
-					'expire_time' => $expireTime,
+					'expireTime' => $expireTime,
+					'providerName' => $this->_providerName,
 				)
 			);
-			Log::debug( 'New queue item: ' . $_id );
+
+			Utility\Log::debug( 'New queue item: ' . $ownerId );
 		}
-		else if ( 200 == $_response->status )
-		{
-			$_item = new \Kisma\Container\CouchDb\QueueItem( $_response->body );
-			Log::debug( 'Found prior queue item, _rev: ' . $_item->version );
-		}
+		//	Existing item
 		else
 		{
-			throw new \Kisma\StorageException( 'Unexpected CouchDb response.', $_response->status, null, $_response );
+			$_item = $_response;
+
+			Utility\Log::debug( 'Found prior queue item, _rev: ' . $_item->version );
+
+			//	Update
+			$_item->ownerId = $ownerId;
+			$_item->queueData = $feedData;
+			$_item->expireTime = $expireTime;
+			$_item->providerName = $this->_providerName;
+			$_item->updated = new \DateTime( 'now' );
 		}
 
-		//	Doc exists, read and update...
-		$_item->update_time = date( 'c' );
-
 		//	Write it out and update
-		$this->_documentManager->persist( $_item );
-		$this->_documentManager->flush();
-		$this->_documentManager->refresh( $_item );
-		Log::debug( 'Document queued: ' . $_id );
+		$this->_dm->save( $_item );
+		Utility\Log::debug( 'Document queued for ' . $ownerId );
 
 		return $_item->version;
-	}
-
-	/**
-	 * Creates a new queue with the specified name.
-	 *
-	 * @param string $name
-	 *
-	 * @return Queue
-	 */
-	public function createQueue( $name )
-	{
-		//	Create and return a new queue
-		return new Queue(
-			array(
-				'queueName' => $name,
-				'queueService' => $this,
-			)
-		);
 	}
 
 	/**
@@ -268,7 +205,7 @@ class QueueServiceProvider extends SilexServiceProvider
 	public function createKey( $id = null, $salt = null )
 	{
 		//	Start with the _id
-		$_key = $id ? : $this->_queueName . microtime( true );
+		$_key = $id ? : ( $this->_queueName . '.' . microtime( true ) );
 
 		//	Encrypt first
 		if ( null !== $salt && false !== $this->_encryptKeys )
@@ -277,7 +214,7 @@ class QueueServiceProvider extends SilexServiceProvider
 		}
 
 		//	Then hash
-		if ( null !== $id && false !== $this->_hashKeys )
+		if ( null !== $_key && false !== $this->_hashKeys )
 		{
 			$_key = $this->_hashKey( $_key );
 		}
@@ -291,71 +228,9 @@ class QueueServiceProvider extends SilexServiceProvider
 		return $_key;
 	}
 
-	/**
-	 * @param string $id
-	 *
-	 * @return mixed
-	 */
-	public function documentExists( $id )
-	{
-		/** @var $_response \Doctrine\CouchDB\HTTP\Response */
-		$_response = $this->_client->findDocument( $id );
-
-		if ( 404 != $_response->status )
-		{
-			return $_response->body;
-		}
-
-		return false;
-	}
-
 	//*************************************************************************
 	//* Private Methods
 	//*************************************************************************
-
-	/**
-	 * Creates our design document
-	 *
-	 * @param bool   $noSave
-	 * @param string $name
-	 *
-	 * @return bool|\Kisma\Components\Document
-	 */
-	public function createDesignDocument( $noSave = false, $name = 'document' )
-	{
-		if ( false !== ( $_doc = $this->documentExists( $name, $noSave ) ) )
-		{
-			return $_doc;
-		}
-
-		$_doc = new \Kisma\Components\DesignDocument();
-		$_doc->_id = $name;
-
-		try
-		{
-			//	Store it
-			return $this->_client->createDesignDocument( $name, $_doc );
-		}
-		catch ( \Exception $_ex )
-		{
-			if ( 404 == $_ex->getCode() )
-			{
-				//	No database, rethrow
-				throw $_ex;
-			}
-
-			/**
-			 * Conflict-o-rama!
-			 */
-			if ( 409 == $_ex->getCode() )
-			{
-				//	I guess we don't care...
-				return true;
-			}
-		}
-
-		return false;
-	}
 
 	/**
 	 * Hashes an _id
@@ -384,11 +259,38 @@ class QueueServiceProvider extends SilexServiceProvider
 	{
 		if ( null === $id )
 		{
-			$id = '|<|' . $this->_password . '|*|' . $this->_userName . '|>|';
+			$id = '|<|' . $id . '|>|';
 		}
 
 		//	Return encrypted string
 		return \Kisma\Utility\Hash::encryptString( $id, $salt );
+	}
+
+	/**
+	 * Pulls a changes feed for this queue
+	 *
+	 * @param int		$since
+	 * @param array|null $params
+	 *
+	 * @return array
+	 * @throws \Doctrine\CouchDB\HTTP\HTTPException
+	 */
+	protected function _getFeedChanges( $since = 0, array $params = null )
+	{
+		$_client = $this->_dm->getCouchDBClient();
+
+		$_path = '/' . $_client->getDatabase() . '/_changes?filter=' . $this->_designDocument . '/inbound_queue';
+		$_path .= '&provider_name=' . $this->_providerName;
+		$_path .= '&since=' . $since;
+
+		$_response = $_client->getHttpClient()->request( 'GET', $_path, $params );
+
+		if ( $_response->status != 200 )
+		{
+			throw  HTTPException::fromResponse( $_path, $_response );
+		}
+
+		return $_response->body;
 	}
 
 	//*************************************************************************
@@ -464,6 +366,17 @@ class QueueServiceProvider extends SilexServiceProvider
 	}
 
 	/**
+	 * @param string $queueName
+	 *
+	 * @return \Kisma\Provider\CouchDb\QueueServiceProvider
+	 */
+	public function setQueueName( $queueName )
+	{
+		$this->_queueName = $queueName;
+		return $this;
+	}
+
+	/**
 	 * @return string
 	 */
 	public function getQueueName()
@@ -472,10 +385,79 @@ class QueueServiceProvider extends SilexServiceProvider
 	}
 
 	/**
-	 * @return \Doctrine\CouchDB\CouchDBClient
+	 * @param string $designPath
+	 *
+	 * @return \Kisma\Provider\CouchDb\QueueServiceProvider
 	 */
-	public function getClient()
+	public function setDesignPath( $designPath )
 	{
-		return $this->_client;
+		$this->_designPath = $designPath;
+		return $this;
 	}
+
+	/**
+	 * @return string
+	 */
+	public function getDesignPath()
+	{
+		return $this->_designPath;
+	}
+
+	/**
+	 * @param \Kisma\Provider\CouchDb\DocumentManager $dm
+	 *
+	 * @return \Kisma\Provider\CouchDb\QueueServiceProvider
+	 */
+	public function setDm( $dm )
+	{
+		$this->_dm = $dm;
+		return $this;
+	}
+
+	/**
+	 * @return \Kisma\Provider\CouchDb\DocumentManager
+	 */
+	public function getDm()
+	{
+		return $this->_dm;
+	}
+
+	/**
+	 * @param string $designDocument
+	 *
+	 * @return \Kisma\Provider\CouchDb\QueueServiceProvider
+	 */
+	public function setDesignDocument( $designDocument )
+	{
+		$this->_designDocument = $designDocument;
+		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getDesignDocument()
+	{
+		return $this->_designDocument;
+	}
+
+	/**
+	 * @param string $providerName
+	 *
+	 * @return \Kisma\Provider\CouchDb\QueueServiceProvider
+	 */
+	public function setProviderName( $providerName )
+	{
+		$this->_providerName = $providerName;
+		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getProviderName()
+	{
+		return $this->_providerName;
+	}
+
 }

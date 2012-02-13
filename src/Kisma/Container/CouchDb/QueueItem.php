@@ -18,56 +18,55 @@ namespace Kisma\Container\CouchDb;
 
 use Kisma\K;
 use Kisma\Utility;
-use Doctrine\ODM\CouchDB\Mapping\Annotations\Document;
-use Doctrine\Common\Annotations\Annotation;
 
 /**
  * QueueItem
  * A queue item. Nothing more than a subclass that sets some standard queue item properties
  *
  * @Document
- * @property int $create_time
- * @property int $update_time
- * @property int $expire_time
+ *
  * @property mixed $queueData
  * @property mixed $locked
- * @property string $version
  */
-class QueueItem extends \Kisma\Container\Document
+class QueueItem extends \Kisma\Container\CouchDb\Document
 {
 	//*************************************************************************
 	//* Constants
 	//*************************************************************************
 
 	/**
-	 * @var string The "name" of this document
+	 * @var string The document name
 	 */
-	const DocumentName = 'Kisma.Container.CouchDb.QueueItem';
+	const DocumentName = 'Kisma\\Container\\CouchDb\\QueueItem';
 
 	//*************************************************************************
 	//* Document Fields
 	//*************************************************************************
 
 	/**
-	 * @Field(type="object")
+	 * @Field(type="mixed")
 	 */
 	public $queueData = null;
 	/**
 	 * @Field(type="boolean")
 	 */
 	public $locked = false;
-
-	//*************************************************************************
-	//* Public Methods
-	//*************************************************************************
-
 	/**
-	 * @param array $options
+	 * @Index
+	 * @Field(type="string")
+	 * @var string|null
 	 */
-	public function __construct( $options = array() )
-	{
-		//	Set our object's name and let 'er go
-		$this->setDocumentName( self::DocumentName );
-		parent::__construct( $options );
-	}
+	public $ownerId = null;
+	/**
+	 * @Index
+	 * @Field(type="string")
+	 * @var string|null
+	 */
+	public $providerName = null;
+	/**
+	 * @var \DateTime
+	 * @Field(type="datetime")
+	 */
+	public $updated = null;
+
 }
