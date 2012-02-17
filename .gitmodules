@@ -13,3 +13,6 @@
 [submodule "vendor/assetic"]
 	path = vendor/assetic
 	url = git://github.com/kriswallsmith/assetic.git
+[submodule "vendor/couchdb-odm"]
+	path = vendor/couchdb-odm
+	url = git://github.com/doctrine/couchdb-odm.git

@@ -520,7 +520,10 @@ class Kisma extends Components\Seed implements AppConfig
 		);
 
 		//	Make sure the directory is there
-		@@mkdir( $_logPath, 0775, true );
+		if ( !is_dir( $_logPath ) )
+		{
+			@@mkdir( $_logPath, 0775, true );
+		}
 
 		$_logFileName =
 			Utility\FileSystem::makePath( $_logPath, self::app( 'app.config.log_file_name', 'web.app.log' ), false );

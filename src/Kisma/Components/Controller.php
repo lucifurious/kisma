@@ -20,6 +20,7 @@ namespace Kisma\Components;
 use Kisma\Kisma as K;
 use Silex\Application;
 use Silex\ControllerProviderInterface;
+use Silex\ControllerCollection;
 use Symfony\Component\HttpFoundation\Request;
 
 /**

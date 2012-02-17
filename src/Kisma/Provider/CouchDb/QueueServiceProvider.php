@@ -279,8 +279,8 @@ class QueueServiceProvider extends SilexServiceProvider
 	{
 		$_client = $this->_dm->getCouchDBClient();
 
-		$_path = '/' . $_client->getDatabase() . '/_changes?filter=' . $this->_designDocument . '/inbound_queue';
-		$_path .= '&provider_name=' . $this->_providerName;
+		$_path = '/' . $_client->getDatabase() . '/_changes?filter=' . $_client->getDatabase() . '/queue';
+		$_path .= '&providerName=' . $this->_providerName;
 		$_path .= '&since=' . $since;
 
 		$_response = $_client->getHttpClient()->request( 'GET', $_path, $params );
