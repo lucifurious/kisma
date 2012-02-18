@@ -64,6 +64,10 @@ abstract class Seed implements \Kisma\IKisma, \Kisma\IConfigurable, \Countable, 
 	 * @var bool If true, setting an undefined property throws an exception
 	 */
 	protected $_propertiesRequired = false;
+	/**
+	 * @var array Object metrics
+	 */
+	protected static $_metrics = array();
 
 	//*************************************************************************
 	//* Default/Magic Methods
@@ -78,6 +82,9 @@ abstract class Seed implements \Kisma\IKisma, \Kisma\IConfigurable, \Countable, 
 	 */
 	public function __construct( $options = array() )
 	{
+		//	Metrics
+		$_startTime = microtime( true );
+
 		//	Configure our options/properties
 		$this->setOptions( $options, true );
 
@@ -86,6 +93,9 @@ abstract class Seed implements \Kisma\IKisma, \Kisma\IConfigurable, \Countable, 
 
 		//	Fire the initialize event
 		$this->dispatch( Event\ComponentEvent::AfterConstruct );
+
+		//	Store metrics
+		self::$_metrics[__METHOD__] = microtime( true ) - $_startTime;
 	}
 
 	/**
@@ -140,7 +150,7 @@ abstract class Seed implements \Kisma\IKisma, \Kisma\IConfigurable, \Countable, 
 		$this->_objectId = spl_object_hash( $this );
 
 		//	Catch null input, non-traversable, or empty options
-		if ( empty( $options ) || ( !is_array( $options ) && !( $options instanceof \Traversable ) && !( $options instanceof \stdClass) ) )
+		if ( empty( $options ) || ( !is_array( $options ) && !( $options instanceof \Traversable ) && !( $options instanceof \stdClass ) ) )
 		{
 			$options = array();
 		}
@@ -410,6 +420,14 @@ abstract class Seed implements \Kisma\IKisma, \Kisma\IConfigurable, \Countable, 
 	public function getSkipNext()
 	{
 		return $this->_skipNext;
+	}
+
+	/**
+	 * @return array
+	 */
+	public static function getMetrics()
+	{
+		return self::$_metrics;
 	}
 
 }

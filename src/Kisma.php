@@ -134,6 +134,9 @@ class Kisma extends Components\Seed implements AppConfig
 	{
 		//	Trigger the onTerminate event
 		$this->dispatch( Event\ApplicationEvent::Terminate );
+
+		//	Dump metrics
+		self::log( 'Cycle metrics: ' . print_r( self::$_metrics, true ) );
 	}
 
 	/**
@@ -314,9 +317,9 @@ class Kisma extends Components\Seed implements AppConfig
 	/**
 	 * @static
 	 *
-	 * @param string|null       $service
+	 * @param string|null	   $service
 	 * @param mixed|null		$defaultValue
-	 * @param bool              $setValue If true, $app[$service] will be set to $defaultValue
+	 * @param bool			  $setValue If true, $app[$service] will be set to $defaultValue
 	 *
 	 * @return \Silex\Application|\Kisma\Kisma|mixed
 	 */
@@ -351,20 +354,27 @@ class Kisma extends Components\Seed implements AppConfig
 	 */
 	public static function log( $message, $level = LogLevel::Info, $context = array(), $echo = false )
 	{
-		//		error_log( $message . PHP_EOL );
-		if ( !isset( self::$_app[K::Logger] ) || false !== $echo )
+		if ( isset( self::$_app[K::Logger] ) && false === $echo )
 		{
-			error_log( $message . PHP_EOL );
-
-			if ( false !== $echo )
-			{
-				echo $message . ( 'cli' == PHP_SAPI ? PHP_EOL : '<br/>' );
-			}
-
+			self::$_app[K::Logger]->{$level}( $message, $context );
 			return;
 		}
 
-		self::$_app[K::Logger]->{$level}( $message, $context );
+		if ( isset( self::$_app['app.config.full_log_file_name'] ) )
+		{
+			error_log( message . PHP_EOL, 3, self::$_app['app.config.full_log_file_name'] );
+		}
+		else
+		{
+			error_log( $message . PHP_EOL );
+		}
+
+		if ( false !== $echo )
+		{
+			echo $message . ( 'cli' == PHP_SAPI ? PHP_EOL : '<br/>' );
+		}
+
+		return;
 	}
 
 	//*************************************************************************
@@ -385,7 +395,7 @@ class Kisma extends Components\Seed implements AppConfig
 		//
 		if ( 'cli' == PHP_SAPI || !$this->serviceEnabled( 'twig' ) )
 		{
-//			Utility\Log::trace( 'Twig service disabled by configuration.' );
+			//			Utility\Log::trace( 'Twig service disabled by configuration.' );
 		}
 		else
 		{
@@ -452,7 +462,7 @@ class Kisma extends Components\Seed implements AppConfig
 
 		if ( !$this->serviceEnabled( 'error_handler' ) )
 		{
-//			Utility\Log::trace( 'Error handler service disabled by configuration.' );
+			//			Utility\Log::trace( 'Error handler service disabled by configuration.' );
 		}
 		else
 		{
@@ -504,7 +514,7 @@ class Kisma extends Components\Seed implements AppConfig
 
 		if ( false === ( $_logService = self::app( 'app.config.service.enable.monolog', true ) ) )
 		{
-//			Utility\Log::trace( 'Monolog service disabled by configuration.' );
+			//			Utility\Log::trace( 'Monolog service disabled by configuration.' );
 			return;
 		}
 
@@ -551,6 +561,8 @@ class Kisma extends Components\Seed implements AppConfig
 			self::$_app['monolog']->pushHandler( $_firePhp );
 			Utility\Log::debug( 'FirePHP handler registered.' );
 		}
+
+		self::$_app['app.config.full_log_file_name'] = $_logFileName;
 	}
 
 	/**
@@ -597,7 +609,7 @@ class Kisma extends Components\Seed implements AppConfig
 	{
 		if ( !$this->serviceEnabled( 'auto_discover_controllers' ) )
 		{
-//			Utility\Log::trace( 'Controller discovery disabled by configuration.' );
+			//			Utility\Log::trace( 'Controller discovery disabled by configuration.' );
 			return false;
 		}
 
