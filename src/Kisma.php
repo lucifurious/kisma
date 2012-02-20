@@ -135,8 +135,8 @@ class Kisma extends Components\Seed implements AppConfig
 		//	Trigger the onTerminate event
 		$this->dispatch( Event\ApplicationEvent::Terminate );
 
-		//	Dump metrics
-		self::log( 'Cycle metrics: ' . print_r( self::$_metrics, true ) );
+//		//	Dump metrics
+//		self::log( 'Cycle metrics: ' . print_r( self::$_metrics, true ) );
 	}
 
 	/**
