@@ -6,14 +6,14 @@
  * Dual licensed under the MIT License and the GNU General Public License (GPL) Version 2.
  * See {@link http://github.com/Pogostick/kisma/licensing/} for complete information.
  *
- * @copyright	 Copyright 2011, Pogostick, LLC. (http://www.pogostick.com/)
- * @link		  http://github.com/Pogostick/kisma/ Kisma(tm)
- * @license	   http://github.com/Pogostick/kisma/licensing/
- * @author		Jerry Ablan <kisma@pogostick.com>
- * @category	  Kisma_Aspects_Storage_CouchDb
- * @package	   kisma.aspects.storage
- * @namespace	 \Kisma\Aspects\Storage
- * @since		 v1.0.0
+ * @copyright     Copyright 2011, Pogostick, LLC. (http://www.pogostick.com/)
+ * @link          http://github.com/Pogostick/kisma/ Kisma(tm)
+ * @license       http://github.com/Pogostick/kisma/licensing/
+ * @author        Jerry Ablan <kisma@pogostick.com>
+ * @category      Kisma_Aspects_Storage_CouchDb
+ * @package       kisma.aspects.storage
+ * @namespace     \Kisma\Aspects\Storage
+ * @since         v1.0.0
  * @filesource
  */
 namespace Kisma\Provider\CouchDb;
@@ -108,19 +108,18 @@ class QueueServiceProvider extends SilexServiceProvider
 	 * Get work items from the queue
 	 * The descending param is used to get LIFO (if true) or FIFO (if false) behavior.
 	 *
-	 * @param int  $since
-	 * @param int  $maxItems
-	 * @param bool $useLocks If true, a lock will be added to the queue item
+	 * @param string $ownerId
+	 * @param int    $since
+	 * @param string $queryParams
+	 * @param int    $maxItems
 	 *
 	 * @return array|false
 	 */
-	public function dequeue( $since = 0, $maxItems = self::DefaultMaxItems, $useLocks = false )
+	public function dequeue( $ownerId, $since = 0, $queryParams = array(), $maxItems = self::DefaultMaxItems )
 	{
-		$_queueItems = array();
-
 		Utility\Log::debug( 'Requesting changes...' );
 
-		$_changes = $this->_getFeedChanges( $since );
+		$_changes = $this->_getFeedChanges( $ownerId, $since, $queryParams );
 
 		if ( empty( $_changes ) || !isset( $_changes['results'] ) )
 		{
@@ -128,64 +127,54 @@ class QueueServiceProvider extends SilexServiceProvider
 			return false;
 		}
 
-		//	Build doc array non-locked
-		foreach ( $_changes['results'] as $_message )
-		{
-			//	Add successful lock to work item list
-			$_queueItems[] = array(
-				'seq' => $_message['seq'],
-				'id' => $_message['id'],
-			);
-		}
-
 		//	Return queue item(s)
-		return empty( $_queueItems ) ? false : $_queueItems;
+		return empty( $_changes['results'] ) ? false : $_changes['results'];
 	}
 
 	/**
 	 * Adds a work item to the queue
 	 *
 	 * @param string $ownerId The owner of this queue item
+	 * @param string $accountId User account id
 	 * @param mixed  $feedData Any kind of info you want to pass the dequeuer process
-	 * @param int	$expireTime How long to keep this guy around. -1 = until deleted
+	 * @param int    $expireTime How long to keep this guy around. -1 = until deleted
 	 *
 	 * @return mixed|false The _rev of the saved message, false if unchanged
 	 */
-	public function enqueue( $ownerId, $feedData, $expireTime = -1 )
+	public function enqueue( $ownerId, $accountId, $feedData, $expireTime = -1 )
 	{
 		//	Look up this item
 		$_repo = $this->_dm->getRepository( QueueItem::DocumentName );
-		$_response = $_repo->findOneBy( array( 'ownerId' => $ownerId ) );
+		$_response = $_repo->findOneBy( array( 'ownerId' => $ownerId, 'accountId' => $accountId ) );
 		$_feedUpdate = null;
+		$_queueType = 'raw';
+
+		if ( is_object( $feedData ) )
+		{
+			$_queueType = \Kisma\Utility\Inflector::tag( get_class( $feedData ), true, true );
+		}
 
 		//	New item
 		if ( empty( $_response ) )
 		{
-			$_item = new QueueItem(
-				array(
-					'ownerId' => $ownerId,
-					'queueData' => $feedData,
-					'expireTime' => $expireTime,
-					'providerName' => $this->_providerName,
-				)
-			);
-
-			Utility\Log::debug( 'New queue item: ' . $ownerId );
+			$_item = new QueueItem();
+			$_item->ownerId = $ownerId;
+			$_item->accountId = $accountId;
+			$_item->providerName = $this->_providerName;
+			Utility\Log::debug( 'New queue item (' . $_item->queueType . '): ' . $ownerId );
 		}
 		//	Existing item
 		else
 		{
 			$_item = $_response;
-
 			Utility\Log::debug( 'Found prior queue item, _rev: ' . $_item->version );
-
-			//	Update
-			$_item->ownerId = $ownerId;
-			$_item->queueData = $feedData;
-			$_item->expireTime = $expireTime;
-			$_item->providerName = $this->_providerName;
-			$_item->updated = new \DateTime( 'now' );
 		}
+
+		//	Update
+		$_item->queueType = $_queueType;
+		$_item->queueData = $feedData;
+		$_item->expireTime = $expireTime;
+		$_item->updated = new \DateTime( 'now' );
 
 		//	Write it out and update
 		$this->_dm->save( $_item );
@@ -195,37 +184,18 @@ class QueueServiceProvider extends SilexServiceProvider
 	}
 
 	/**
-	 * Given an $id, based on settings, hash/encrypt/prefix the $id
+	 * @static
+	 * Creates a default generic queue
 	 *
-	 * @param null|string $id
-	 * @param null|string $salt If null, key will NOT be encrypted
+	 * @param array $options
 	 *
-	 * @return string
+	 * @return \Kisma\Provider\CouchDb\QueueServiceProvider
 	 */
-	public function createKey( $id = null, $salt = null )
+	public static function create( $options = array() )
 	{
-		//	Start with the _id
-		$_key = $id ? : ( $this->_queueName . '.' . microtime( true ) );
-
-		//	Encrypt first
-		if ( null !== $salt && false !== $this->_encryptKeys )
-		{
-			$_key = $this->_encryptKey( $salt, $_key );
-		}
-
-		//	Then hash
-		if ( null !== $_key && false !== $this->_hashKeys )
-		{
-			$_key = $this->_hashKey( $_key );
-		}
-
-		if ( null !== $this->_keyPrefix )
-		{
-			$_key = $this->_keyPrefix . ':' . $_key;
-		}
-
-		//	Return the new key!
-		return $_key;
+		$_queueService = new CouchDb\QueueServiceProvider( $options );
+		K::app()->register( $_queueService );
+		return $_queueService;
 	}
 
 	//*************************************************************************
@@ -269,19 +239,30 @@ class QueueServiceProvider extends SilexServiceProvider
 	/**
 	 * Pulls a changes feed for this queue
 	 *
-	 * @param int		$since
-	 * @param array|null $params
+	 * @param string     $ownerId
+	 * @param int        $since
+	 * @param array      $query
+	 * @param string     $params
 	 *
 	 * @return array
 	 * @throws \Doctrine\CouchDB\HTTP\HTTPException
 	 */
-	protected function _getFeedChanges( $since = 0, array $params = null )
+	protected function _getFeedChanges( $ownerId, $since = 0, $query = array(), $params = null )
 	{
 		$_client = $this->_dm->getCouchDBClient();
 
-		$_path = '/' . $_client->getDatabase() . '/_changes?filter=' . $_client->getDatabase() . '/queue';
-		$_path .= '&providerName=' . $this->_providerName;
-		$_path .= '&since=' . $since;
+		$_path = '/' . $_client->getDatabase() . '/_changes?';
+
+		if ( empty( $query ) )
+		{
+			$query = array();
+		}
+
+		$query['owner_id'] = $ownerId;
+		$query['providerName'] = $this->_providerName;
+		$query['since'] = $since;
+
+		$_path .= http_build_query( $query ) . '&filter=' . $_client->getDatabase() . '/queue';
 
 		$_response = $_client->getHttpClient()->request( 'GET', $_path, $params );
 

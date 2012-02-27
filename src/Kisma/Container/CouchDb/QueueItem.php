@@ -23,10 +23,14 @@ use Kisma\Utility;
  * QueueItem
  * A queue item. Nothing more than a subclass that sets some standard queue item properties
  *
- * @Document
+ * @Document @Index
  *
+ * @property string $ownerId
+ * @property string $accountId
+ * @property string $providerName
+ * @property string $updated
  * @property mixed $queueData
- * @property mixed $locked
+ * @property bool $locked
  */
 class QueueItem extends \Kisma\Container\CouchDb\Document
 {
@@ -44,6 +48,31 @@ class QueueItem extends \Kisma\Container\CouchDb\Document
 	//*************************************************************************
 
 	/**
+	 * @Field @Index
+	 * @var string|null
+	 */
+	public $ownerId = null;
+	/**
+	 * @Field @Index
+	 * @var string|null
+	 */
+	public $accountId = null;
+	/**
+	 * @Field @Index
+	 * @var string|null
+	 */
+	public $providerName = null;
+	/**
+	 * @Field(type="datetime")
+	 * @var \DateTime
+	 */
+	public $updated = null;
+	/**
+	 * @Field @Index
+	 * @var string
+	 */
+	public $queueType = 'raw';
+	/**
 	 * @Field(type="mixed")
 	 */
 	public $queueData = null;
@@ -51,22 +80,5 @@ class QueueItem extends \Kisma\Container\CouchDb\Document
 	 * @Field(type="boolean")
 	 */
 	public $locked = false;
-	/**
-	 * @Index
-	 * @Field(type="string")
-	 * @var string|null
-	 */
-	public $ownerId = null;
-	/**
-	 * @Index
-	 * @Field(type="string")
-	 * @var string|null
-	 */
-	public $providerName = null;
-	/**
-	 * @var \DateTime
-	 * @Field(type="datetime")
-	 */
-	public $updated = null;
 
 }

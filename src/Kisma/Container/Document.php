@@ -66,6 +66,78 @@ abstract class Document extends \Kisma\Components\Seed implements \Kisma\IContai
 		parent::__construct( $options );
 	}
 
+	/**
+	 * A generic mapping method
+	 *
+	 * @param array[] $map
+	 * @param string  $source
+	 * @param string  $mappedId
+	 * @param bool	$singleValue
+	 *
+	 * @param bool	$singleValue
+	 *
+	 * @return \Kisma\Container\Document
+	 */
+	public function mapValue( &$map, $source, $mappedId = null, $singleValue = false )
+	{
+		//	make sure it's an array
+		if ( empty( $map ) )
+		{
+			$map = array();
+		}
+
+		//	Make sure source array is there
+		if ( !isset( $map[$source] ) )
+		{
+			$map[$source] = $singleValue ? null : array();
+		}
+
+		if ( !$singleValue )
+		{
+			//	Remove mapping?
+			if ( null === $mappedId && false !== ( $_key = array_search( $mappedId, $map[$source] ) ) )
+			{
+				unset( $map[$source][$_key] );
+			}
+			//	Add mapping
+			else if ( !in_array( $mappedId, $map[$source] ) )
+			{
+				array_push( $map[$source], $mappedId );
+			}
+		}
+		else
+		{
+			if ( null === $mappedId )
+			{
+				unset( $map[$source] );
+			}
+			else
+			{
+				$map[$source] = $mappedId;
+			}
+		}
+
+		return $this;
+	}
+
+	/**
+	 * A generic mapping method
+	 *
+	 * @param array[] $map
+	 * @param string  $source
+	 * @param string  $mappedId
+	 *
+	 * @return \Kisma\Container\Document
+	 */
+	public function isMapped( &$map, $source, $mappedId = null, $singleValue = false )
+	{
+		return
+			//	No id, true if there is a mapping in general
+			( null === $mappedId && isset( $map, $map[$source] ) ) ||
+			//	No id, true if there is a mapping in general
+			( null !== $mappedId && isset( $map, $map[$source] ) && $map[$source] == $mappedId );
+	}
+
 	//*************************************************************************
 	//* Properties
 	//*************************************************************************

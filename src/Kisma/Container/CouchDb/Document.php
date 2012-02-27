@@ -72,6 +72,10 @@ abstract class Document extends \Kisma\Container\Document
 	 * @var string The name of this document's database
 	 */
 	protected $_databaseName = null;
+	/**
+	 * @var bool
+	 */
+	protected $_newDocument = true;
 
 	//*************************************************************************
 	//* Event Handlers
@@ -113,6 +117,8 @@ abstract class Document extends \Kisma\Container\Document
 	 */
 	public function onFlush( \Doctrine\ODM\CouchDB\Event\OnFlushEventArgs $events )
 	{
+		//	Not a new record
+		$this->_newDocument = false;
 	}
 
 	/**
@@ -120,6 +126,8 @@ abstract class Document extends \Kisma\Container\Document
 	 */
 	public function postLoad( \Doctrine\ODM\CouchDB\Event\LifecycleEventArgs $events )
 	{
+		//	Not a new record
+		$this->_newDocument = false;
 	}
 
 	/**
@@ -134,6 +142,8 @@ abstract class Document extends \Kisma\Container\Document
 	 */
 	public function postUpdate( \Doctrine\ODM\CouchDB\Event\LifecycleEventArgs $events )
 	{
+		//	Not a new record
+		$this->_newDocument = false;
 	}
 
 	/**
@@ -185,5 +195,24 @@ abstract class Document extends \Kisma\Container\Document
 	public function getDatabaseName()
 	{
 		return $this->_databaseName;
+	}
+
+	/**
+	 * @param boolean $newDocument
+	 *
+	 * @return \Kisma\Container\CouchDb\Document
+	 */
+	public function setNewDocument( $newDocument )
+	{
+		$this->_newDocument = $newDocument;
+		return $this;
+	}
+
+	/**
+	 * @return boolean
+	 */
+	public function getNewDocument()
+	{
+		return $this->_newDocument;
 	}
 }

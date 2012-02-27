@@ -122,9 +122,9 @@ class Kisma extends Components\Seed implements AppConfig
 
 		$_endTime = microtime( true );
 
-		Utility\Log::trace(
-			'Kisma operational velocity achieved in ' . number_format( $_endTime - $_startTime, 4 ) . 's'
-		);
+//		Utility\Log::trace(
+//			'Kisma operational velocity achieved in ' . number_format( $_endTime - $_startTime, 4 ) . 's'
+//		);
 	}
 
 	/**

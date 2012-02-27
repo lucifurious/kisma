@@ -113,7 +113,6 @@ abstract class Controller extends Seed implements \Silex\ControllerProviderInter
 					);
 
 					return $_result;
-
 				}
 			);
 		}

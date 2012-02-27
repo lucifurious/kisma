@@ -20,32 +20,35 @@
 namespace Kisma\Utility;
 
 //*************************************************************************
-//* Aliases 
+//* Aliases
 //*************************************************************************
 
 use Kisma\Kisma;
+use Kisma\Components\Seed;
+use Kisma\IUtility;
 
 //*************************************************************************
-//* Requirements 
+//* Requirements
 //*************************************************************************
 
 /**
  * Render
  */
-class Render extends \Kisma\Components\Seed implements \Kisma\IUtility
+class Render extends Seed implements IUtility
 {
 	//*************************************************************************
-	//* Public Methods 
+	//* Public Methods
 	//*************************************************************************
 
 	/**
 	 * Render a bootstrap template
+	 *
 	 * @param array $payload
 	 */
 	public static function bootstrap( $payload = array() )
 	{
 		$_template = Option::o( $payload, 'template', '_bootstrap_container.twig' );
-		\Kisma\Kisma::app()->render( $_template, $payload );
+		Kisma::app()->render( $_template, $payload );
 	}
 
 }

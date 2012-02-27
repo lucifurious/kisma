@@ -7,20 +7,20 @@
  * Dual licensed under the MIT License and the GNU General Public License (GPL) Version 2.
  * See {@link http://github.com/Pogostick/kisma/licensing/} for complete information.
  *
- * @copyright	 Copyright 2011, Pogostick, LLC. (http://www.pogostick.com/)
- * @link		  http://github.com/Pogostick/kisma/ Kisma(tm)
- * @license	   http://github.com/Pogostick/kisma/licensing/
- * @author		Jerry Ablan <kisma@pogostick.com>
- * @category	  Kisma_Utility
- * @package	   kisma.utility
- * @namespace	 \Kisma\Utility
- * @since		 v1.0.0
+ * @copyright     Copyright 2011, Pogostick, LLC. (http://www.pogostick.com/)
+ * @link          http://github.com/Pogostick/kisma/ Kisma(tm)
+ * @license       http://github.com/Pogostick/kisma/licensing/
+ * @author        Jerry Ablan <kisma@pogostick.com>
+ * @category      Kisma_Utility
+ * @package       kisma.utility
+ * @namespace     \Kisma\Utility
+ * @since         v1.0.0
  * @filesource
  */
 
 namespace Kisma\Utility;
 
-use Kisma\Kisma;
+use Kisma\Kisma as K;
 
 /**
  * Scalar
@@ -33,7 +33,7 @@ class Scalar implements \Kisma\IUtility
 	 *
 	 * @static
 	 *
-	 * @param mixed $possibleArray
+	 * @param mixed      $possibleArray
 	 * @param mixed|null $_ [optional]
 	 *
 	 * @return bool
@@ -155,7 +155,7 @@ class Scalar implements \Kisma\IUtility
 	 * @param string $haystack
 	 * @param string $needle
 	 * @param bool   $caseSensitive
-	 * @param int	$offset
+	 * @param int    $offset
 	 *
 	 * @return bool
 	 */
@@ -201,8 +201,8 @@ class Scalar implements \Kisma\IUtility
 	 * You can pass in an array of key value pairs and do many at once.
 	 *
 	 * @param \stdClass|array $options
-	 * @param string		  $key
-	 * @param mixed		   $value
+	 * @param string          $key
+	 * @param mixed           $value
 	 *
 	 * @return bool
 	 */
@@ -245,5 +245,4 @@ class Scalar implements \Kisma\IUtility
 		//	Sorry charlie...
 		return false;
 	}
-
 }

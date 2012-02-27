@@ -28,7 +28,7 @@ use Kisma\Event\ModelEvent;
 /**
  * Model
  */
-abstract class Model extends Seed implements \Kisma\IModel
+abstract class Model extends \Kisma\Container\CouchDb\Document implements \Kisma\IModel
 {
 	//*************************************************************************
 	//* Private Members 
@@ -38,10 +38,6 @@ abstract class Model extends Seed implements \Kisma\IModel
 	 * @var array
 	 */
 	protected $_validationErrors = array();
-	/**
-	 * @var array
-	 */
-	protected $_fields = array();
 
 	//*************************************************************************
 	//* Public Methods 
@@ -154,89 +150,6 @@ abstract class Model extends Seed implements \Kisma\IModel
 	}
 
 	/**
-	 * Returns all field values
-	 *
-	 * @param array $fields
-	 *
-	 * @return array
-	 */
-	public function getValues( $fields = array() )
-	{
-		if ( !is_array( $fields ) )
-		{
-			$fields = array( $fields );
-		}
-
-		$_result = array();
-
-		if ( empty( $fields ) )
-		{
-			$fields = $this->_fields;
-		}
-
-		foreach ( $fields as $_field )
-		{
-			$_result[$_field] = $this->{$_field};
-		}
-
-		return $_result;
-	}
-
-	/**
-	 * Sets a field value or multiple if array provided
-	 *
-	 * @param array $fields
-	 * @param null  $value
-	 */
-	public function setValue( $fields = array(), $value = null )
-	{
-		$_fields = $fields;
-
-		if ( !is_array( $fields ) && null !== $value )
-		{
-			$_fields = array( (string)$fields => $value );
-		}
-
-		if ( empty( $_fields ) )
-		{
-			$_fields = $this->_fields;
-		}
-
-		foreach ( $_fields as $_field => $_value )
-		{
-			if ( isset( $this->_fields[$_field] ) )
-			{
-				$this->{$_field} = $_value;
-			}
-		}
-	}
-
-	/**
-	 * Clears a field value or values if array given
-	 *
-	 * @param array $fields
-	 */
-	public function unsetValue( $fields = array() )
-	{
-		$_fields = $fields;
-
-		if ( !is_array( $fields ) )
-		{
-			$_fields = array( $fields );
-		}
-
-		if ( empty( $_fields ) )
-		{
-			$_fields = $this->_fields;
-		}
-
-		foreach ( $_fields as $_field )
-		{
-			unset( $this->{$_field} );
-		}
-	}
-
-	/**
 	 * @param mixed $offset
 	 *
 	 * @return bool
@@ -301,28 +214,6 @@ abstract class Model extends Seed implements \Kisma\IModel
 	public function onBeforeValidate( \Kisma\Event\ModelEvent $event )
 	{
 		return true;
-	}
-
-	//*************************************************************************
-	//* Properties
-	//*************************************************************************
-
-	/**
-	 * @param array $fields
-	 * @return \Kisma\Components\Model
-	 */
-	public function setFields( $fields )
-	{
-		$this->_fields = $fields;
-		return $this;
-	}
-
-	/**
-	 * @return array
-	 */
-	public function getFields()
-	{
-		return $this->_fields;
 	}
 
 }
