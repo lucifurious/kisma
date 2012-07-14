@@ -158,8 +158,6 @@
           <content-type name="PL/SQL" enabled="true" />
           <content-type name="JavaScript" enabled="true" />
           <content-type name="PHP" enabled="true" />
-          <content-type name="JSP" enabled="true" />
-          <content-type name="JSPx" enabled="true" />
           <content-type name="YAML" enabled="true" />
           <content-type name="Bash" enabled="true" />
         </content-types>
@@ -229,7 +227,7 @@
             <filter-element type="OBJECT" id="dblink" selected="true" />
           </any-schema>
         </basic-filter>
-        <smart-filter>
+        <extended-filter>
           <filter-element type="RESERVED_WORD" id="keyword" selected="true" />
           <filter-element type="RESERVED_WORD" id="function" selected="true" />
           <filter-element type="RESERVED_WORD" id="parameter" selected="true" />
@@ -287,7 +285,7 @@
             <filter-element type="OBJECT" id="cluster" selected="true" />
             <filter-element type="OBJECT" id="dblink" selected="true" />
           </any-schema>
-        </smart-filter>
+        </extended-filter>
       </filters>
       <sorting enabled="true">
         <sorting-element type="RESERVED_WORD" id="keyword" />
@@ -350,5 +348,6 @@
     <default-html-doctype>http://www.w3.org/1999/xhtml</default-html-doctype>
   </component>
   <component name="ProjectRootManager" version="2" />
+  <component name="RegexUtilComponent" text="1900-01-01 2007/08/13 1900.01.01 1900 01 01 1900-01.01 1900 13 01 1900 02 31" flags="0" regex="(19|20)\d\d([- /.])(0[1-9]|1[012])\2(0[1-9]|[12][0-9]|3[01])" mode="0" />
 </project>
 

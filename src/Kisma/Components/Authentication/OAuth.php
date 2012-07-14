@@ -2,15 +2,15 @@
 /**
  * OAuth.php
  *
- * Kisma(tm) : PHP Nanoframework (http://github.com/Pogostick/kisma/)
+ * Kisma(tm) : PHP Nanoframework (http://github.com/lucifurious/kisma/)
  * Copyright 2011, Pogostick, LLC. (http://www.pogostick.com/)
  *
  * Dual licensed under the MIT License and the GNU General Public License (GPL) Version 2.
- * See {@link http://github.com/Pogostick/kisma/licensing/} for complete information.
+ * See {@link http://github.com/lucifurious/kisma/licensing/} for complete information.
  *
  * @copyright	 Copyright 2011, Pogostick, LLC. (http://www.pogostick.com/)
- * @link		  http://github.com/Pogostick/kisma/ Kisma(tm)
- * @license	   http://github.com/Pogostick/kisma/licensing/
+ * @link		  http://github.com/lucifurious/kisma/ Kisma(tm)
+ * @license	   http://github.com/lucifurious/kisma/licensing/
  * @author		Jerry Ablan <kisma@pogostick.com>
  * @category	  Kisma_Services_Authentication
  * @package	   kisma.services.authentication
@@ -329,4 +329,4 @@ abstract class OAuth extends \Kisma\Components\Service
 		return $this->_scopes;
 	}
 }
-	
+

@@ -3,11 +3,11 @@
  * @file
  * A base class for Kisma models
  *
- * Kisma(tm) : PHP Nanoframework (http://github.com/Pogostick/kisma/)
- * Copyright 2009-2011, Jerry Ablan/Pogostick, LLC., All Rights Reserved
+ * Kisma(tm) : PHP Nanoframework (http://github.com/lucifurious/kisma/)
+ * Copyright 2009-2011, Jerry Ablan, All Rights Reserved
  *
- * @copyright Copyright (c) 2009-2011 Jerry Ablan/Pogostick, LLC.
- * @license http://github.com/Pogostick/Kisma/blob/master/LICENSE
+ * @copyright Copyright (c) 2009-2011 Jerry Ablan
+ * @license http://github.com/lucifurious/kisma/blob/master/LICENSE
  *
  * @author Jerry Ablan <kisma@pogostick.com>
  * @category Framework
@@ -31,7 +31,7 @@ use Kisma\Event\ModelEvent;
 abstract class Model extends \Kisma\Container\CouchDb\Document implements \Kisma\IModel
 {
 	//*************************************************************************
-	//* Private Members 
+	//* Private Members
 	//*************************************************************************
 
 	/**
@@ -40,7 +40,7 @@ abstract class Model extends \Kisma\Container\CouchDb\Document implements \Kisma
 	protected $_validationErrors = array();
 
 	//*************************************************************************
-	//* Public Methods 
+	//* Public Methods
 	//*************************************************************************
 
 	/**

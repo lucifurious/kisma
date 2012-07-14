@@ -3,11 +3,11 @@
  * @file
  * Provides ...
  *
- * Kisma(tm) : PHP Nanoframework (http://github.com/Pogostick/kisma/)
- * Copyright 2009-2011, Jerry Ablan/Pogostick, LLC., All Rights Reserved
+ * Kisma(tm) : PHP Nanoframework (http://github.com/lucifurious/kisma/)
+ * Copyright 2009-2011, Jerry Ablan, All Rights Reserved
  *
- * @copyright Copyright (c) 2009-2011 Jerry Ablan/Pogostick, LLC.
- * @license http://github.com/Pogostick/Kisma/blob/master/LICENSE
+ * @copyright Copyright (c) 2009-2011 Jerry Ablan
+ * @license http://github.com/lucifurious/kisma/blob/master/LICENSE
  *
  * @author Jerry Ablan <kisma@pogostick.com>
  * @category Framework
@@ -20,7 +20,7 @@
 namespace Kisma\Provider;
 
 //*************************************************************************
-//* Aliases 
+//* Aliases
 //*************************************************************************
 
 use Kisma\Kisma;
@@ -28,7 +28,7 @@ use Kisma\Utility;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 //*************************************************************************
-//* Requirements 
+//* Requirements
 //*************************************************************************
 
 /**
@@ -37,11 +37,11 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 class RenderServiceProvider extends SilexServiceProvider
 {
 	//*************************************************************************
-	//* Class Constants 
+	//* Class Constants
 	//*************************************************************************
 
 	//*************************************************************************
-	//* Private Members 
+	//* Private Members
 	//*************************************************************************
 
 	/**
@@ -50,11 +50,11 @@ class RenderServiceProvider extends SilexServiceProvider
 	protected $_renderMap = array();
 
 	//*************************************************************************
-	//* Public Methods 
+	//* Public Methods
 	//*************************************************************************
 
 	//*************************************************************************
-	//* Private Methods 
+	//* Private Methods
 	//*************************************************************************
 
 	//*************************************************************************

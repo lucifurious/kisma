@@ -3,11 +3,11 @@
  * @file
  * Provides ...
  *
- * Kisma(tm) : PHP Nanoframework (http://github.com/Pogostick/kisma/)
- * Copyright 2009-2011, Jerry Ablan/Pogostick, LLC., All Rights Reserved
+ * Kisma(tm) : PHP Nanoframework (http://github.com/lucifurious/kisma/)
+ * Copyright 2009-2011, Jerry Ablan, All Rights Reserved
  *
- * @copyright Copyright (c) 2009-2011 Jerry Ablan/Pogostick, LLC.
- * @license http://github.com/Pogostick/Kisma/blob/master/LICENSE
+ * @copyright Copyright (c) 2009-2011 Jerry Ablan
+ * @license http://github.com/lucifurious/kisma/blob/master/LICENSE
  *
  * @author Jerry Ablan <kisma@pogostick.com>
  * @category Framework
@@ -20,7 +20,7 @@
 namespace Kisma\Provider\CouchDb;
 
 //*************************************************************************
-//* Aliases 
+//* Aliases
 //*************************************************************************
 
 use Kisma\Container\CouchDb\Session;
