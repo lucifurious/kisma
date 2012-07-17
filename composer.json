@@ -1,30 +1,42 @@
 {
-	name        : "Pogostick/Kisma",
-	description : "PHP Nanoframework",
-	keywords    :
-		[
-			"php framework rest psr-0 5.3"
-		],
-	homepage    : "https://github.com/Pogostick/Kisma",
-	type        : "library",
-	license     : "MIT",
-	authors     :
-		[
-			{
-				name     : "Jerry Ablan",
-				email    : "kisma@pogostick.com",
-				homepage : "http://pogostick.com/"
-			}
-		],
-	require     : {
-		php : ">=5.3.0"
+	"name":         "kisma/kisma",
+	"description":  "PHP Fun-Size Framework",
+	"keywords":     [
+		"php", "php5", "rest", "mvc", "framework"
+	],
+	"homepage":     "https://github.com/lucifurious/kisma",
+	"type":         "library",
+	"license":      "MIT",
+	"authors":      [
+		{
+			"name":  "Jerry Ablan",
+			"email": "jerryablan@gmail.com"
+		}
+	],
+	"require":      {
+		"monolog/monolog": "1.*",
+		"twig/twig":       "1.*",
+		"twig/extensions": "dev-master"
 	},
-	suggest     : {
-		ext-curl: "*"
-},
-autoload: {
-psr-0: {
-Kisma: "lib/"
-}
-}
+	"repositories": [
+		{
+			"type":    "package",
+			"package": {
+				"name":        "twitter/bootstrap",
+				"description": "twitter bootstrap",
+				"version":     "dev-master",
+				"dist":        {
+					"url":  "http://twitter.github.com/bootstrap/assets/bootstrap.zip",
+					"type": "zip"
+				}
+			}
+		}
+	],
+	"autoload":     {
+		"psr-0": {
+			"Monolog":          "src/",
+			"Twig_":            "lib/",
+			"Twig_Extensions_": "lib/"
+		}
+	}
 }

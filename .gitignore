@@ -1,8 +1,5 @@
+*/*.log/*
 kisma.log
 examples/blog/app/cache/
 .gitignore
-build/certs/
-vendor.old
-vendor.old/doctrine-common
-vendor/silex.original/
-vendor/ckeditor/
+vendor

@@ -1,22 +1,19 @@
 <?php
 /**
- * @file
- *            The Kisma(tm) Framework bootstrap loader
+ * Kisma.php
+ * The Kisma(tm) Fun-Size Framework bootstrap loader
  *
  * Kisma(tm) : PHP Fun-Size Framework (http://github.com/lucifurious/kisma/)
- * Copyright 2009-2012, Jerry Ablan, All Rights Reserved
  *
- * @copyright Copyright (c) 2009-2011 Jerry Ablan
- * @license   http://github.com/lucifurious/kisma/blob/master/LICENSE
- * @author    Jerry Ablan <kisma@pogostick.com>
+ * @copyright Copyright (c) 2009-2012 Jerry Ablan
+ * @license   MIT (http://github.com/lucifurious/kisma/blob/master/LICENSE)
+ * @author    Jerry Ablan <get.kisma@gmail.com>
  */
+namespace Kisma;
 
 require_once __DIR__ . '/Kisma/enums.php';
 require_once __DIR__ . '/Kisma/Components/Seed.php';
-
-use Kisma\Utility\Option;
-
-use Symfony\Component\ClassLoader\UniversalClassLoader;
+require_once __DIR__ . '/Kisma/Utility/Option.php';
 
 /**
  * The Kisma bootstrap loader
@@ -30,7 +27,7 @@ class Kisma
 	//*************************************************************************
 
 	/**
-	 * @var \Symfony\Component\ClassLoader\UniversalClassLoader
+	 * @var \Composer\Autoload\ClassLoader
 	 */
 	protected static $_autoLoader = null;
 	/**
@@ -41,76 +38,67 @@ class Kisma
 	 * @var array The library configuration options
 	 */
 	protected static $_options = array();
+	/**
+	 * @var bool True if Kisma has been initialized
+	 */
+	protected static $_conception = false;
 
 	//**************************************************************************
 	//* Public Methods
 	//**************************************************************************
 
 	/**
-	 * @static
+	 * Plant the seed of life into Kisma!
 	 *
 	 * @param array $options
+	 *
+	 * @return bool
 	 */
-	public static function initialize( $options = array() )
+	public static function conceive( $options = array() )
 	{
-		static $_initialized = false;
-
-		if ( false === $_initialized )
+		if ( false === self::$_conception || empty( self::$_autoLoader ) )
 		{
 			/**
 			 * Set up the autoloader
 			 */
-			self::$_autoLoader = new UniversalClassLoader();
-			self::$_autoLoader->register( true );
-			self::$_autoLoader->useIncludePath( true );
+			self::$_autoLoader = require( dirname( __DIR__ ) . '/vendor/autoload.php' );
+
+			if ( is_callable( $options ) )
+			{
+				$options = call_user_func( $options );
+			}
+
+			//	Set any application-level options passed in
+			self::$_options = \Kisma\Utility\Option::merge( self::$_options, $options );
 
 			//	We done baby!
-			$_initialized = true;
+			self::$_conception = true;
 		}
+
+		return self::$_conception;
 	}
 
 	/**
-	 * Registers a namespace.
+	 * @param string $key
+	 * @param mixed  $value
 	 *
-	 * @param string       $namespace The namespace
-	 * @param array|string $paths     The location(s) of the namespace
+	 * @return mixed
 	 */
-	public static function registerNamespace( $namespace, $paths )
+	public static function set( $key, $value = null )
 	{
-		self::initialize();
-		self::$_autoLoader->registerNamespace( $namespace, $paths );
+		return \Kisma\Utility\Option::set( self::$_options, $key, $value );
 	}
 
 	/**
-	 * Registers a set of classes using the PEAR naming convention.
+	 * @param string $key
+	 * @param mixed  $defaultValue
+	 * @param bool   $removeIfFound
 	 *
-	 * @param string       $prefix  The classes prefix
-	 * @param array|string $paths   The location(s) of the classes
+	 * @return mixed
 	 */
-	public static function registerPrefix( $prefix, $paths )
+	public static function get( $key, $defaultValue = null, $removeIfFound = false )
 	{
-		self::initialize();
-		self::$_autoLoader->registerPrefix( $prefix, $paths );
-	}
-
-	/**
-	 * @static
-	 *
-	 * @param string $message
-	 * @param int    $logLevel
-	 *
-	 * @param array  $context
-	 *
-	 * @return bool
-	 */
-	public static function log( $message, $logLevel = \CIS\Utility\Lumberjack::Info, $context = array() )
-	{
-//		if ( !self::$_lumberjack )
-//		{
-//			self::initialize();
-//		}
-//
-//		return self::$_lumberjack->log( $message, $logLevel, $context );
+		return \Kisma\Utility\Option::get( self::$_options, $key, $defaultValue, $removeIfFound );
 	}
 
 	//*************************************************************************
@@ -118,7 +106,7 @@ class Kisma
 	//*************************************************************************
 
 	/**
-	 * @return null|\Symfony\Component\ClassLoader\UniversalClassLoader
+	 * @return null|\Composer\Autoload\ClassLoader
 	 */
 	public static function getAutoLoader()
 	{
@@ -142,17 +130,6 @@ class Kisma
 	}
 
 	/**
-	 * @param string $key
-	 * @param mixed  $value
-	 *
-	 * @return mixed
-	 */
-	public static function setOption( $key, $value = null )
-	{
-		return Option::set( self::$_options, $key, $value );
-	}
-
-	/**
 	 * @return array
 	 */
 	public static function getOptions()
@@ -160,15 +137,4 @@ class Kisma
 		return self::$_options;
 	}
 
-	/**
-	 * @param string $key
-	 * @param mixed  $defaultValue
-	 * @param bool   $removeIfFound
-	 *
-	 * @return mixed
-	 */
-	public static function getOption( $key, $defaultValue = null, $removeIfFound = false )
-	{
-		return Option::get( self::$_options, $key, $defaultValue, $removeIfFound );
-	}
 }
