@@ -3,7 +3,7 @@
  * @file
  * Provides a base for testing
  *
- * Kisma(tm) : PHP Nanoframework (http://github.com/lucifurious/kisma/)
+ * Kisma(tm) : PHP Fun-Size Framework (http://github.com/lucifurious/kisma/)
  * Copyright 2009-2011, Jerry Ablan, All Rights Reserved
  *
  * @copyright Copyright (c) 2009-2011 Jerry Ablan

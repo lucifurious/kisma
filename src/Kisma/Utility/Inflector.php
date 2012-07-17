@@ -3,7 +3,7 @@
  * @file
  * Provides Inflector manipulation utilities
  *
- * Kisma(tm) : PHP Nanoframework (http://github.com/lucifurious/kisma/)
+ * Kisma(tm) : PHP Fun-Size Framework (http://github.com/lucifurious/kisma/)
  * Copyright 2009-2011, Jerry Ablan, All Rights Reserved
  *
  * @copyright Copyright (c) 2009-2011 Jerry Ablan
@@ -33,7 +33,7 @@ class Inflector implements \Kisma\IUtility
 	 * Given a Kisma identifier, return it to neutral format (lowercase, period and underscores)
 	 *
 	 * Examples:
-	 *	   Class Name:			\Kisma\Components\ComponentEvent becomes "kisma.components.component_event"
+	 *	   Class Name:			\Kisma\Components\ObjectEvent becomes "kisma.components.component_event"
 	 *
 	 * @param string $tag
 	 *

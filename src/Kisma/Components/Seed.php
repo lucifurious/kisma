@@ -3,7 +3,7 @@
  * @file
  * Provides a base for Kisma components and objects
  *
- * Kisma(tm) : PHP Nanoframework (http://github.com/lucifurious/kisma/)
+ * Kisma(tm) : PHP Fun-Size Framework (http://github.com/lucifurious/kisma/)
  * Copyright 2009-2011, Jerry Ablan, All Rights Reserved
  *
  * @copyright Copyright (c) 2009-2011 Jerry Ablan
@@ -91,7 +91,7 @@ abstract class Seed implements \Kisma\IKisma, \Kisma\IConfigurable, \Countable, 
 		Utility\Events::subscribe( $this );
 
 		//	Fire the initialize event
-		$this->dispatch( Event\ComponentEvent::AfterConstruct );
+		$this->dispatch( Event\ObjectEvent::AfterConstruct );
 
 		//	Store metrics
 		self::$_metrics[__METHOD__] = microtime( true ) - $_startTime;
@@ -103,7 +103,7 @@ abstract class Seed implements \Kisma\IKisma, \Kisma\IConfigurable, \Countable, 
 	public function __destruct()
 	{
 		//	Fire the initialize event
-		$this->dispatch( Event\ComponentEvent::BeforeDestruct );
+		$this->dispatch( Event\ObjectEvent::BeforeDestruct );
 	}
 
 	/**
@@ -132,7 +132,7 @@ abstract class Seed implements \Kisma\IKisma, \Kisma\IConfigurable, \Countable, 
 	 */
 	public function dispatch( $eventName, $event = null )
 	{
-		\Kisma\K::app( 'dispatcher' )->dispatch( $eventName, $event ? : new \Kisma\Event\ComponentEvent( $this ) );
+		\Kisma\K::app( 'dispatcher' )->dispatch( $eventName, $event ? : new \Kisma\Components\ObjectEvent( $this ) );
 	}
 
 	/**
