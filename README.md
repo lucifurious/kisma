@@ -1,4 +1,4 @@
-![](http://github.com/lucifurious/kisma/raw/master/assets/kisma-logo-64x64.png)
+![](https://github.com/lucifurious/kisma/raw/master/assets/kisma-logo-64x64.png)
 
 Kisma! The Fun-Size Framework
 =============================
