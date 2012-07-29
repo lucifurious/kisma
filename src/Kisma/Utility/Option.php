@@ -136,15 +136,27 @@ class Option
 	}
 
 	/**
-	 * @param array  $options
-	 * @param string $key
-	 * @param mixed  $value
+	 * @param array        $options
+	 * @param string|array $key
+	 * @param mixed        $value
 	 *
 	 * @return mixed
 	 */
 	public static function set( &$options = array(), $key, $value = null )
 	{
-		return self::so( $options, $key, $value );
+		if ( is_array( $key ) && null === $value )
+		{
+			$_new = $key;
+		}
+		else
+		{
+			$_new = array( $key => $value );
+		}
+
+		foreach ( $_new as $_key => $_value )
+		{
+			self::so( $options, $_key, $_value );
+		}
 	}
 
 	/**

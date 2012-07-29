@@ -90,14 +90,19 @@ class Kisma
 	}
 
 	/**
-	 * @param string $key
+	 * @param string $key If you pass in a null, you'll get an array of all keys in return.
 	 * @param mixed  $defaultValue
 	 * @param bool   $removeIfFound
 	 *
-	 * @return mixed
+	 * @return mixed|array
 	 */
 	public static function get( $key, $defaultValue = null, $removeIfFound = false )
 	{
+		if ( null === $key )
+		{
+			return self::$_options;
+		}
+
 		return \Kisma\Utility\Option::get( self::$_options, $key, $defaultValue, $removeIfFound );
 	}
 

@@ -10,32 +10,24 @@
  */
 namespace Kisma\Core;
 
-use Kisma\Utility\EventManager;
-
 /**
  * Seed
  * A nugget of goodness that grows into something wonderful
  *
- * Seed implements a protocol of defining properties and events.
+ * Seed provides two services for a class. You're free to use it or not. Never required.
  *
- * A property is defined by a getter method, and/or a setter method.
- * Properties can be accessed in the way like accessing normal object members.
- * Reading or writing a property will cause the invocation of the corresponding
- * getter or setter method, e.g
- * <pre>
- * $_a = $_object->text;    // equivalent to $_a = $_object->getText();
- * $_object->text = 'abc';    // equivalent to $_object->setText( 'abc' );
- * </pre>
+ * Attribute Storage
+ * =================
+ * The first service is attribute storage. A seed can have pre-defined and late-bound
+ * attributes simply by calling the object's set() method.
  *
- * The signature of getter and setter methods is as follows,
+ * Conversely, getting an attribute value is done by calling get().
  *
- * <pre>
- * //    Getter method defines a readable property
- * public function getText() { ... }
+ * You can pass an array of attributes to the constructor to have them set for you. Otherwise you must call set()
  *
- * //    Setter method defines a writable property with $value to be set to the property
- * public function setText( $value ) { ... }
- * </pre>
+ * Publish/Subscribe
+ * =================
+ * The second is a publish/subscribe service. Yeah, fancy name for event system.
  *
  * An event is defined by the presence of a method whose name starts with 'on'.
  * The event name is the method name. When an event is triggered, event handlers attached
@@ -70,7 +62,12 @@ use Kisma\Utility\EventManager;
  * Unless otherwise specified, the object will automatically search for and
  * attach any event handlers that exist in your object.
  *
- * To disable this feature, set 'autoAttachEvents' to false during construction
+ * To disable this feature, set the 'autoAttachEvents' attribute to false during construction
+ *
+ * Built-in Attributes
+ * ===================
+ *
+ * @property bool $autoAttachEvents
  */
 abstract class Seed implements \Kisma\Core\Interfaces\SeedEvents
 {
@@ -83,7 +80,7 @@ abstract class Seed implements \Kisma\Core\Interfaces\SeedEvents
 	 */
 	private $_seedId = null;
 	/**
-	 * @var array|mixed The place where this objects data is stored
+	 * @var array|mixed Object attributes storage. Set to false to disable feature
 	 */
 	protected $_storage = array();
 
@@ -94,15 +91,15 @@ abstract class Seed implements \Kisma\Core\Interfaces\SeedEvents
 	/**
 	 * Base constructor
 	 *
-	 * @param array|\stdClass $options An array of name/value pairs that will get assigned to object properties should those properties exist
+	 * @param array|\stdClass $attributes An array of name/value pairs that will be placed into storage
 	 */
-	public function __construct( $options = array() )
+	public function __construct( $attributes = array() )
 	{
 		//	This is my seed. There are many like it, but this one is mine.
 		$this->_seedId = spl_object_hash( $this );
 
-		//	If an option list is specified, try to assign values to properties automatically
-		$this->set( $options );
+		//	Set the attributes
+		$this->set( $attributes );
 
 		//	Wake-up the events
 		$this->__wakeup();
@@ -116,15 +113,15 @@ abstract class Seed implements \Kisma\Core\Interfaces\SeedEvents
 		//	Attach any event handlers we find if desired and object is a reactor...
 		if ( $this instanceOf \Kisma\Core\Interfaces\Reactor && $this->get( 'auto_attach_events' ) )
 		{
-			EventManager::subscribe( $this );
+			\Kisma\Utility\EventManager::subscribe( $this );
 		}
 
 		//	Publish after_construct event
-		EventManager::publish( $this, self::AfterConstruct );
+		$this->trigger( $this, self::AfterConstruct );
 	}
 
 	/**
-	 * Destructor stub
+	 * Destructor
 	 */
 	public function __destruct()
 	{
@@ -132,7 +129,7 @@ abstract class Seed implements \Kisma\Core\Interfaces\SeedEvents
 		try
 		{
 			//	To prevent that freaky frame 0 error, I'm wrapping and gagging
-			@EventManager::publish( $this, self::BeforeDestruct );
+			@$this->trigger( $this, self::BeforeDestruct );
 		}
 		catch ( \Exception $_ex )
 		{
@@ -182,52 +179,118 @@ abstract class Seed implements \Kisma\Core\Interfaces\SeedEvents
 	 */
 	public function trigger( $eventName, $eventData = null )
 	{
-		return EventManager::publish( $this, $eventName, $eventData );
+		return \Kisma\Utility\EventManager::publish( $this, $eventName, $eventData );
+	}
+
+	//*************************************************************************
+	//* Attribute Management
+	//*************************************************************************
+
+	/**
+	 * Returns an array of default attributes to initialize storage
+	 *
+	 * @return array
+	 */
+	public function getDefaultAttributes()
+	{
+		return array(
+			'auto_attach_events' => true,
+		);
 	}
 
 	/**
-	 * Sets the values of one or more keys in storage
+	 * Sets the values of one or more attributes in storage
 	 *
 	 * @param string|array $key
 	 * @param mixed|null   $value
-	 *
-	 * @param bool         $mergeOptions
+	 * @param bool         $overwrite If an array of keys was passed, setting this to true will replace the existing storage contents
 	 *
 	 * @return mixed
 	 */
-	public function set( $key, $value = null, $mergeOptions = true )
+	public function set( $key, $value = null, $overwrite = false )
 	{
-		if ( is_array( $key ) && null === $value )
+		if ( false === $this->_storage )
 		{
-			$_options = $key;
-		}
-		else
-		{
-			$_options = array(
-				$key,
-				$value,
-			);
+			return false;
 		}
 
-		//	Catch null input, non-traversable, or empty options
-		if ( empty( $_options ) || ( !is_array( $_options ) && !( $_options instanceof \Traversable ) && !( $_options instanceof \stdClass ) ) )
+		//	First time in?
+		if ( null === $this->_storage )
 		{
-			$_options = array();
+			$this->initializeStorage();
 		}
 
-		//	Set our own options and work from there
-		if ( true !== $mergeOptions || !is_array( $_options ) )
+		$_attributes = ( is_array( $key ) && null === $value ) ? $key : array( $key => $value );
+
+		//	Can't do nothing 'til they stop sparklin'
+		if ( !empty( $_attributes ) )
 		{
-			//	Overwrite the options...
-			$this->_storage = (array)$_options;
-		}
-		else
-		{
-			//	Merge the options...
-			$this->_storage = array_merge( $this->_storage, (array)$_options );
+			//	Overwrite if the conditions are right
+			if ( true === $overwrite && is_array( $key ) && null === $value )
+			{
+				//	Overwrite the attributes...
+				$this->_storage = $key;
+			}
+			else
+			{
+				//	Merge the options...
+				\Kisma\Utility\Option::set( $this->_storage, $_attributes );
+			}
 		}
 
 		return $this;
+	}
+
+	/**
+	 * Gets the values of one or more attributes from storage
+	 *
+	 * @param string|array $key
+	 *
+	 * @return array|bool|mixed|null|string
+	 */
+	public function get( $key = null )
+	{
+		if ( false === $this->_storage )
+		{
+			return false;
+		}
+
+		if ( empty( $key ) )
+		{
+			return $this->getStorage();
+		}
+
+		if ( !is_array( $key ) )
+		{
+			return \Kisma\Utility\Option::get( $key );
+		}
+
+		foreach ( $key as $_key )
+		{
+			if ( isset( $this->_storage[$_key] ) )
+			{
+				$key[$_key] = \Kisma\Utility\Option::get( $this->_storage, $_key );
+			}
+		}
+
+		return $key;
+	}
+
+	/**
+	 * Base initialization of storage. Child classes can override to use a database or document store
+	 *
+	 * @return array
+	 */
+	public function initializeStorage()
+	{
+		$this->_storage = array();
+
+		foreach ( $this->getDefaultAttributes() as $_attribute => $_defaultValue )
+		{
+			\Kisma\Utility\Option::set( $this->_storage, $_attribute, $_defaultValue );
+		}
+
+		return $this->_storage;
 	}
 
 	//*************************************************************************
@@ -245,7 +308,7 @@ abstract class Seed implements \Kisma\Core\Interfaces\SeedEvents
 	/**
 	 * @param array|mixed $storage
 	 *
-	 * @return array|mixed
+	 * @return \Kisma\Core\Seed
 	 */
 	public function setStorage( $storage )
 	{
