@@ -32,7 +32,7 @@ use Doctrine\Common\EventSubscriber;
  *
  * @property string $documentName
  */
-abstract class Document extends \Kisma\Components\Seed implements \Kisma\IContainer
+abstract class Document extends \Kisma\Core\Seed implements \Kisma\IContainer
 {
 	//*************************************************************************
 	//* Private Members

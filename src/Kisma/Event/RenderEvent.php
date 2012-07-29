@@ -61,7 +61,7 @@ class RenderEvent extends KismaEvent
 	//*************************************************************************
 
 	/**
-	 * @param \Kisma\Components\Seed|\Silex\Application|array $target
+	 * @param \Kisma\Core\Seed|\Silex\Application|array $target
 	 * @param string|null									 $viewFile
 	 * @param array|null									  $payload
 	 * @param string|null									 $output

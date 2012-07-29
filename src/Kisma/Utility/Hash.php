@@ -30,7 +30,7 @@ namespace Kisma\Utility
 	/**
 	 * Hash code/password helpers
 	 */
-	class Hash extends \Kisma\Components\Seed implements \Kisma\IUtility
+	class Hash extends \Kisma\Core\Seed implements \Kisma\IUtility
 	{
 		//********************************************************************************
 		//* Private Members

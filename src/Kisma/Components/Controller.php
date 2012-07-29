@@ -166,11 +166,11 @@ abstract class Controller extends Seed implements \Silex\ControllerProviderInter
 	//*************************************************************************
 
 	/**
-	 * @param \Kisma\Components\ObjectEvent $event
+	 * @param \Kisma\Core\Events\SeedEvent $event
 	 *
 	 * @return bool
 	 */
-	public function onAfterConstruct( \Kisma\Components\ObjectEvent $event )
+	public function onAfterConstruct( \Kisma\Core\Events\SeedEvent $event )
 	{
 		$this->_discoverActions();
 

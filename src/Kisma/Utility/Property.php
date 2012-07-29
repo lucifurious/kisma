@@ -25,7 +25,7 @@ use Kisma\AccessorMode;
  * Property
  * Provides property manipulation routines
  */
-class Property extends \Kisma\Components\Seed implements \Kisma\IUtility
+class Property extends \Kisma\Core\Seed implements \Kisma\IUtility
 {
 	//*************************************************************************
 	//* Public Methods
@@ -61,7 +61,7 @@ class Property extends \Kisma\Components\Seed implements \Kisma\IUtility
 	}
 
 	/**
-	 * @param \Kisma\Components\Seed					  $object
+	 * @param \Kisma\Core\Seed					  $object
 	 * @param string									  $propertyName
 	 * @param string									  $access
 	 * @param mixed|null								  $valueOrDefault

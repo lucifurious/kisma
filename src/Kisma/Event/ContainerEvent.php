@@ -23,7 +23,7 @@ namespace Kisma\Event;
  * KismaEvent
  * Wrapper for an event triggered within Kisma
  *
- * @property-read \Kisma\Components\Seed $target
+ * @property-read \Kisma\Core\Seed $target
  */
 class ContainerEvent extends KismaEvent
 {

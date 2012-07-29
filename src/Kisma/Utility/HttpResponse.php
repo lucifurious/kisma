@@ -27,7 +27,7 @@ use Kisma\K;
  * HttpResponse
  * A response to an HTTP request
  */
-class HttpResponse extends \Kisma\Components\Seed
+class HttpResponse extends \Kisma\Core\Seed
 {
 	//*************************************************************************
 	//* Private Members

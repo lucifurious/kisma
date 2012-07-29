@@ -33,7 +33,7 @@ class Inflector implements \Kisma\IUtility
 	 * Given a Kisma identifier, return it to neutral format (lowercase, period and underscores)
 	 *
 	 * Examples:
-	 *	   Class Name:			\Kisma\Components\ObjectEvent becomes "kisma.components.component_event"
+	 *	   Class Name:			\Kisma\Core\Events\SeedEvent becomes "kisma.components.component_event"
 	 *
 	 * @param string $tag
 	 *

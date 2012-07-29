@@ -23,7 +23,7 @@ namespace Kisma\Event;
  * KismaEvent
  * Wrapper for an event triggered within Kisma
  *
- * @property-read \Kisma\Components\Seed $target
+ * @property-read \Kisma\Core\Seed $target
  */
 abstract class KismaEvent extends \Symfony\Component\EventDispatcher\Event implements \Kisma\IContainer
 {
@@ -34,12 +34,12 @@ abstract class KismaEvent extends \Symfony\Component\EventDispatcher\Event imple
 	/**
 	 * The object where this event was thrown
 	 *
-	 * @var \Kisma\Components\Seed|\Silex\Application|array
+	 * @var \Kisma\Core\Seed|\Silex\Application|array
 	 */
 	protected $_target;
 
 	/**
-	 * @param array|\Kisma\Components\Seed|\Silex\Application $target The event in which the event occurred
+	 * @param array|\Kisma\Core\Seed|\Silex\Application $target The event in which the event occurred
 	 */
 	public function __construct( $target )
 	{
@@ -53,7 +53,7 @@ abstract class KismaEvent extends \Symfony\Component\EventDispatcher\Event imple
 	/**
 	 * Returns the app in which this event was thrown
 	 *
-	 * @return \Kisma\Components\Seed
+	 * @return \Kisma\Core\Seed
 	 */
 	public function getTarget()
 	{

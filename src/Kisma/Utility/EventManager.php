@@ -14,7 +14,7 @@
 namespace Kisma\Utility;
 
 use \Kisma\Utility\Inflector;
-use \Kisma\Components\ObjectEvent;
+use \Kisma\Core\Events\SeedEvent;
 
 /**
  * EventManager class
@@ -142,24 +142,28 @@ class EventManager
 	 * @param string $eventName
 	 * @param mixed  $eventData
 	 *
-	 * @throws \Kisma\InvalidEventHandlerException
+	 * @throws \Kisma\EventHandlerException
 	 * @return bool|int
 	 */
 	public static function publish( $publisher, $eventName, &$eventData = null )
 	{
 		$_eventTag = Inflector::tag( $eventName, true, true );
 
-		if ( !isset( self::$_eventMap[$_eventTag] ) || empty( self::$_eventMap[$_eventTag] ) )
+		/**
+		 * Let's not waste time in here if you don't belong....
+		 * Ensure we're an event reactor, unknown event, or no handlers for the event
+		 */
+		if ( !( $publisher instanceof Reactor ) || !isset( self::$_eventMap[$_eventTag] ) || empty( self::$_eventMap[$_eventTag] ) )
 		{
 			return false;
 		}
 
 		$_event =
-			( $eventData instanceof ObjectEvent )
+			( $eventData instanceof SeedEvent )
 				?
 				$eventData
 				:
-				new ObjectEvent( $publisher, $eventData );
+				new SeedEvent( $publisher, $eventData );
 
 		foreach ( self::$_eventMap[$_eventTag] as $_callback )
 		{
@@ -185,7 +189,7 @@ class EventManager
 			}
 
 			//	Oops!
-			throw new \Kisma\InvalidEventHandlerException(
+			throw new \Kisma\EventHandlerException(
 				'Event "' . ( is_object( $_callback[0] )
 					?
 					get_class( $_callback[0] )

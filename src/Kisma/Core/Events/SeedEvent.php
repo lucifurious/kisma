@@ -11,17 +11,17 @@
  * @author    Jerry Ablan <kisma@pogostick.com>
  * @ingroup   events
  */
-namespace Kisma\Components;
+namespace Kisma\Core\Events;
 
 /**
- * ObjectEvent is the base class for all events
+ * SeedEvent is the base class for all events
  *
  * It encapsulates the parameters associated with an event.
  * The {@link source} property describes who raised the event.
  *
  * If an event handler sets {@link stopPropagation} to true, propagation will halt.
  */
-class ObjectEvent
+class SeedEvent
 {
 	//**************************************************************************
 	//* Private Members
@@ -63,7 +63,7 @@ class ObjectEvent
 	/**
 	 * @param mixed $data
 	 *
-	 * @return ObjectEvent
+	 * @return SeedEvent
 	 */
 	public function setData( $data )
 	{
@@ -80,9 +80,9 @@ class ObjectEvent
 	}
 
 	/**
-	 * @param \Kisma\Components\Seed $source
+	 * @param \Kisma\Core\Seed $source
 	 *
-	 * @return ObjectEvent
+	 * @return SeedEvent
 	 */
 	public function setSource( $source )
 	{
@@ -91,7 +91,7 @@ class ObjectEvent
 	}
 
 	/**
-	 * @return \Kisma\Components\Seed
+	 * @return \Kisma\Core\Seed
 	 */
 	public function getSource()
 	{
@@ -101,7 +101,7 @@ class ObjectEvent
 	/**
 	 * @param boolean $stopPropagation
 	 *
-	 * @return ObjectEvent
+	 * @return SeedEvent
 	 */
 	public function setStopPropagation( $stopPropagation )
 	{

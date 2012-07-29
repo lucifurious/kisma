@@ -23,7 +23,7 @@ namespace Kisma\Utility;
 //* Aliases
 //*************************************************************************
 
-use \Kisma\Components\Seed;
+use \Kisma\Core\Seed;
 
 /**
  * FileSystem

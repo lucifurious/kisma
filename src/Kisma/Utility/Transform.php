@@ -33,7 +33,7 @@ namespace Kisma\Utility
 	/**
 	 * Transform
 	 */
-	class Transform extends \Kisma\Components\Seed implements \Kisma\IUtility
+	class Transform extends \Kisma\Core\Seed implements \Kisma\IUtility
 	{
 		/**
 		 * Dynamically generates the object from the properties of the given object

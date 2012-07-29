@@ -106,6 +106,20 @@ class ObjectException extends KismaException
 {
 }
 
+/**
+ *
+ */
+class EventException extends ObjectException
+{
+}
+
+/**
+ *
+ */
+class EventHandlerException extends EventException
+{
+}
+
 /**************************************************************************
  ** Process Lock
  **************************************************************************/
