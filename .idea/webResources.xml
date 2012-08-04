@@ -2,12 +2,12 @@
 <project version="4">
   <component name="WebResourcesPaths">
     <contentEntries>
-      <entry url="file://$PROJECT_DIR$">
+      <entry url="file:///media/storage/opt/kisma">
         <entryData>
           <resourceRoots>
-            <path value="file://$PROJECT_DIR$/Kisma" />
-            <path value="file://$PROJECT_DIR$/src" />
-            <path value="file://$PROJECT_DIR$/examples/blog" />
+            <path value="file:///media/storage/opt/kisma/Kisma" />
+            <path value="file:///media/storage/opt/kisma/src" />
+            <path value="file:///media/storage/opt/kisma/examples/blog" />
           </resourceRoots>
         </entryData>
       </entry>

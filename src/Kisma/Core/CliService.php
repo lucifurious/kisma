@@ -1,33 +1,14 @@
 <?php
 /**
- * @file
- * Provides CLI service handler
- *
- * Kisma(tm) : PHP Fun-Size Framework (http://github.com/lucifurious/kisma/)
- * Copyright 2009-2011, Jerry Ablan, All Rights Reserved
- *
- * @copyright Copyright (c) 2009-2011 Jerry Ablan
- * @license http://github.com/lucifurious/kisma/blob/master/LICENSE
- *
- * @author Jerry Ablan <kisma@pogostick.com>
- * @category Components
- * @package kisma.components
- * @since 1.0.0
- *
- * @ingroup components
+ * CliService.php
  */
-namespace Kisma\Components;
-
-//*************************************************************************
-//* Aliases
-//*************************************************************************
-
-use Kisma\Components as Components;
+namespace Kisma\Core;
 
 /**
- * A base class for CLI service handlers
+ * CliService
+ * A base class for CLI services
  */
-abstract class CliService extends Components\Service
+abstract class CliService extends Service
 {
 	//********************************************************************************
 	//* Member Variables
@@ -74,8 +55,8 @@ abstract class CliService extends Components\Service
 	{
 		$_results = array(
 			'original' => $arguments,
-			'rebuilt' => array(),
-			'options' => array(),
+			'rebuilt'  => array(),
+			'options'  => array(),
 		);
 
 		//	Our return options array...
@@ -122,15 +103,7 @@ abstract class CliService extends Components\Service
 		$arguments = array_merge( array( $_className ), $_options['rebuilt'] );
 
 		//	Set our values based on options...
-		foreach ( $_options['options'] as $_key => $_value )
-		{
-			switch ( strtolower( trim( $_key ) ) )
-			{
-				default:
-					$this->__set( $_key, $_value );
-					break;
-			}
-		}
+		$this->set( $_options );
 
 		return $arguments;
 	}
@@ -141,7 +114,8 @@ abstract class CliService extends Components\Service
 
 	/**
 	 * @param string $workingDirectory
-	 * @return \Kisma\Components\CliService
+	 *
+	 * @return \Kisma\Core\CliService
 	 */
 	public function setWorkingDirectory( $workingDirectory )
 	{

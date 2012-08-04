@@ -17,17 +17,17 @@ namespace Kisma\Core\Interfaces;
  */
 interface ServiceEvents
 {
-    //*************************************************************************
-    //* Constants
-    //*************************************************************************
+	//*************************************************************************
+	//* Constants
+	//*************************************************************************
 
-    /**
-     * @var string
-     */
-    const BeforeServiceCall = 'cis.services.before_service_call';
-    /**
-     * @var string
-     */
-    const AfterServiceCall = 'cis.services.after_service_call';
+	/**
+	 * @var string
+	 */
+	const BeforeServiceCall = 'kisma.core.service.before_service_call';
+	/**
+	 * @var string
+	 */
+	const AfterServiceCall = 'kisma.core.service.after_service_call';
 
 }

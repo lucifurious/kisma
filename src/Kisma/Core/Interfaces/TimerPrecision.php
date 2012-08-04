@@ -1,9 +1,6 @@
 <?php
 /**
  * TimerPrecision.php
- *
- * @copyright Copyright (c) 2012 Silverpop Systems, Inc.
- * @author    Jerry Ablan <jablan@silverpop.com>
  */
 namespace Kisma\Core\Interfaces;
 
@@ -40,4 +37,5 @@ interface TimerPrecision
 	 * @var string Stop timer command
 	 */
 	const Stop = 'stop';
+
 }
