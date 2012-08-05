@@ -32,26 +32,38 @@ abstract class Service extends Seed implements \Kisma\Core\Interfaces\ServiceEve
 	protected $_serviceName = null;
 
 	//*************************************************************************
+	//* Public Methods
+	//*************************************************************************
+
+	/**
+	 * When a service is constructed, this method is called by default
+	 * @param array $options
+	 *
+	 * @return mixed
+	 */
+	abstract public function initialize( $options = array() );
+
+	//*************************************************************************
 	//* Event Handlers
 	//*************************************************************************
 
 	/**
-	 * @param \Kisma\Event\ServiceEvent $event
+	 * @param \Kisma\Core\Events\SeedEvent $event
 	 *
 	 * @return bool
 	 */
-	public function onBeforeServiceCall( \Kisma\Event\ServiceEvent $event )
+	public function onBeforeServiceCall( $event )
 	{
 		//	Default implementation
 		return true;
 	}
 
 	/**
-	 * @param \Kisma\Event\ServiceEvent $event
+	 * @param \Kisma\Core\Events\SeedEvent $event
 	 *
 	 * @return bool
 	 */
-	public function onAfterServiceCall( \Kisma\Event\ServiceEvent $event )
+	public function onAfterServiceCall( $event )
 	{
 		//	Default implementation
 		return true;
@@ -79,4 +91,5 @@ abstract class Service extends Seed implements \Kisma\Core\Interfaces\ServiceEve
 	{
 		return $this->_serviceName;
 	}
+
 }
