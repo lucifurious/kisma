@@ -34,9 +34,7 @@
 	],
 	"autoload":     {
 		"psr-0": {
-			"Monolog":          "src/",
-			"Twig_":            "lib/",
-			"Twig_Extensions_": "lib/"
+			"Kisma":            "src/"
 		}
 	}
 }
