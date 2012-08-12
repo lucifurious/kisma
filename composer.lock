@@ -1,19 +1,9 @@
 {
-    "hash": "6a264fe70a857e9154b7ad9613938e15",
+    "hash": "57a253343bd85339966b40b71d08111a",
     "packages": [
         {
             "package": "monolog/monolog",
             "version": "1.1.0"
-        },
-        {
-            "package": "twig/extensions",
-            "version": "dev-master",
-            "source-reference": "feb6d3f10c411e2631997c0a905aa581c80305c1",
-            "commit-date": "1337599699"
-        },
-        {
-            "package": "twig/twig",
-            "version": "v1.9.0"
         }
     ],
     "packages-dev": null,
@@ -21,7 +11,7 @@
 
     ],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "twig/extensions": 20
-    }
+    "stability-flags": [
+
+    ]
 }

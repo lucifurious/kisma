@@ -90,7 +90,7 @@ class Storage extends \Kisma\Core\Service
 	 * @param mixed|null   $value
 	 * @param bool         $overwrite If an array of keys was passed, setting this to true will replace the existing storage contents
 	 *
-	 * @return mixed
+	 * @return bool
 	 */
 	public function set( $key, $value = null, $overwrite = false )
 	{
@@ -123,17 +123,18 @@ class Storage extends \Kisma\Core\Service
 			}
 		}
 
-		return $this;
+		return true;
 	}
 
 	/**
 	 * Gets the values of one or more attributes from storage
 	 *
-	 * @param string|array $key
+	 * @param string|array $key          Single key or an array of keys
+	 * @param mixed        $defaultValue Will affect default value of all array values if array requested
 	 *
 	 * @return array|bool|mixed|null|string
 	 */
-	public function get( $key = null )
+	public function get( $key = null, $defaultValue = null )
 	{
 		if ( false === $this->_storage )
 		{
@@ -147,14 +148,14 @@ class Storage extends \Kisma\Core\Service
 
 		if ( !is_array( $key ) )
 		{
-			return \Kisma\Utility\Option::get( $key );
+			return \Kisma\Utility\Option::get( $this->_storage, $key, $defaultValue );
 		}
 
 		foreach ( $key as $_key )
 		{
 			if ( isset( $this->_storage[$_key] ) )
 			{
-				$key[$_key] = \Kisma\Utility\Option::get( $this->_storage, $_key );
+				$key[$_key] = \Kisma\Utility\Option::get( $this->_storage, $_key, $defaultValue );
 			}
 		}
 

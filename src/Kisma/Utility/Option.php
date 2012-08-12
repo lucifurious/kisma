@@ -144,15 +144,13 @@ class Option
 	 */
 	public static function set( &$options = array(), $key, $value = null )
 	{
-		array_walk( self::collapse( $key, $value ), function( $value, $key ) use( &$options )
-		{
-			self::so( $options, $key, $value );
-		} );
-
-//		foreach ( self::collapse( $key, $value ) as $_key => $_value )
-//		{
-//			self::so( $options, $_key, $_value );
-//		}
+		array_walk(
+			self::collapse( $key, $value ),
+			function ( $value, $key ) use ( &$options )
+			{
+				Option::so( $options, $key, $value );
+			}
+		);
 	}
 
 	/**

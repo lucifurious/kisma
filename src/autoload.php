@@ -4,14 +4,12 @@
  * Bootstrap loader for the Kisma
  *
  */
-namespace Kisma;
-
-//**************************************************************************
-//* Requirements
-//**************************************************************************
 
 //	Some basics for all
-require_once __DIR__ . '/Kisma.php';
+if ( !class_exists( '\\Kisma', false ) )
+{
+	require_once __DIR__ . '/Kisma.php';
+}
 
 //	Initialize
-Kisma::conceive();
+\Kisma::conceive();

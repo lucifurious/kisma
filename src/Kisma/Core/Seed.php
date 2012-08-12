@@ -10,8 +10,6 @@
  */
 namespace Kisma\Core;
 
-use Kisma\Core\Interfaces\SeedEvents;
-
 /**
  * Seed
  * A nugget of goodness that grows into something wonderful
@@ -71,7 +69,7 @@ use Kisma\Core\Interfaces\SeedEvents;
  *
  * @property bool $autoAttachEvents
  */
-abstract class Seed implements SeedEvents
+abstract class Seed implements \Kisma\Core\Interfaces\SeedEvents
 {
 	//********************************************************************************
 	//* Member Variables
@@ -113,7 +111,7 @@ abstract class Seed implements SeedEvents
 	public function __wakeup()
 	{
 		//	Attach any event handlers we find if desired and object is a reactor...
-		if ( $this instanceOf \Kisma\Core\Interfaces\Reactor && $this->_attributes->get( 'auto_attach_events' ) )
+		if ( true === $this->get( 'auto_attach_events', true ) && $this instanceOf \Kisma\Core\Interfaces\Reactor )
 		{
 			\Kisma\Utility\EventManager::subscribe( $this );
 		}
@@ -192,7 +190,52 @@ abstract class Seed implements SeedEvents
 	 */
 	public function trigger( $eventName, $eventData = null )
 	{
-		return \Kisma\Utility\EventManager::publish( $this, $eventName, $eventData );
+		$_manager = $this->get( 'event_manager' );
+
+		if ( empty( $_manager ) )
+		{
+			return false;
+		}
+
+		return call_user_func( array( $_manager, 'publish' ), $this, $eventName, $eventData );
+	}
+
+	/**
+	 * Allows for asking for attributes by using "get_<name>" and "set_<name>"
+	 *
+	 * @param $name
+	 * @param $arguments
+	 *
+	 * @return mixed
+	 * @convenience
+	 */
+	public function __call( $name, $arguments )
+	{
+		//	If we don't have any attribute storage, bail
+		if ( $this->_attributes )
+		{
+			$_prefix = strtolower( substr( $name, 0, 4 ) );
+
+			if ( 'get_' == $_prefix || 'set_' == $_prefix )
+			{
+				$_attribute = strtolower( substr( $name, 4 ) );
+
+				switch ( $_prefix )
+				{
+					case 'get_':
+						if ( isset( $this->_attributes->{$_attribute} ) )
+						{
+							array_unshift( $arguments, $_attribute );
+							return call_user_func_array( array( $this->_attributes, 'get' ), $arguments );
+						}
+						break;
+
+					case 'set_':
+						array_unshift( $arguments, $_attribute );
+						return call_user_func_array( array( $this->_attributes, 'set' ), $arguments );
+				}
+			}
+		}
 	}
 
 	//*************************************************************************
@@ -206,9 +249,41 @@ abstract class Seed implements SeedEvents
 	 */
 	public function getDefaultAttributes()
 	{
-		return array(
-			'auto_attach_events' => true,
-		);
+		if ( $this instanceof \Kisma\Core\Interfaces\Reactor )
+		{
+			return array(
+				'auto_attach_events' => true,
+				'event_manager'      => '\\Kisma\\Utility\\EventManager',
+			);
+		}
+	}
+
+	/**
+	 * Gets an attribute
+	 *
+	 * @param string|array $name
+	 * @param mixed        $defaultValue
+	 *
+	 * @return mixed
+	 * @convenience
+	 */
+	public function get( $name, $defaultValue = null )
+	{
+		return !empty( $this->_attributes ) ? $this->_attributes->get( $name, $defaultValue ) : $defaultValue;
+	}
+
+	/**
+	 * Sets an attribute
+	 *
+	 * @param string|array $name
+	 * @param mixed        $value
+	 *
+	 * @return bool
+	 * @convenience
+	 */
+	public function set( $name, $value = null )
+	{
+		return !empty( $this->_attributes ) ? $this->_attributes->set( $name, $value ) : false;
 	}
 
 	//*************************************************************************

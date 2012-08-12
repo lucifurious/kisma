@@ -14,9 +14,9 @@
 		}
 	],
 	"require":      {
-		"monolog/monolog": "1.*"
     },
     "suggest":{
+		"monolog/monolog": "1.*",
 		"twig/twig":       "1.*",
 		"twig/extensions": "dev-master"
 	},

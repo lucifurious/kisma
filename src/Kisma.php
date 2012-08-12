@@ -9,39 +9,30 @@
  * @license   MIT (http://github.com/lucifurious/kisma/blob/master/LICENSE)
  * @author    Jerry Ablan <get.kisma@gmail.com>
  */
-namespace Kisma;
-
 require_once __DIR__ . '/Kisma/enums.php';
-require_once __DIR__ . '/Kisma/Core/Seed.php';
 require_once __DIR__ . '/Kisma/Utility/Option.php';
+require_once __DIR__ . '/Kisma/Utility/Inflector.php';
+require_once __DIR__ . '/Kisma/Core/Interfaces/KismaEvents.php';
 
 /**
  * The Kisma bootstrap loader
  *
  * Contains a few core functions implemented statically to be lightweight and single instance.
  */
-class Kisma
+class Kisma implements \Kisma\Core\Interfaces\KismaEvents
 {
 	//*************************************************************************
 	//* Private Members
 	//*************************************************************************
 
 	/**
-	 * @var \Composer\Autoload\ClassLoader
-	 */
-	protected static $_autoLoader = null;
-	/**
-	 * @var string The library's base path
-	 */
-	protected static $_basePath = __DIR__;
-	/**
 	 * @var array The library configuration options
 	 */
-	protected static $_options = array();
-	/**
-	 * @var bool True if Kisma has been initialized
-	 */
-	protected static $_conception = false;
+	protected static $_options = array(
+		'base_path'   => __DIR__,
+		'auto_loader' => null,
+		'conception'  => false,
+	);
 
 	//**************************************************************************
 	//* Public Methods
@@ -56,12 +47,13 @@ class Kisma
 	 */
 	public static function conceive( $options = array() )
 	{
-		if ( false === self::$_conception || empty( self::$_autoLoader ) )
+		if ( false === self::get( 'conception' ) || null === self::get( 'auto_loader' ) )
 		{
 			/**
 			 * Set up the autoloader
 			 */
-			self::$_autoLoader = require( dirname( __DIR__ ) . '/vendor/autoload.php' );
+			$_autoLoader = require( dirname( __DIR__ ) . '/vendor/autoload.php' );
+			self::set( 'auto_loader', $_autoLoader );
 
 			if ( is_callable( $options ) )
 			{
@@ -71,11 +63,22 @@ class Kisma
 			//	Set any application-level options passed in
 			self::$_options = \Kisma\Utility\Option::merge( self::$_options, $options );
 
+			//	Register our faux-destructor
+			\register_shutdown_function(
+				function ( $eventName = \Kisma\Core\Interfaces\KismaEvents::Death )
+				{
+					\Kisma\Utility\EventManager::publish( null, $eventName );
+				}
+			);
+
 			//	We done baby!
-			self::$_conception = true;
+			self::set( 'conception', true );
+
+			//	And let the world know we're alive
+			\Kisma\Utility\EventManager::publish( null, self::Birth );
 		}
 
-		return self::$_conception;
+		return self::get( 'conception' );
 	}
 
 	/**
@@ -107,6 +110,30 @@ class Kisma
 	}
 
 	//*************************************************************************
+	//* Default Event Handlers
+	//*************************************************************************
+
+	/**
+	 * @param \Kisma\Core\Events\SeedEvent $event
+	 *
+	 * @return bool
+	 */
+	public function onBirth( $event = null )
+	{
+		return true;
+	}
+
+	/**
+	 * @param \Kisma\Core\Events\SeedEvent $event
+	 *
+	 * @return bool
+	 */
+	public function onDeath( $event = null )
+	{
+		return true;
+	}
+
+	//*************************************************************************
 	//* Properties
 	//*************************************************************************
 
@@ -115,7 +142,7 @@ class Kisma
 	 */
 	public static function getAutoLoader()
 	{
-		return self::$_autoLoader;
+		return self::get( 'auto_loader' );
 	}
 
 	/**
@@ -123,7 +150,7 @@ class Kisma
 	 */
 	public static function getBasePath()
 	{
-		return self::$_basePath;
+		return self::get( 'base_path' );
 	}
 
 	/**

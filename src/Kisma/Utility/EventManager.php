@@ -13,9 +13,6 @@
  */
 namespace Kisma\Utility;
 
-use \Kisma\Utility\Inflector;
-use \Kisma\Core\Events\SeedEvent;
-
 /**
  * EventManager class
  * Utility class that provides event management
@@ -116,7 +113,7 @@ class EventManager
 				}
 
 				//	Create a closure to house the call.
-				$_listeners[$_eventTag][] = function( $event ) use ( $object, $_method )
+				$_listeners[$_eventTag][] = function ( $event ) use ( $object, $_method )
 				{
 					return call_user_func( array( $object, $_method->name ), $event );
 				};
@@ -138,33 +135,41 @@ class EventManager
 	 *
 	 * @static
 	 *
-	 * @param object $publisher
-	 * @param string $eventName
-	 * @param mixed  $eventData
+	 * @param null|\Kisma\Core\Interfaces\Reactor $publisher
+	 * @param string                              $eventName
+	 * @param mixed                               $eventData
 	 *
 	 * @throws \Kisma\EventHandlerException
 	 * @return bool|int
 	 */
 	public static function publish( $publisher, $eventName, &$eventData = null )
 	{
-		$_eventTag = Inflector::tag( $eventName, true, true );
-
 		/**
 		 * Let's not waste time in here if you don't belong....
-		 * Ensure we're an event reactor, unknown event, or no handlers for the event
+		 * Ensure we're an event reactor, and if the publisher is empty, make sure it's the application
 		 */
-		if ( !( $publisher instanceof Reactor ) || !isset( self::$_eventMap[$_eventTag] ) || empty( self::$_eventMap[$_eventTag] ) )
+		if ( !( $publisher instanceof \Kisma\Core\Interfaces\Reactor ) || ( null === $publisher && !( $publisher instanceof \Kisma\Kisma ) ) )
 		{
 			return false;
 		}
 
+		//	Ensure this is a valid event
+		$_eventTag = Inflector::tag( $eventName, true, true );
+
+		if ( !isset( self::$_eventMap[$_eventTag] ) || empty( self::$_eventMap[$_eventTag] ) )
+		{
+			return false;
+		}
+
+		//	Make a new event if one wasn't provided
 		$_event =
-			( $eventData instanceof SeedEvent )
+			( $eventData instanceof \Kisma\Core\Events\SeedEvent )
 				?
 				$eventData
 				:
-				new SeedEvent( $publisher, $eventData );
+				new \Kisma\Core\Events\SeedEvent( $publisher, $eventData );
 
+		//	Call each handler in order
 		foreach ( self::$_eventMap[$_eventTag] as $_callback )
 		{
 			//	Stop further handling if the event has been handled...
@@ -190,11 +195,13 @@ class EventManager
 
 			//	Oops!
 			throw new \Kisma\EventHandlerException(
-				'Event "' . ( is_object( $_callback[0] )
-					?
-					get_class( $_callback[0] )
-					:
-					'<unknownClass>' ) . '.' . $_eventTag . ' has an invalid listener subscribed to it.'
+				'Event "' .
+					( is_object( $_callback[0] )
+						?
+						get_class( $_callback[0] )
+						:
+						'<unknownClass>' ) .
+					'.' . $_eventTag . ' has an invalid listener subscribed to it.'
 			);
 		}
 
