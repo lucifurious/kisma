@@ -1,5 +1,7 @@
 ![Kisma](https://github.com/lucifurious/kisma/raw/master/assets/kisma-logo-64x64.png)
 
+NOTE: I'm in the process of restructuring the library. Please wait until I release a beta before you try to use it.
+
 Kisma! The Fun-Size Framework
 =============================
 Thanks for checking out *Kisma*!
