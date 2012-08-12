@@ -12,7 +12,7 @@
 namespace Kisma;
 
 require_once __DIR__ . '/Kisma/enums.php';
-require_once __DIR__ . '/Kisma/Components/Seed.php';
+require_once __DIR__ . '/Kisma/Core/Seed.php';
 require_once __DIR__ . '/Kisma/Utility/Option.php';
 
 /**

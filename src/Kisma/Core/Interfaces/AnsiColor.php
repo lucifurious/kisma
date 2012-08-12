@@ -1,7 +1,14 @@
 <?php
 /**
  * @file
- * Standard ANSI color attributes
+ *            Standard ANSI color attributes
+ *
+ * Kisma(tm) : PHP Fun-Size Framework (http://github.com/lucifurious/kisma/)
+ * Copyright 2009-2012, Jerry Ablan, All Rights Reserved
+ *
+ * @copyright Copyright (c) 2009-2012 Jerry Ablan
+ * @license   http://github.com/lucifurious/kisma/blob/master/LICENSE
+ * @author    Jerry Ablan <get.kisma@gmail.com>
  */
 namespace Kisma\Core\Interfaces;
 

@@ -1,15 +1,11 @@
 <?php
 /**
- * @file
- *            The base object event class
- *
  * Kisma(tm) : PHP Fun-Size Framework (http://github.com/lucifurious/kisma/)
- * Copyright 2009-2011, Jerry Ablan, All Rights Reserved
+ * Copyright 2009-2012, Jerry Ablan, All Rights Reserved
  *
- * @copyright Copyright (c) 2009-2011 Jerry Ablan
+ * @copyright Copyright (c) 2009-2012 Jerry Ablan
  * @license   http://github.com/lucifurious/kisma/blob/master/LICENSE
- * @author    Jerry Ablan <kisma@pogostick.com>
- * @ingroup   events
+ * @author    Jerry Ablan <get.kisma@gmail.com>
  */
 namespace Kisma\Core\Events;
 

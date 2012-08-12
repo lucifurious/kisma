@@ -10,6 +10,8 @@
  */
 namespace Kisma\Core;
 
+use Kisma\Core\Interfaces\SeedEvents;
+
 /**
  * Seed
  * A nugget of goodness that grows into something wonderful
@@ -69,7 +71,7 @@ namespace Kisma\Core;
  *
  * @property bool $autoAttachEvents
  */
-abstract class Seed implements \Kisma\Core\Interfaces\SeedEvents
+abstract class Seed implements SeedEvents
 {
 	//********************************************************************************
 	//* Member Variables
@@ -80,9 +82,9 @@ abstract class Seed implements \Kisma\Core\Interfaces\SeedEvents
 	 */
 	private $_seedId = null;
 	/**
-	 * @var array|mixed Object attributes storage. Set to false to disable feature
+	 * @var \Kisma\Core\Services\Storage Attributes storage. Set to false to disable feature
 	 */
-	protected $_storage = array();
+	protected $_attributes = null;
 
 	//********************************************************************************
 	//* Constructor/Magic
@@ -95,7 +97,7 @@ abstract class Seed implements \Kisma\Core\Interfaces\SeedEvents
 	 */
 	public function __construct( $attributes = array() )
 	{
-		//	This is my seed. There are many like it, but this one is mine.
+		//	This is my hash. There are many like it, but this one is mine.
 		$this->_seedId = spl_object_hash( $this );
 
 		//	Set the attributes
@@ -111,7 +113,7 @@ abstract class Seed implements \Kisma\Core\Interfaces\SeedEvents
 	public function __wakeup()
 	{
 		//	Attach any event handlers we find if desired and object is a reactor...
-		if ( $this instanceOf \Kisma\Core\Interfaces\Reactor && $this->get( 'auto_attach_events' ) )
+		if ( $this instanceOf \Kisma\Core\Interfaces\Reactor && $this->_attributes->get( 'auto_attach_events' ) )
 		{
 			\Kisma\Utility\EventManager::subscribe( $this );
 		}
@@ -150,6 +152,17 @@ abstract class Seed implements \Kisma\Core\Interfaces\SeedEvents
 	 */
 	public function onAfterConstruct( $event = null )
 	{
+		if ( false !== $this->_attributes )
+		{
+			if ( empty( $this->_attributes ) )
+			{
+				//	Create a new storage object
+				$this->_attributes = new \Kisma\Core\Services\Storage(
+					$this->getDefaultAttributes()
+				);
+			}
+		}
+
 		return true;
 	}
 
@@ -198,101 +211,6 @@ abstract class Seed implements \Kisma\Core\Interfaces\SeedEvents
 		);
 	}
 
-	/**
-	 * Sets the values of one or more attributes in storage
-	 *
-	 * @param string|array $key
-	 * @param mixed|null   $value
-	 * @param bool         $overwrite If an array of keys was passed, setting this to true will replace the existing storage contents
-	 *
-	 * @return mixed
-	 */
-	public function set( $key, $value = null, $overwrite = false )
-	{
-		if ( false === $this->_storage )
-		{
-			return false;
-		}
-
-		//	First time in?
-		if ( null === $this->_storage )
-		{
-			$this->initializeStorage();
-		}
-
-		$_attributes = ( is_array( $key ) && null === $value ) ? $key : array( $key => $value );
-
-		//	Can't do nothing 'til they stop sparklin'
-		if ( !empty( $_attributes ) )
-		{
-			//	Overwrite if the conditions are right
-			if ( true === $overwrite && is_array( $key ) && null === $value )
-			{
-				//	Overwrite the attributes...
-				$this->_storage = $key;
-			}
-			else
-			{
-				//	Merge the options...
-				\Kisma\Utility\Option::set( $this->_storage, $_attributes );
-			}
-		}
-
-		return $this;
-	}
-
-	/**
-	 * Gets the values of one or more attributes from storage
-	 *
-	 * @param string|array $key
-	 *
-	 * @return array|bool|mixed|null|string
-	 */
-	public function get( $key = null )
-	{
-		if ( false === $this->_storage )
-		{
-			return false;
-		}
-
-		if ( empty( $key ) )
-		{
-			return $this->getStorage();
-		}
-
-		if ( !is_array( $key ) )
-		{
-			return \Kisma\Utility\Option::get( $key );
-		}
-
-		foreach ( $key as $_key )
-		{
-			if ( isset( $this->_storage[$_key] ) )
-			{
-				$key[$_key] = \Kisma\Utility\Option::get( $this->_storage, $_key );
-			}
-		}
-
-		return $key;
-	}
-
-	/**
-	 * Base initialization of storage. Child classes can override to use a database or document store
-	 *
-	 * @return array
-	 */
-	public function initializeStorage()
-	{
-		$this->_storage = array();
-
-		foreach ( $this->getDefaultAttributes() as $_attribute => $_defaultValue )
-		{
-			\Kisma\Utility\Option::set( $this->_storage, $_attribute, $_defaultValue );
-		}
-
-		return $this->_storage;
-	}
-
 	//*************************************************************************
 	//* Properties
 	//*************************************************************************
@@ -312,7 +230,7 @@ abstract class Seed implements \Kisma\Core\Interfaces\SeedEvents
 	 */
 	public function setStorage( $storage )
 	{
-		$this->_storage = $storage;
+		$this->_attributes = $storage;
 		return $this;
 	}
 
@@ -321,7 +239,7 @@ abstract class Seed implements \Kisma\Core\Interfaces\SeedEvents
 	 */
 	public function getStorage()
 	{
-		return $this->_storage;
+		return $this->_attributes;
 	}
 
 }

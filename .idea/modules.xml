@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file:///media/storage/opt/kisma/.idea/kisma.iml" filepath="/media/storage/opt/kisma/.idea/kisma.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/kisma.iml" filepath="$PROJECT_DIR$/.idea/kisma.iml" />
     </modules>
   </component>
 </project>

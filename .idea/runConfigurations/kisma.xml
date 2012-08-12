@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="kisma" type="PhpLocalRunConfigurationType" factoryName="PHP Console" path="/media/storage/opt/kisma/tests/KismaTest.php">
+  <configuration default="false" name="kisma" type="PhpLocalRunConfigurationType" factoryName="PHP Console" path="$PROJECT_DIR$/tests/KismaTest.php">
     <RunnerSettings RunnerId="PhpScriptDebugRunner" />
     <ConfigurationWrapper RunnerId="PhpScriptDebugRunner" />
     <method />

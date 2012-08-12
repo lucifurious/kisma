@@ -144,19 +144,15 @@ class Option
 	 */
 	public static function set( &$options = array(), $key, $value = null )
 	{
-		if ( is_array( $key ) && null === $value )
+		array_walk( self::collapse( $key, $value ), function( $value, $key ) use( &$options )
 		{
-			$_new = $key;
-		}
-		else
-		{
-			$_new = array( $key => $value );
-		}
+			self::so( $options, $key, $value );
+		} );
 
-		foreach ( $_new as $_key => $_value )
-		{
-			self::so( $options, $_key, $_value );
-		}
+//		foreach ( self::collapse( $key, $value ) as $_key => $_value )
+//		{
+//			self::so( $options, $_key, $_value );
+//		}
 	}
 
 	/**
@@ -314,6 +310,27 @@ class Option
 		}
 
 		return $array;
+	}
+
+	/**
+	 * Converts $key and $value into array($key => $value) if $key is not already an array.
+	 *
+	 * @static
+	 *
+	 * @param string|array $key
+	 * @param mixed        $value
+	 *
+	 * @return array
+	 */
+	public static function collapse( $key, $value = null )
+	{
+		return ( is_array( $key ) && null === $value )
+			?
+			$key
+			:
+			array(
+				$key => $value
+			);
 	}
 
 	/**

@@ -37,15 +37,33 @@ abstract class Service extends Seed implements \Kisma\Core\Interfaces\ServiceEve
 
 	/**
 	 * When a service is constructed, this method is called by default
+	 *
 	 * @param array $options
 	 *
-	 * @return mixed
+	 * @return bool
 	 */
 	abstract public function initialize( $options = array() );
 
 	//*************************************************************************
 	//* Event Handlers
 	//*************************************************************************
+
+	/**
+	 * After the base object is constructed, call the service's initialize method
+	 *
+	 * @param \Kisma\Core\Events\SeedEvent $event
+	 *
+	 * @return bool
+	 */
+	public function onAfterConstruct( $event = null )
+	{
+		if ( parent::onAfterConstruct( $event ) )
+		{
+			return $this->initialize( $event->getData() );
+		}
+
+		return false;
+	}
 
 	/**
 	 * @param \Kisma\Core\Events\SeedEvent $event

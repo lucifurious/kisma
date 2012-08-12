@@ -1,14 +1,21 @@
 <?php
 /**
- * CliService.php
+ * Cli.php
+ *
+ * Kisma(tm) : PHP Fun-Size Framework (http://github.com/lucifurious/kisma/)
+ * Copyright 2009-2012, Jerry Ablan, All Rights Reserved
+ *
+ * @copyright Copyright (c) 2009-2012 Jerry Ablan
+ * @license   http://github.com/lucifurious/kisma/blob/master/LICENSE
+ * @author    Jerry Ablan <get.kisma@gmail.com>
  */
-namespace Kisma\Core;
+namespace Kisma\Core\Services;
 
 /**
- * CliService
+ * Cli
  * A base class for CLI services
  */
-abstract class CliService extends Service
+abstract class Cli extends \Kisma\Core\Service
 {
 	//********************************************************************************
 	//* Member Variables
@@ -115,7 +122,7 @@ abstract class CliService extends Service
 	/**
 	 * @param string $workingDirectory
 	 *
-	 * @return \Kisma\Core\CliService
+	 * @return Cli
 	 */
 	public function setWorkingDirectory( $workingDirectory )
 	{

@@ -2,12 +2,12 @@
 /**
  * StorageEvents.php
  *
- * @author Jerry Ablan <jablan@silverpop.com>
- *         Copyright (c) 2012 Silverpop Systems, Inc.
- *         http://www.silverpop.com Silverpop Systems, Inc.
+ * Kisma(tm) : PHP Fun-Size Framework (http://github.com/lucifurious/kisma/)
+ * Copyright 2009-2012, Jerry Ablan, All Rights Reserved
  *
- * @author Jerry Ablan <jablan@silverpop.com>
- * @filesource
+ * @copyright Copyright (c) 2009-2012 Jerry Ablan
+ * @license   http://github.com/lucifurious/kisma/blob/master/LICENSE
+ * @author    Jerry Ablan <get.kisma@gmail.com>
  */
 namespace Kisma\Core\Interfaces;
 
@@ -24,26 +24,26 @@ interface StorageEvents
 	/**
 	 * @var string
 	 */
-	const BeforeFind = 'cis.services.storage.before_find';
+	const BeforeFind = 'kisma.core.storage.before_find';
 	/**
 	 * @var string
 	 */
-	const AfterFind = 'cis.services.storage.after_find';
+	const AfterFind = 'kisma.core.storage.after_find';
 	/**
 	 * @var string
 	 */
-	const BeforeSave = 'cis.services.storage.before_save';
+	const BeforeSave = 'kisma.core.storage.before_save';
 	/**
 	 * @var string
 	 */
-	const AfterSave = 'cis.services.storage.after_save';
+	const AfterSave = 'kisma.core.storage.after_save';
 	/**
 	 * @var string
 	 */
-	const BeforeDelete = 'cis.services.storage.before_delete';
+	const BeforeDelete = 'kisma.core.storage.before_delete';
 	/**
 	 * @var string
 	 */
-	const AfterDelete = 'cis.services.storage.after_delete';
+	const AfterDelete = 'kisma.core.storage.after_delete';
 
 }

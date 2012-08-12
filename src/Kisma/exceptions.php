@@ -120,6 +120,13 @@ class EventHandlerException extends EventException
 {
 }
 
+/**
+ *
+ */
+class InvalidEventHandlerException extends EventHandlerException
+{
+}
+
 /**************************************************************************
  ** Process Lock
  **************************************************************************/
@@ -218,14 +225,6 @@ class CouchDbException extends StorageException
 /**************************************************************************
  ** Events
  **************************************************************************/
-
-class EventException extends KismaException
-{
-}
-
-class InvalidEventHandlerException extends EventException
-{
-}
 
 //*************************************************************************
 //* Services
