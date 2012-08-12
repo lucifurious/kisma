@@ -16,7 +16,7 @@
 	"require":      {
 		"monolog/monolog": "1.*"
     },
-    "suggests":{
+    "suggest":{
 		"twig/twig":       "1.*",
 		"twig/extensions": "dev-master"
 	},
