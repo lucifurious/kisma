@@ -25,6 +25,8 @@ namespace Kisma\Core;
  *
  * You can pass an array of attributes to the constructor to have them set for you. Otherwise you must call set()
  *
+ * To disable this feature, set the '$attributeStorage' attribute to false before calling the parent constructor.
+ *
  * Publish/Subscribe
  * =================
  * The second is a publish/subscribe service. Yeah, fancy name for event system.
@@ -38,20 +40,12 @@ namespace Kisma\Core;
  *
  * Event handlers should have the following signature:
  * <pre>
- * public function onEventName( $event ) { ... }
+ * public|protected|private function [_]onEventName( $event = null ) { ... }
  * </pre>
  *
- * OR
+ * $event (\Kisma\Core\Events\SeedEvent) will contain details about the event in question.
  *
- * <pre>
- * [private|protected] function _onEventName( $event ) { ... }
- * </pre>
- *
- * $event will contain details about the event in question.
- *
- * To subscribe to an event, call {@link EventManager::subscribe} method.
- *
- * Both property names and event names are case-insensitive.
+ * To subscribe to an event, call the {@link EventManager::subscribe} method.
  *
  * You may also use closures for event handlers, ala jQuery
  *
@@ -62,27 +56,43 @@ namespace Kisma\Core;
  * Unless otherwise specified, the object will automatically search for and
  * attach any event handlers that exist in your object.
  *
- * To disable this feature, set the 'autoAttachEvents' attribute to false during construction
+ * To disable this feature, set the '$autoAttachEvents' attribute to false before calling the parent constructor.
  *
- * Built-in Attributes
+ * Default Attributes
  * ===================
  *
- * @property bool $autoAttachEvents
+ * The following attributes are default in every Seed object:
+ *
+ * @property-read string                            $id                     The unique ID of this seed
+ * @property string                                 $tag                    Defaults to class name with $id
+ * @property string                                 $name                   Defaults to class name
+ * @property bool                                   $autoAttachEvents       Defaults to true.
+ * @property \Kisma\Core\Interfaces\StorageProvider $attributeStorage       The attributes storage object
+ * @property string                                 $eventManager           Defaults to \Kisma\Utility\EventManager
  */
-abstract class Seed implements \Kisma\Core\Interfaces\SeedEvents
+class Seed implements \Kisma\Core\Interfaces\SeedEvents, \Kisma\Core\Interfaces\SeedAttributes, \Kisma\Core\Interfaces\StorageProvider
 {
+	//*************************************************************************
+	//* Constants
+	//*************************************************************************
+
+	/**
+	 * @var string The default storage provider for all objects
+	 */
+	const DefaultStorageProvider = '\\Kisma\\Core\\Services\\Storage';
+	/**
+	 * @var string The default event manager for an object
+	 */
+	const DefaultEventManager = '\\Kisma\\Utility\\EventManager';
+
 	//********************************************************************************
 	//* Member Variables
 	//********************************************************************************
 
 	/**
-	 * @var string My unique id
+	 * @var \Kisma\Core\Services\Storage Attributes storage.
 	 */
-	private $_seedId = null;
-	/**
-	 * @var \Kisma\Core\Services\Storage Attributes storage. Set to false to disable feature
-	 */
-	protected $_attributes = null;
+	protected $_attributeStorage = null;
 
 	//********************************************************************************
 	//* Constructor/Magic
@@ -91,15 +101,14 @@ abstract class Seed implements \Kisma\Core\Interfaces\SeedEvents
 	/**
 	 * Base constructor
 	 *
-	 * @param array|\stdClass $attributes An array of name/value pairs that will be placed into storage
+	 * @param array|object $attributes An array of name/value pairs that will be placed into storage
+	 *
+	 * @throws \Kisma\InvalidAttributeValueException
 	 */
 	public function __construct( $attributes = array() )
 	{
-		//	This is my hash. There are many like it, but this one is mine.
-		$this->_seedId = spl_object_hash( $this );
-
-		//	Set the attributes
-		$this->set( $attributes );
+		//	Initialize the storage system
+		$this->_initializeStorage( $attributes );
 
 		//	Wake-up the events
 		$this->__wakeup();
@@ -111,29 +120,23 @@ abstract class Seed implements \Kisma\Core\Interfaces\SeedEvents
 	public function __wakeup()
 	{
 		//	Attach any event handlers we find if desired and object is a reactor...
-		if ( true === $this->get( 'auto_attach_events', true ) && $this instanceOf \Kisma\Core\Interfaces\Reactor )
+		if ( true === $this->getAutoAttachEvents( true ) && $this instanceOf \Kisma\Core\Interfaces\Reactor )
 		{
 			\Kisma\Utility\EventManager::subscribe( $this );
-		}
 
-		//	Publish after_construct event
-		$this->trigger( $this, self::AfterConstruct );
-	}
+			//	Publish after_construct event
+			$this->trigger( $this, self::AfterConstruct );
 
-	/**
-	 * Destructor
-	 */
-	public function __destruct()
-	{
-		//	Fire the initialize event
-		try
-		{
-			//	To prevent that freaky frame 0 error, I'm wrapping and gagging
-			@$this->trigger( $this, self::BeforeDestruct );
-		}
-		catch ( \Exception $_ex )
-		{
-			//	Ignored on porpoise
+			//	Register our faux-destructor
+			$_seed = $this;
+
+			\register_shutdown_function(
+				function () use ( $_seed )
+				{
+					//	He's dead Jim.
+					\Kisma\Utility\EventManager::publish( $_seed, Seed::BeforeDestruct );
+				}
+			);
 		}
 	}
 
@@ -150,17 +153,6 @@ abstract class Seed implements \Kisma\Core\Interfaces\SeedEvents
 	 */
 	public function onAfterConstruct( $event = null )
 	{
-		if ( false !== $this->_attributes )
-		{
-			if ( empty( $this->_attributes ) )
-			{
-				//	Create a new storage object
-				$this->_attributes = new \Kisma\Core\Services\Storage(
-					$this->getDefaultAttributes()
-				);
-			}
-		}
-
 		return true;
 	}
 
@@ -190,7 +182,7 @@ abstract class Seed implements \Kisma\Core\Interfaces\SeedEvents
 	 */
 	public function trigger( $eventName, $eventData = null )
 	{
-		$_manager = $this->get( 'event_manager' );
+		$_manager = $this->getEventManager();
 
 		if ( empty( $_manager ) )
 		{
@@ -201,7 +193,7 @@ abstract class Seed implements \Kisma\Core\Interfaces\SeedEvents
 	}
 
 	/**
-	 * Allows for asking for attributes by using "get_<name>" and "set_<name>"
+	 * Allows for attribute access by using "get[_]<AttributeName>" and "set[_]<AttributeName>"
 	 *
 	 * @param $name
 	 * @param $arguments
@@ -212,30 +204,58 @@ abstract class Seed implements \Kisma\Core\Interfaces\SeedEvents
 	public function __call( $name, $arguments )
 	{
 		//	If we don't have any attribute storage, bail
-		if ( $this->_attributes )
+		if ( $this->_attributeStorage )
 		{
-			$_prefix = strtolower( substr( $name, 0, 4 ) );
+			$_prefix = strtolower( substr( trim( $name ), 0, 3 ) );
 
-			if ( 'get_' == $_prefix || 'set_' == $_prefix )
+			if ( 'get' == $_prefix || 'set' == $_prefix )
 			{
-				$_attribute = strtolower( substr( $name, 4 ) );
-
-				switch ( $_prefix )
-				{
-					case 'get_':
-						if ( isset( $this->_attributes->{$_attribute} ) )
-						{
-							array_unshift( $arguments, $_attribute );
-							return call_user_func_array( array( $this->_attributes, 'get' ), $arguments );
-						}
-						break;
-
-					case 'set_':
-						array_unshift( $arguments, $_attribute );
-						return call_user_func_array( array( $this->_attributes, 'set' ), $arguments );
-				}
+				array_unshift( $arguments, substr( $name, ( '_' == $name[4] ? 4 : 3 ) ) );
+				return call_user_func_array( array( $this->_attributeStorage, $_prefix ), $arguments );
 			}
 		}
+	}
+
+	//*************************************************************************
+	//* Private Methods
+	//*************************************************************************
+
+	/**
+	 * @param array|object $attributes
+	 *
+	 * @return bool
+	 * @throws \Kisma\InvalidAttributeValueException
+	 */
+	protected function _initializeStorage( $attributes = array() )
+	{
+		$_storageProvider = \Kisma\Utility\Option::get( $attributes, self::AttributeStorage, $this->_attributeStorage, true );
+
+		if ( false === $_storageProvider )
+		{
+			return false;
+		}
+
+		//	Set our default storage class
+		if ( null === $_storageProvider )
+		{
+			$_storageProvider = self::DefaultStorageProvider;
+		}
+
+		//	Must be a class name or implement the base storage provider interface
+		if ( !is_string( $_storageProvider ) && !( $_storageProvider instanceof \Kisma\Core\Interfaces\StorageProvider ) )
+		{
+			throw new \Kisma\InvalidAttributeValueException( self::AttributeStorage, $_storageProvider );
+		}
+
+		$this->_attributeStorage = new $_storageProvider(
+			$this->getDefaultAttributes()
+		);
+
+		//	Now add the attributes...
+		$this->set( $attributes );
+
+		//	We're done!
+		return true;
 	}
 
 	//*************************************************************************
@@ -249,41 +269,40 @@ abstract class Seed implements \Kisma\Core\Interfaces\SeedEvents
 	 */
 	public function getDefaultAttributes()
 	{
-		if ( $this instanceof \Kisma\Core\Interfaces\Reactor )
-		{
-			return array(
-				'auto_attach_events' => true,
-				'event_manager'      => '\\Kisma\\Utility\\EventManager',
-			);
-		}
+		return array(
+			//	This is my hash. There are many like it, but this one is mine.
+			self::Id               => spl_object_hash( $this ),
+			self::Tag              => \Kisma\Utility\Inflector::tag( get_called_class(), true ),
+			self::Name             => \Kisma\Utility\Inflector::tag( get_called_class() ),
+			self::AutoAttachEvents => ( $this instanceof \Kisma\Core\Interfaces\Reactor ),
+			self::EventManager     => ( $this instanceof \Kisma\Core\Interfaces\Reactor ? self::DefaultEventManager : null ),
+		);
 	}
 
 	/**
-	 * Gets an attribute
-	 *
-	 * @param string|array $name
-	 * @param mixed        $defaultValue
-	 *
-	 * @return mixed
-	 * @convenience
+	 * {@InheritDoc}
 	 */
-	public function get( $name, $defaultValue = null )
+	public function get( $key = null, $defaultValue = null, $burnAfterReading = false )
 	{
-		return !empty( $this->_attributes ) ? $this->_attributes->get( $name, $defaultValue ) : $defaultValue;
+		return
+			!empty( $this->_attributeStorage )
+				?
+				$this->_attributeStorage->get( $key, $defaultValue, $burnAfterReading )
+				:
+				$defaultValue;
 	}
 
 	/**
-	 * Sets an attribute
-	 *
-	 * @param string|array $name
-	 * @param mixed        $value
-	 *
-	 * @return bool
-	 * @convenience
+	 * {@InheritDoc}
 	 */
-	public function set( $name, $value = null )
+	public function set( $key, $value = null, $overwrite = true )
 	{
-		return !empty( $this->_attributes ) ? $this->_attributes->set( $name, $value ) : false;
+		return
+			!empty( $this->_attributeStorage )
+				?
+				$this->_attributeStorage->set( $key, $value, $overwrite = true )
+				:
+				false;
 	}
 
 	//*************************************************************************
@@ -291,30 +310,22 @@ abstract class Seed implements \Kisma\Core\Interfaces\SeedEvents
 	//*************************************************************************
 
 	/**
-	 * @return string
-	 */
-	public function getSeedId()
-	{
-		return $this->_seedId;
-	}
-
-	/**
-	 * @param array|mixed $storage
+	 * @param \Kisma\Core\Interfaces\StorageProvider $storage
 	 *
 	 * @return \Kisma\Core\Seed
 	 */
-	public function setStorage( $storage )
+	public function setAttributeStorage( $storage )
 	{
-		$this->_attributes = $storage;
+		$this->_attributeStorage = $storage;
 		return $this;
 	}
 
 	/**
-	 * @return array|mixed
+	 * @return \Kisma\Core\Interfaces\StorageProvider
 	 */
-	public function getStorage()
+	public function getAttributeStorage()
 	{
-		return $this->_attributes;
+		return $this->_attributeStorage;
 	}
 
 }

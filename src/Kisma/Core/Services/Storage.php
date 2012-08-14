@@ -14,7 +14,7 @@ namespace Kisma\Core\Services;
  * Storage
  * A dead-simple storage class.  Keeps key value pairs in an array.
  */
-class Storage extends \Kisma\Core\Service
+class Storage extends \Kisma\Core\Service implements \Kisma\Core\Interfaces\StorageProvider
 {
 	//********************************************************************************
 	//* Member Variables
@@ -28,6 +28,29 @@ class Storage extends \Kisma\Core\Service
 	//*************************************************************************
 	//* Magical Crap
 	//*************************************************************************
+
+	/**
+	 * @param array $attributes
+	 */
+	public function __construct( $attributes = array() )
+	{
+		//	Since we are the default attribute provider, we cannot have nice things (like our own attributes). :(
+		$this->_attributeStorage = false;
+
+		$_storage = array();
+
+		array_walk( \Kisma\Utility\Option::clean( $attributes ),
+			function ( $value, $key ) use ( &$_storage )
+			{
+				\Kisma\Utility\Option::set( $_storage, $key, $value );
+			}
+		);
+
+		//	Set the cleaned up storage center
+		$this->_storage = $_storage;
+
+		parent::__construct();
+	}
 
 	/**
 	 * @param string $name
@@ -57,7 +80,7 @@ class Storage extends \Kisma\Core\Service
 	 */
 	public function __isset( $name )
 	{
-		return isset( $this->_attributes, $this->_attributes[$name] );
+		return is_array( $this->_storage ) && isset( $this->_storage, $this->_storage[\Kisma\Utility\Inflector::tag( $name, true )] );
 	}
 
 	//*************************************************************************
@@ -75,22 +98,25 @@ class Storage extends \Kisma\Core\Service
 	{
 		parent::initialize( $options );
 
-		if ( empty( $this->_serviceName ) )
+		if ( null === ( $_default = $this->getName() ) )
 		{
-			$this->_serviceName = \Kisma\Utility\Inflector::tag( get_called_class() );
+			$_default = \Kisma\Utility\Inflector::tag( get_called_class() );
 		}
+
+		$this->setName(
+			\Kisma\Utility\Option::get(
+				$options,
+				\Kisma\Core\Interfaces\SeedAttributes::Name,
+				$_default
+			),
+			true
+		);
 
 		return true;
 	}
 
 	/**
-	 * Sets the values of one or more attributes in storage
-	 *
-	 * @param string|array $key
-	 * @param mixed|null   $value
-	 * @param bool         $overwrite If an array of keys was passed, setting this to true will replace the existing storage contents
-	 *
-	 * @return bool
+	 * {@InheritDoc}
 	 */
 	public function set( $key, $value = null, $overwrite = false )
 	{
@@ -127,14 +153,9 @@ class Storage extends \Kisma\Core\Service
 	}
 
 	/**
-	 * Gets the values of one or more attributes from storage
-	 *
-	 * @param string|array $key          Single key or an array of keys
-	 * @param mixed        $defaultValue Will affect default value of all array values if array requested
-	 *
-	 * @return array|bool|mixed|null|string
+	 * {@InheritDoc}
 	 */
-	public function get( $key = null, $defaultValue = null )
+	public function get( $key = null, $defaultValue = null, $burnAfterReading = false )
 	{
 		if ( false === $this->_storage )
 		{

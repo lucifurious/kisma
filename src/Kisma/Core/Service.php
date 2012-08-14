@@ -30,6 +30,10 @@ abstract class Service extends Seed implements \Kisma\Core\Interfaces\ServiceEve
 	 * @var string The name of this service
 	 */
 	protected $_serviceName = null;
+	/**
+	 * @var string The tag of this service
+	 */
+	protected $_serviceTag = null;
 
 	//*************************************************************************
 	//* Public Methods
@@ -57,22 +61,39 @@ abstract class Service extends Seed implements \Kisma\Core\Interfaces\ServiceEve
 	 */
 	public function onAfterConstruct( $event = null )
 	{
-		if ( parent::onAfterConstruct( $event ) )
-		{
-			return $this->initialize( $event->getData() );
-		}
-
-		return false;
+		return
+			(
+				parent::onAfterConstruct( $event ) && $this->initialize( $event->getData() )
+			);
 	}
 
 	/**
 	 * @param \Kisma\Core\Events\SeedEvent $event
 	 *
-	 * @return bool
+	 * @return bool Default implementation always returns true
 	 */
-	public function onBeforeServiceCall( $event )
+	public function onBeforeServiceCall( $event = null )
 	{
-		//	Default implementation
+		return true;
+	}
+
+	/**
+	 * @param \Kisma\Core\Events\SeedEvent $event
+	 *
+	 * @return bool Default implementation always returns true
+	 */
+	public function onAfterServiceCall( $event = null )
+	{
+		return true;
+	}
+
+	/**
+	 * @param \Kisma\Core\Events\SeedEvent $event
+	 *
+	 * @return bool Default implementation always returns true
+	 */
+	public function onSuccess( $event = null )
+	{
 		return true;
 	}
 
@@ -81,9 +102,8 @@ abstract class Service extends Seed implements \Kisma\Core\Interfaces\ServiceEve
 	 *
 	 * @return bool
 	 */
-	public function onAfterServiceCall( $event )
+	public function onFailure( $event = null )
 	{
-		//	Default implementation
 		return true;
 	}
 

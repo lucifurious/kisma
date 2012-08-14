@@ -163,6 +163,59 @@ class ProcessLockFileException extends KismaException
 //* Property
 //*************************************************************************
 
+/**  */
+class AttributeException extends KismaException
+{
+}
+
+/**  */
+class InvalidAttributeValueException extends AttributeException
+{
+	//*************************************************************************
+	//* Public Methods
+	//*************************************************************************
+
+	/**
+	 * @param string $key
+	 * @param mixed  $value
+	 * @param mixed  $previous
+	 * @param mixed  $info
+	 */
+	public function __construct( $key = null, $value = null, $previous = null, $info = null )
+	{
+		$_message =
+			'An invalid value was provided for the attribute "' . $key . '": ' .
+				(
+				is_scalar( $value ) ? $value :
+					(
+					null === $value ? 'NULL' : print_r( $value, true )
+					)
+				);
+
+		parent::__construct( $_message, null, $previous, $info );
+	}
+}
+
+/**  */
+class InvalidAttributeKeyException extends AttributeException
+{
+	//*************************************************************************
+	//* Public Methods
+	//*************************************************************************
+
+	/**
+	 * @param string $key      The rejected key
+	 * @param mixed  $provider Class name of the storage provider
+	 * @param mixed  $previous
+	 * @param mixed  $info
+	 */
+	public function __construct( $key = null, $provider = null, $previous = null, $info = null )
+	{
+		$_message = 'The key "' . $key . '" is not valid for attributes storage provider: ' . $provider;
+		parent::__construct( $_message, null, $previous, $info );
+	}
+}
+
 /**
  * A base exception for property errors
  */

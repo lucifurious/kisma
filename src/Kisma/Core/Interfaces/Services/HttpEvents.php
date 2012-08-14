@@ -1,13 +1,14 @@
 <?php
 /**
  * HttpEvents.php
+ * Standard ANSI color attributes
  *
- * @author Jerry Ablan <jablan@silverpop.com>
- *         Copyright (c) 2012 Silverpop Systems, Inc.
- *         http://www.silverpop.com Silverpop Systems, Inc.
+ * Kisma(tm) : PHP Fun-Size Framework (http://github.com/lucifurious/kisma/)
+ * Copyright 2009-2012, Jerry Ablan, All Rights Reserved
  *
- * @author Jerry Ablan <jablan@silverpop.com>
- * @filesource
+ * @copyright Copyright (c) 2009-2012 Jerry Ablan
+ * @license   http://github.com/lucifurious/kisma/blob/master/LICENSE
+ * @author    Jerry Ablan <get.kisma@gmail.com>
  */
 namespace Kisma\Core\Interfaces\Services;
 
