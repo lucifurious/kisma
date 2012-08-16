@@ -10,8 +10,8 @@
  * @author    Jerry Ablan <get.kisma@gmail.com>
  */
 require_once __DIR__ . '/Kisma/enums.php';
-require_once __DIR__ . '/Kisma/Utility/Option.php';
-require_once __DIR__ . '/Kisma/Utility/Inflector.php';
+require_once __DIR__ . '/Kisma/Core/Utility/Option.php';
+require_once __DIR__ . '/Kisma/Core/Utility/Inflector.php';
 require_once __DIR__ . '/Kisma/Core/Interfaces/KismaEvents.php';
 
 /**
@@ -61,13 +61,13 @@ class Kisma implements \Kisma\Core\Interfaces\KismaEvents
 			}
 
 			//	Set any application-level options passed in
-			self::$_options = \Kisma\Utility\Option::merge( self::$_options, $options );
+			self::$_options = \Kisma\Core\Utility\Option::merge( self::$_options, $options );
 
 			//	Register our faux-destructor
 			\register_shutdown_function(
 				function ( $eventName = \Kisma\Core\Interfaces\KismaEvents::Death )
 				{
-					\Kisma\Utility\EventManager::publish( null, $eventName );
+					\Kisma\Core\Utility\EventManager::publish( null, $eventName );
 				}
 			);
 
@@ -75,7 +75,7 @@ class Kisma implements \Kisma\Core\Interfaces\KismaEvents
 			self::set( 'conception', true );
 
 			//	And let the world know we're alive
-			\Kisma\Utility\EventManager::publish( null, self::Birth );
+			\Kisma\Core\Utility\EventManager::publish( null, self::Birth );
 		}
 
 		return self::get( 'conception' );
@@ -89,7 +89,7 @@ class Kisma implements \Kisma\Core\Interfaces\KismaEvents
 	 */
 	public static function set( $key, $value = null )
 	{
-		return \Kisma\Utility\Option::set( self::$_options, $key, $value );
+		return \Kisma\Core\Utility\Option::set( self::$_options, $key, $value );
 	}
 
 	/**
@@ -106,7 +106,7 @@ class Kisma implements \Kisma\Core\Interfaces\KismaEvents
 			return self::$_options;
 		}
 
-		return \Kisma\Utility\Option::get( self::$_options, $key, $defaultValue, $removeIfFound );
+		return \Kisma\Core\Utility\Option::get( self::$_options, $key, $defaultValue, $removeIfFound );
 	}
 
 	//*************************************************************************

@@ -17,7 +17,7 @@
     <inspection_tool class="PhpUndefinedFieldInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true">
       <option name="DOWNGRADE_SEVERITY" value="true" />
     </inspection_tool>
-    <inspection_tool class="PhpUndefinedMethodInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+    <inspection_tool class="PhpUndefinedMethodInspection" enabled="true" level="INFO" enabled_by_default="true">
       <option name="DOWNGRADE_SEVERITY" value="true" />
     </inspection_tool>
     <inspection_tool class="RequiredAttributes" enabled="true" level="WARNING" enabled_by_default="true">

@@ -74,6 +74,6 @@ class KismaTest extends PHPUnit_Framework_TestCase
 	public function testGetOptions()
 	{
 		$this->assertTrue( is_array( $_options = \Kisma::getOptions() ) );
-		$this->assertArrayHasKey( \Kisma\Utility\Inflector::tag( 'testSetOption', true ), $_options );
+		$this->assertArrayHasKey( \Kisma\Core\Utility\Inflector::tag( 'testSetOption', true ), $_options );
 	}
 }

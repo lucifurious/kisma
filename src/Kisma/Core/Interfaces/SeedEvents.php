@@ -22,9 +22,28 @@ interface SeedEvents
 	/**
 	 * @var string
 	 */
-	const AfterConstruct = 'kisma.foundation.events.after_construct';
+	const AfterConstruct = 'kisma.core.seed.after_construct';
 	/**
 	 * @var string
 	 */
-	const BeforeDestruct = 'kisma.foundation.events.before_destruct';
+	const BeforeDestruct = 'kisma.core.seed.before_destruct';
+
+	//*************************************************************************
+	//* Public Methods
+	//*************************************************************************
+
+	/**
+	 * @param \Kisma\Core\Events\SeedEvent $event
+	 *
+	 * @return bool
+	 */
+	public function onBeforeDestruct( $event = null );
+
+	/**
+	 * @param \Kisma\Core\Events\SeedEvent $event
+	 *
+	 * @return bool
+	 */
+	public function onAfterConstruct( $event = null );
+
 }

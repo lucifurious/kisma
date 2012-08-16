@@ -35,7 +35,7 @@ interface StorageProvider
 	 * @param mixed             $value
 	 * @param bool              $overwrite If true, any existing value will be overwritten
 	 *
-	 * @return mixed
+	 * @return StorageProvider
 	 */
 	public function set( $key, $value = null, $overwrite = true );
 

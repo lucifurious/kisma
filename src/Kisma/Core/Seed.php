@@ -145,16 +145,13 @@ class Seed implements \Kisma\Core\Interfaces\SeedEvents, \Kisma\Core\Interfaces\
 		$this->_tag = \Kisma\Core\Utility\Inflector::tag( get_called_class(), true );
 		$this->_name = \Kisma\Core\Utility\Inflector::tag( get_called_class() );
 
-		if ( $this instanceof \Kisma\Core\Interfaces\Reactor )
+		if ( false !== ( $this->_discoverEvents = ( $this instanceof \Kisma\Core\Interfaces\Reactor ) ) )
 		{
-			$this->_discoverEvents = ( $this instanceof \Kisma\Core\Interfaces\Reactor );
-			$this->addServiceClass( 'event_manager', self::DefaultEventManager );
-		}
+			//	Add the event service
+			$_manager = $this->addServiceClass( 'event_manager', self::DefaultEventManager );
 
-		//	Attach any event handlers we find if desired and object is a reactor...
-		if ( true === $this->_discoverEvents )
-		{
-			if ( false !== ( $_manager = $this->getServiceClass( 'event_manager' ) ) )
+			//	Attach any event handlers we find if desired and object is a reactor...
+			if ( false !== $_manager )
 			{
 				//	Subscribe to events...
 				call_user_func(
@@ -360,11 +357,12 @@ class Seed implements \Kisma\Core\Interfaces\SeedEvents, \Kisma\Core\Interfaces\
 	 * @param string         $name
 	 * @param string|Service $service
 	 *
-	 * @return string
+	 * @return string|Service
 	 */
 	public function addServiceClass( $name, $service )
 	{
-		return \Kisma\Core\Utility\Option::set( $this->_serviceMap, $name, $service );
+		\Kisma\Core\Utility\Option::set( $this->_serviceMap, $name, $service );
+		return $service;
 	}
 
 	//*************************************************************************

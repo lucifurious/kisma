@@ -53,7 +53,7 @@ abstract class Http extends \Kisma\Core\Service implements \Kisma\Core\Interface
 		//	Trigger the event
 		return $this->trigger(
 			self::RequestReceived,
-			$this->_request = \Kisma\Utility\Option::get( $options, 'request', $_REQUEST )
+			$this->_request = \Kisma\Core\Utility\Option::get( $options, 'request', $_REQUEST )
 		);
 	}
 

@@ -2,25 +2,62 @@
 /**
  * SeedTest_Object
  */
-class SeedTest_Object extends \Kisma\Core\Seed
+class SeedTest_Object extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\Reactor
 {
+	//*************************************************************************
+	//* Public Members
+	//*************************************************************************
+
+	/**
+	 * @var bool
+	 */
+	public $constructEvent = false;
+	/**
+	 * @var bool
+	 */
+	public $destructEvent = false;
+	/**
+	 * @var \Kisma\Core\SeedTest
+	 */
+	public $tester = null;
+
 	//*************************************************************************
 	//* Public Methods
 	//*************************************************************************
 
 	/**
-	 * @return array
+	 * @param array                $settings
+	 * @param \Kisma\Core\SeedTest $tester
+	 *
+	 * @return \SeedTest_Object
 	 */
-	public function getDefaultAttributes()
+	public function __construct( $settings = array(), $tester = null )
 	{
-		return array_merge(
+		parent::__construct(
 			array(
 				'itemOne'   => 1,
 				'itemTwo'   => 2,
 				'itemThree' => 3,
-			),
-			parent::getDefaultAttributes()
+			)
 		);
+
+		$this->tester = $tester;
 	}
 
+	/**
+	 * {@InheritDoc}
+	 */
+	public function onAfterConstruct( $event = null )
+	{
+		return $this->constructEvent = parent::onAfterConstruct( $event );
+	}
+
+	/**
+	 * {@InheritDoc}
+	 */
+	public function onBeforeDestruct( $event = null )
+	{
+		$this->tester->destructorEventFired( 1 );
+		return parent::onBeforeDestruct( $event );
+	}
 }

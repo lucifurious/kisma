@@ -1,7 +1,5 @@
 <?php
 /**
- * Control.php
- *
  * Kisma(tm) : PHP Fun-Size Framework (http://github.com/lucifurious/kisma/)
  * Copyright 2009-2012, Jerry Ablan, All Rights Reserved
  *
@@ -11,46 +9,69 @@
  * @copyright          Copyright 2009-2012, Jerry Ablan, All Rights Reserved
  * @link               http://github.com/lucifurious/kisma/ Kisma(tm)
  * @license            http://github.com/lucifurious/kisma/licensing/
- * @author             Jerry Ablan <get.kisma@gmail.com>
+ * @author             Jerry Ablan <kisma@pogostick.com>
+ * @category           Kisma_Components
+ * @package            kisma.components
+ * @since              v1.0.0
  * @filesource
  */
-namespace Kisma\Core\Services;
+namespace Kisma\Components;
+
+use Kisma\Kisma as K;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Control
+ * Controller
+ * The base class for controllers
+ *
+ * Provides two event handlers:
+ *
+ * before_action and after_action which are called before and after the action is called, respectively.
  */
-abstract class Control extends \Kisma\Core\Service implements \Kisma\Core\Interfaces\ControlEvents
+abstract class Controller extends Seed implements \Silex\ControllerProviderInterface, \Kisma\IController
 {
 	//*************************************************************************
 	//* Private Members
 	//*************************************************************************
 
 	/**
-	 * @var string Storage key/nickname/short name for this controller
+	 * @var string The default action when none specified
+	 */
+	protected $_defaultAction = 'index';
+	/**
+	 * @var array The actions of this controller
+	 */
+	protected $_actions = null;
+	/**
+	 * @var string The name of this controller
+	 */
+	protected $_controllerName = null;
+	/**
+	 * @var string Storage key for this controller
 	 */
 	protected $_tag = null;
 	/**
-	 * @var Route[] The routes I know about
+	 * @var null|array The custom routes for this controller
+	 * @todo implement
 	 */
-	protected $_routes = array();
+	protected $_routes = null;
+	/**
+	 * @var bool True if request was a post vs. get
+	 */
+	protected $_isPost = false;
+	/**
+	 * @var Silex\Application
+	 */
+	protected $_app = null;
 
 	//*************************************************************************
 	//* Public Methods
 	//*************************************************************************
 
 	/**
-	 * @param string $tag
-	 * @param Route  $route
-	 */
-	public function addRoute( $tag, $route )
-	{
-		\Kisma\Core\Utility\Option::set( $this->_routes, $tag, $route );
-	}
-
-	/**
 	 * actions requests to actions
 	 *
-	 * @param \Kisma\Core\Services\Application|\Kisma\Kisma|\Silex\Application $app
+	 * @param \Kisma\Kisma|\Silex\Application $app
 	 *
 	 * @return ControllerCollection A ControllerCollection instance
 	 */
@@ -71,7 +92,7 @@ abstract class Control extends \Kisma\Core\Service implements \Kisma\Core\Interf
 			$_route = ( '/' != $_action ? '/' . $_action . '/' : '/' );
 
 			$_controllers->match( $_route,
-				function ( Application $app, Request $request ) use ( $_action, $_method, $_tag )
+				function( Application $app, Request $request ) use( $_action, $_method, $_tag )
 				{
 					$_event = new \Kisma\Event\ControllerEvent( $app[$_tag] );
 
@@ -112,8 +133,7 @@ abstract class Control extends \Kisma\Core\Service implements \Kisma\Core\Interf
 
 		foreach ( $_mirror->getMethods( \ReflectionMethod::IS_PUBLIC ) as $_method )
 		{
-			if ( 'action' == strtolower( substr( $_method->name,
-				strlen( $_method->name ) - 6,
+			if ( 'action' == strtolower( substr( $_method->name, strlen( $_method->name ) - 6,
 				6 ) ) && 'on' != strtolower( substr( $_method->name, 0, 2 ) )
 			)
 			{

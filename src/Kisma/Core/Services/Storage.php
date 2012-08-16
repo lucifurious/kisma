@@ -14,14 +14,14 @@ namespace Kisma\Core\Services;
  * Storage
  * A dead-simple storage class.  Keeps key value pairs in an array.
  */
-class Storage extends \Kisma\Core\Service implements \Kisma\Core\Interfaces\StorageProvider
+class Storage extends \Kisma\Core\Service implements \Kisma\Core\Interfaces\StorageProvider, \Kisma\Core\Interfaces\StorageService
 {
 	//********************************************************************************
 	//* Member Variables
 	//********************************************************************************
 
 	/**
-	 * @var array|mixed Object attributes storage. Set to false to disable feature
+	 * @var array|\Kisma\Core\Interfaces\StorageService The storage array
 	 */
 	protected $_storage = array();
 
@@ -30,24 +30,22 @@ class Storage extends \Kisma\Core\Service implements \Kisma\Core\Interfaces\Stor
 	//*************************************************************************
 
 	/**
-	 * @param array $attributes
+	 * @param array $data
 	 */
-	public function __construct( $attributes = array() )
+	public function __construct( $data = array() )
 	{
-		//	Since we are the default attribute provider, we cannot have nice things (like our own attributes). :(
-		$this->_attributeStorage = false;
-
 		$_storage = array();
 
-		array_walk( \Kisma\Utility\Option::clean( $attributes ),
+		array_walk( \Kisma\Core\Utility\Option::clean( $data ),
 			function ( $value, $key ) use ( &$_storage )
 			{
-				\Kisma\Utility\Option::set( $_storage, $key, $value );
+				\Kisma\Core\Utility\Option::set( $_storage, $key, $value );
 			}
 		);
 
 		//	Set the cleaned up storage center
 		$this->_storage = $_storage;
+		unset( $_storage );
 
 		parent::__construct();
 	}
@@ -59,7 +57,7 @@ class Storage extends \Kisma\Core\Service implements \Kisma\Core\Interfaces\Stor
 	 */
 	public function __get( $name )
 	{
-		return $this->get( $name );
+		return call_user_func_array( array( $this, 'get' ), func_get_args() );
 	}
 
 	/**
@@ -70,7 +68,7 @@ class Storage extends \Kisma\Core\Service implements \Kisma\Core\Interfaces\Stor
 	 */
 	public function __set( $name, $value )
 	{
-		return $this->set( $name, $value );
+		return call_user_func_array( array( $this, 'set' ), func_get_args() );
 	}
 
 	/**
@@ -80,7 +78,8 @@ class Storage extends \Kisma\Core\Service implements \Kisma\Core\Interfaces\Stor
 	 */
 	public function __isset( $name )
 	{
-		return is_array( $this->_storage ) && isset( $this->_storage, $this->_storage[\Kisma\Utility\Inflector::tag( $name, true )] );
+		return is_array( $this->_storage ) &&
+			array_key_exists( \Kisma\Core\Utility\Inflector::tag( $name, true ), $this->_storage );
 	}
 
 	//*************************************************************************
@@ -96,23 +95,22 @@ class Storage extends \Kisma\Core\Service implements \Kisma\Core\Interfaces\Stor
 	 */
 	public function initialize( $options = array() )
 	{
-		parent::initialize( $options );
+		return true;
+	}
 
-		if ( null === ( $_default = $this->getName() ) )
+	/**
+	 * {@InheritDoc}
+	 */
+	public function initializeStorage( $options = array() )
+	{
+		$this->_storage = array();
+
+		foreach ( \Kisma\Core\Utility\Option::merge( $this->getDefaultSettings(), $options ) as $_key => $_value )
 		{
-			$_default = \Kisma\Utility\Inflector::tag( get_called_class() );
+			\Kisma\Core\Utility\Option::set( $this->_storage, $_key, $_value );
 		}
 
-		$this->setName(
-			\Kisma\Utility\Option::get(
-				$options,
-				\Kisma\Core\Interfaces\SeedAttributes::Name,
-				$_default
-			),
-			true
-		);
-
-		return true;
+		return $this->_storage;
 	}
 
 	/**
@@ -120,36 +118,30 @@ class Storage extends \Kisma\Core\Service implements \Kisma\Core\Interfaces\Stor
 	 */
 	public function set( $key, $value = null, $overwrite = false )
 	{
-		if ( false === $this->_storage )
-		{
-			return false;
-		}
-
-		//	First time in?
-		if ( null === $this->_storage )
+		if ( empty( $this->_storage ) )
 		{
 			$this->initializeStorage();
 		}
 
-		$_attributes = \Kisma\Utility\Option::collapse( $key, $value );
+		$_settings = \Kisma\Core\Utility\Option::collapse( $key, $value );
 
 		//	Can't do nothing 'til they stop sparklin'
-		if ( !empty( $_attributes ) )
+		if ( !empty( $_settings ) )
 		{
-			//	Overwrite if the conditions are right
-			if ( false !== $overwrite && is_array( $key ) && null === $value )
+			//	Set the value(s)
+			foreach ( $_settings as $_key => $_value )
 			{
-				//	Overwrite the attributes...
-				$this->_storage = $key;
-			}
-			else
-			{
-				//	Merge the options...
-				\Kisma\Utility\Option::set( $this->_storage, $_attributes );
+				//	Don't overwrite if not wanted...
+				if ( false === $overwrite && isset( $this->_storage[\Kisma\Core\Utility\Inflector::tag( $_key, true )] ) )
+				{
+					continue;
+				}
+
+				\Kisma\Core\Utility\Option::set( $this->_storage, $_key, $_value );
 			}
 		}
 
-		return true;
+		return $this;
 	}
 
 	/**
@@ -157,47 +149,25 @@ class Storage extends \Kisma\Core\Service implements \Kisma\Core\Interfaces\Stor
 	 */
 	public function get( $key = null, $defaultValue = null, $burnAfterReading = false )
 	{
-		if ( false === $this->_storage )
+		if ( empty( $this->_storage ) )
 		{
-			return null;
-		}
-
-		if ( empty( $key ) )
-		{
-			return $this->getStorage();
+			$this->initializeStorage();
 		}
 
 		if ( !is_array( $key ) )
 		{
-			return \Kisma\Utility\Option::get( $this->_storage, $key, $defaultValue );
+			return \Kisma\Core\Utility\Option::get( $this->_storage, $key, $defaultValue );
 		}
 
 		foreach ( $key as $_key )
 		{
 			if ( isset( $this->_storage[$_key] ) )
 			{
-				$key[$_key] = \Kisma\Utility\Option::get( $this->_storage, $_key, $defaultValue );
+				$key[$_key] = \Kisma\Core\Utility\Option::get( $this->_storage, $_key, $defaultValue );
 			}
 		}
 
 		return $key;
-	}
-
-	/**
-	 * Base initialization of storage. Child classes can override to use a database or document store
-	 *
-	 * @return array
-	 */
-	public function initializeStorage()
-	{
-		$this->_storage = array();
-
-		foreach ( $this->getDefaultAttributes() as $_attribute => $_defaultValue )
-		{
-			\Kisma\Utility\Option::set( $this->_storage, $_attribute, $_defaultValue );
-		}
-
-		return $this->_storage;
 	}
 
 	//*************************************************************************
@@ -207,7 +177,7 @@ class Storage extends \Kisma\Core\Service implements \Kisma\Core\Interfaces\Stor
 	/**
 	 * @param array|mixed $storage
 	 *
-	 * @return \Kisma\Core\Seed
+	 * @return \Kisma\Core\Services\Storage
 	 */
 	public function setStorage( $storage )
 	{
@@ -216,7 +186,7 @@ class Storage extends \Kisma\Core\Service implements \Kisma\Core\Interfaces\Stor
 	}
 
 	/**
-	 * @return array|mixed
+	 * @return array|\Kisma\Core\Interfaces\StorageService
 	 */
 	public function getStorage()
 	{

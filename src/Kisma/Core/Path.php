@@ -45,7 +45,7 @@ abstract class Route extends \Kisma\Core\Service implements \Kisma\Core\Interfac
 	 */
 	public function addRoute( $tag, $route )
 	{
-		\Kisma\Utility\Option::set( $this->_routes, $tag, $route );
+		\Kisma\Core\Utility\Option::set( $this->_routes, $tag, $route );
 	}
 
 	/**
@@ -119,7 +119,7 @@ abstract class Route extends \Kisma\Core\Service implements \Kisma\Core\Interfac
 			)
 			{
 				$_routeName =
-					lcfirst( \Kisma\Utility\Inflector::camelize( str_ireplace( 'Action', null, $_method->name ) ) );
+					lcfirst( \Kisma\Core\Utility\Inflector::camelize( str_ireplace( 'Action', null, $_method->name ) ) );
 
 				$_actions[$_routeName] = $_method->name;
 
@@ -133,7 +133,7 @@ abstract class Route extends \Kisma\Core\Service implements \Kisma\Core\Interfac
 
 		$this->setControllerName(
 			lcfirst(
-				\Kisma\Utility\Inflector::camelize(
+				\Kisma\Core\Utility\Inflector::camelize(
 					str_ireplace( array( 'ControllerProvider', 'Controller' ), null, $_mirror->getShortName() )
 				)
 			)
