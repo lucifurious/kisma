@@ -1,10 +1,7 @@
 {
-    "hash": "57a253343bd85339966b40b71d08111a",
+    "hash": "30e6989237167282a846b426d10b240c",
     "packages": [
-        {
-            "package": "monolog/monolog",
-            "version": "1.1.0"
-        }
+
     ],
     "packages-dev": null,
     "aliases": [
