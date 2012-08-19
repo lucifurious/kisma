@@ -1,6 +1,6 @@
 {
 	"name":         "kisma/kisma",
-	"description":  "PHP Fun-Size Framework",
+	"description":  "A Fun-Sized PHP Framework",
 	"keywords":     [
 		"php", "php5", "rest", "mvc", "framework"
 	],
