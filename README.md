@@ -2,8 +2,8 @@
 
 NOTE: I'm in the process of restructuring the library. Please wait until I release a beta before you try to use it.
 
-Kisma! The Fun-Size Framework
-=============================
+Kisma! A Fun-Sized PHP Framework
+==================================
 Thanks for checking out *Kisma*!
 
 <a href="http://www.jetbrains.com/phpstorm/" style="display:block;alt="PHP IDE with advanced HTML/CSS/JavaScript editor for hardcore web-developers" title="PHP IDE with advanced HTML/CSS/JavaScript editor for hardcore web-developers">
@@ -13,13 +13,13 @@ Thanks for checking out *Kisma*!
 
 About the name...
 =================
-Besides being a town in the Rift Valley of Kenya, "kisma" is the ![Quechuan](http://en.wikipedia.org/wiki/Quechua) word for "womb". Since all living things are birthed from a womb (of sorts) I thought why not applications? So the that's where I came up with the name.
+Besides being a town in the Rift Valley of Kenya, "kisma" is the Quechuan word for "womb". Since all living things are birthed from a womb (sort of) I thought why not applications? So the that's where I came up with the name. Yes, it's whimsical. Big whoop, whaddya gonna do about it?
 
-The base class of the Kisma library classes is called "Seed", as it is from this class that all framework functionality springs.
+The core base class of many Kisma library classes is called "Seed", as it is from this class that all life (i.e. application functionality) springs.
 
-Secondly, the "size" of the framework is labeled as "fun-size". Yes, I've chosen a whimisical adjective to describe the type of framework this is. I've grown weary of the micro-, macro-, nano-, mega- framework arguments of late.
+Secondly, the "size" of the library is labeled as "fun-sized". Yes, more whimsicality. I've grown weary of the micro-, macro-, nano-, mega- framework arguments of late. So cope.
 
-A framework is supposed to help you, the coder, develop whatever it is you're developing in a timely, productive fashion. If you have to jump through a thousand hoops just to bootstrap the damned framework, it's not easy.  If there are choices for configuration file formats, that's not easy. I'm all for flexibility, but I'm more in favor of maintainability. I can't have one person on my team writing his config files in YAML, another in PHP, one in XML, etc. I'm not knocking frameworks that accept this. I'm just saying that I've avoided that.
+A framework is supposed to help you, the coder, develop whatever it is you're developing in a timely, productive fashion. If you have to jump through a thousand hoops just to bootstrap the damned framework, it's not easy.  If there are choices for configuration file formats, that's not easy. I'm all for flexibility, but I'm more in favor of maintainability. I can't have one person on my team writing his config files in YAML, another in PHP, one in XML, etc. I'm not knocking frameworks that accept this. I'm just saying that I've avoided that for the sake of consistency and readability.
 
 Design Goals
 ============
@@ -31,8 +31,9 @@ This framework is NOT designed for ultra-fast performance (but it isn't slow eit
 * Fully leverage PHP 5.3, its features such as namespaces, embracing the DRY KISS.
 * Use built-in PHP library calls whenever possible for speed.
 * Consistent access/interface usage by all objects
-* Completely extensible from the base up, minimal cohesion and coupling, heavy use of DI whereever possible
-* Usable from/with any other framework
+* Completely extensible from the base up, minimal cohesion and coupling.
+* Usable from/with any other framework or library
+* ABSOLUTELY NO USE OF MAGIC __get() AND __set()
 
 I will be working on more documentation when I flesh out my model more.
 
@@ -44,6 +45,7 @@ Features
 * All setters return $this for easy chaining
 * Easy to configure
 * PSR-0 compliant
+* Registered with Packagist, Composer-compatible!
 
 Notes
 =====
