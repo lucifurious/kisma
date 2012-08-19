@@ -110,7 +110,6 @@ class EventManager
 				if ( null !== ( $_eventTag = $_mirror->getConstant( $_eventName ) ) )
 				{
 					//	We have a winner!
-
 					if ( !isset( $_listeners[$_eventTag] ) )
 					{
 						$_listeners[$_eventTag] = array();

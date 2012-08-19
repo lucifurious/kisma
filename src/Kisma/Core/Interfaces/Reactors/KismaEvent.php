@@ -1,13 +1,14 @@
 <?php
 /**
- * KismaEvents.php
+ * KismaEvent.php
  */
-namespace Kisma\Core\Interfaces;
+namespace Kisma\Core\Interfaces\Reactors;
 
 /**
+ * KismaEvent
  * The Kisma application-level events
  */
-interface KismaEvents
+interface KismaEvent extends \Kisma\Core\Interfaces\Reactor
 {
 	//*************************************************************************
 	//* Constants

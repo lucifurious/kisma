@@ -4,7 +4,7 @@
  */
 require_once  __DIR__ . '/bootstrap.php';
 
-class KismaTest extends PHPUnit_Framework_TestCase
+class KismaTest extends \Kisma\Core\TestCase
 {
 	/**
 	 * @var \Kisma
@@ -54,7 +54,7 @@ class KismaTest extends PHPUnit_Framework_TestCase
 	 * @covers Kisma::set
 	 * @covers Kisma::get
 	 */
-	public function testSetOption()
+	public function testSet()
 	{
 		\Kisma::set( 'testSetOption', true );
 		$this->assertTrue( \Kisma::get( 'testSetOption' ) );
@@ -63,9 +63,21 @@ class KismaTest extends PHPUnit_Framework_TestCase
 	/**
 	 * @covers Kisma::get
 	 */
-	public function testGetOption()
+	public function testGet()
 	{
 		$this->assertTrue( \Kisma::get( 'testSetOption' ) );
+	}
+
+	/**
+	 * @covers Kisma::setOptions
+	 */
+	public function testSetOptions()
+	{
+		$this->assertTrue( is_array( $_options = \Kisma::getOptions() ) );
+		$_options['testSetOption2'] = true;
+		\Kisma::setOptions( $_options );
+
+		$this->assertTrue( \Kisma::get( 'testSetOption2', false ) );
 	}
 
 	/**

@@ -1,66 +1,64 @@
 <?php
 /**
- * Lumberjack.php
+ * Levels.php
  */
 namespace Kisma\Core\Interfaces;
-
 /**
- * Lumberjack
- * When a class implements this interface, it becomes a logger.
+ * Levels
+ * Individual log entry levels
  */
-interface Lumberjack
+interface Levels
 {
 	//*************************************************************************
 	//* Constants
 	//*************************************************************************
 
 	/**
-	 * @var int The default is info
+	 * @var int
 	 */
-	const __default = self::Info;
-
+	const Emergency = 600;
 	/**
-	 * @var int alert
+	 * @var int
 	 */
 	const Alert = 550;
 	/**
-	 * @var int critical error
+	 * @var int
 	 */
 	const Critical = 500;
 	/**
-	 * @var int error
+	 * @var int
 	 */
 	const Error = 400;
 	/**
-	 * @var int warning
+	 * @var int
 	 */
 	const Warning = 300;
 	/**
 	 * @var int
 	 */
+	const Notice = 250;
+	/**
+	 * @var int
+	 */
 	const Info = 200;
 	/**
-	 * @var int debug
+	 * @var int
 	 */
 	const Debug = 100;
-	/**
-	 * @var int trace (same as debug)
-	 */
-	const Trace = 100;
 
 	//*************************************************************************
-	//* Methods
+	//* Public Methods
 	//*************************************************************************
 
 	/**
 	 * @abstract
 	 *
 	 * @param string|\Exception $message
-	 * @param int|string        $level
-	 * @param string            $source
-	 * @param mixed             $data
+	 * @param int               $level
+	 * @param array             $context
+	 * @param mixed             $extra
 	 *
-	 * @return mixed
+	 * @return bool If warning level or greater, false is returned. Otherwise true.
 	 */
-	public function log( $message, $level, $source, $data = null );
+	public function log( $message, $level, $context = array(), $extra = null );
 }

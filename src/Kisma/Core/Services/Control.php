@@ -19,7 +19,7 @@ namespace Kisma\Core\Services;
 /**
  * Control
  */
-abstract class Control extends \Kisma\Core\Service implements \Kisma\Core\Interfaces\ControlEvents
+abstract class Control extends \Kisma\Core\Service implements \Kisma\Core\Interfaces\ControlEventReactor
 {
 	//*************************************************************************
 	//* Private Members

@@ -1,13 +1,13 @@
 <?php
 /**
- * RouteEvents.php
+ * ControlEvent.php
  */
-namespace Kisma\Core\Interfaces;
+namespace Kisma\Core\Interfaces\Reactors;
 
 /**
- * Events for request routers
+ * Events for request controllers
  */
-interface RouteEvents
+interface ControlEvent extends \Kisma\Core\Interfaces\Reactor
 {
 	//*************************************************************************
 	//* Constants
@@ -16,15 +16,26 @@ interface RouteEvents
 	/**
 	 * @var string
 	 */
-	const BeforeRouting = 'kisma.route.before_routing';
+	const RequestReceived = 'kisma.service.control.request_received';
 	/**
 	 * @var string
 	 */
-	const AfterRoutine = 'kisma.route.after_routing';
+	const BeforeRequestDispatch = 'kisma.service.control.before_request_dispatch';
+	/**
+	 * @var string
+	 */
+	const AfterRequestDispatch = 'kisma.service.control.after_request_dispatch';
 
 	//*************************************************************************
 	//* Public Methods
 	//*************************************************************************
+
+	/**
+	 * @param \Kisma\Core\Events\SeedEvent $event
+	 *
+	 * @return bool
+	 */
+	public function onRequestReceived( $event = null );
 
 	/**
 	 * @param \Kisma\Core\Events\SeedEvent $event

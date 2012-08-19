@@ -35,8 +35,10 @@ class Storage extends \Kisma\Core\Service implements \Kisma\Core\Interfaces\Stor
 	public function __construct( $data = array() )
 	{
 		$_storage = array();
+		$_data = \Kisma\Core\Utility\Option::clean( $data );
 
-		array_walk( \Kisma\Core\Utility\Option::clean( $data ),
+		array_walk(
+			$_data,
 			function ( $value, $key ) use ( &$_storage )
 			{
 				\Kisma\Core\Utility\Option::set( $_storage, $key, $value );

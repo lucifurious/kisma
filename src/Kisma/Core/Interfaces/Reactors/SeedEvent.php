@@ -1,19 +1,19 @@
 <?php
 /**
- * SeedEvents.php
+ * SeedEvent.php
  *
  * @description Kisma(tm) : PHP Fun-Size Framework (http://github.com/lucifurious/kisma/)
  * @copyright   Copyright (c) 2009-2012 Jerry Ablan
  * @license     http://github.com/lucifurious/kisma/blob/master/LICENSE
  * @author      Jerry Ablan <get.kisma@gmail.com>
  */
-namespace Kisma\Core\Interfaces;
+namespace Kisma\Core\Interfaces\Reactors;
 
 /**
- * SeedEvents
+ * SeedEvent
  * Defines the event interface for all seeds
  */
-interface SeedEvents
+interface SeedEvent extends \Kisma\Core\Interfaces\Reactor
 {
 	//*************************************************************************
 	//* Constants

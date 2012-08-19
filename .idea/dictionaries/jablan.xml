@@ -20,8 +20,10 @@
       <w>faux</w>
       <w>filesource</w>
       <w>github</w>
+      <w>hasher</w>
       <w>inflector</w>
       <w>isset</w>
+      <w>japhrimel</w>
       <w>kisma</w>
       <w>kisma's</w>
       <w>lucifurious</w>
@@ -33,15 +35,18 @@
       <w>pogostick</w>
       <w>potencier</w>
       <w>sapi</w>
+      <w>serializedneeds</w>
       <w>sparklin</w>
       <w>streamable</w>
       <w>submodule</w>
       <w>submodules</w>
       <w>traversable</w>
+      <w>umask</w>
       <w>unalias</w>
       <w>unapply</w>
       <w>undefineds</w>
       <w>unlinks</w>
+      <w>unserialized</w>
       <w>unsets</w>
       <w>virtualize</w>
       <w>virtualized</w>

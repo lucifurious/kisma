@@ -20,21 +20,8 @@ namespace Kisma\Core;
  *
  * @property string $serviceName The name of this service
  */
-abstract class Service extends Seed implements \Kisma\Core\Interfaces\ServiceEvents
+abstract class Service extends Seed implements \Kisma\Core\Interfaces\Reactors\ServiceEvent
 {
-	//********************************************************************************
-	//* Private Members
-	//********************************************************************************
-
-	/**
-	 * @var string The name of this service
-	 */
-	protected $_serviceName = null;
-	/**
-	 * @var string The tag of this service
-	 */
-	protected $_serviceTag = null;
-
 	//*************************************************************************
 	//* Public Methods
 	//*************************************************************************
@@ -61,10 +48,12 @@ abstract class Service extends Seed implements \Kisma\Core\Interfaces\ServiceEve
 	 */
 	public function onAfterConstruct( $event = null )
 	{
-		return
-			(
-				parent::onAfterConstruct( $event ) && $this->initialize( $event->getData() )
-			);
+		if ( !parent::onAfterConstruct( $event ) )
+		{
+			return false;
+		}
+
+		return $this->initialize( $event->getData() );
 	}
 
 	/**
@@ -106,28 +95,4 @@ abstract class Service extends Seed implements \Kisma\Core\Interfaces\ServiceEve
 	{
 		return true;
 	}
-
-	//********************************************************************************
-	//* Property Accessors
-	//********************************************************************************
-
-	/**
-	 * @param string $serviceName
-	 *
-	 * @return \Kisma\Core\Service
-	 */
-	public function setServiceName( $serviceName )
-	{
-		$this->_serviceName = $serviceName;
-		return $this;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getServiceName()
-	{
-		return $this->_serviceName;
-	}
-
 }

@@ -1,33 +1,13 @@
 <?php
 /**
  * CouchDbClient.php
- * Kisma(tm) : PHP Fun-Size Framework (http://github.com/lucifurious/kisma/)
- * Copyright 2009-2012, Jerry Ablan, All Rights Reserved
- *
- * Dual licensed under the MIT License and the GNU General Public License (GPL) Version 2.
- * See {@link http://github.com/lucifurious/kisma/licensing/} for complete information.
- *
- * @copyright	 Copyright 2009-2012, Jerry Ablan, All Rights Reserved
- * @link		  http://github.com/lucifurious/kisma/ Kisma(tm)
- * @license	   http://github.com/lucifurious/kisma/licensing/
- * @author		Jerry Ablan <kisma@pogostick.com>
- * @package	   kisma.utility
- * @since		 v1.0.0
- * @filesource
  */
 namespace Kisma\Core\Utility;
-
-//*************************************************************************
-//* Aliases
-//*************************************************************************
-
-use Kisma\Core\Utility as Utility;
-
 /**
  * CouchDbClient
- * A generic HTTP class
+ * A really basic generic CouchDb client
  */
-class CouchDbClient extends Http
+class CouchDbClient extends Curl
 {
 	//*************************************************************************
 	//* Constants
@@ -64,7 +44,7 @@ class CouchDbClient extends Http
 	{
 		try
 		{
-			return ( 200 === $this->head( '//' )->status );
+			return ( 200 === $this->_curl( self::Head, '//' )->status );
 		}
 		catch ( \Exception $_ex )
 		{
@@ -76,8 +56,8 @@ class CouchDbClient extends Http
 	 * @param string $databaseName
 	 * @param bool   $createIfNotFound
 	 *
+	 * @throws \Kisma\CouchDbException
 	 * @return bool|mixed
-	 * @throws \Teledini\Exceptions\StorageException
 	 */
 	public function databaseExists( $databaseName, $createIfNotFound = true )
 	{
@@ -89,7 +69,7 @@ class CouchDbClient extends Http
 
 		//	Get the database
 		$_databaseName = '//' . trim( $databaseName, '/ ' );
-		$_response = $this->get( $_databaseName );
+		$_response = $this->_curl( self::Get, $_databaseName );
 
 		if ( 200 !== $_response->status )
 		{
@@ -100,15 +80,20 @@ class CouchDbClient extends Http
 			}
 
 			//	Create the database...
-			$_response = $this->put( $_databaseName );
-
-			if ( isset( $_response->error ) || true !== $_response->body->ok )
+			if ( true === $createIfNotFound )
 			{
-				throw new \Kisma\CouchDbException( 'Error creating database', $_response->status, null, $_response );
+				$_response = $this->_curl( self::Put, $_databaseName );
+
+				if ( isset( $_response->error ) || ( isset( $_response->body, $_response->body->ok ) && true !== $_response->body->ok ) )
+				{
+					throw new \Kisma\CouchDbException( 'Error creating database', $_response->status, null, $_response );
+				}
+
+				$this->_createDesignDocument();
+				return $_response;
 			}
 
-			$this->_createDesignDocument();
-			return $_response;
+			return false;
 		}
 
 		return true;
@@ -120,16 +105,16 @@ class CouchDbClient extends Http
 	 * @param string $id
 	 * @param bool   $returnObject
 	 *
-	 * @return false|\Kisma\Storage\CouchDbDocument
+	 * @return bool|string
 	 */
 	public function documentExists( $id, $returnObject = false )
 	{
 		if ( false === $returnObject )
 		{
-			return ( '200' == $this->head( $id )->status );
+			return ( '200' == $this->_curl( self::Head, $id )->status );
 		}
 
-		$_document = $this->get( $id );
+		$_document = $this->_curl( self::Get, $id );
 		return empty( $_document ) ? false : $_document;
 
 	}
@@ -141,7 +126,7 @@ class CouchDbClient extends Http
 	 */
 	public function getRevsLimit()
 	{
-		return $this->get( '_revs_limit' );
+		return $this->_curl( self::Get, '_revs_limit' );
 	}
 
 	/**
@@ -177,7 +162,7 @@ class CouchDbClient extends Http
 			$_query = '?' . trim( implode( '&', $_options ), '&' );
 		}
 
-		return $this->get( '_changes' . $_query );
+		return $this->_curl( self::Get, '_changes' . $_query );
 	}
 
 	/**
@@ -202,7 +187,7 @@ class CouchDbClient extends Http
 		{
 			$_keys = array(
 				'startKey' => $this->_makeViewKey( $startKey ),
-				'endKey' => $this->_makeViewKey( $endKey ),
+				'endKey'   => $this->_makeViewKey( $endKey ),
 			);
 		}
 
@@ -226,11 +211,63 @@ class CouchDbClient extends Http
 
 		$_query = trim( $_query, '&' );
 
-		Log::trace( 'Getting view: ' . $viewName . ( false === strpos( $viewName,
-			'?' ) ? '?' . $_query : '&' . $_query ) );
-
-		return $this->get( $viewName . ( false === strpos( $viewName, '?' ) ? '?' . $_query : '&' . $_query ) );
+		return $this->_curl( self::Get, $viewName . ( false === strpos( $viewName, '?' ) ? '?' . $_query : '&' . $_query ) );
 	}
+
+	/**
+	 * Get an attachment by id and name
+	 *
+	 * @param string $id
+	 * @param string $fileName
+	 *
+	 * @return mixed
+	 */
+	public function getAttachment( $id, $fileName )
+	{
+		return $this->_curl( self::Get, '/' . $id . '/' . urlencode( $fileName ) );
+	}
+
+	/**
+	 * Bulk document storage
+	 *
+	 * @param array $documents
+	 * @param bool  $allOrNothing
+	 *
+	 * @return bool|mixed
+	 */
+	public function bulk( $documents = array(), $allOrNothing = false )
+	{
+		$_payload = new \stdClass();
+		$_payload->all_or_nothing = $allOrNothing;
+		$_payload->docs = $documents;
+
+		return $this->_curl( self::Post, '/_bulk_docs', json_encode( $_payload ) );
+	}
+
+	/**
+	 * Copy a document
+	 *
+	 * @param string $fromId
+	 * @param string $targetId
+	 * @param string $targetRev
+	 *
+	 * @return mixed
+	 */
+	public function copyById( $fromId, $targetId, $targetRev = null )
+	{
+		return $this->_curl(
+			\Kisma\Core\Enums\HttpMethod::Copy,
+			$fromId,
+			array(),
+			array(
+				CURLOPT_HTTPHEADER => 'Destination: ' . $targetId . ( $targetRev ? '?rev=' . $targetRev : null ),
+			)
+		);
+	}
+
+	//*************************************************************************
+	//* Private Methods
+	//*************************************************************************
 
 	/**
 	 * @param array|string $key
@@ -278,71 +315,21 @@ class CouchDbClient extends Http
 	}
 
 	/**
-	 * Get an attachment by id and name
-	 *
-	 * @param string $id
-	 * @param string $fileName
-	 *
-	 * @return mixed
-	 */
-	public function getAttachment( $id, $fileName )
-	{
-		return $this->get( '/' . $id . '/' . urlencode( $fileName ) );
-	}
-
-	/**
-	 * Bulk document storage
-	 *
-	 * @param array $documents
-	 * @param bool  $allOrNothing
-	 *
-	 * @return bool|mixed
-	 */
-	public function bulk( $documents = array(), $allOrNothing = false )
-	{
-		$_payload = new \stdClass();
-		$_payload->all_or_nothing = $allOrNothing;
-		$_payload->docs = $documents;
-
-		return $this->post( '/_bulk_docs', json_encode( $_payload ) );
-	}
-
-	/**
-	 * Copy a document
-	 *
-	 * @param string $fromId
-	 * @param string $targetId
-	 * @param string $targetRev
-	 *
-	 * @return mixed
-	 */
-	public function copyById( $fromId, $targetId, $targetRev = null )
-	{
-		return $this->_httpRequest( \Kisma\HttpMethod::Copy, $fromId, array(), array(
-			CURLOPT_HTTPHEADER => 'Destination: ' . $targetId . ( $targetRev ? '?rev=' . $targetRev : null ),
-		) );
-	}
-
-	//*************************************************************************
-	//* Private Methods
-	//*************************************************************************
-
-	/**
 	 * Adds the current database name to the front of the url unless the url starts with two slashes.
 	 *
 	 * Example:
 	 *
-	 *  $url = '12345'		becomes				$url = '/[$this->_databaseName]/12345'
-	 *  $url = '//database_awesome/12345'		$url = '/database_awesome/12345'
+	 *  $url = '12345'        becomes                $url = '/[$this->_databaseName]/12345'
+	 *  $url = '//database_awesome/12345'        $url = '/database_awesome/12345'
 	 *
-	 * @param \Kisma\HttpMethod|string $method
-	 * @param string                   $url
-	 * @param array                    $payload
-	 * @param array                    $options
+	 * @param string $method
+	 * @param string $url
+	 * @param array  $payload
+	 * @param array  $options
 	 *
 	 * @return bool|\stdClass
 	 */
-	protected function _httpRequest( $method = \Kisma\HttpMethod::Get, $url, $payload = array(), $options = array() )
+	protected function _curl( $method = \Kisma\Core\Enums\HttpMethod::Get, $url, $payload = array(), $options = array() )
 	{
 		$_response = false;
 
@@ -357,15 +344,15 @@ class CouchDbClient extends Http
 		}
 
 		//	Construct the url
-		$_url = 'http://' . $this->_hostName . ( $this->_hostPort ? ':' . $this->_hostPort : null ) . $url;
+		$_url = 'http://' . $this->_hostName . ( self::$_hostPort ? ':' . self::$_hostPort : null ) . $url;
 
-		if ( false !== ( $_result = parent::_httpRequest( $method, $_url, $payload, $options ) ) )
+		if ( false !== ( $_result = parent::request( $method, $_url, $payload, $options ) ) )
 		{
 			$_response = new \stdClass();
-			$_response->info = $this->_info;
-			$_response->error = $this->_error;
-			$_response->status = $this->_info['http_code'];
-			$_response->body = json_decode( $_result );
+			$_response->info = self::$_info;
+			$_response->error = self::$_error;
+			$_response->status = self::$_info['http_code'];
+			$_response->body = $_result;
 		}
 
 		return $_response;
@@ -382,6 +369,7 @@ class CouchDbClient extends Http
 	/**
 	 * Creates our design document
 	 *
+	 * @throws \Exception
 	 * @return bool
 	 */
 	protected function _createDesignDocument()
@@ -397,12 +385,12 @@ class CouchDbClient extends Http
 
 		$_doc->views = new \stdClass();
 		$_doc->views->by_date = new \stdClass();
-		$_doc->views->by_date->map = 'function( doc ) { emit(doc.create_time, doc); }';
+		$_doc->views->by_date->map = 'function(doc){if(doc.created){emit(doc.created, doc);}}';
 
 		try
 		{
 			//	Store it
-			$this->put( $_doc->_id, $_doc );
+			$this->_curl( self::Put, $_doc->_id, $_doc );
 		}
 		catch ( \Exception $_ex )
 		{
@@ -432,28 +420,28 @@ class CouchDbClient extends Http
 	 *
 	 * Options are:
 	 *
-	 * Name				Default
-	 * -------------	   -------------
-	 * host_name		   localhost
-	 * host_port		   5984
-	 * user_name		   null
-	 * password			   null
-	 * database_name	   null
+	 * Name                Default
+	 * -------------       -------------
+	 * host_name           localhost
+	 * host_port           5984
+	 * user_name           null
+	 * password            null
+	 * database_name       null
 	 *
 	 * @return \Kisma\Core\Utility\CouchDbClient
 	 */
-	public static function create( &$options = array() )
+	public static function create( $options = array() )
 	{
 		// Client factory...
 		$_client = new self();
-		$_client->setUserName( Utility\Option::o( $options, 'user_name', null, true ) );
-		$_client->setPassword( Utility\Option::o( $options, 'password', null, true ) );
-		$_client->setHostName( Utility\Option::o( $options, 'host_name', 'localhost', true ) );
-		$_client->setHostPort( Utility\Option::o( $options, 'host_port', 5984, true ) );
+		$_client->setHostName( Option::get( $options, 'host_name', 'localhost' ) );
+		$_client::setUserName( Option::get( $options, 'user_name', null ) );
+		$_client::setPassword( Option::get( $options, 'password', null ) );
+		$_client::setHostPort( Option::get( $options, 'host_port', 5984 ) );
 
 		$_client->setDatabaseName(
-			Utility\Option::o( $options, 'database_name', null, true ),
-			Utility\Option::o( $options, 'create_if_not_found', true, true )
+			Option::get( $options, 'database_name', null ),
+			Option::get( $options, 'create_if_not_found', true )
 		);
 
 		return $_client;
@@ -486,6 +474,8 @@ class CouchDbClient extends Http
 
 	/**
 	 * @param string $hostName
+	 *
+	 * @return \Kisma\Core\Utility\CouchDbClient
 	 */
 	public function setHostName( $hostName )
 	{

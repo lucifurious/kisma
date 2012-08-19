@@ -1,55 +1,22 @@
 <?php
 /**
- * enums.php
- * Enumeration awesomeness!
+ * @file
+ *            Provides ...
  *
- * Kisma(tm) : PHP Fun-Size Framework (http://github.com/lucifurious/kisma/)
- * Copyright 2009-2012, Jerry Ablan, All Rights Reserved
+ * Kisma(tm) : PHP Nanoframework (http://github.com/Pogostick/kisma/)
+ * Copyright 2009-2011, Jerry Ablan/Pogostick, LLC., All Rights Reserved
  *
- * Dual licensed under the MIT License and the GNU General Public License (GPL) Version 2.
- * See {@link http://github.com/lucifurious/kisma/licensing/} for complete information.
+ * @copyright Copyright (c) 2009-2011 Jerry Ablan/Pogostick, LLC.
+ * @license   http://github.com/Pogostick/Kisma/blob/master/LICENSE
  *
- * @copyright          Copyright 2009-2012, Jerry Ablan, All Rights Reserved
- * @link               http://github.com/lucifurious/kisma/ Kisma(tm)
- * @license            http://github.com/lucifurious/kisma/licensing/
- * @author             Jerry Ablan <kisma@pogostick.com>
- * @category           Kisma_Enums
- * @package            kisma.enums
- * @since              v1.0.0
- * @filesource
+ * @author    Jerry Ablan <kisma@pogostick.com>
+ * @category  Framework
+ * @package   kisma
+ * @since     1.0.0
+ *
+ * @ingroup   framework
  */
-namespace Kisma;
-
-//*************************************************************************
-//* Requirements
-//*************************************************************************
-
-/**
- * Interfaces and exceptions are required here
- */
-require_once __DIR__ . '/interfaces.php';
-require_once __DIR__ . '/exceptions.php';
-
-/**
- * We want to use SplEnum here, but it's an optional library and not
- * standard in any PHP distribution. In addition, the current version
- * available via pecl is not compatible with PHP 5.3.
- *
- * If you have it, we use it. Otherwise, we don't
- */
-if ( class_exists( '\SplEnum' ) )
-{
-	require_once __DIR__ . '/KismaEnum_Spl.php';
-}
-else
-{
-	require_once __DIR__ . '/KismaEnum_NonSpl.php';
-}
-
-//*************************************************************************
-//*	Enums
-//*************************************************************************
-
+namespace Kisma\Core\Enums;
 /**
  * Various pre-defined application access levels
  */
@@ -254,28 +221,6 @@ class PagerLocation extends KismaEnum
 	const TopRight = 1;
 	const BottomLeft = 2;
 	const BottomRight = 3;
-}
-
-/**
- */
-class Seconds extends KismaEnum
-{
-	//*************************************************************************
-	//* Constants
-	//*************************************************************************
-
-	const __default = self::PerMinute;
-
-	/**
-	 * @const int The number of seconds in various periods
-	 */
-	const PerMinute = 60;
-	const PerHour = 3600;
-	const PerEighthDay = 10800;
-	const PerQuarterDay = 21600;
-	const PerHalfDate = 43200;
-	const PerDay = 86400;
-	const PerWeek = 604800;
 }
 
 /**

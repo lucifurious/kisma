@@ -68,7 +68,7 @@ namespace Kisma\Core;
  * @property \Kisma\Core\Interfaces\StorageProvider $settings         The attributes storage object
  * @property string                                 $eventManager     Defaults to \Kisma\Core\Utility\EventManager
  */
-class Seed implements \Kisma\Core\Interfaces\SeedEvents, \Kisma\Core\Interfaces\StorageProvider
+class Seed implements \Kisma\Core\Interfaces\Reactors\SeedEvent, \Kisma\Core\Interfaces\StorageProvider
 {
 	//*************************************************************************
 	//* Constants

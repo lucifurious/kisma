@@ -9,17 +9,12 @@
  * @license   MIT (http://github.com/lucifurious/kisma/blob/master/LICENSE)
  * @author    Jerry Ablan <get.kisma@gmail.com>
  */
-require_once __DIR__ . '/Kisma/enums.php';
-require_once __DIR__ . '/Kisma/Core/Utility/Option.php';
-require_once __DIR__ . '/Kisma/Core/Utility/Inflector.php';
-require_once __DIR__ . '/Kisma/Core/Interfaces/KismaEvents.php';
-
 /**
  * The Kisma bootstrap loader
  *
  * Contains a few core functions implemented statically to be lightweight and single instance.
  */
-class Kisma implements \Kisma\Core\Interfaces\KismaEvents
+class Kisma implements \Kisma\Core\Interfaces\Reactors\KismaEvent
 {
 	//*************************************************************************
 	//* Private Members
@@ -47,38 +42,42 @@ class Kisma implements \Kisma\Core\Interfaces\KismaEvents
 	 */
 	public static function conceive( $options = array() )
 	{
-		if ( false === self::get( 'conception' ) || null === self::get( 'auto_loader' ) )
+		//	Set any passed in options...
+		if ( is_callable( $options ) )
+		{
+			$options = call_user_func( $options );
+		}
+
+		//	Set any application-level options passed in
+		self::$_options = \Kisma\Core\Utility\Option::merge( self::$_options, $options );
+
+		if ( null === ( $_autoLoader = self::getAutoLoader() ) )
 		{
 			/**
 			 * Set up the autoloader
 			 */
 			$_autoLoader = require( dirname( __DIR__ ) . '/vendor/autoload.php' );
 			self::set( 'auto_loader', $_autoLoader );
+		}
 
-			if ( is_callable( $options ) )
-			{
-				$options = call_user_func( $options );
-			}
-
-			//	Set any application-level options passed in
-			self::$_options = \Kisma\Core\Utility\Option::merge( self::$_options, $options );
-
-			//	Register our faux-destructor
+		//	Register our faux-destructor
+		if ( false === ( $_conceived = self::get( 'conception' ) ) )
+		{
 			\register_shutdown_function(
-				function ( $eventName = \Kisma\Core\Interfaces\KismaEvents::Death )
+				function ( $eventName = \Kisma\Core\Interfaces\Reactors\KismaEvent::Death )
 				{
 					\Kisma\Core\Utility\EventManager::publish( null, $eventName );
 				}
 			);
 
 			//	We done baby!
-			self::set( 'conception', true );
-
-			//	And let the world know we're alive
-			\Kisma\Core\Utility\EventManager::publish( null, self::Birth );
+			self::set( 'conception', $_conceived = true );
 		}
 
-		return self::get( 'conception' );
+		//	And let the world know we're alive
+		\Kisma\Core\Utility\EventManager::publish( null, self::Birth );
+
+		return $_conceived;
 	}
 
 	/**
@@ -89,7 +88,7 @@ class Kisma implements \Kisma\Core\Interfaces\KismaEvents
 	 */
 	public static function set( $key, $value = null )
 	{
-		return \Kisma\Core\Utility\Option::set( self::$_options, $key, $value );
+		\Kisma\Core\Utility\Option::set( self::$_options, $key, $value );
 	}
 
 	/**

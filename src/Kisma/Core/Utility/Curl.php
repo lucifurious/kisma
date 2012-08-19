@@ -6,9 +6,9 @@ namespace Kisma\Core\Utility;
 
 /**
  * Curl
- * A generic HTTP Curl class
+ * A kick-ass cURL wrapper
  */
-class Curl implements \Kisma\Core\Interfaces\HttpMethod
+class Curl extends \Kisma\Core\Enums\HttpMethod
 {
 	//*************************************************************************
 	//* Private Members
@@ -52,11 +52,11 @@ class Curl implements \Kisma\Core\Interfaces\HttpMethod
 	//*************************************************************************
 
 	/**
-	 * @param string     $url
-	 * @param array|null $payload
-	 * @param array|null $curlOptions
+	 * @param string          $url
+	 * @param array|\stdClass $payload
+	 * @param array           $curlOptions
 	 *
-	 * @return string
+	 * @return string|\stdClass
 	 */
 	public static function get( $url, $payload = array(), $curlOptions = array() )
 	{
@@ -64,11 +64,11 @@ class Curl implements \Kisma\Core\Interfaces\HttpMethod
 	}
 
 	/**
-	 * @param string     $url
-	 * @param array|null $payload
-	 * @param array|null $curlOptions
+	 * @param string          $url
+	 * @param array|\stdClass $payload
+	 * @param array           $curlOptions
 	 *
-	 * @return bool|mixed
+	 * @return bool|mixed|\stdClass
 	 */
 	public static function put( $url, $payload = array(), $curlOptions = array() )
 	{
@@ -76,11 +76,11 @@ class Curl implements \Kisma\Core\Interfaces\HttpMethod
 	}
 
 	/**
-	 * @param string     $url
-	 * @param array|null $payload
-	 * @param array|null $curlOptions
+	 * @param string          $url
+	 * @param array|\stdClass $payload
+	 * @param array           $curlOptions
 	 *
-	 * @return bool|mixed
+	 * @return bool|mixed|\stdClass
 	 */
 	public static function post( $url, $payload = array(), $curlOptions = array() )
 	{
@@ -88,11 +88,11 @@ class Curl implements \Kisma\Core\Interfaces\HttpMethod
 	}
 
 	/**
-	 * @param string     $url
-	 * @param array|null $payload
-	 * @param array|null $curlOptions
+	 * @param string          $url
+	 * @param array|\stdClass $payload
+	 * @param array           $curlOptions
 	 *
-	 * @return bool|mixed
+	 * @return bool|mixed|\stdClass
 	 */
 	public static function delete( $url, $payload = array(), $curlOptions = array() )
 	{
@@ -100,11 +100,11 @@ class Curl implements \Kisma\Core\Interfaces\HttpMethod
 	}
 
 	/**
-	 * @param string     $url
-	 * @param array|null $payload
-	 * @param array|null $curlOptions
+	 * @param string          $url
+	 * @param array|\stdClass $payload
+	 * @param array           $curlOptions
 	 *
-	 * @return bool|mixed
+	 * @return bool|mixed|\stdClass
 	 */
 	public static function head( $url, $payload = array(), $curlOptions = array() )
 	{
@@ -112,11 +112,11 @@ class Curl implements \Kisma\Core\Interfaces\HttpMethod
 	}
 
 	/**
-	 * @param string     $url
-	 * @param array|null $payload
-	 * @param array|null $curlOptions
+	 * @param string          $url
+	 * @param array|\stdClass $payload
+	 * @param array           $curlOptions
 	 *
-	 * @return bool|mixed
+	 * @return bool|mixed|\stdClass
 	 */
 	public static function options( $url, $payload = array(), $curlOptions = array() )
 	{
@@ -124,11 +124,11 @@ class Curl implements \Kisma\Core\Interfaces\HttpMethod
 	}
 
 	/**
-	 * @param string     $url
-	 * @param array|null $payload
-	 * @param array|null $curlOptions
+	 * @param string          $url
+	 * @param array|\stdClass $payload
+	 * @param array           $curlOptions
 	 *
-	 * @return bool|mixed
+	 * @return bool|mixed|\stdClass
 	 */
 	public static function copy( $url, $payload = array(), $curlOptions = array() )
 	{
@@ -136,11 +136,11 @@ class Curl implements \Kisma\Core\Interfaces\HttpMethod
 	}
 
 	/**
-	 * @param string     $url
-	 * @param array|null $payload
-	 * @param array|null $curlOptions
+	 * @param string          $url
+	 * @param array|\stdClass $payload
+	 * @param array           $curlOptions
 	 *
-	 * @return bool|mixed
+	 * @return bool|mixed|\stdClass
 	 */
 	public static function patch( $url, $payload = array(), $curlOptions = array() )
 	{
@@ -148,12 +148,12 @@ class Curl implements \Kisma\Core\Interfaces\HttpMethod
 	}
 
 	/**
-	 * @param string     $method
-	 * @param string     $url
-	 * @param array|null $payload
-	 * @param array|null $curlOptions
+	 * @param string          $method
+	 * @param string          $url
+	 * @param array|\stdClass $payload
+	 * @param array           $curlOptions
 	 *
-	 * @return string
+	 * @return string|\stdClass
 	 */
 	public static function request( $method, $url, $payload = array(), $curlOptions = array() )
 	{
@@ -170,10 +170,16 @@ class Curl implements \Kisma\Core\Interfaces\HttpMethod
 	 * @param array  $payload
 	 * @param array  $curlOptions
 	 *
-	 * @return bool|mixed
+	 * @throws \InvalidArgumentException
+	 * @return bool|mixed|\stdClass
 	 */
 	protected static function _httpRequest( $method = self::Get, $url, $payload = array(), $curlOptions = array() )
 	{
+		if ( !self::contains( $method ) )
+		{
+			throw new \InvalidArgumentException( 'Invalid method "' . $method . '" specified.' );
+		}
+
 		//	Reset!
 		self::$_lastHttpCode = self::$_error = self::$_info = $_tmpFile = null;
 
@@ -281,6 +287,22 @@ class Curl implements \Kisma\Core\Interfaces\HttpMethod
 		{
 			//	Worked, but no data...
 			$_result = null;
+		}
+
+		//	Attempt to auto-decode inbound JSON
+		if ( !empty( $_result ) )
+		{
+			try
+			{
+				if ( false !== ( $_json = @json_decode( $_result ) ) )
+				{
+					$_result = $_json;
+				}
+			}
+			catch ( \Exception $_ex )
+			{
+				//	Ignored
+			}
 		}
 
 		@curl_close( $_curl );

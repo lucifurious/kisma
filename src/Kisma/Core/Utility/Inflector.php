@@ -16,14 +16,13 @@
  *
  * @ingroup utilities
  */
-
 namespace Kisma\Core\Utility;
 
 /**
  * Inflector
  * Provides Inflector manipulation routines
  */
-class Inflector implements \Kisma\IUtility
+class Inflector implements \Kisma\Core\Interfaces\SeedUtility
 {
 	//*************************************************************************
 	//* Public Methods

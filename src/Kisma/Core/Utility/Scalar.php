@@ -1,37 +1,22 @@
 <?php
 /**
  * Scalar.php
- * Kisma(tm) : PHP Fun-Size Framework (http://github.com/lucifurious/kisma/)
- * Copyright 2009-2012, Jerry Ablan, All Rights Reserved
- *
- * Dual licensed under the MIT License and the GNU General Public License (GPL) Version 2.
- * See {@link http://github.com/lucifurious/kisma/licensing/} for complete information.
- *
- * @copyright     Copyright 2009-2012, Jerry Ablan, All Rights Reserved
- * @link          http://github.com/lucifurious/kisma/ Kisma(tm)
- * @license       http://github.com/lucifurious/kisma/licensing/
- * @author        Jerry Ablan <kisma@pogostick.com>
- * @category      Kisma_Utility
- * @package       kisma.utility
- * @namespace     \Kisma\Core\Utility
- * @since         v1.0.0
- * @filesource
  */
-
 namespace Kisma\Core\Utility;
-
-use Kisma\Kisma as K;
-
 /**
  * Scalar
- * Helpers for working with scalars
+ * Scalar utility class
  */
-class Scalar implements \Kisma\IUtility
+class Scalar implements \Kisma\Core\Interfaces\SeedUtility
 {
+	//*************************************************************************
+	//* Public Methods
+	//*************************************************************************
+
 	/**
 	 * Multi-argument is_array helper
 	 *
-	 * @static
+	 * Usage: is_array( $array1[, $array2][, ...])
 	 *
 	 * @param mixed      $possibleArray
 	 * @param mixed|null $_ [optional]
@@ -69,36 +54,6 @@ class Scalar implements \Kisma\IUtility
 
 		//	Return the fresh array...
 		return $_array;
-	}
-
-	/**
-	 * Generic super-easy/lazy way to convert lots of different things (like SimpleXmlElement) to an array
-	 *
-	 * @param object $object
-	 *
-	 * @return array|object
-	 * @return array|false
-	 */
-	public static function toArray( $object )
-	{
-		if ( is_object( $object ) )
-		{
-			$object = (array)$object;
-		}
-
-		if ( !is_array( $object ) )
-		{
-			return $object;
-		}
-
-		$_result = array();
-
-		foreach ( $object as $_key => $_value )
-		{
-			$_result[preg_replace( "/^\\0(.*)\\0/", "", $_key )] = self::toArray( $_value );
-		}
-
-		return $_result;
 	}
 
 	/**
@@ -184,13 +139,13 @@ class Scalar implements \Kisma\IUtility
 	}
 
 	/**
-	 * Tests if a value needs unserialization
+	 * Tests if a value has been serialized
 	 *
 	 * @param string $value
 	 *
 	 * @return boolean
 	 */
-	public static function isSerialized( $value )
+	public static function serialized( $value )
 	{
 		$_result = @unserialize( $value );
 		return !( false === $_result && $value != serialize( false ) );

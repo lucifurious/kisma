@@ -20,7 +20,7 @@ namespace Kisma\Core\Services;
  *
  * @property string $request The $_REQUEST currently being serviced
  */
-abstract class Http extends \Kisma\Core\Service implements \Kisma\Core\Interfaces\Services\HttpEvents, \Kisma\Core\Interfaces\HttpMethod
+abstract class Http extends \Kisma\Core\Service implements \Kisma\Core\Interfaces\Reactors\HttpEvent, \Kisma\Core\Interfaces\HttpMethod
 {
 	//*************************************************************************
 	//* Private Members

@@ -17,7 +17,7 @@
  * @ingroup framework
  */
 
-namespace Kisma;
+namespace Kisma\Core;
 
 /**
  * Testing base class

@@ -1,16 +1,16 @@
 <?php
 /**
- * ServiceEvents.php
+ * ServiceEvent.php
  *
  * @filesource
  */
-namespace Kisma\Core\Interfaces;
+namespace Kisma\Core\Interfaces\Reactors;
 
 /**
- * ServiceEvents
+ * ServiceEvent
  * Defines an interface a base service class must support
  */
-interface ServiceEvents
+interface ServiceEvent extends \Kisma\Core\Interfaces\Reactor
 {
 	//*************************************************************************
 	//* Constants

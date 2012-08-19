@@ -15,35 +15,43 @@ interface HttpMethod
 	//*************************************************************************
 
 	/**
-	 * @const string Available HTTP Methods
+	 * @var string
 	 */
 	const Get = 'GET';
 	/**
-	 * @const string Available HTTP Methods
+	 * @var string
 	 */
 	const Put = 'PUT';
 	/**
-	 * @const string Available HTTP Methods
+	 * @var string
 	 */
 	const Head = 'HEAD';
 	/**
-	 * @const string Available HTTP Methods
+	 * @var string
 	 */
 	const Post = 'POST';
 	/**
-	 * @const string Available HTTP Methods
+	 * @var string
 	 */
 	const Delete = 'DELETE';
 	/**
-	 * @const string Available HTTP Methods
+	 * @var string
 	 */
 	const Options = 'OPTIONS';
 	/**
-	 * @const string Available HTTP Methods
+	 * @var string
 	 */
 	const Copy = 'COPY';
 	/**
-	 * @const string Available HTTP Methods
+	 * @var string
 	 */
 	const Patch = 'PATCH';
+	/**
+	 * @var string
+	 */
+	const Trace = 'TRACE';
+	/**
+	 * @var string
+	 */
+	const Connect = 'CONNECT';
 }

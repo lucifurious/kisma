@@ -1,186 +1,41 @@
 <?php
 /**
- * Route.php
- *
- * Kisma(tm) : PHP Fun-Size Framework (http://github.com/lucifurious/kisma/)
- * Copyright 2009-2012, Jerry Ablan, All Rights Reserved
- *
- * Dual licensed under the MIT License and the GNU General Public License (GPL) Version 2.
- * See {@link http://github.com/lucifurious/kisma/licensing/} for complete information.
- *
- * @copyright          Copyright 2009-2012, Jerry Ablan, All Rights Reserved
- * @link               http://github.com/lucifurious/kisma/ Kisma(tm)
- * @license            http://github.com/lucifurious/kisma/licensing/
- * @author             Jerry Ablan <get.kisma@gmail.com>
- * @filesource
+ * Path.php
  */
 namespace Kisma\Core;
 
 /**
- * Route
- * A route defines the path an inbound request takes on its journey
+ * Path
+ * A path defines a route that an inbound request takes on its journey through the application.
  */
-abstract class Route extends \Kisma\Core\Service implements \Kisma\Core\Interfaces\RouteEvents
+abstract class Path extends Seed implements \Kisma\Core\Interfaces\Reactors\RouteEvent
 {
 	//*************************************************************************
 	//* Private Members
 	//*************************************************************************
 
 	/**
-	 * @var string Storage key/nickname/short name for this controller
+	 * @var mixed The inbound request
 	 */
-	protected $_tag = null;
+	protected $_request = null;
 	/**
-	 * @var Route[] The routes I know about
+	 * @var array The request handlers
 	 */
-	protected $_routes = array();
+	protected $_handlers = array();
 
 	//*************************************************************************
 	//* Public Methods
 	//*************************************************************************
 
 	/**
-	 * @param string $tag
-	 * @param Route  $route
-	 */
-	public function addRoute( $tag, $route )
-	{
-		\Kisma\Core\Utility\Option::set( $this->_routes, $tag, $route );
-	}
-
-	/**
-	 * actions requests to actions
+	 * @param mixed $request
+	 * @param array $handler
 	 *
-	 * @param \Kisma\Core\Services\Application|\Kisma\Kisma|\Silex\Application $app
-	 *
-	 * @return ControllerCollection A ControllerCollection instance
+	 * @return void
 	 */
-	public function connect( Application $app )
+	public function addHandler( $request, $handler )
 	{
-		$_tag = $this->_tag;
-		$_defaultRoute = null;
-		$_controllers = new \Silex\ControllerCollection();
-		$_actions = $this->_discoverActions();
-
-		//	Set the controller into the app
-		$app[$_tag] = $this->setApp( $app );
-
-		//	Set up a route for each discovered action...
-		foreach ( $_actions as $_action => $_method )
-		{
-			//	Build the route, along with default if specified...
-			$_route = ( '/' != $_action ? '/' . $_action . '/' : '/' );
-
-			$_controllers->match( $_route,
-				function ( Application $app, Request $request ) use ( $_action, $_method, $_tag )
-				{
-					$_event = new \Kisma\Event\ControllerEvent( $app[$_tag] );
-
-					$app[$_tag]->setIsPost(
-						( \Kisma\HttpMethod::Post == $request->getMethod() )
-					)->dispatch( \Kisma\Event\ControllerEvent::BeforeAction, $_event );
-
-					$_event->setResult(
-						$_result = call_user_func( array( $app[$_tag], $_method ), $app, $request )
-					);
-
-					$app[$_tag]->dispatch(
-						\Kisma\Event\ControllerEvent::AfterAction,
-						$_event
-					);
-
-					return $_result;
-				}
-			);
-		}
-
-		//	Return the collection...
-		return $_controllers;
-	}
-
-	/**
-	 * @return array
-	 */
-	protected function _discoverActions()
-	{
-		if ( null !== $this->_actions )
-		{
-			return $this->_actions;
-		}
-
-		$_actions = array();
-		$_mirror = new \ReflectionClass( $this );
-
-		foreach ( $_mirror->getMethods( \ReflectionMethod::IS_PUBLIC ) as $_method )
-		{
-			if ( 'action' == strtolower( substr( $_method->name,
-				strlen( $_method->name ) - 6,
-				6 ) ) && 'on' != strtolower( substr( $_method->name, 0, 2 ) )
-			)
-			{
-				$_routeName =
-					lcfirst( \Kisma\Core\Utility\Inflector::camelize( str_ireplace( 'Action', null, $_method->name ) ) );
-
-				$_actions[$_routeName] = $_method->name;
-
-				//	Add a default action/route to the discovered list if wanted
-				if ( !empty( $this->_defaultAction ) && 0 == strcasecmp( $this->_defaultAction, $_routeName ) )
-				{
-					$_actions['/'] = $_method->name;
-				}
-			}
-		}
-
-		$this->setControllerName(
-			lcfirst(
-				\Kisma\Core\Utility\Inflector::camelize(
-					str_ireplace( array( 'ControllerProvider', 'Controller' ), null, $_mirror->getShortName() )
-				)
-			)
-		);
-
-		return $this->_actions = $_actions;
-	}
-
-	//*************************************************************************
-	//* Event Handlers
-	//*************************************************************************
-
-	/**
-	 * @param \Kisma\Core\Events\SeedEvent $event
-	 *
-	 * @return bool
-	 */
-	public function onAfterConstruct( \Kisma\Core\Events\SeedEvent $event )
-	{
-		$this->_discoverActions();
-
-		$this->_app = K::app();
-		$this->setTag( 'controller.' . $this->_controllerName );
-		$this->_tag = 'controller.' . $this->_controllerName;
-		return parent::onAfterConstruct( $event );
-	}
-
-	/**
-	 * @param \Kisma\Event\ControllerEvent $event
-	 *
-	 * @return bool
-	 */
-	public function onBeforeAction( \Kisma\Event\ControllerEvent $event )
-	{
-		//	Default implementation
-		return true;
-	}
-
-	/**
-	 * @param \Kisma\Event\ControllerEvent $event
-	 *
-	 * @return bool
-	 */
-	public function onAfterAction( \Kisma\Event\ControllerEvent $event )
-	{
-		//	Default implementation
-		return true;
+		\Kisma\Core\Utility\Option::set( $this->_handlers, $request, $handler );
 	}
 
 	//*************************************************************************
@@ -188,145 +43,41 @@ abstract class Route extends \Kisma\Core\Service implements \Kisma\Core\Interfac
 	//*************************************************************************
 
 	/**
-	 * @param array $actions
+	 * @param array $handlers
 	 *
-	 * @return \Kisma\Components\Controller
+	 * @return \Kisma\Core\Path
 	 */
-	public function setActions( $actions )
+	public function setHandlers( $handlers )
 	{
-		$this->_actions = $actions;
+		$this->_handlers = $handlers;
 		return $this;
 	}
 
 	/**
 	 * @return array
 	 */
-	public function getActions()
+	public function getHandlers()
 	{
-		return $this->_actions;
+		return $this->_handlers;
 	}
 
 	/**
-	 * @param string $controllerName
+	 * @param mixed $request
 	 *
-	 * @return \Kisma\Components\Controller
+	 * @return \Kisma\Core\Path
 	 */
-	public function setControllerName( $controllerName )
+	public function setRequest( $request )
 	{
-		$this->_controllerName = $controllerName;
-		$this->_tag = 'controller.' . $controllerName;
+		$this->_request = $request;
 		return $this;
 	}
 
 	/**
-	 * @return string
+	 * @return mixed
 	 */
-	public function getControllerName()
+	public function getRequest()
 	{
-		return $this->_controllerName;
-	}
-
-	/**
-	 * @param array|null $routes
-	 *
-	 * @return \Kisma\Components\Controller
-	 */
-	public function setRoutes( $routes )
-	{
-		$this->_routes = $routes;
-		return $this;
-	}
-
-	/**
-	 * @return array|null
-	 */
-	public function getRoutes()
-	{
-		return $this->_routes;
-	}
-
-	/**
-	 * @param boolean $isPost
-	 *
-	 * @return \Kisma\Components\Controller
-	 */
-	public function setIsPost( $isPost )
-	{
-		$this->_isPost = $isPost;
-		return $this;
-	}
-
-	/**
-	 * @return boolean
-	 */
-	public function getIsPost()
-	{
-		return $this->_isPost;
-	}
-
-	/**
-	 * @return boolean
-	 */
-	public function isPost()
-	{
-		return $this->_isPost;
-	}
-
-	/**
-	 * @param string $defaultAction
-	 *
-	 * @return \Kisma\Components\Controller
-	 */
-	public function setDefaultAction( $defaultAction )
-	{
-		$this->_defaultAction = $defaultAction;
-		return $this;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getDefaultAction()
-	{
-		return $this->_defaultAction;
-	}
-
-	/**
-	 * @param \Silex\Application $app
-	 *
-	 * @return \Kisma\Components\Controller
-	 */
-	public function setApp( $app )
-	{
-		$this->_app = $app;
-		return $this;
-	}
-
-	/**
-	 * @return \Silex\Application
-	 */
-	public function getApp()
-	{
-		return $this->_app;
-	}
-
-	/**
-	 * @param string $tag
-	 *
-	 * @return \Kisma\Components\Controller
-	 */
-	public function setTag( $tag )
-	{
-		$this->_tag = $tag;
-		return $this;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getTag()
-	{
-		return $this->_tag;
+		return $this->_request;
 	}
 
 }

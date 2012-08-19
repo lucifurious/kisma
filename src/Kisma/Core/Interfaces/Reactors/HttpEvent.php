@@ -1,6 +1,6 @@
 <?php
 /**
- * HttpEvents.php
+ * HttpEvent.php
  * Standard ANSI color attributes
  *
  * Kisma(tm) : PHP Fun-Size Framework (http://github.com/lucifurious/kisma/)
@@ -10,13 +10,12 @@
  * @license   http://github.com/lucifurious/kisma/blob/master/LICENSE
  * @author    Jerry Ablan <get.kisma@gmail.com>
  */
-namespace Kisma\Core\Interfaces\Services;
-
+namespace Kisma\Core\Interfaces\Reactors;
 /**
- * HttpEvents
+ * HttpEvent
  * Defines an interface the Http service class knows how to deal with
  */
-interface HttpEvents
+interface HttpEvent extends \Kisma\Core\Interfaces\Reactor
 {
 	//*************************************************************************
 	//* Constants
