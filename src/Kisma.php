@@ -1,17 +1,10 @@
 <?php
 /**
  * Kisma.php
- * The Kisma(tm) Fun-Size Framework bootstrap loader
- *
- * Kisma(tm) : PHP Fun-Size Framework (http://github.com/lucifurious/kisma/)
- *
- * @copyright Copyright (c) 2009-2012 Jerry Ablan
- * @license   MIT (http://github.com/lucifurious/kisma/blob/master/LICENSE)
- * @author    Jerry Ablan <get.kisma@gmail.com>
+ * Bootstrap loader
  */
 /**
- * The Kisma bootstrap loader
- *
+ * Kisma
  * Contains a few core functions implemented statically to be lightweight and single instance.
  */
 class Kisma implements \Kisma\Core\Interfaces\Publisher, \Kisma\Core\Interfaces\Events\Kisma
@@ -168,13 +161,4 @@ class Kisma implements \Kisma\Core\Interfaces\Publisher, \Kisma\Core\Interfaces\
 		return self::$_options;
 	}
 
-	/**
-	 * Returns the unique identifier for this reactor
-	 *
-	 * @return string
-	 */
-	public function getId()
-	{
-		// TODO: Implement getId() method.
-	}
 }

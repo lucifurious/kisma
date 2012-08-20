@@ -16,6 +16,6 @@ interface Http
 	/**
 	 * @var string
 	 */
-	const RequestReceived = 'kisma.core.services.http.request_received';
+	const RequestReceived = 'kisma.core.http.request_received';
 
 }

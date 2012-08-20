@@ -16,10 +16,10 @@ interface Publisher extends \Kisma\Core\Interfaces\Publisher
 	/**
 	 * @var string
 	 */
-	const BeforePublish = 'kisma.route.before_publish';
+	const BeforePublish = 'kisma.core.publisher.before_publish';
 	/**
 	 * @var string
 	 */
-	const AfterPublish = 'kisma.route.after_publish';
+	const AfterPublish = 'kisma.core.publisher.after_publish';
 
 }
