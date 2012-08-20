@@ -1,13 +1,10 @@
 <?php
 /**
  * Http.php
- *
- * @description Kisma(tm) : PHP Fun-Size Framework (http://github.com/lucifurious/kisma/)
- * @copyright   Copyright (c) 2009-2012 Jerry Ablan
- * @license     http://github.com/lucifurious/kisma/blob/master/LICENSE
- * @author      Jerry Ablan <get.kisma@gmail.com>
  */
 namespace Kisma\Core\Services;
+
+use Kisma\Core\Interfaces;
 
 /**
  * Http
@@ -18,16 +15,16 @@ namespace Kisma\Core\Services;
  * onRequestReceived
  * the service is run, respectively.
  *
- * @property string $request The $_REQUEST currently being serviced
+ * @property \Kisma\Core\Services\Request $request The request currently being serviced
  */
-abstract class Http extends \Kisma\Core\Service implements \Kisma\Core\Interfaces\Reactors\HttpEvent, \Kisma\Core\Interfaces\HttpMethod
+class SeedHttp extends \Kisma\Core\Service implements Interfaces\Events\Http, \Kisma\Core\Interfaces\HttpMethod
 {
 	//*************************************************************************
 	//* Private Members
 	//*************************************************************************
 
 	/**
-	 * @var array The $_REQUEST currently being serviced
+	 * @var \Kisma\Core\Services\Request The current request
 	 */
 	protected $_request = null;
 
@@ -37,24 +34,22 @@ abstract class Http extends \Kisma\Core\Service implements \Kisma\Core\Interface
 
 	/**
 	 * {@InheritDoc}
-	 * Triggers the Request Received event
-	 *
-	 * @param array $options Set 'request' to override the inbound $_REQUEST
-	 *
-	 * @return bool True if it's all good, false if not: Not a web process or the event handler returned false
 	 */
 	public function initialize( $options = array() )
 	{
-		if ( 'cli' == PHP_SAPI )
+		if ( !parent::initialize( $options ) )
 		{
 			return false;
 		}
 
+		$this->_request = new \Kisma\Core\Services\Request();
+
 		//	Trigger the event
-		return $this->trigger(
-			self::RequestReceived,
-			$this->_request = \Kisma\Core\Utility\Option::get( $options, 'request', $_REQUEST )
-		);
+		return
+			$this->publish(
+				self::RequestReceived,
+				$this->_request
+			);
 	}
 
 	//*************************************************************************
@@ -77,9 +72,9 @@ abstract class Http extends \Kisma\Core\Service implements \Kisma\Core\Interface
 	//********************************************************************************
 
 	/**
-	 * @param array $request
+	 * @param Request $request
 	 *
-	 * @return \Kisma\Core\Services\Http
+	 * @return \Kisma\Core\Services\SeedHttp
 	 */
 	public function setRequest( $request )
 	{
@@ -88,7 +83,7 @@ abstract class Http extends \Kisma\Core\Service implements \Kisma\Core\Interface
 	}
 
 	/**
-	 * @return array
+	 * @return Request
 	 */
 	public function getRequest()
 	{

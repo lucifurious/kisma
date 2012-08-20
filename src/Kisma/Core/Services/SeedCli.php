@@ -1,21 +1,13 @@
 <?php
 /**
- * Cli.php
- *
- * Kisma(tm) : PHP Fun-Size Framework (http://github.com/lucifurious/kisma/)
- * Copyright 2009-2012, Jerry Ablan, All Rights Reserved
- *
- * @copyright Copyright (c) 2009-2012 Jerry Ablan
- * @license   http://github.com/lucifurious/kisma/blob/master/LICENSE
- * @author    Jerry Ablan <get.kisma@gmail.com>
+ * SeedCli.php
  */
 namespace Kisma\Core\Services;
-
 /**
- * Cli
+ * SeedCli
  * A base class for CLI services
  */
-abstract class Cli extends \Kisma\Core\Service
+abstract class SeedCli extends \Kisma\Core\Service implements \Kisma\Core\Interfaces\RequestSource
 {
 	//********************************************************************************
 	//* Member Variables
@@ -25,6 +17,10 @@ abstract class Cli extends \Kisma\Core\Service
 	 * @var string The current working directory
 	 */
 	protected $_workingDirectory = null;
+	/**
+	 * @var \Kisma\Core\Services\Request
+	 */
+	protected $_request = null;
 
 	//*************************************************************************
 	//* Public Methods
@@ -122,7 +118,7 @@ abstract class Cli extends \Kisma\Core\Service
 	/**
 	 * @param string $workingDirectory
 	 *
-	 * @return Cli
+	 * @return \Kisma\Core\Services\SeedCli
 	 */
 	public function setWorkingDirectory( $workingDirectory )
 	{
@@ -136,6 +132,25 @@ abstract class Cli extends \Kisma\Core\Service
 	public function getWorkingDirectory()
 	{
 		return $this->_workingDirectory;
+	}
+
+	/**
+	 * @param \Kisma\Core\Services\Request $request
+	 *
+	 * @return \Kisma\Core\Services\SeedCli
+	 */
+	public function setRequest( $request )
+	{
+		$this->_request = $request;
+		return $this;
+	}
+
+	/**
+	 * @return \Kisma\Core\Services\Request
+	 */
+	public function getRequest()
+	{
+		return $this->_request;
 	}
 
 }

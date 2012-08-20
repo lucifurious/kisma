@@ -1,18 +1,8 @@
 <?php
 /**
- * @file
- *            Down and dirty event system
- *
- * Kisma(tm) : PHP Fun-Size Framework (http://github.com/lucifurious/kisma/)
- *
- * @copyright Copyright (c) 2009-2012 Jerry Ablan
- * @license   http://github.com/lucifurious/kisma/blob/master/LICENSE
- * @author    Jerry Ablan <kisma@pogostick.com>
- *
- * @ingroup   utility
+ * EventManager.php
  */
 namespace Kisma\Core\Utility;
-
 /**
  * EventManager class
  * Utility class that provides event management
@@ -44,9 +34,9 @@ class EventManager
 	/**
 	 * Wires up any event handlers automatically
 	 *
-	 * @param object     $object
-	 * @param array|null $listeners Array of 'event.name' => callback/closure pairs
-	 * @param string     $signature
+	 * @param \Kisma\Core\Interfaces\Subscriber $object
+	 * @param array|null                        $listeners Array of 'event.name' => callback/closure pairs
+	 * @param string                            $signature
 	 *
 	 * @return void
 	 */
@@ -75,8 +65,8 @@ class EventManager
 	 * Builds a hash of events and handlers that are present in this object based on the event handler signature.
 	 * This merely builds the hash, nothing is done with it.
 	 *
-	 * @param \Kisma\Core\Interfaces\Reactor $object
-	 * @param string                         $signature
+	 * @param \Kisma\Core\Interfaces\Subscriber $object
+	 * @param string                            $signature
 	 *
 	 * @internal param bool $appendToList
 	 *
@@ -86,9 +76,16 @@ class EventManager
 	{
 		static $_discovered = array();
 
+		if ( !( $object instanceof \Kisma\Core\Interfaces\Subscriber ) )
+		{
+			//	Not a subscriber, beat it...
+			$_discovered[$object->getId()] = true;
+			return false;
+		}
+
 		$_listeners = array();
 
-		if ( !isset( $_discovered[spl_object_hash( $object )] ) )
+		if ( !isset( $_discovered[$object->getId()] ) )
 		{
 			$_mirror = new \ReflectionClass( $object );
 			$_methods = $_mirror->getMethods( \ReflectionMethod::IS_PUBLIC | \ReflectionMethod::IS_PROTECTED );
@@ -139,29 +136,21 @@ class EventManager
 	 *
 	 * @static
 	 *
-	 * @param null|\Kisma\Core\Interfaces\Reactor $publisher
-	 * @param string                              $eventName
-	 * @param mixed                               $eventData
+	 * @param null|\Kisma\Core\Interfaces\Subscriber $publisher
+	 * @param string                                 $eventName
+	 * @param mixed                                  $eventData
 	 *
-	 * @throws \Kisma\EventHandlerException
+	 * @throws \Kisma\InvalidEventHandlerException
 	 * @return bool|int
 	 */
 	public static function publish( $publisher, $eventName, $eventData = null )
 	{
-		/**
-		 * Let's not waste time in here if you don't belong....
-		 * Ensure we're an event reactor, and if the publisher is empty, make sure it's the application
-		 */
-		if ( !( $publisher instanceof \Kisma\Core\Interfaces\Reactor ) || ( null === $publisher && !( $publisher instanceof \Kisma ) ) )
-		{
-			return false;
-		}
-
 		//	Ensure this is a valid event
 		$_eventTag = Inflector::tag( $eventName, true );
 
 		if ( !isset( self::$_eventMap[$_eventTag] ) || empty( self::$_eventMap[$_eventTag] ) )
 		{
+			//	No registered listeners, bail
 			return false;
 		}
 
@@ -202,7 +191,7 @@ class EventManager
 			else
 			{
 				//	Oops!
-				throw new \Kisma\EventHandlerException(
+				throw new \Kisma\InvalidEventHandlerException(
 					'Event "' .
 						( is_object( $_callback[0] )
 							?

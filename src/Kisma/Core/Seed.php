@@ -10,6 +10,8 @@
  */
 namespace Kisma\Core;
 
+use Kisma\Core\Interfaces;
+
 /**
  * Seed
  * A nugget of goodness that grows into something wonderful
@@ -33,7 +35,7 @@ namespace Kisma\Core;
  * The event name is the method name. When an event is triggered, event handlers attached
  * to the event will be invoked automatically.
  *
- * An event is triggered by calling the {@link trigger} method. Attached event
+ * An event is triggered by calling the {@link publish} method. Attached event
  * handlers will be invoked automatically in the order they were attached to the event.
  *
  * Event handlers should have the following signature:
@@ -54,7 +56,7 @@ namespace Kisma\Core;
  * Unless otherwise specified, the object will automatically search for and
  * attach any event handlers that exist in your object.
  *
- * To disable this feature, set the '$autoAttachEvents' attribute to false before calling the parent constructor.
+ * To disable this feature, set the '$autoAttachEvents' setting to false before calling the parent constructor.
  *
  * Properties
  * ==========
@@ -65,10 +67,10 @@ namespace Kisma\Core;
  * @property string                                 $tag
  * @property string                                 $name
  * @property bool                                   $autoAttachEvents Defaults to true.
- * @property \Kisma\Core\Interfaces\StorageProvider $settings         The attributes storage object
+ * @property \Kisma\Core\Interfaces\StorageProvider $settings         The settings storage object
  * @property string                                 $eventManager     Defaults to \Kisma\Core\Utility\EventManager
  */
-class Seed implements \Kisma\Core\Interfaces\Reactors\SeedEvent, \Kisma\Core\Interfaces\StorageProvider
+class Seed implements Interfaces\Events\Publisher, Interfaces\Events\Seed, Interfaces\StorageProvider
 {
 	//*************************************************************************
 	//* Constants
@@ -106,9 +108,7 @@ class Seed implements \Kisma\Core\Interfaces\Reactors\SeedEvent, \Kisma\Core\Int
 	/**
 	 * @var array A map of services available to this object and their service class
 	 */
-	protected $_serviceMap = array(
-		'event_manager' => '\\Kisma\\Core\\Utility\\EventManager',
-	);
+	protected $_serviceMap = array();
 	/**
 	 * @var \Kisma\Core\Interfaces\StorageProvider Settings storage service
 	 */
@@ -127,14 +127,11 @@ class Seed implements \Kisma\Core\Interfaces\Reactors\SeedEvent, \Kisma\Core\Int
 	 */
 	public function __construct( $settings = array() )
 	{
-		//	This is my hash. There are many like it, but this one is mine.
-		$this->_id = spl_object_hash( $this );
-
-		//	Initialize the storage system
-		$this->_initializeStorage( $settings );
-
 		//	Wake-up the events
 		$this->__wakeup();
+
+		//	Initialize storage
+		$this->_initializeStorage( $settings );
 	}
 
 	/**
@@ -142,27 +139,30 @@ class Seed implements \Kisma\Core\Interfaces\Reactors\SeedEvent, \Kisma\Core\Int
 	 */
 	public function __wakeup()
 	{
+		//	This is my hash. There are many like it, but this one is mine.
+		$this->_id = spl_object_hash( $this );
 		$this->_tag = \Kisma\Core\Utility\Inflector::tag( get_called_class(), true );
 		$this->_name = \Kisma\Core\Utility\Inflector::tag( get_called_class() );
 
-		if ( false !== ( $this->_discoverEvents = ( $this instanceof \Kisma\Core\Interfaces\Reactor ) ) )
+		//	Wire in the event service if we're a subscriber
+		if ( false !== ( $this->_discoverEvents = ( $this->_discoverEvents && ( $this instanceof \Kisma\Core\Interfaces\Subscriber ) ) ) )
 		{
-			//	Add the event service
-			$_manager = $this->addServiceClass( 'event_manager', self::DefaultEventManager );
-
-			//	Attach any event handlers we find if desired and object is a reactor...
-			if ( false !== $_manager )
+			//	Add the event service and attach any event handlers we find...
+			if ( false !== ( $_manager = $this->getServiceClass( 'event_manager', self::DefaultEventManager ) ) )
 			{
+				//	Add the service
+				$this->addServiceClass( 'event_manager', $_manager );
+
 				//	Subscribe to events...
 				call_user_func(
 					array( $_manager, 'subscribe' ),
 					$this
 				);
-
-				//	Publish after_construct event
-				$this->trigger( self::AfterConstruct );
 			}
 		}
+
+		//	Publish after_construct event
+		$this->publish( self::AfterConstruct );
 	}
 
 	/**
@@ -173,7 +173,7 @@ class Seed implements \Kisma\Core\Interfaces\Reactors\SeedEvent, \Kisma\Core\Int
 		try
 		{
 			//	Publish after_destruct event
-			$this->trigger( self::BeforeDestruct );
+			$this->publish( self::BeforeDestruct );
 		}
 		catch ( \Exception $_ex )
 		{
@@ -222,8 +222,15 @@ class Seed implements \Kisma\Core\Interfaces\Reactors\SeedEvent, \Kisma\Core\Int
 	 *
 	 * @return bool|int
 	 */
-	public function trigger( $eventName, $eventData = null )
+	public function publish( $eventName, $eventData = null )
 	{
+		//	Not a publisher
+		if ( !( $this instanceof \Kisma\Core\Interfaces\Events\Publisher ) )
+		{
+			return false;
+		}
+
+		//	No event manager configured...
 		if ( false === ( $_manager = $this->getServiceClass( 'event_manager' ) ) )
 		{
 			return false;
@@ -245,7 +252,7 @@ class Seed implements \Kisma\Core\Interfaces\Reactors\SeedEvent, \Kisma\Core\Int
 	 */
 	public function __call( $name, $arguments )
 	{
-		//	If we don't have any attribute storage, bail
+		//	If we don't have any settings storage, bail
 		if ( !empty( $this->_settings ) )
 		{
 			$_prefix = strtolower( substr( trim( $name ), 0, 3 ) );
@@ -258,7 +265,7 @@ class Seed implements \Kisma\Core\Interfaces\Reactors\SeedEvent, \Kisma\Core\Int
 		}
 
 		//	Done
-		throw new \Kisma\InvalidAttributeKeyException( 'The setting "' . $name . '" is not defined.' );
+		throw new \Kisma\InvalidSettingKeyException( 'The setting "' . $name . '" is not defined.' );
 	}
 
 	//*************************************************************************
@@ -268,15 +275,15 @@ class Seed implements \Kisma\Core\Interfaces\Reactors\SeedEvent, \Kisma\Core\Int
 	/**
 	 * @param array|object $settings
 	 *
+	 * @throws \Kisma\InvalidSettingKeyException
 	 * @return bool
-	 * @throws \Kisma\InvalidAttributeValueException
 	 */
 	protected function _initializeStorage( $settings = array() )
 	{
 		//	Storage services have to deal with their own junk
 		if ( !( $this instanceof \Kisma\Core\Interfaces\StorageService ) )
 		{
-			$_storageProvider = \Kisma\Core\Utility\Option::get( $settings, 'storageProvider', $this->_settings, true );
+			$_storageProvider = is_string( $settings ) ? $settings : \Kisma\Core\Utility\Option::get( $settings, 'storageProvider', null, true );
 
 			//	Set our default storage class
 			if ( null === $_storageProvider )
@@ -287,10 +294,10 @@ class Seed implements \Kisma\Core\Interfaces\Reactors\SeedEvent, \Kisma\Core\Int
 			//	Must be a class name or implement the base storage provider interface
 			if ( !is_string( $_storageProvider ) && !( $_storageProvider instanceof \Kisma\Core\Interfaces\StorageProvider ) )
 			{
-				throw new \Kisma\InvalidAttributeValueException( 'storageProvider', $_storageProvider );
+				throw new \Kisma\InvalidSettingKeyException( 'storageProvider', $_storageProvider );
 			}
 
-			//	Now add the attributes...
+			//	Now add the settings...
 			$this->_settings = new $_storageProvider(
 				\Kisma\Core\Utility\Option::merge(
 					$settings,
@@ -304,7 +311,7 @@ class Seed implements \Kisma\Core\Interfaces\Reactors\SeedEvent, \Kisma\Core\Int
 	}
 
 	//*************************************************************************
-	//* Attribute Management
+	//* Setting Management
 	//*************************************************************************
 
 	/**
@@ -323,7 +330,7 @@ class Seed implements \Kisma\Core\Interfaces\Reactors\SeedEvent, \Kisma\Core\Int
 	public function get( $key = null, $defaultValue = null, $burnAfterReading = false )
 	{
 		return
-			!empty( $this->_settings )
+			$this->_settings instanceof \Kisma\Core\Interfaces\StorageProvider
 				?
 				$this->_settings->get( $key, $defaultValue, $burnAfterReading )
 				:
@@ -336,7 +343,7 @@ class Seed implements \Kisma\Core\Interfaces\Reactors\SeedEvent, \Kisma\Core\Int
 	public function set( $key, $value = null, $overwrite = true )
 	{
 		return
-			!empty( $this->_settings )
+			$this->_settings instanceof \Kisma\Core\Interfaces\StorageProvider
 				?
 				$this->_settings->set( $key, $value, $overwrite )
 				:
@@ -345,12 +352,13 @@ class Seed implements \Kisma\Core\Interfaces\Reactors\SeedEvent, \Kisma\Core\Int
 
 	/**
 	 * @param string $name
+	 * @param bool   $defaultClass
 	 *
 	 * @return string|Service
 	 */
-	public function getServiceClass( $name )
+	public function getServiceClass( $name, $defaultClass = false )
 	{
-		return \Kisma\Core\Utility\Option::get( $this->_serviceMap, $name, false );
+		return \Kisma\Core\Utility\Option::get( $this->_serviceMap, $name, $defaultClass );
 	}
 
 	/**

@@ -54,7 +54,7 @@ class SeedTest extends \PHPUnit_Framework_TestCase
 	/**
 	 * @covers Kisma\Core\Seed::onAfterConstruct
 	 * @covers Kisma\Core\Seed::__wakeup
-	 * @covers Kisma\Core\Seed::trigger
+	 * @covers Kisma\Core\Seed::publish
 	 * @covers Kisma\Core\Seed::getDefaultSettings
 	 * @covers Kisma\Core\Utility\EventManager::subscribe
 	 * @covers Kisma\Core\Utility\EventManager::discover

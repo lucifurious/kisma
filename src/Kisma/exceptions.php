@@ -164,12 +164,12 @@ class ProcessLockFileException extends KismaException
 //*************************************************************************
 
 /**  */
-class AttributeException extends KismaException
+class SettingException extends KismaException
 {
 }
 
 /**  */
-class InvalidAttributeValueException extends AttributeException
+class InvalidSettingValueException extends SettingException
 {
 	//*************************************************************************
 	//* Public Methods
@@ -184,7 +184,7 @@ class InvalidAttributeValueException extends AttributeException
 	public function __construct( $key = null, $value = null, $previous = null, $info = null )
 	{
 		$_message =
-			'An invalid value was provided for the attribute "' . $key . '": ' .
+			'An invalid value was provided for "' . $key . '": ' .
 				(
 				is_scalar( $value ) ? $value :
 					(
@@ -197,7 +197,7 @@ class InvalidAttributeValueException extends AttributeException
 }
 
 /**  */
-class InvalidAttributeKeyException extends AttributeException
+class InvalidSettingKeyException extends SettingException
 {
 	//*************************************************************************
 	//* Public Methods
@@ -211,7 +211,7 @@ class InvalidAttributeKeyException extends AttributeException
 	 */
 	public function __construct( $key = null, $provider = null, $previous = null, $info = null )
 	{
-		$_message = 'The key "' . $key . '" is not valid for attributes storage provider: ' . $provider;
+		$_message = 'The key "' . $key . '" is not valid for provider: ' . $provider;
 		parent::__construct( $_message, null, $previous, $info );
 	}
 }

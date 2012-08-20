@@ -89,18 +89,6 @@ class Storage extends \Kisma\Core\Service implements \Kisma\Core\Interfaces\Stor
 	//*************************************************************************
 
 	/**
-	 * When a service is constructed, this method is called by default
-	 *
-	 * @param array $options
-	 *
-	 * @return bool
-	 */
-	public function initialize( $options = array() )
-	{
-		return true;
-	}
-
-	/**
 	 * {@InheritDoc}
 	 */
 	public function initializeStorage( $options = array() )

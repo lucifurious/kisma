@@ -18,9 +18,9 @@ namespace Kisma\Core;
  * onBeforeServiceCall and onAfterServiceCall which are called before and after
  * the service is run, respectively.
  *
- * @property string $serviceName The name of this service
+ * @property bool $initialized Set to true by service once initialized
  */
-abstract class Service extends Seed implements \Kisma\Core\Interfaces\Reactors\ServiceEvent
+abstract class Service extends Seed
 {
 	//*************************************************************************
 	//* Public Methods
@@ -33,7 +33,11 @@ abstract class Service extends Seed implements \Kisma\Core\Interfaces\Reactors\S
 	 *
 	 * @return bool
 	 */
-	abstract public function initialize( $options = array() );
+	public function initialize( $options = array() )
+	{
+		$this->set( 'initialized', true );
+		return true;
+	}
 
 	//*************************************************************************
 	//* Event Handlers
@@ -48,12 +52,7 @@ abstract class Service extends Seed implements \Kisma\Core\Interfaces\Reactors\S
 	 */
 	public function onAfterConstruct( $event = null )
 	{
-		if ( !parent::onAfterConstruct( $event ) )
-		{
-			return false;
-		}
-
-		return $this->initialize( $event->getData() );
+		return $this->get( 'initialized' ) || $this->initialize( $event->getData() );
 	}
 
 	/**
@@ -64,6 +63,16 @@ abstract class Service extends Seed implements \Kisma\Core\Interfaces\Reactors\S
 	public function onBeforeServiceCall( $event = null )
 	{
 		return true;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getDefaultSettings()
+	{
+		return array(
+			'initialized' => false,
+		);
 	}
 
 	/**

@@ -14,7 +14,7 @@
  *
  * Contains a few core functions implemented statically to be lightweight and single instance.
  */
-class Kisma implements \Kisma\Core\Interfaces\Reactors\KismaEvent
+class Kisma implements \Kisma\Core\Interfaces\Publisher, \Kisma\Core\Interfaces\Events\Kisma
 {
 	//*************************************************************************
 	//* Private Members
@@ -64,7 +64,7 @@ class Kisma implements \Kisma\Core\Interfaces\Reactors\KismaEvent
 		if ( false === ( $_conceived = self::get( 'conception' ) ) )
 		{
 			\register_shutdown_function(
-				function ( $eventName = \Kisma\Core\Interfaces\Reactors\KismaEvent::Death )
+				function ( $eventName = \Kisma\Core\Interfaces\Events\Kisma::Death )
 				{
 					\Kisma\Core\Utility\EventManager::publish( null, $eventName );
 				}
@@ -168,4 +168,13 @@ class Kisma implements \Kisma\Core\Interfaces\Reactors\KismaEvent
 		return self::$_options;
 	}
 
+	/**
+	 * Returns the unique identifier for this reactor
+	 *
+	 * @return string
+	 */
+	public function getId()
+	{
+		// TODO: Implement getId() method.
+	}
 }

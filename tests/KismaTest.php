@@ -17,6 +17,7 @@ class KismaTest extends \Kisma\Core\TestCase
 	protected function setUp()
 	{
 		$this->object = new \Kisma\Core\Services\Storage();
+		$this->_service = new \Kisma\Core\Services\SeedHttp();
 	}
 
 	/**
