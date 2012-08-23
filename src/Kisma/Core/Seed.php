@@ -11,6 +11,10 @@
 namespace Kisma\Core;
 
 use Kisma\Core\Interfaces;
+use BadMethodCallException;
+use Kisma\Core\Exceptions\SeedException;
+use Kisma\Core\Exceptions\SettingException;
+use Kisma\Core\Exceptions\InvalidSettingKeyException;
 
 /**
  * Seed
@@ -122,8 +126,6 @@ class Seed implements Interfaces\Events\Publisher, Interfaces\Events\Seed, Inter
 	 * Base constructor
 	 *
 	 * @param array|object $settings An array of key/value pairs that will be placed into storage
-	 *
-	 * @throws \Kisma\InvalidAttributeValueException
 	 */
 	public function __construct( $settings = array() )
 	{
@@ -246,9 +248,7 @@ class Seed implements Interfaces\Events\Publisher, Interfaces\Events\Seed, Inter
 	 * @param string $name
 	 * @param array  $arguments
 	 *
-	 * @throws \Kisma\InvalidAttributeKeyException
 	 * @return mixed
-	 * @convenience
 	 */
 	public function __call( $name, $arguments )
 	{
@@ -265,7 +265,7 @@ class Seed implements Interfaces\Events\Publisher, Interfaces\Events\Seed, Inter
 		}
 
 		//	Done
-		throw new \Kisma\InvalidSettingKeyException( 'The setting "' . $name . '" is not defined.' );
+		throw new \BadMethodCallException( 'The method "' . $name . '" is not defined.' );
 	}
 
 	//*************************************************************************
@@ -275,7 +275,6 @@ class Seed implements Interfaces\Events\Publisher, Interfaces\Events\Seed, Inter
 	/**
 	 * @param array|object $settings
 	 *
-	 * @throws \Kisma\InvalidSettingKeyException
 	 * @return bool
 	 */
 	protected function _initializeStorage( $settings = array() )
@@ -294,7 +293,7 @@ class Seed implements Interfaces\Events\Publisher, Interfaces\Events\Seed, Inter
 			//	Must be a class name or implement the base storage provider interface
 			if ( !is_string( $_storageProvider ) && !( $_storageProvider instanceof \Kisma\Core\Interfaces\StorageProvider ) )
 			{
-				throw new \Kisma\InvalidSettingKeyException( 'storageProvider', $_storageProvider );
+				throw new InvalidSettingKeyException( 'The setting "storageProvider" is either not set or bogus: ' . $_storageProvider );
 			}
 
 			//	Now add the settings...

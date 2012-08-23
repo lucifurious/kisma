@@ -24,6 +24,7 @@ namespace Kisma\Core\Utility;
 //*************************************************************************
 
 use \Kisma\Core\Seed;
+use Kisma\Core\Exceptions\UtilityException;
 
 /**
  * FileSystem
@@ -72,7 +73,7 @@ class FileSystem extends Seed implements \Kisma\Core\Interfaces\SeedUtility
 			{
 				if ( false === @mkdir( $_path, 0, true ) )
 				{
-					throw new \Kisma\UtilityException( 'The result path "' . $_path . '" could not be created.' );
+					throw new UtilityException( 'The result path "' . $_path . '" could not be created.' );
 				}
 			}
 		}

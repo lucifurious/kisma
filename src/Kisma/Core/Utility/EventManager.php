@@ -3,6 +3,8 @@
  * EventManager.php
  */
 namespace Kisma\Core\Utility;
+use Kisma\Core\Exceptions\InvalidEventHandlerException;
+
 /**
  * EventManager class
  * Utility class that provides event management
@@ -191,7 +193,7 @@ class EventManager
 			else
 			{
 				//	Oops!
-				throw new \Kisma\InvalidEventHandlerException(
+				throw new InvalidEventHandlerException(
 					'Event "' .
 						( is_object( $_callback[0] )
 							?

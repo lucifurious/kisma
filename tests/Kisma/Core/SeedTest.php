@@ -80,6 +80,9 @@ class SeedTest extends \PHPUnit_Framework_TestCase
 
 		$_two = $this->_object->get_item_two();
 		$this->assertTrue( 2 == $_two );
+
+		$this->setExpectedException( '\\BadMethodCallException' );
+		$this->_object->BadMethodCall();
 	}
 
 	/**

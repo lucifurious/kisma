@@ -1,13 +1,17 @@
 <?php
 /**
- * CouchDbClient.php
+ * Client.php
  */
-namespace Kisma\Core\Utility;
+namespace Kisma\Core\Services\DataStore\CouchDb;
+
+use Kisma\Core\Utility\Curl;
+use Kisma\Core\Exceptions\CouchDbException;
+
 /**
- * CouchDbClient
- * A really basic generic CouchDb client
+ * Client
+ * A really really really basic generic CouchDb client
  */
-class CouchDbClient extends Curl
+class Client extends Curl
 {
 	//*************************************************************************
 	//* Constants
@@ -76,7 +80,7 @@ class CouchDbClient extends Curl
 			if ( 404 !== $_response->status )
 			{
 				//	Problems...
-				throw new \Kisma\CouchDbException( 'Unexpected status "' . $_response->status . '"', $_response->status, null, $_response );
+				throw new CouchDbException( 'Unexpected status "' . $_response->status . '"', $_response->status, null, $_response );
 			}
 
 			//	Create the database...
@@ -86,7 +90,7 @@ class CouchDbClient extends Curl
 
 				if ( isset( $_response->error ) || ( isset( $_response->body, $_response->body->ok ) && true !== $_response->body->ok ) )
 				{
-					throw new \Kisma\CouchDbException( 'Error creating database', $_response->status, null, $_response );
+					throw new CouchDbException( 'Error creating database', $_response->status, null, $_response );
 				}
 
 				$this->_createDesignDocument();
