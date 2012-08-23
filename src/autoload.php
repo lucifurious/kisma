@@ -3,7 +3,7 @@
  * autoload.php
  * Bootstrap loader for Kisma
  */
-error_reporting( E_ALL + E_STRICT );
+error_reporting( -1 );
 $_kismaOptions = array();
 
 //	Some basics for all
