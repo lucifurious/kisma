@@ -4,7 +4,7 @@
  */
 namespace Kisma\Core\Interfaces\Events;
 /**
- * HttpEvent
+ * Http
  * Defines an interface the Http service class knows how to deal with
  */
 interface Http
@@ -16,6 +16,6 @@ interface Http
 	/**
 	 * @var string
 	 */
-	const RequestReceived = 'kisma.core.http.request_received';
+	const RequestReceived = 'kisma.core.services.network.http.request_received';
 
 }

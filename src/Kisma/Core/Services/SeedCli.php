@@ -7,7 +7,7 @@ namespace Kisma\Core\Services;
  * SeedCli
  * A base class for CLI services
  */
-abstract class SeedCli extends \Kisma\Core\Service implements \Kisma\Core\Interfaces\RequestSource
+abstract class SeedCli extends \Kisma\Core\SeedService implements \Kisma\Core\Interfaces\RequestSource
 {
 	//********************************************************************************
 	//* Member Variables

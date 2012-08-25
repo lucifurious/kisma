@@ -1,23 +1,23 @@
 <?php
 /**
- * Request.php
+ * SeedRequest.php
  */
 namespace Kisma\Core\Services;
 
 use Kisma\Core\Utility\Option;
 
 /**
- * Request
- * Encapsulates an application request
+ * SeedRequest
+ * A base class for all service requests
  */
-class Request extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\RequestSource
+abstract class SeedRequest extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\RequestSource
 {
 	//*************************************************************************
 	//* Private Members
 	//*************************************************************************
 
 	/**
-	 * @var int
+	 * @var int The source of this request
 	 */
 	protected $_source = self::Http;
 	/**
@@ -28,22 +28,6 @@ class Request extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\Request
 	 * @var int Depending on the source, contains the count of command line arguments
 	 */
 	protected $_argumentCount = null;
-	/**
-	 * @var string
-	 */
-	protected $_uri = null;
-	/**
-	 * @var \Kisma\Core\Enums\HttpMethod
-	 */
-	protected $_method = null;
-	/**
-	 * @var string
-	 */
-	protected $_content = null;
-	/**
-	 * @var array
-	 */
-	protected $_headers = null;
 	/**
 	 * @var array
 	 */
@@ -67,7 +51,7 @@ class Request extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\Request
 	//*************************************************************************
 
 	/**
-	 * Load the inbound $_REQUEST object
+	 * Pull some stuff from the environment/system
 	 */
 	protected function _loadRequest()
 	{
@@ -79,35 +63,8 @@ class Request extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\Request
 			$this->_argumentCount = Option::get( $_SERVER, 'argc' );
 		}
 
-		//	Pull out some info...
-		$this->_raw = array(
-			'server'  => $_SERVER,
-			'request' => isset( $_REQUEST ) ? $_REQUEST : null,
-		);
-
-		$this->_uri = Option::get( $_SERVER, 'REQUEST_URI' );
-		$this->_method = Option::get( $_SERVER, 'REQUEST_METHOD' );
-
-		//	Pull out the headers
-		$this->_headers = array();
-
-		foreach ( $_SERVER as $_key => $_value )
-		{
-			if ( false === stripos( $_key, 'HTTP_', 0 ) )
-			{
-				continue;
-			}
-
-			$_clean = str_replace(
-				'HTTP_',
-				null,
-				strtoupper( $_key )
-			);
-
-			$_key = \Kisma\Core\Utility\Inflector::tag( strtolower( $_clean ), true );
-
-			$this->_headers[$_key] = $_value;
-		}
+		//	Save off the raw body
+		$this->_raw = @file_get_contents( 'php://input' );
 
 		return true;
 	}
@@ -117,43 +74,15 @@ class Request extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\Request
 	//*************************************************************************
 
 	/**
-	 * @return array
+	 * @param int $argumentCount
+	 *
+	 * @return SeedRequest
 	 */
-	public function getHeaders()
+	public function setArgumentCount( $argumentCount )
 	{
-		return $this->_headers;
-	}
+		$this->_argumentCount = $argumentCount;
 
-	/**
-	 * @return \Kisma\Core\Enums\HttpMethod
-	 */
-	public function getMethod()
-	{
-		return $this->_method;
-	}
-
-	/**
-	 * @return int
-	 */
-	public function getSource()
-	{
-		return $this->_source;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getUri()
-	{
-		return $this->_uri;
-	}
-
-	/**
-	 * @return array
-	 */
-	public function getRaw()
-	{
-		return $this->_raw;
+		return $this;
 	}
 
 	/**
@@ -165,10 +94,63 @@ class Request extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\Request
 	}
 
 	/**
+	 * @param array $arguments
+	 *
+	 * @return SeedRequest
+	 */
+	public function setArguments( $arguments )
+	{
+		$this->_arguments = $arguments;
+
+		return $this;
+	}
+
+	/**
 	 * @return array
 	 */
 	public function getArguments()
 	{
 		return $this->_arguments;
 	}
+
+	/**
+	 * @param int $source
+	 *
+	 * @return SeedRequest
+	 */
+	public function setSource( $source )
+	{
+		$this->_source = $source;
+
+		return $this;
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getSource()
+	{
+		return $this->_source;
+	}
+
+	/**
+	 * @param array $raw
+	 *
+	 * @return SeedRequest
+	 */
+	public function setRaw( $raw )
+	{
+		$this->_raw = $raw;
+
+		return $this;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getRaw()
+	{
+		return $this->_raw;
+	}
+
 }

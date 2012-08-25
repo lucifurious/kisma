@@ -2,7 +2,7 @@
 /**
  * Http.php
  */
-namespace Kisma\Core\Services;
+namespace Kisma\Core\Services\Network;
 
 use Kisma\Core\Interfaces;
 
@@ -13,18 +13,16 @@ use Kisma\Core\Interfaces;
  * Provides one event handler:
  *
  * onRequestReceived
- * the service is run, respectively.
- *
- * @property \Kisma\Core\Services\Request $request The request currently being serviced
+ * Happens when the service is run, respectively.
  */
-class SeedHttp extends \Kisma\Core\SeedService implements Interfaces\Events\Http, \Kisma\Core\Interfaces\HttpMethod
+class Http extends \Kisma\Core\Services\SeedService implements \Kisma\Core\Interfaces\HttpMethod, \Kisma\Core\Interfaces\Events\Http
 {
 	//*************************************************************************
 	//* Private Members
 	//*************************************************************************
 
 	/**
-	 * @var \Kisma\Core\Services\Request The current request
+	 * @var HttpRequest The current request
 	 */
 	protected $_request = null;
 
@@ -42,13 +40,11 @@ class SeedHttp extends \Kisma\Core\SeedService implements Interfaces\Events\Http
 			return false;
 		}
 
-		$this->_request = new \Kisma\Core\Services\Request();
-
 		//	Trigger the event
 		return
 			$this->publish(
 				self::RequestReceived,
-				$this->_request
+				$this->_request = new HttpRequest()
 			);
 	}
 
@@ -57,7 +53,7 @@ class SeedHttp extends \Kisma\Core\SeedService implements Interfaces\Events\Http
 	//*************************************************************************
 
 	/**
-	 * @param \Kisma\Core\Events\SeedEvent $event
+	 * @param \Kisma\Core\Events\ServiceEvent $event
 	 *
 	 * @return bool
 	 */
@@ -72,18 +68,19 @@ class SeedHttp extends \Kisma\Core\SeedService implements Interfaces\Events\Http
 	//********************************************************************************
 
 	/**
-	 * @param Request $request
+	 * @param HttpRequest $request
 	 *
-	 * @return \Kisma\Core\Services\SeedHttp
+	 * @return Http
 	 */
 	public function setRequest( $request )
 	{
 		$this->_request = $request;
+
 		return $this;
 	}
 
 	/**
-	 * @return Request
+	 * @return HttpRequest
 	 */
 	public function getRequest()
 	{

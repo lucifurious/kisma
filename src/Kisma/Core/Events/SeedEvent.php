@@ -1,16 +1,12 @@
 <?php
 /**
- * Kisma(tm) : PHP Fun-Size Framework (http://github.com/lucifurious/kisma/)
- * Copyright 2009-2012, Jerry Ablan, All Rights Reserved
- *
- * @copyright Copyright (c) 2009-2012 Jerry Ablan
- * @license   http://github.com/lucifurious/kisma/blob/master/LICENSE
- * @author    Jerry Ablan <get.kisma@gmail.com>
+ * SeedEvent.php
  */
 namespace Kisma\Core\Events;
 
 /**
- * SeedEvent is the base class for all events
+ * SeedEvent
+ * The base class for Kisma events
  *
  * It encapsulates the parameters associated with an event.
  * The {@link source} property describes who raised the event.
@@ -24,11 +20,11 @@ class SeedEvent
 	//**************************************************************************
 
 	/**
-	 * @var Seed the source of this event
+	 * @var object The source of this event
 	 */
 	protected $_source;
 	/**
-	 * @var boolean Indicates if this event has been handled
+	 * @var boolean Events will continue to propagate if this is "false"
 	 */
 	protected $_stopPropagation = false;
 	/**
@@ -64,6 +60,7 @@ class SeedEvent
 	public function setData( $data )
 	{
 		$this->_data = $data;
+
 		return $this;
 	}
 
@@ -83,6 +80,7 @@ class SeedEvent
 	public function setSource( $source )
 	{
 		$this->_source = $source;
+
 		return $this;
 	}
 
@@ -102,6 +100,7 @@ class SeedEvent
 	public function setStopPropagation( $stopPropagation )
 	{
 		$this->_stopPropagation = $stopPropagation;
+
 		return $this;
 	}
 

@@ -82,6 +82,7 @@ class EventManager
 		{
 			//	Not a subscriber, beat it...
 			$_discovered[$object->getId()] = true;
+
 			return false;
 		}
 
@@ -208,6 +209,24 @@ class EventManager
 		}
 
 		return true;
+	}
+
+	/**
+	 * @param object $object
+	 *
+	 * @return bool|string
+	 */
+	public static function canPublish( $object )
+	{
+		//	Publisher with an event manager?
+		if ( $object instanceof \Kisma\Core\Interfaces\Events\Publisher )
+		{
+			//	Return the event manager service or false
+			return $object->getServiceClass( 'event_manager' );
+		}
+
+		//	Nope!
+		return false;
 	}
 
 	//*************************************************************************

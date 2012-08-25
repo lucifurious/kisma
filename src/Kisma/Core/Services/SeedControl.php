@@ -6,7 +6,7 @@ namespace Kisma\Core\Services;
 /**
  * Control
  */
-abstract class SeedControl extends \Kisma\Core\Service implements \Kisma\Core\Interfaces\Reactors\ControlEvent
+abstract class SeedControl extends \Kisma\Core\SeedService implements \Kisma\Core\Interfaces\Reactors\ControlEvent
 {
 	//*************************************************************************
 	//* Private Members

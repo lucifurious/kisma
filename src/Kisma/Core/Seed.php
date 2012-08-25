@@ -12,8 +12,6 @@ namespace Kisma\Core;
 
 use Kisma\Core\Interfaces;
 use BadMethodCallException;
-use Kisma\Core\Exceptions\SeedException;
-use Kisma\Core\Exceptions\SettingException;
 use Kisma\Core\Exceptions\InvalidSettingKeyException;
 
 /**
@@ -226,14 +224,8 @@ class Seed implements Interfaces\Events\Publisher, Interfaces\Events\Seed, Inter
 	 */
 	public function publish( $eventName, $eventData = null )
 	{
-		//	Not a publisher
-		if ( !( $this instanceof \Kisma\Core\Interfaces\Events\Publisher ) )
-		{
-			return false;
-		}
-
-		//	No event manager configured...
-		if ( false === ( $_manager = $this->getServiceClass( 'event_manager' ) ) )
+		//	Can we publish?
+		if ( false === ( $_manager = \Kisma\Core\Utility\EventManager::canPublish( $this ) ) )
 		{
 			return false;
 		}
@@ -353,7 +345,7 @@ class Seed implements Interfaces\Events\Publisher, Interfaces\Events\Seed, Inter
 	 * @param string $name
 	 * @param bool   $defaultClass
 	 *
-	 * @return string|Service
+	 * @return string|SeedService
 	 */
 	public function getServiceClass( $name, $defaultClass = false )
 	{
@@ -362,9 +354,9 @@ class Seed implements Interfaces\Events\Publisher, Interfaces\Events\Seed, Inter
 
 	/**
 	 * @param string         $name
-	 * @param string|Service $service
+	 * @param string|SeedService $service
 	 *
-	 * @return string|Service
+	 * @return string|SeedService
 	 */
 	public function addServiceClass( $name, $service )
 	{

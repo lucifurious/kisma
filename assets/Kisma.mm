@@ -3,7 +3,7 @@
 <node COLOR="#000000" CREATED="1325988276602" ID="ID_1786733603" MODIFIED="1325997814057">
 <richcontent TYPE="NODE"><html>
   <head>
-    
+
   </head>
   <body>
     <p style="text-align: center">
@@ -43,7 +43,7 @@
 <edge STYLE="bezier" WIDTH="thin"/>
 <font NAME="SansSerif" SIZE="12"/>
 </node>
-<node COLOR="#111111" CREATED="1325995560651" ID="ID_1349210283" MODIFIED="1325997635970" TEXT="Service">
+<node COLOR="#111111" CREATED="1325995560651" ID="ID_1349210283" MODIFIED="1325997635970" TEXT="SeedService">
 <edge STYLE="bezier" WIDTH="thin"/>
 <font NAME="SansSerif" SIZE="12"/>
 </node>
@@ -168,7 +168,7 @@
 <node COLOR="#0033ff" CREATED="1325997486162" ID="ID_507131099" MODIFIED="1325997767330" POSITION="left">
 <richcontent TYPE="NODE"><html>
   <head>
-    
+
   </head>
   <body>
     <p>

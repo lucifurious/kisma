@@ -1,14 +1,14 @@
 <?php
 /**
- * Service.php
+ * SeedService.php
  */
 namespace Kisma\Core\Interfaces\Events;
 
 /**
- * Service
+ * SeedService
  * Defines the event interface for all services
  */
-interface Service
+interface SeedService
 {
 	//*************************************************************************
 	//* Constants

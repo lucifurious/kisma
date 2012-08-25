@@ -1,27 +1,31 @@
 <?php
 /**
- * Service.php
- *
- * @description Kisma(tm) : PHP Fun-Size Framework (http://github.com/lucifurious/kisma/)
- * @copyright   Copyright (c) 2009-2012 Jerry Ablan
- * @license     http://github.com/lucifurious/kisma/blob/master/LICENSE
- * @author      Jerry Ablan <get.kisma@gmail.com>
+ * SeedService.php
  */
-namespace Kisma\Core;
+namespace Kisma\Core\Services;
 
 /**
- * Service
+ * SeedService
  * The base class for services provided
  *
  * Provides two event handlers:
  *
- * onBeforeServiceCall and onAfterServiceCall which are called before and after
- * the service is run, respectively.
+ * onBeforeRequest and onAfterRequest which are called before and after
+ * a service request is processed, respectively.
  *
  * @property bool $initialized Set to true by service once initialized
  */
-abstract class Service extends Seed
+abstract class SeedService extends \Kisma\Core\Seed
 {
+	//*************************************************************************
+	//* Private Members
+	//*************************************************************************
+
+	/**
+	 * @var bool Set to true by service once initialized
+	 */
+	protected $_initialized = false;
+
 	//*************************************************************************
 	//* Public Methods
 	//*************************************************************************
@@ -35,8 +39,32 @@ abstract class Service extends Seed
 	 */
 	public function initialize( $options = array() )
 	{
-		$this->set( 'initialized', true );
-		return true;
+		return $this->_initialized = true;
+	}
+
+	/**
+	 * {@InheritDoc}
+	 */
+	public function publish( $eventName, $eventData = null )
+	{
+		$_event = new \Kisma\Core\Events\ServiceEvent( $this );
+
+		if ( !is_array( $eventData ) )
+		{
+			$eventData = array( $eventData );
+		}
+
+		foreach ( $eventData as $_request )
+		{
+			if ( !( $_request instanceof \Kisma\Core\Services\SeedRequest ) )
+			{
+				throw new \InvalidArgumentException( '$eventData must be an array or a SeedRequest.' );
+			}
+
+			$_event->pushRequest( $_request );
+		}
+
+		return parent::publish( $eventName, $_event );
 	}
 
 	//*************************************************************************
@@ -46,13 +74,13 @@ abstract class Service extends Seed
 	/**
 	 * After the base object is constructed, call the service's initialize method
 	 *
-	 * @param \Kisma\Core\Events\SeedEvent $event
+	 * @param \Kisma\Core\Events\ServiceEvent $event
 	 *
 	 * @return bool
 	 */
 	public function onAfterConstruct( $event = null )
 	{
-		return $this->get( 'initialized' ) || $this->initialize( $event->getData() );
+		return $this->_initialized ? : $this->initialize( $event->getData() );
 	}
 
 	/**

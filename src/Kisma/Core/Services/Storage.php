@@ -14,7 +14,7 @@ namespace Kisma\Core\Services;
  * Storage
  * A dead-simple storage class.  Keeps key value pairs in an array.
  */
-class Storage extends \Kisma\Core\Service implements \Kisma\Core\Interfaces\StorageProvider, \Kisma\Core\Interfaces\StorageService
+class Storage extends \Kisma\Core\SeedService implements \Kisma\Core\Interfaces\StorageProvider, \Kisma\Core\Interfaces\StorageService
 {
 	//********************************************************************************
 	//* Member Variables
