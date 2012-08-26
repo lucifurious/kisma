@@ -32,6 +32,10 @@ abstract class SeedRequest extends \Kisma\Core\Seed implements \Kisma\Core\Inter
 	 * @var array
 	 */
 	protected $_raw = null;
+	/**
+	 * @var mixed The result of the request, if any
+	 */
+	protected $_result = null;
 
 	//*************************************************************************
 	//* Public Methods
@@ -151,6 +155,26 @@ abstract class SeedRequest extends \Kisma\Core\Seed implements \Kisma\Core\Inter
 	public function getRaw()
 	{
 		return $this->_raw;
+	}
+
+	/**
+	 * @param mixed $result
+	 *
+	 * @return SeedRequest
+	 */
+	public function setResult( $result )
+	{
+		$this->_result = $result;
+
+		return $this;
+	}
+
+	/**
+	 * @return mixed
+	 */
+	public function getResult()
+	{
+		return $this->_result;
 	}
 
 }

@@ -43,10 +43,37 @@ class ServiceEvent extends SeedEvent
 	 * @var \Kisma\Core\Services\SeedRequest[] One or more requests for this service
 	 */
 	protected $_requestQueue = array();
+	/**
+	 * @var array
+	 */
+	protected $_responses = array();
+	/**
+	 * @var \Kisma\Core\Interfaces\ServiceRequester
+	 */
+	protected $_requester = null;
 
 	//**************************************************************************
 	//* Public Methods
 	//**************************************************************************
+
+	/**
+	 * {@InheritDoc}
+	 *
+	 * @param \Kisma\Core\Interfaces\ServiceRequester $requester Optional requester (grandparent)
+	 */
+	public function __construct( $source = null, $data = null, $requester = null )
+	{
+		//	If $data is a request, yeah, you can read....
+		if ( $data instanceof \Kisma\Core\Services\SeedRequest )
+		{
+			$this->pushRequest( $data );
+			$data = null;
+		}
+
+		$this->_requester = $requester;
+
+		parent::__construct( $source, $data );
+	}
 
 	/**
 	 * Pushes the request on to the end of the queue
@@ -57,10 +84,11 @@ class ServiceEvent extends SeedEvent
 	 */
 	public function pushRequest( $request )
 	{
-		if ( !is_array( $this->_requestQueue ) || empty( $this->_requestQueue ) )
-		{
-			$this->_requestQueue = array();
-		}
+		$this->_requestQueue = \Kisma\Core\Utility\Option::clean( $this->_requestQueue );
+		$this->_responses = \Kisma\Core\Utility\Option::clean( $this->_responses );
+
+		//	Set up the response entry for this
+		$this->_responses[$request->getId()] = null;
 
 		return array_push( $this->_requestQueue, $request );
 	}
@@ -72,12 +100,34 @@ class ServiceEvent extends SeedEvent
 	 */
 	public function popRequest()
 	{
-		if ( !is_array( $this->_requestQueue ) || empty( $this->_requestQueue ) )
-		{
-			$this->_requestQueue = array();
-		}
+		$this->_requestQueue = \Kisma\Core\Utility\Option::clean( $this->_requestQueue );
 
 		return array_pop( $this->_requestQueue );
+	}
+
+	/**
+	 * @param string $requestId
+	 * @param mixed  $result
+	 *
+	 * @return \Kisma\Core\Events\ServiceEvent
+	 */
+	public function setRequestResult( $requestId, $result = true )
+	{
+		//	Stuff the response, who cares....
+		\Kisma\Core\Utility\Option::set( $this->_responses, $requestId, $result );
+
+		return $this;
+	}
+
+	/**
+	 * @param string $requestId
+	 * @param mixed  $defaultResult
+	 *
+	 * @return mixed
+	 */
+	public function getRequestResult( $requestId, $defaultResult = null )
+	{
+		return \Kisma\Core\Utility\Option::get( $this->_responses, $requestId, $defaultResult );
 	}
 
 	//**************************************************************************
@@ -85,28 +135,39 @@ class ServiceEvent extends SeedEvent
 	//**************************************************************************
 
 	/**
-	 * @param array|\Kisma\Core\Services\SeedRequest[] $requestQueue
-	 *
-	 * @return \Kisma\Core\Events\ServiceEvent
-	 */
-	public function setRequestQueue( $requestQueue )
-	{
-		if ( !is_array( $requestQueue ) || empty( $requestQueue ) )
-		{
-			$requestQueue = array();
-		}
-
-		$this->_requestQueue = $requestQueue;
-
-		return $this;
-	}
-
-	/**
 	 * @return array|\Kisma\Core\Services\SeedRequest[]
 	 */
 	public function getRequestQueue()
 	{
 		return $this->_requestQueue;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getResponses()
+	{
+		return $this->_responses;
+	}
+
+	/**
+	 * @param \Kisma\Core\Interfaces\ServiceRequester $requester
+	 *
+	 * @return ServiceEvent
+	 */
+	public function setRequester( $requester )
+	{
+		$this->_requester = $requester;
+
+		return $this;
+	}
+
+	/**
+	 * @return \Kisma\Core\Interfaces\ServiceRequester
+	 */
+	public function getRequester()
+	{
+		return $this->_requester;
 	}
 
 }

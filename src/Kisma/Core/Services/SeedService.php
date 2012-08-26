@@ -8,14 +8,14 @@ namespace Kisma\Core\Services;
  * SeedService
  * The base class for services provided
  *
- * Provides two event handlers:
+ * Provides three event handlers:
  *
- * onBeforeRequest and onAfterRequest which are called before and after
- * a service request is processed, respectively.
+ * onSuccess, onFailure, and onOther
  *
- * @property bool $initialized Set to true by service once initialized
+ * @property bool                              $initialized Set to true by service once initialized
+ * @property \Kisma\Core\Interfaces\Dispatcher $dispatcher  The dispatcher, if any, who owns this service.
  */
-abstract class SeedService extends \Kisma\Core\Seed
+abstract class SeedService extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\Events\Service
 {
 	//*************************************************************************
 	//* Private Members
@@ -25,13 +25,17 @@ abstract class SeedService extends \Kisma\Core\Seed
 	 * @var bool Set to true by service once initialized
 	 */
 	protected $_initialized = false;
+	/**
+	 * @var \Kisma\Core\Interfaces\Dispatcher
+	 */
+	protected $_dispatcher = null;
 
 	//*************************************************************************
 	//* Public Methods
 	//*************************************************************************
 
 	/**
-	 * When a service is constructed, this method is called by default
+	 * When a service is constructed, this method is called once, automatically
 	 *
 	 * @param array $options
 	 *
@@ -54,6 +58,7 @@ abstract class SeedService extends \Kisma\Core\Seed
 			$eventData = array( $eventData );
 		}
 
+		//	Build the request stack
 		foreach ( $eventData as $_request )
 		{
 			if ( !( $_request instanceof \Kisma\Core\Services\SeedRequest ) )
@@ -68,7 +73,7 @@ abstract class SeedService extends \Kisma\Core\Seed
 	}
 
 	//*************************************************************************
-	//* Event Handlers
+	//* Default Event Handlers
 	//*************************************************************************
 
 	/**
@@ -84,37 +89,33 @@ abstract class SeedService extends \Kisma\Core\Seed
 	}
 
 	/**
-	 * @param \Kisma\Core\Events\SeedEvent $event
+	 * Receives events from dispatchers
 	 *
-	 * @return bool Default implementation always returns true
+	 * @param \Kisma\Core\Events\ServiceEvent $event
+	 *
+	 * @return bool
 	 */
-	public function onBeforeServiceCall( $event = null )
+	public function onDispatch( $event = null )
 	{
+		if ( null !== $event )
+		{
+			$_result = true;
+			$this->_dispatcher = $event->getSource();
+
+			while ( null !== ( $_request = $event->popRequest() ) )
+			{
+				$this->_dispatcher->
+				$this->_processRequest( $_request, $event );
+			}
+
+			return $_result;
+		}
+
 		return true;
 	}
 
 	/**
-	 * @return array
-	 */
-	public function getDefaultSettings()
-	{
-		return array(
-			'initialized' => false,
-		);
-	}
-
-	/**
-	 * @param \Kisma\Core\Events\SeedEvent $event
-	 *
-	 * @return bool Default implementation always returns true
-	 */
-	public function onAfterServiceCall( $event = null )
-	{
-		return true;
-	}
-
-	/**
-	 * @param \Kisma\Core\Events\SeedEvent $event
+	 * @param \Kisma\Core\Events\ServiceEvent $event
 	 *
 	 * @return bool Default implementation always returns true
 	 */
@@ -124,7 +125,7 @@ abstract class SeedService extends \Kisma\Core\Seed
 	}
 
 	/**
-	 * @param \Kisma\Core\Events\SeedEvent $event
+	 * @param \Kisma\Core\Events\ServiceEvent $event
 	 *
 	 * @return bool
 	 */
@@ -132,4 +133,5 @@ abstract class SeedService extends \Kisma\Core\Seed
 	{
 		return true;
 	}
+
 }

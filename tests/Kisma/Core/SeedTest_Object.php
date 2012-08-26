@@ -31,18 +31,11 @@ class SeedTest_Object extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces
 	 *
 	 * @return \SeedTest_Object
 	 */
-	public function __construct( $settings = array(), $tester = null )
+/*	public function __construct( $settings = array(), $tester = null )
 	{
-		parent::__construct(
-			array(
-				'itemOne'   => 1,
-				'itemTwo'   => 2,
-				'itemThree' => 3,
-			)
-		);
-
+		parent::__construct();
 		$this->tester = $tester;
-	}
+	}*/
 
 	/**
 	 * {@InheritDoc}

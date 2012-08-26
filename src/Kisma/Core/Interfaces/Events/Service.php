@@ -1,27 +1,23 @@
 <?php
 /**
- * SeedService.php
+ * Service.php
  */
 namespace Kisma\Core\Interfaces\Events;
 
 /**
- * SeedService
+ * Service
  * Defines the event interface for all services
  */
-interface SeedService
+interface Service
 {
 	//*************************************************************************
 	//* Constants
 	//*************************************************************************
 
 	/**
-	 * @var string Fired before a service call is made
+	 * @var string Published by dispatchers
 	 */
-	const BeforeServiceCall = 'kisma.core.service.before_service_call';
-	/**
-	 * @var string Fired after the service call has completed
-	 */
-	const AfterServiceCall = 'kisma.core.service.after_service_call';
+	const Dispatch = 'kisma.core.service.dispatch';
 	/**
 	 * @var string Fired when the service call succeeded
 	 */

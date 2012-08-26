@@ -1,26 +1,11 @@
 <?php
 /**
- * @file
- *            Provides ...
- *
- * Kisma(tm) : PHP Fun-Size Framework (http://github.com/lucifurious/kisma/)
- * Copyright 2009-2011, Jerry Ablan, All Rights Reserved
- *
- * @copyright Copyright (c) 2009-2011 Jerry Ablan
- * @license   http://github.com/lucifurious/kisma/blob/master/LICENSE
- *
- * @author    Jerry Ablan <kisma@pogostick.com>
- * @category  Framework
- * @package   kisma
- * @since     1.0.0
- *
- * @ingroup   framework
+ * Option.php
  */
 namespace Kisma\Core\Utility;
-
 /**
  * Option
- * Provides methods to manipulate option arrays and object
+ * Provides methods to manipulate array and object properties
  */
 class Option
 {
@@ -29,16 +14,40 @@ class Option
 	//*************************************************************************
 
 	/**
-	 * @param array      $options
-	 * @param string     $key
-	 * @param mixed|null $defaultValue
-	 * @param boolean    $unsetValue
+	 * @param array  $options
+	 * @param string $key
 	 *
-	 * @return mixed
+	 * @return bool
 	 */
-	public static function get( &$options = array(), $key, $defaultValue = null, $unsetValue = false )
+	public static function contains( &$options = array(), $key )
 	{
-		return self::o( $options, $key, $defaultValue, $unsetValue );
+		$_key = Inflector::tag( $key, true );
+
+		//	Check both the raw and cooked keys
+		return
+			( is_array( $options ) && ( isset( $options[$key] ) || isset( $options[$_key] ) ) )
+			||
+			( is_object( $options ) && ( property_exists( $options, $key ) || property_exists( $options, $_key ) ) );
+	}
+
+	/**
+	 * @param array $options
+	 * @param array $keys
+	 * @param mixed $defaultValue
+	 *
+	 * @return array
+	 */
+	public static function getMany( &$options = array(), $keys, $defaultValue = null )
+	{
+		$_results = array();
+		$_keys = self::collapse( $keys, $defaultValue );
+
+		foreach ( $_keys as $_key )
+		{
+			$_results[$_key] = self::get( $options, $_key, $defaultValue );
+		}
+
+		return $_results;
 	}
 
 	/**
@@ -52,8 +61,13 @@ class Option
 	 *
 	 * @return mixed
 	 */
-	public static function o( &$options = array(), $key, $defaultValue = null, $unsetValue = false )
+	public static function get( &$options = array(), $key, $defaultValue = null, $unsetValue = false )
 	{
+		if ( is_array( $key ) )
+		{
+			return self::getMany( $options, $key, $defaultValue, $unsetValue );
+		}
+
 		$_originalKey = $key;
 
 		//	Inflect pain!
@@ -66,58 +80,45 @@ class Option
 		if ( is_array( $options ) )
 		{
 			//	Check for the original key too
-			if ( array_key_exists( $_originalKey, $options ) )
+			if ( !array_key_exists( $key, $options ) && array_key_exists( $_originalKey, $options ) )
 			{
 				$key = $_originalKey;
 			}
 
-			if ( array_key_exists( $key, $options ) )
+			if ( isset( $options[$key] ) )
 			{
 				$_newValue = $options[$key];
 
-				if ( $unsetValue )
+				if ( false !== $unsetValue )
 				{
 					unset( $options[$key] );
 				}
-			}
 
-			//	Set it in the array if not an unsetter...
-			if ( !$unsetValue )
-			{
-				$options[$key] = $_newValue;
+				return $_newValue;
 			}
 		}
-		//	Also now handle accessible object properties
-		else
+
+		if ( is_object( $options ) )
 		{
-			if ( is_object( $options ) )
+			if ( !property_exists( $options, $key ) && property_exists( $options, $_originalKey ) )
 			{
-				if ( property_exists( $options, $_originalKey ) )
+				$key = $_originalKey;
+			}
+
+			if ( isset( $options->{$key} ) )
+			{
+				$_newValue = $options->{$key};
+
+				if ( false !== $unsetValue )
 				{
-					$key = $_originalKey;
+					unset( $options->{$key} );
 				}
 
-				if ( property_exists( $options, $key ) )
-				{
-					if ( isset( $options->$key ) )
-					{
-						$_newValue = $options->$key;
-
-						if ( $unsetValue )
-						{
-							unset( $options->$key );
-						}
-					}
-
-					if ( !$unsetValue )
-					{
-						$options->$key = $_newValue;
-					}
-				}
+				return $_newValue;
 			}
 		}
 
-		//	Return...
+		//	Return the default...
 		return $_newValue;
 	}
 
@@ -130,95 +131,50 @@ class Option
 	 *
 	 * @return mixed
 	 */
-	public static function oo( &$options = array(), $key, $subKey, $defaultValue = null, $unsetValue = false )
+	public static function getDeep( &$options = array(), $key, $subKey, $defaultValue = null, $unsetValue = false )
 	{
-		return self::o( self::o( $options, $key, array() ), $subKey, $defaultValue, $unsetValue );
-	}
-
-	/**
-	 * @param array        $options
-	 * @param string|array $key
-	 * @param mixed        $value
-	 *
-	 * @return mixed
-	 */
-	public static function set( &$options = array(), $key, $value = null )
-	{
-		$_options = self::collapse( $key, $value );
-
-		array_walk(
-			$_options,
-			function ( $value, $key ) use ( &$options )
-			{
-				Option::so( $options, $key, $value );
-			}
-		);
+		return self::get( self::get( $options, $key, array() ), $subKey, $defaultValue, $unsetValue );
 	}
 
 	/**
 	 * Sets an value in the given array at key.
 	 *
 	 * @param array|object $options
-	 * @param string       $key
+	 * @param string|array $key Pass a single key or an array of KVPs
 	 * @param mixed|null   $value
 	 *
-	 * @return mixed The new value of the key
+	 * @return void
 	 */
-	public static function so( &$options = array(), $key, $value = null )
+	public static function set( &$options = array(), $key, $value = null )
 	{
-		$_originalKey = $key;
+		$_options = self::collapse( $key, $value );
 
-		$key = Inflector::tag( $key, true );
-
-		if ( is_array( $options ) )
+		foreach ( $_options as $_key => $_value )
 		{
-			//	Check for the original key too
-			if ( !array_key_exists( $key, $options ) && array_key_exists( $_originalKey, $options ) )
+			$_originalKey = $_key;
+			$_key = Inflector::tag( $_key, true );
+
+			if ( is_array( $options ) )
 			{
-				$key = $_originalKey;
+				//	Check for the original key too
+				if ( !array_key_exists( $_key, $options ) && array_key_exists( $_originalKey, $options ) )
+				{
+					$_key = $_originalKey;
+				}
+
+				$options[$_key] = $_value;
 			}
 
-			if ( null === $value )
-			{
-				unset( $options[$key] );
-			}
-			else
-			{
-				return $options[$key] = $value;
-			}
-		}
-		else
-		{
 			if ( is_object( $options ) )
 			{
-				if ( !property_exists( $options, $key ) && property_exists( $options, $_originalKey ) )
+				if ( !property_exists( $options, $_key ) && property_exists( $options, $_originalKey ) )
 				{
-					$key = $_originalKey;
+					$_key = $_originalKey;
 				}
 
-				if ( null === $value )
-				{
-					unset( $options->{$key} );
-				}
-				else
-				{
-					return $options->$key = $value;
-				}
+				$options->{$_key} = $_value;
 			}
 		}
-
-		return null;
-	}
-
-	/**
-	 * @param array  $options
-	 * @param string $key
-	 *
-	 * @return mixed The last value of the key
-	 */
-	public static function remove( &$options = array(), $key )
-	{
-		return self::uo( $options, $key );
 	}
 
 	/**
@@ -226,12 +182,18 @@ class Option
 	 *
 	 * @param array  $options
 	 * @param string $key
-	 *
-	 * @return mixed The new value of the key
 	 */
-	public static function uo( &$options = array(), $key )
+	public static function remove( &$options = array(), $key )
 	{
-		return self::so( $options, $key, null, true );
+		if ( is_array( $options ) && isset( $options[$key] ) )
+		{
+			unset( $options[$key] );
+		}
+
+		if ( is_object( $options ) && property_exists( $options, $key ) )
+		{
+			unset( $options->{$key} );
+		}
 	}
 
 	/**
@@ -254,6 +216,7 @@ class Option
 		if ( !empty( $_haystack ) && count( $_haystack ) > 1 )
 		{
 			$_needle = array_shift( $_haystack );
+
 			return in_array( $_needle, $_haystack );
 		}
 
@@ -304,12 +267,7 @@ class Option
 	 */
 	public static function clean( $array = null )
 	{
-		if ( empty( $array ) || !is_array( $array ) )
-		{
-			$array = array();
-		}
-
-		return $array;
+		return ( empty( $array ) || !is_array( $array ) ) ? array() : $array;
 	}
 
 	/**
@@ -356,6 +314,7 @@ class Option
 		}
 
 		unset( $_arrays );
+
 		return $_target;
 	}
 
