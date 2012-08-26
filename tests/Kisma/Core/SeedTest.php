@@ -49,6 +49,7 @@ class SeedTest extends \PHPUnit_Framework_TestCase
 
 	/**
 	 * @covers Kisma\Core\Seed::__wakeup
+	 * @covers Kisma\Core\Seed::__construct
 	 * @covers Kisma\Core\Seed::publish
 	 */
 	public function testOnAfterConstruct()
