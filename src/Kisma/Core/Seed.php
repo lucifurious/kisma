@@ -1,17 +1,8 @@
 <?php
 /**
  * Seed.php
- * Provides a base for Kisma components and objects
- *
- * @description Kisma(tm) : PHP Fun-Size Framework (http://github.com/lucifurious/kisma/)
- * @copyright   Copyright (c) 2009-2012 Jerry Ablan
- * @license     http://github.com/lucifurious/kisma/blob/master/LICENSE
- * @author      Jerry Ablan <get.kisma@gmail.com>
  */
 namespace Kisma\Core;
-
-use Kisma\Core\Interfaces;
-
 /**
  * Seed
  * A nugget of goodness that grows into something wonderful
@@ -57,13 +48,13 @@ use Kisma\Core\Interfaces;
  * checks for invalid properties. If the property does not exist, it will be added as public. No
  * getter or setter will be created however. Use of the new property is entirely up to you.
  *
- * @property-read string $id              A unique ID assigned to this object
+ * @property-read string $id              A unique ID assigned to this object, the last part of which is the creation time
  * @property string      $tag             The tag of this object. Defaults to the base name of the class
  * @property string      $name            The name of this object. Defaults tot he class name
  * @property bool        $discoverEvents  Defaults to true.
  * @property string      $eventManager    Defaults to \Kisma\Core\Utility\EventManager
  */
-class Seed implements Interfaces\Seed, Interfaces\Events\Publisher, Interfaces\Events\Seed
+class Seed implements \Kisma\Core\Interfaces\Seed, \Kisma\Core\Interfaces\Publisher
 {
 	//*************************************************************************
 	//* Constants
@@ -129,7 +120,7 @@ class Seed implements Interfaces\Seed, Interfaces\Events\Publisher, Interfaces\E
 	public function __wakeup()
 	{
 		//	This is my hash. There are many like it, but this one is mine.
-		$this->_id = sha1( spl_object_hash( $this ) . getmypid() . microtime( true ) );
+		$this->_id = sha1( spl_object_hash( $this ) . getmypid() ) . microtime( true );
 
 		//	Auto-set tag and name if they're empty
 		if ( null === $this->_tag )

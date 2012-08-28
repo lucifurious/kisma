@@ -3,7 +3,6 @@
  * ServiceEvent.php
  */
 namespace Kisma\Core\Events;
-
 /**
  * ServiceEvent
  * An event that is consumed by a service.
@@ -47,32 +46,20 @@ class ServiceEvent extends SeedEvent
 	 * @var array
 	 */
 	protected $_responses = array();
-	/**
-	 * @var \Kisma\Core\Interfaces\ServiceRequester
-	 */
-	protected $_requester = null;
 
 	//**************************************************************************
 	//* Public Methods
 	//**************************************************************************
 
 	/**
-	 * {@InheritDoc}
-	 *
-	 * @param \Kisma\Core\Interfaces\ServiceRequester $requester Optional requester (grandparent)
+	 * @param \Kisma\Core\Interfaces\Consumer  $source
+	 * @param \Kisma\Core\Services\SeedRequest $request
 	 */
-	public function __construct( $source = null, $data = null, $requester = null )
+	public function __construct( $source, \Kisma\Core\Services\SeedRequest $request )
 	{
-		//	If $data is a request, yeah, you can read....
-		if ( $data instanceof \Kisma\Core\Services\SeedRequest )
-		{
-			$this->pushRequest( $data );
-			$data = null;
-		}
+		parent::__construct( $source, $request );
 
-		$this->_requester = $requester;
-
-		parent::__construct( $source, $data );
+		$this->pushRequest( $request );
 	}
 
 	/**
@@ -103,6 +90,16 @@ class ServiceEvent extends SeedEvent
 		$this->_requestQueue = \Kisma\Core\Utility\Option::clean( $this->_requestQueue );
 
 		return array_pop( $this->_requestQueue );
+	}
+
+	/**
+	 * Make "$request" look like a property
+	 *
+	 * @return \Kisma\Core\Services\SeedRequest
+	 */
+	public function getRequest()
+	{
+		return $this->popRequest();
 	}
 
 	/**
@@ -148,26 +145,6 @@ class ServiceEvent extends SeedEvent
 	public function getResponses()
 	{
 		return $this->_responses;
-	}
-
-	/**
-	 * @param \Kisma\Core\Interfaces\ServiceRequester $requester
-	 *
-	 * @return ServiceEvent
-	 */
-	public function setRequester( $requester )
-	{
-		$this->_requester = $requester;
-
-		return $this;
-	}
-
-	/**
-	 * @return \Kisma\Core\Interfaces\ServiceRequester
-	 */
-	public function getRequester()
-	{
-		return $this->_requester;
 	}
 
 }

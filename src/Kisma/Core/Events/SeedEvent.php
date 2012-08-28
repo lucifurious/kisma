@@ -11,7 +11,7 @@ namespace Kisma\Core\Events;
  * It encapsulates the parameters associated with an event.
  * The {@link source} property describes who raised the event.
  *
- * If an event handler sets {@link stopPropagation} to true, propagation will halt.
+ * If an event handler calls the kill() method, propagation will halt.
  */
 class SeedEvent
 {
@@ -24,9 +24,9 @@ class SeedEvent
 	 */
 	protected $_source;
 	/**
-	 * @var boolean Events will continue to propagate if this is "false"
+	 * @var boolean Set to true to stop the bubbling of events at any point
 	 */
-	protected $_stopPropagation = false;
+	protected $_kill = false;
 	/**
 	 * @var mixed Any event data the sender wants to convey
 	 */
@@ -46,6 +46,27 @@ class SeedEvent
 	{
 		$this->_source = $source;
 		$this->_data = $data;
+		$this->_kill = false;
+	}
+
+	/**
+	 * Kills propagation immediately
+	 *
+	 * @return SeedEvent
+	 */
+	public function kill()
+	{
+		$this->_kill = true;
+
+		return $this;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function wasKilled()
+	{
+		return ( false !== $this->_kill );
 	}
 
 	//**************************************************************************
@@ -92,23 +113,4 @@ class SeedEvent
 		return $this->_source;
 	}
 
-	/**
-	 * @param boolean $stopPropagation
-	 *
-	 * @return SeedEvent
-	 */
-	public function setStopPropagation( $stopPropagation )
-	{
-		$this->_stopPropagation = $stopPropagation;
-
-		return $this;
-	}
-
-	/**
-	 * @return boolean
-	 */
-	public function getStopPropagation()
-	{
-		return $this->_stopPropagation;
-	}
 }

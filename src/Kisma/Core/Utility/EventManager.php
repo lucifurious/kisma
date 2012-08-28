@@ -169,7 +169,7 @@ class EventManager
 		foreach ( self::$_eventMap[$_eventTag] as $_callback )
 		{
 			//	Stop further handling if the event has been handled...
-			if ( $_event->getStopPropagation() )
+			if ( $_event->wasKilled() )
 			{
 				break;
 			}

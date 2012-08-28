@@ -1,21 +1,13 @@
 <?php
 /**
- * StorageProvider.php
- *
- * Kisma(tm) : PHP Fun-Size Framework (http://github.com/lucifurious/kisma/)
- * Copyright 2009-2012, Jerry Ablan, All Rights Reserved
- *
- * @copyright Copyright (c) 2009-2012 Jerry Ablan
- * @license   http://github.com/lucifurious/kisma/blob/master/LICENSE
- * @author    Jerry Ablan <get.kisma@gmail.com>
+ * KeyValueStore.php
  */
-namespace Kisma\Core\Interfaces;
-
+namespace Kisma\Core\Interfaces\Services;
 /**
- * StorageProvider
+ * KeyValueStore
  * Defines an interface for storage providers
  */
-interface StorageProvider
+interface KeyValueStore extends \Kisma\Core\Interfaces\Service
 {
 	//*************************************************************************
 	//* Public Methods
@@ -35,8 +27,13 @@ interface StorageProvider
 	 * @param mixed             $value
 	 * @param bool              $overwrite If true, any existing value will be overwritten
 	 *
-	 * @return StorageProvider
+	 * @return KeyValueStore
 	 */
 	public function set( $key, $value = null, $overwrite = true );
+
+	/**
+	 * @param string|array|null $key
+	 */
+	public function remove( $key = null );
 
 }

@@ -7,7 +7,7 @@ namespace Kisma\Core\Interfaces\Events;
  * Publisher
  * Events for event publishers
  */
-interface Publisher extends \Kisma\Core\Interfaces\Publisher
+interface Publisher
 {
 	//*************************************************************************
 	//* Constants

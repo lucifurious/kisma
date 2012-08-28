@@ -14,7 +14,7 @@ namespace Kisma\Core\Services;
  * Storage
  * A dead-simple storage class.  Keeps key value pairs in an array.
  */
-class Storage extends \Kisma\Core\SeedService implements \Kisma\Core\Interfaces\StorageProvider, \Kisma\Core\Interfaces\StorageService
+class Storage extends SeedService implements \Kisma\Core\Interfaces\Services\KeyValueStore
 {
 	//********************************************************************************
 	//* Member Variables
@@ -91,7 +91,7 @@ class Storage extends \Kisma\Core\SeedService implements \Kisma\Core\Interfaces\
 	/**
 	 * {@InheritDoc}
 	 */
-	public function initializeStorage( $options = array() )
+	public function initializeService( $options = array() )
 	{
 		$this->_storage = array();
 
@@ -172,6 +172,7 @@ class Storage extends \Kisma\Core\SeedService implements \Kisma\Core\Interfaces\
 	public function setStorage( $storage )
 	{
 		$this->_storage = $storage;
+
 		return $this;
 	}
 
@@ -181,6 +182,14 @@ class Storage extends \Kisma\Core\SeedService implements \Kisma\Core\Interfaces\
 	public function getStorage()
 	{
 		return $this->_storage;
+	}
+
+	/**
+	 * @param string|array|null $key
+	 */
+	public function remove( $key = null )
+	{
+		// TODO: Implement remove() method.
 	}
 
 }

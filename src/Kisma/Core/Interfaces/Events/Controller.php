@@ -1,13 +1,13 @@
 <?php
 /**
- * Dispatcher.php
+ * Controller.php
  */
 namespace Kisma\Core\Interfaces\Events;
 /**
- * Dispatcher
- * Events for dispatchers
+ * Controller
+ * Events for Controllers
  */
-interface Dispatcher extends \Kisma\Core\Interfaces\Dispatcher
+interface Controller
 {
 	//*************************************************************************
 	//* Constants
@@ -16,10 +16,10 @@ interface Dispatcher extends \Kisma\Core\Interfaces\Dispatcher
 	/**
 	 * @var string
 	 */
-	const NewRequest = 'kisma.core.dispatcher.new_request';
+	const NewRequest = 'kisma.core.Controller.new_request';
 	/**
 	 * @var string
 	 */
-	const AfterDispatch = 'kisma.core.dispatcher.after_dispatch';
+	const AfterDispatch = 'kisma.core.Controller.after_dispatch';
 
 }

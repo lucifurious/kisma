@@ -14,7 +14,7 @@ interface Subscriber
 	//*************************************************************************
 
 	/**
-	 * Returns the unique identifier for this reactor
+	 * Returns the unique identifier for this subscriber
 	 *
 	 * @return string
 	 */

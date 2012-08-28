@@ -1,21 +1,21 @@
 <?php
 /**
- * Path.php
+ * Route.php
  */
 namespace Kisma\Core;
 
 /**
- * Path
- * A path defines a route that an inbound request takes on its journey through the application.
+ * Route
+ * A route defines a path that an inbound request takes on its journey through the application.
  */
-abstract class Path extends Seed implements \Kisma\Core\Interfaces\Reactors\RouteEvent
+abstract class Route extends Seed implements \Kisma\Core\Interfaces\Events\Route
 {
 	//*************************************************************************
 	//* Private Members
 	//*************************************************************************
 
 	/**
-	 * @var mixed The inbound request
+	 * @var \Kisma\Core\Services\SeedRequest The inbound request
 	 */
 	protected $_request = null;
 	/**
@@ -45,11 +45,12 @@ abstract class Path extends Seed implements \Kisma\Core\Interfaces\Reactors\Rout
 	/**
 	 * @param array $handlers
 	 *
-	 * @return \Kisma\Core\Path
+	 * @return \Kisma\Core\Route
 	 */
 	public function setHandlers( $handlers )
 	{
 		$this->_handlers = $handlers;
+
 		return $this;
 	}
 
@@ -64,11 +65,12 @@ abstract class Path extends Seed implements \Kisma\Core\Interfaces\Reactors\Rout
 	/**
 	 * @param mixed $request
 	 *
-	 * @return \Kisma\Core\Path
+	 * @return \Kisma\Core\Route
 	 */
 	public function setRequest( $request )
 	{
 		$this->_request = $request;
+
 		return $this;
 	}
 

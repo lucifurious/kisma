@@ -6,7 +6,7 @@ namespace Kisma\Core\Services;
 /**
  * Control
  */
-abstract class SeedControl extends \Kisma\Core\SeedService implements \Kisma\Core\Interfaces\Reactors\ControlEvent
+abstract class SeedControl extends SeedService
 {
 	//*************************************************************************
 	//* Private Members
@@ -24,6 +24,14 @@ abstract class SeedControl extends \Kisma\Core\SeedService implements \Kisma\Cor
 	//*************************************************************************
 	//* Public Methods
 	//*************************************************************************
+
+	/**
+	 * @return bool
+	 */
+	public function initializeService()
+	{
+		return parent::initializeService();
+	}
 
 	/**
 	 * @param string            $tag
@@ -91,6 +99,7 @@ abstract class SeedControl extends \Kisma\Core\SeedService implements \Kisma\Cor
 	public function setPaths( $paths )
 	{
 		$this->_paths = $paths;
+
 		return $this;
 	}
 
@@ -110,6 +119,7 @@ abstract class SeedControl extends \Kisma\Core\SeedService implements \Kisma\Cor
 	public function setTasks( $tasks )
 	{
 		$this->_tasks = $tasks;
+
 		return $this;
 	}
 

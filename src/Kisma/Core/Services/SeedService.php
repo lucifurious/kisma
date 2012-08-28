@@ -12,72 +12,52 @@ namespace Kisma\Core\Services;
  *
  * onSuccess, onFailure, and onOther
  *
- * @property bool                              $initialized Set to true by service once initialized
- * @property \Kisma\Core\Interfaces\Dispatcher $dispatcher  The dispatcher, if any, who owns this service.
+ * @property bool|int                        $state       The current state of the service
+ * @property \Kisma\Core\Interfaces\Consumer $consumer    The consumer, if any, who owns this service.
+ * @property SeedRequest                     $request     The request
  */
-abstract class SeedService extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\Events\Service
+abstract class SeedService extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\Service, \Kisma\Core\Interfaces\Services\ServiceState
 {
 	//*************************************************************************
 	//* Private Members
 	//*************************************************************************
 
 	/**
-	 * @var bool Set to true by service once initialized
+	 * @var \Kisma\Core\Interfaces\Consumer
 	 */
-	protected $_initialized = false;
+	protected $_consumer = null;
 	/**
-	 * @var \Kisma\Core\Interfaces\Dispatcher
+	 * @var \Kisma\Core\Services\SeedRequest
 	 */
-	protected $_dispatcher = null;
+	protected $_request = null;
+	/**
+	 * @var bool|int The current state of the service
+	 */
+	protected $_state = self::Uninitialized;
 
 	//*************************************************************************
-	//* Public Methods
+	//* Interface Methods
 	//*************************************************************************
-
-	/**
-	 * When a service is constructed, this method is called once, automatically
-	 *
-	 * @param array $options
-	 *
-	 * @return bool
-	 */
-	public function initialize( $options = array() )
-	{
-		return $this->_initialized = true;
-	}
 
 	/**
 	 * {@InheritDoc}
 	 */
-	public function publish( $eventName, $eventData = null )
-	{
-		$_event = new \Kisma\Core\Events\ServiceEvent( $this );
+	abstract public function initializeService( $event );
 
-		if ( !is_array( $eventData ) )
-		{
-			$eventData = array( $eventData );
-		}
-
-		//	Build the request stack
-		foreach ( $eventData as $_request )
-		{
-			if ( !( $_request instanceof \Kisma\Core\Services\SeedRequest ) )
-			{
-				throw new \InvalidArgumentException( '$eventData must be an array or a SeedRequest.' );
-			}
-
-			$_event->pushRequest( $_request );
-		}
-
-		return parent::publish( $eventName, $_event );
-	}
+	/**
+	 * {@InheritDoc}
+	 */
+	abstract public function processRequest( $request );
 
 	//*************************************************************************
 	//* Default Event Handlers
 	//*************************************************************************
 
 	/**
-	 * After the base object is constructed, call the service's initialize method
+	 * Drives the service forward!
+	 *
+	 * After the base object is constructed, call the service's initialize method,
+	 * then process the request
 	 *
 	 * @param \Kisma\Core\Events\ServiceEvent $event
 	 *
@@ -85,53 +65,90 @@ abstract class SeedService extends \Kisma\Core\Seed implements \Kisma\Core\Inter
 	 */
 	public function onAfterConstruct( $event = null )
 	{
-		return $this->_initialized ? : $this->initialize( $event->getData() );
-	}
+		$this->_consumer = $event->getSource();
+		$this->_request = $event->getRequest();
 
-	/**
-	 * Receives events from dispatchers
-	 *
-	 * @param \Kisma\Core\Events\ServiceEvent $event
-	 *
-	 * @return bool
-	 */
-	public function onDispatch( $event = null )
-	{
-		if ( null !== $event )
+		if ( false === $this->initializeService( $event ) )
 		{
-			$_result = true;
-			$this->_dispatcher = $event->getSource();
-
-			while ( null !== ( $_request = $event->popRequest() ) )
-			{
-				$this->_dispatcher->
-				$this->_processRequest( $_request, $event );
-			}
-
-			return $_result;
+			return false;
 		}
 
-		return true;
+		$this->_state = self::Initialized;
+
+		if ( false === ( $_result = $this->processRequest( $this->_request ) ) )
+		{
+			$this->publish( self::Failure );
+		}
+		else
+		{
+			$this->publish( self::Success );
+		}
+
+		return $this->publish( self::Complete );
+	}
+
+	//*************************************************************************
+	//* Properties
+	//*************************************************************************
+
+	/**
+	 * @param \Kisma\Core\Interfaces\Consumer $consumer
+	 *
+	 * @return SeedService
+	 */
+	public function setConsumer( $consumer )
+	{
+		$this->_consumer = $consumer;
+
+		return $this;
 	}
 
 	/**
-	 * @param \Kisma\Core\Events\ServiceEvent $event
-	 *
-	 * @return bool Default implementation always returns true
+	 * @return \Kisma\Core\Interfaces\Consumer
 	 */
-	public function onSuccess( $event = null )
+	public function getConsumer()
 	{
-		return true;
+		return $this->_consumer;
 	}
 
 	/**
-	 * @param \Kisma\Core\Events\ServiceEvent $event
+	 * @param \Kisma\Core\Services\SeedRequest $request
 	 *
-	 * @return bool
+	 * @return SeedService
 	 */
-	public function onFailure( $event = null )
+	public function setRequest( $request )
 	{
-		return true;
+		$this->_request = $request;
+
+		return $this;
+	}
+
+	/**
+	 * @return \Kisma\Core\Services\SeedRequest
+	 */
+	public function getRequest()
+	{
+		return $this->_request;
+	}
+
+	/**
+	 * @param bool|int $state
+	 *
+	 * @return SeedService
+	 */
+	public function setState( $state )
+	{
+		$this->_state = $state;
+
+		return $this;
+	}
+
+	/**
+	 * @return bool|int
+	 */
+	public function getState()
+	{
+		return $this->_state;
 	}
 
 }

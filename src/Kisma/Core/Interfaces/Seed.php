@@ -7,7 +7,7 @@ namespace Kisma\Core\Interfaces;
  * Seed
  * All seeds have this
  */
-interface Seed
+interface Seed extends \Kisma\Core\Interfaces\Events\Seed
 {
 	//*************************************************************************
 	//* Public Methods
