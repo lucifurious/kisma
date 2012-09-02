@@ -15,17 +15,8 @@ use Kisma\Core\Interfaces;
  * onRequestReceived
  * Happens when the service is run, respectively.
  */
-class Http extends \Kisma\Core\Services\SeedService implements \Kisma\Core\Interfaces\HttpMethod, \Kisma\Core\Interfaces\Events\Http
+abstract class Http extends \Kisma\Core\Services\SeedService implements \Kisma\Core\Interfaces\HttpMethod, \Kisma\Core\Interfaces\Events\Http
 {
-	//*************************************************************************
-	//* Private Members
-	//*************************************************************************
-
-	/**
-	 * @var HttpRequest The current request
-	 */
-	protected $_request = null;
-
 	//*************************************************************************
 	//* Public Methods
 	//*************************************************************************
@@ -33,58 +24,24 @@ class Http extends \Kisma\Core\Services\SeedService implements \Kisma\Core\Inter
 	/**
 	 * {@InheritDoc}
 	 */
-	public function initialize( $options = array() )
+	public function initialize( $consumer = null, $request = null )
 	{
-		if ( !parent::initialize( $options ) )
+		if ( !parent::initialize( $consumer, $request ) )
 		{
 			return false;
+		}
+
+		if ( null === $this->_request )
+		{
+			$this->_request = new HttpRequest();
 		}
 
 		//	Trigger the event
 		return
 			$this->publish(
 				self::RequestReceived,
-				$this->_request = new HttpRequest()
+				$this->_request
 			);
-	}
-
-	//*************************************************************************
-	//* Event Handlers
-	//*************************************************************************
-
-	/**
-	 * @param \Kisma\Core\Events\ServiceEvent $event
-	 *
-	 * @return bool
-	 */
-	public function onRequestReceived( $event )
-	{
-		//	Default implementation
-		return true;
-	}
-
-	//********************************************************************************
-	//* Property Accessors
-	//********************************************************************************
-
-	/**
-	 * @param HttpRequest $request
-	 *
-	 * @return Http
-	 */
-	public function setRequest( $request )
-	{
-		$this->_request = $request;
-
-		return $this;
-	}
-
-	/**
-	 * @return HttpRequest
-	 */
-	public function getRequest()
-	{
-		return $this->_request;
 	}
 
 }

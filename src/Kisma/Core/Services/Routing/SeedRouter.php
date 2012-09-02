@@ -37,6 +37,8 @@ abstract class SeedDispatcher extends \Kisma\Core\Seed implements \Kisma\Core\In
 
 	/**
 	 * @param array|\Kisma\Core\Services\SeedService $settings
+	 *
+	 * @throws \InvalidArgumentException
 	 */
 	public function __construct( $settings = array() )
 	{

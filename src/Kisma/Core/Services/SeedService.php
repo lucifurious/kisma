@@ -3,14 +3,13 @@
  * SeedService.php
  */
 namespace Kisma\Core\Services;
-
 /**
  * SeedService
  * The base class for services provided
  *
  * Provides three event handlers:
  *
- * onSuccess, onFailure, and onOther
+ * onSuccess, onFailure, and onComplete
  *
  * @property bool|int                        $state       The current state of the service
  * @property \Kisma\Core\Interfaces\Consumer $consumer    The consumer, if any, who owns this service.
@@ -42,7 +41,13 @@ abstract class SeedService extends \Kisma\Core\Seed implements \Kisma\Core\Inter
 	/**
 	 * {@InheritDoc}
 	 */
-	abstract public function initializeService( $event );
+	public function initialize( $consumer = null, $request = null )
+	{
+		$this->_consumer = $consumer;
+		$this->_request = $request;
+
+		return true;
+	}
 
 	/**
 	 * {@InheritDoc}
@@ -65,10 +70,7 @@ abstract class SeedService extends \Kisma\Core\Seed implements \Kisma\Core\Inter
 	 */
 	public function onAfterConstruct( $event = null )
 	{
-		$this->_consumer = $event->getSource();
-		$this->_request = $event->getRequest();
-
-		if ( false === $this->initializeService( $event ) )
+		if ( false === $this->initialize( $event->getSource(), $event->getData() ) )
 		{
 			return false;
 		}
@@ -77,14 +79,16 @@ abstract class SeedService extends \Kisma\Core\Seed implements \Kisma\Core\Inter
 
 		if ( false === ( $_result = $this->processRequest( $this->_request ) ) )
 		{
+			$this->_state = self::Completed;
 			$this->publish( self::Failure );
 		}
 		else
 		{
+			$this->_state = self::Completed;
 			$this->publish( self::Success );
 		}
 
-		return $this->publish( self::Complete );
+		$this->publish( self::Complete );
 	}
 
 	//*************************************************************************

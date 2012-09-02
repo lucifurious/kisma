@@ -12,6 +12,19 @@ namespace Kisma\Core\Utility;
  */
 class Log extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\SeedUtility, \Kisma\Core\Interfaces\Levels
 {
+	//*************************************************************************
+	//* Constants
+	//*************************************************************************
+
+	/**
+	 * @var string The default log line format
+	 */
+	const DefaultLogFormat = '%%level%% %%date%% %%time%% %%context_tag%%: %%message%%';
+	/**
+	 * @var string The default log line format
+	 */
+	const AlternateLogFormat = '%%level%% %%date%% %%time%% %%host_name%% %%context_tag%%%%process_id%%: %%message%%';
+
 	//********************************************************************************
 	//* Private Members
 	//********************************************************************************
@@ -31,6 +44,10 @@ class Log extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\SeedUtility
 		true  => '<*',
 		false => '*>',
 	);
+	/**
+	 * @var string
+	 */
+	protected static $_defaultLog = null;
 
 	//********************************************************************************
 	//* Public Methods
@@ -39,8 +56,10 @@ class Log extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\SeedUtility
 	/**
 	 * {@InheritDoc}
 	 */
-	public static function log( $message, $level = self::Info, $context = array(), $extra = null )
+	public static function log( $message, $level = self::Info, $context = array(), $extra = null, $tag = null )
 	{
+		$_timestamp = time();
+
 		//	Get the indent, if any
 		$_unindent = ( ( $_newIndent = self::_processMessage( $message ) ) > 0 );
 
@@ -57,9 +76,32 @@ class Log extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\SeedUtility
 			$_tempIndent = 0;
 		}
 
-		$_entry = self::$_prefix . str_repeat( '  ', $_tempIndent ) . \Kisma\Core\Enums\Levels::getIndicator( $level ) . ' ' . $message;
+		$_levelName = self::_getLogLevel( $level );
 
-//		K::log( $_logEntry, $level, array( 'source' => self::_getCallingMethod() ) );
+		$_entry = str_ireplace(
+			array(
+				'%%level%%',
+				'%%date%%',
+				'%%time%%',
+				'%%host_name%%',
+				'%%context_tag%%',
+				'%%process_id%%',
+				'%%message%%',
+			),
+			array(
+				$_levelName,
+				date( 'M d', $_timestamp ),
+				date( 'H:i:s', $_timestamp ),
+				gethostname(),
+				Option::get( $context, 'tag', $tag ),
+				'[' . getmypid() . ']',
+				self::$_prefix . str_repeat( '  ', $_tempIndent ) . $message,
+			),
+			self::DefaultLogFormat
+		) . PHP_EOL;
+
+		@error_log( $_entry, 3, self::$_defaultLog );
+		@flush();
 
 		//	Set indent level...
 		self::$_currentIndent += $_newIndent;
@@ -83,7 +125,7 @@ class Log extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\SeedUtility
 	 */
 	public static function error( $message, $context = array(), $extra = null )
 	{
-		return self::log( $message, self::Error, $context, $extra );
+		return self::log( $message, self::Error, $context, $extra, self::_getCallingMethod() );
 	}
 
 	/**
@@ -97,7 +139,7 @@ class Log extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\SeedUtility
 	 */
 	public static function warning( $message, $context = array(), $extra = null )
 	{
-		return self::log( $message, self::Warning, $context, $extra );
+		return self::log( $message, self::Warning, $context, $extra, self::_getCallingMethod() );
 	}
 
 	/**
@@ -111,7 +153,7 @@ class Log extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\SeedUtility
 	 */
 	public static function notice( $message, $context = array(), $extra = null )
 	{
-		return self::log( $message, self::Notice, $context, $extra );
+		return self::log( $message, self::Notice, $context, $extra, self::_getCallingMethod() );
 	}
 
 	/**
@@ -125,7 +167,7 @@ class Log extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\SeedUtility
 	 */
 	public static function info( $message, $context = array(), $extra = null )
 	{
-		return self::log( $message, self::Info, $context, $extra );
+		return self::log( $message, self::Info, $context, $extra, self::_getCallingMethod() );
 	}
 
 	/**
@@ -139,7 +181,7 @@ class Log extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\SeedUtility
 	 */
 	public static function debug( $message, $context = array(), $extra = null )
 	{
-		return self::log( $message, self::Debug, $context, $extra );
+		return self::log( $message, self::Debug, $context, $extra, self::_getCallingMethod() );
 	}
 
 	/**
@@ -162,6 +204,45 @@ class Log extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\SeedUtility
 	//*************************************************************************
 
 	/**
+	 * @param int  $level
+	 * @param bool $fullName
+	 *
+	 * @return string
+	 */
+	protected static function _getLogLevel( $level = self::Info, $fullName = false )
+	{
+		static $_logLevels = null;
+
+		if ( empty( $_logLevels ) )
+		{
+			$_logLevels = array();
+			$_mirror = new \ReflectionClass( get_called_class() );
+			$_constants = $_mirror->getConstants();
+
+			foreach ( $_constants as $_name => $_value )
+			{
+				$_logLevels[$_name] = $_value;
+			}
+		}
+
+		$_levels = is_string( $level ) ? $_logLevels : array_flip( $_logLevels );
+
+		if ( null === ( $_tag = Option::get( $_levels, $level ) ) )
+		{
+			$_tag = 'Info';
+		}
+
+		if ( false === $fullName )
+		{
+			$_tag = substr( strtoupper( $_tag ), 0, 4 );
+		}
+
+		unset( $_levels );
+
+		return $_tag;
+	}
+
+	/**
 	 * Returns the name of the method that made the call
 	 *
 	 * @return string
@@ -169,11 +250,29 @@ class Log extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\SeedUtility
 	protected static function _getCallingMethod()
 	{
 		$_backTrace = debug_backtrace();
-		$_caller = 4;
-		$_function = Option::get( $_backTrace[$_caller], 'method', Option::get( $_backTrace[$_caller], 'function' ) );
-		$_class = Option::get( $_backTrace[$_caller], 'class' );
-		$_callingMethod = ( null !== $_class ? $_class . Option::get( $_backTrace[$_caller], 'type' ) : null ) . $_function;
-		return str_replace( array( '::', 'kisma.' ), array( '.', 'k.' ), Inflector::untag( $_callingMethod ) );
+
+		$_thisClass = get_called_class();
+		$_type = $_class = $_method = null;
+
+		for ( $_i = 0, $_size = sizeof( $_backTrace ); $_i < $_size; $_i++ )
+		{
+			if ( Option::get( $_backTrace[$_i], 'class' ) == $_thisClass )
+			{
+				continue;
+			}
+
+			$_class = Option::get( $_backTrace[$_i], 'class' );
+			$_method = Option::get( $_backTrace[$_i], 'method', Option::get( $_backTrace[$_i], 'function' ) );
+			$_type = Option::get( $_backTrace[$_i], 'type' );
+			break;
+		}
+
+		if ( $_i >= 0 )
+		{
+			return Inflector::tag( str_ireplace( 'Kisma\\Core\\', null, $_class ), true ) . $_type . $_method;
+		}
+
+		return 'Unknown';
 	}
 
 	/**
@@ -256,4 +355,26 @@ class Log extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\SeedUtility
 	{
 		return self::$_indentTokens;
 	}
+
+	/**
+	 * @param string $defaultLog
+	 */
+	public static function setDefaultLog( $defaultLog )
+	{
+		self::$_defaultLog = $defaultLog;
+	}
+
+	/**
+	 * @return string
+	 */
+	public static function getDefaultLog()
+	{
+		return self::$_defaultLog;
+	}
+
 }
+
+/**
+ * Set a name for the default log
+ */
+Log::setDefaultLog( dirname( \Kisma::getBasePath() ) . '/log/kisma.log' );

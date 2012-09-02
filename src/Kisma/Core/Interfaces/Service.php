@@ -14,16 +14,16 @@ interface Service extends \Kisma\Core\Interfaces\Events\Service
 	//*************************************************************************
 
 	/**
-	 * Initialize the service. Called after service construction
+	 * Initialize the service. Called automatically
 	 *
-	 * @param \Kisma\Core\Events\SeedEvent $event
+	 * @param mixed $options
 	 *
 	 * @return bool
 	 */
-	public function initializeService( $event );
+	public function initialize( $options = array() );
 
 	/**
-	 * Process are request for the services of this class
+	 * Process a request for the services of this class
 	 * Called after the service is initialized
 	 *
 	 * @param \Kisma\Core\Services\SeedRequest $request

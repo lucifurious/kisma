@@ -112,5 +112,4 @@ class SeedEvent
 	{
 		return $this->_source;
 	}
-
 }

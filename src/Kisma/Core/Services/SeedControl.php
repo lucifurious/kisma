@@ -6,36 +6,24 @@ namespace Kisma\Core\Services;
 /**
  * Control
  */
-abstract class SeedControl extends SeedService
+abstract class SeedController extends SeedService implements \Kisma\Core\Interfaces\Controller
 {
 	//*************************************************************************
 	//* Private Members
 	//*************************************************************************
 
 	/**
-	 * @var \Kisma\Core\Path[] The paths I know about
+	 * @var \Kisma\Core\SeedBag
 	 */
-	protected $_paths = array();
-	/**
-	 * @var array
-	 */
-	protected $_tasks = array();
+	protected $_routes = null;
 
 	//*************************************************************************
 	//* Public Methods
 	//*************************************************************************
 
 	/**
-	 * @return bool
-	 */
-	public function initializeService()
-	{
-		return parent::initializeService();
-	}
-
-	/**
 	 * @param string            $tag
-	 * @param \Kisma\Core\Path  $path
+	 * @param SeedRoute  $path
 	 */
 	public function addPath( $tag, $path )
 	{
@@ -92,7 +80,7 @@ abstract class SeedControl extends SeedService
 	//*************************************************************************
 
 	/**
-	 * @param \Kisma\Core\Path[] $paths
+	 * @param SeedRoute[] $paths
 	 *
 	 * @return \Kisma\Core\Services\SeedControl
 	 */
@@ -104,7 +92,7 @@ abstract class SeedControl extends SeedService
 	}
 
 	/**
-	 * @return array|\Kisma\Core\Path[]
+	 * @return array|SeedRoute[]
 	 */
 	public function getPaths()
 	{

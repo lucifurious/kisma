@@ -120,7 +120,7 @@ class Seed implements \Kisma\Core\Interfaces\Seed, \Kisma\Core\Interfaces\Publis
 	public function __wakeup()
 	{
 		//	This is my hash. There are many like it, but this one is mine.
-		$this->_id = sha1( spl_object_hash( $this ) . getmypid() ) . microtime( true );
+		$this->_id = sha1( spl_object_hash( $this ) . getmypid() . microtime( true ) ) . microtime( true );
 
 		//	Auto-set tag and name if they're empty
 		if ( null === $this->_tag )

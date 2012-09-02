@@ -46,19 +46,19 @@ interface Levels
 	 */
 	const Debug = 100;
 
-	//*************************************************************************
-	//* Public Methods
-	//*************************************************************************
-
-	/**
-	 * @abstract
-	 *
-	 * @param string|\Exception $message
-	 * @param int               $level
-	 * @param array             $context
-	 * @param mixed             $extra
-	 *
-	 * @return bool If warning level or greater, false is returned. Otherwise true.
-	 */
-	public function log( $message, $level, $context = array(), $extra = null );
+//	//*************************************************************************
+//	//* Public Methods
+//	//*************************************************************************
+//
+//	/**
+//	 * @abstract
+//	 *
+//	 * @param string|\Exception $message
+//	 * @param int               $level
+//	 * @param array             $context
+//	 * @param mixed             $extra
+//	 *
+//	 * @return bool If warning level or greater, false is returned. Otherwise true.
+//	 */
+//	public function log( $message, $level, $context = array(), $extra = null );
 }

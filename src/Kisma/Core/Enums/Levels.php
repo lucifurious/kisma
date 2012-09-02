@@ -6,7 +6,7 @@ namespace Kisma\Core\Enums;
 /**
  * Levels
  */
-class Levels extends \Kisma\Core\Enums\SeedEnum implements \Kisma\Core\Interfaces\Levels
+abstract class Levels extends \Kisma\Core\Enums\SeedEnum implements \Kisma\Core\Interfaces\Levels
 {
 	//*************************************************************************
 	//* Class Constants

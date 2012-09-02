@@ -3,7 +3,9 @@
  * EventManager.php
  */
 namespace Kisma\Core\Utility;
+
 use Kisma\Core\Exceptions\InvalidEventHandlerException;
+use Kisma\Core\Utility\Log;
 
 /**
  * EventManager class
@@ -28,6 +30,14 @@ class EventManager
 	 * @var array The event map for the application
 	 */
 	protected static $_eventMap = array();
+	/**
+	 * @var bool If true, events will be logged
+	 */
+	protected static $_debug = true;
+	/**
+	 * @var int A counter of fired events for the run of the app
+	 */
+	protected static $_lastEventId = 0;
 
 	//*************************************************************************
 	//* Public Methods
@@ -44,6 +54,11 @@ class EventManager
 	 */
 	public static function subscribe( $object, $listeners = null, $signature = self::DefaultEventHandlerSignature )
 	{
+//		if ( true === self::$_debug )
+//		{
+//			Log::setDefaultLog( __DIR__ . '/event.log' );
+//		}
+
 		//	Allow for passed in listeners
 		$_listeners = $listeners ? : self::discover( $object, $signature );
 
@@ -86,6 +101,8 @@ class EventManager
 			return false;
 		}
 
+		Log::debug( 'Beginning event discovery' );
+
 		$_listeners = array();
 
 		if ( !isset( $_discovered[$object->getId()] ) )
@@ -112,12 +129,23 @@ class EventManager
 					//	We have a winner!
 					if ( !isset( $_listeners[$_eventTag] ) )
 					{
+						if ( self::$_debug )
+						{
+							Log::debug( '-- Listener registered for "' . $_eventTag . '": ' . $_mirror->getName() . '->' . $_name . ' [' . $object->getId() . ']' );
+						}
+
 						$_listeners[$_eventTag] = array();
 					}
 
 					//	Create a closure to house the call.
 					$_listeners[$_eventTag][] = function ( $event ) use ( $object, $_name )
 					{
+						if ( EventManager::getDebug() )
+						{
+							Log::debug( '---- Closure handler called: ' . get_class( $object ) . '->' . $_name . ' [' . $object->getId() . ']',
+								array( 'tag' => Inflector::tag( str_ireplace( 'Kisma\\Core\\', null, __CLASS__ ), true ) . '::{closure}' ) );
+						}
+
 						return call_user_func( array( $object, $_name ), $event );
 					};
 				}
@@ -129,6 +157,8 @@ class EventManager
 
 			$_discovered[spl_object_hash( $object )] = true;
 		}
+
+		Log::debug( 'Event discovery complete' );
 
 		//	Return the current map
 		return $_listeners;
@@ -143,11 +173,18 @@ class EventManager
 	 * @param string                                 $eventName
 	 * @param mixed                                  $eventData
 	 *
-	 * @throws \Kisma\InvalidEventHandlerException
+	 * @throws \Kisma\Core\Exceptions\InvalidEventHandlerException
 	 * @return bool|int
 	 */
 	public static function publish( $publisher, $eventName, $eventData = null )
 	{
+		//	Make sure object is cool
+		if ( !self::canPublish( $publisher ) )
+		{
+			//	Not a publisher. Bail
+			return false;
+		}
+
 		//	Ensure this is a valid event
 		$_eventTag = Inflector::tag( $eventName, true );
 
@@ -175,8 +212,15 @@ class EventManager
 			}
 
 			//	Call the handler
+			$_eventId = self::$_lastEventId++;
+
 			if ( is_string( $_callback ) || is_callable( $_callback ) )
 			{
+				if ( self::$_debug )
+				{
+					Log::debug( '-- Firing direct event "' . $_eventTag . '" (ID#' . $_eventId . ') from: ' . get_class( $publisher ) . ' [' . $publisher->getId() . ']' );
+				}
+
 				//	Call the method
 				if ( false === call_user_func( $_callback, $_event ) )
 				{
@@ -185,6 +229,11 @@ class EventManager
 			}
 			elseif ( is_array( $_callback ) && 1 == count( $_callback ) && $_callback[0] instanceof \Closure )
 			{
+				if ( self::$_debug )
+				{
+					Log::debug( '-- Firing closure event "' . $_eventTag . '" (ID#' . $_eventId . ') from: ' . get_class( $publisher ) . ' [' . $publisher->getId() . ']' );
+				}
+
 				//	Call the closure...
 				if ( false === $_callback[0]( $_event ) )
 				{
@@ -219,14 +268,7 @@ class EventManager
 	public static function canPublish( $object )
 	{
 		//	Publisher with an event manager?
-		if ( $object instanceof \Kisma\Core\Interfaces\Events\Publisher )
-		{
-			//	Return the event manager service or false
-			return $object->getServiceClass( 'event_manager' );
-		}
-
-		//	Nope!
-		return false;
+		return ( $object instanceof \Kisma\Core\Interfaces\Events\Publisher );
 	}
 
 	//*************************************************************************
@@ -239,6 +281,22 @@ class EventManager
 	public static function getEventMap()
 	{
 		return self::$_eventMap;
+	}
+
+	/**
+	 * @param boolean $debug
+	 */
+	public static function setDebug( $debug )
+	{
+		self::$_debug = $debug;
+	}
+
+	/**
+	 * @return boolean
+	 */
+	public static function getDebug()
+	{
+		return self::$_debug;
 	}
 
 }
