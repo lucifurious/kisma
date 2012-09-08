@@ -1,10 +1,10 @@
 <?php
 /**
- * SeedDispatcher.php
+ * SeedRouter.php
  */
-namespace Kisma\Core\Dispatchers;
+namespace Kisma\Core\Routing;
 /**
- * SeedDispatcher
+ * SeedRouter
  * The base class for all dispatchers.
  *
  * A dispatcher links inbound service requests with available services.
@@ -16,7 +16,7 @@ namespace Kisma\Core\Dispatchers;
  * @property \Kisma\Core\Interfaces\RequestSource $source   The source of the request
  * @property \Kisma\Core\Services\SeedService[]   $services The services which are recipients of the dispatcher
  */
-abstract class SeedDispatcher extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\Events\Dispatcher, \Kisma\Core\Interfaces\RequestSource
+abstract class SeedRouter extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\RequestSource
 {
 	//*************************************************************************
 	//* Private Members
@@ -95,13 +95,13 @@ abstract class SeedDispatcher extends \Kisma\Core\Seed implements \Kisma\Core\In
 	}
 
 	/**
-	 * @param \Kisma\Core\Interfaces\ServiceRequester $requester That which requests this service
+	 * @param \Kisma\Core\Interfaces\RequestSource    $requester That which requests this service
 	 * @param \Kisma\Core\Services\SeedRequest        $request   The request itself (like raab)
 	 * @param string                                  $serviceId If set, dispatches request to a specific, single service
 	 *
 	 * @return mixed
 	 */
-	public function dispatchRequest( $requester, $request, $serviceId = null )
+	public function route( $requester, $request, $serviceId = null )
 	{
 		$_result = array();
 
@@ -120,13 +120,4 @@ abstract class SeedDispatcher extends \Kisma\Core\Seed implements \Kisma\Core\In
 
 		return $_result;
 	}
-
-	//*************************************************************************
-	//* Private Methods
-	//*************************************************************************
-
-	//*************************************************************************
-	//* Properties
-	//*************************************************************************
-
 }

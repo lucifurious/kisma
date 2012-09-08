@@ -26,18 +26,6 @@ class SeedTest_Object extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces
 	//*************************************************************************
 
 	/**
-	 * @param array                $settings
-	 * @param \Kisma\Core\SeedTest $tester
-	 *
-	 * @return \SeedTest_Object
-	 */
-/*	public function __construct( $settings = array(), $tester = null )
-	{
-		parent::__construct();
-		$this->tester = $tester;
-	}*/
-
-	/**
 	 * {@InheritDoc}
 	 */
 	public function onAfterConstruct( $event = null )

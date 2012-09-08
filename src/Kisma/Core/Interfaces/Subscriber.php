@@ -20,4 +20,11 @@ interface Subscriber
 	 */
 	public function getId();
 
+	/**
+	 * Returns a key-worthy tag for your object
+	 *
+	 * @return string
+	 */
+	public function getTag();
+
 }

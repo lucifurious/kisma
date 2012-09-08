@@ -267,7 +267,7 @@ class Option
 	 */
 	public static function clean( $array = null )
 	{
-		return ( empty( $array ) || !is_array( $array ) ) ? array() : $array;
+		return ( empty( $array ) ? array() : ( !is_array( $array ) ? array( $array ) : $array ) );
 	}
 
 	/**

@@ -19,7 +19,7 @@ class Log extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\SeedUtility
 	/**
 	 * @var string The default log line format
 	 */
-	const DefaultLogFormat = '%%level%% %%date%% %%time%% %%context_tag%%: %%message%%';
+	const DefaultLogFormat = '%%level%% %%date%% %%time%% %%context_tag%%: %%message%% %%result%% %%event_id%%';
 	/**
 	 * @var string The default log line format
 	 */
@@ -58,6 +58,12 @@ class Log extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\SeedUtility
 	 */
 	public static function log( $message, $level = self::Info, $context = array(), $extra = null, $tag = null )
 	{
+		//	If we're not debugging, don't log debug statements
+		if ( self::Debug == $level && !\Kisma::get( 'debug', false ) )
+		{
+			return true;
+		}
+
 		$_timestamp = time();
 
 		//	Get the indent, if any
@@ -78,6 +84,31 @@ class Log extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\SeedUtility
 
 		$_levelName = self::_getLogLevel( $level );
 
+		if ( null !== ( $_result = Option::get( $context, 'result' ) ) )
+		{
+			if ( is_scalar( $_result ) )
+			{
+				if ( is_bool( $_result ) )
+				{
+					$_result = ( $_result ? '[TRUE]' : '[FALSE]' );
+				}
+				else
+				{
+					$_result = '[' . $_result . ']';
+				}
+
+			}
+			else
+			{
+				$_result = print_r( $_result, true );
+			}
+		}
+
+		if ( null !== ( $_eventId = Option::get( $context, 'event_id' ) ) )
+		{
+			$_eventId = '[' . $_eventId . ']';
+		}
+
 		$_entry = str_ireplace(
 			array(
 				'%%level%%',
@@ -87,6 +118,8 @@ class Log extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\SeedUtility
 				'%%context_tag%%',
 				'%%process_id%%',
 				'%%message%%',
+				'%%result%%',
+				'%%event_id%%'
 			),
 			array(
 				$_levelName,
@@ -96,6 +129,8 @@ class Log extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\SeedUtility
 				Option::get( $context, 'tag', $tag ),
 				'[' . getmypid() . ']',
 				self::$_prefix . str_repeat( '  ', $_tempIndent ) . $message,
+				$_result,
+				$_eventId,
 			),
 			self::DefaultLogFormat
 		) . PHP_EOL;

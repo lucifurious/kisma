@@ -11,7 +11,7 @@ use Kisma\Core\Utility\Log;
  * EventManager class
  * Utility class that provides event management
  */
-class EventManager
+class EventManager extends \Kisma\Core\SeedUtility
 {
 	//*************************************************************************
 	//* Constants
@@ -30,10 +30,6 @@ class EventManager
 	 * @var array The event map for the application
 	 */
 	protected static $_eventMap = array();
-	/**
-	 * @var bool If true, events will be logged
-	 */
-	protected static $_debug = true;
 	/**
 	 * @var int A counter of fired events for the run of the app
 	 */
@@ -54,10 +50,7 @@ class EventManager
 	 */
 	public static function subscribe( $object, $listeners = null, $signature = self::DefaultEventHandlerSignature )
 	{
-//		if ( true === self::$_debug )
-//		{
-//			Log::setDefaultLog( __DIR__ . '/event.log' );
-//		}
+		Log::debug( 'START subscribing' );
 
 		//	Allow for passed in listeners
 		$_listeners = $listeners ? : self::discover( $object, $signature );
@@ -71,11 +64,22 @@ class EventManager
 		//	And wire them up...
 		foreach ( $_listeners as $_eventName => $_callback )
 		{
-			self::$_eventMap[Inflector::tag( $_eventName, true )][] = $_callback;
-			unset( $_callback, $_eventName );
+			$_tag = Inflector::tag( $_eventName, true );
+
+			self::on(
+				$object,
+				$_tag,
+				$_callback
+			);
+
+			Log::debug( '-- "' . $object->getTag() . '" subscribed to "' . $_tag . '"' );
+
+			unset( $_callback, $_eventName, $_tag );
 		}
 
 		unset( $_listeners );
+
+		Log::debug( 'END subscribing' );
 	}
 
 	/**
@@ -93,19 +97,21 @@ class EventManager
 	{
 		static $_discovered = array();
 
+		$_objectId = $object->getId();
+
 		if ( !( $object instanceof \Kisma\Core\Interfaces\Subscriber ) )
 		{
 			//	Not a subscriber, beat it...
-			$_discovered[$object->getId()] = true;
+			$_discovered[$_objectId] = true;
 
 			return false;
 		}
 
-		Log::debug( 'Beginning event discovery' );
+		Log::debug( 'START event discovery' );
 
 		$_listeners = array();
 
-		if ( !isset( $_discovered[$object->getId()] ) )
+		if ( !isset( $_discovered[$_objectId] ) )
 		{
 			$_mirror = new \ReflectionClass( $object );
 			$_methods = $_mirror->getMethods( \ReflectionMethod::IS_PUBLIC | \ReflectionMethod::IS_PROTECTED );
@@ -124,31 +130,19 @@ class EventManager
 				//	Add to the end of the array...
 				$_eventName = Inflector::tag( $_matches[1] );
 
-				if ( null !== ( $_eventTag = $_mirror->getConstant( $_eventName ) ) )
+				if ( null === ( $_eventTag = $_mirror->getConstant( $_eventName ) ) )
 				{
-					//	We have a winner!
-					if ( !isset( $_listeners[$_eventTag] ) )
-					{
-						if ( self::$_debug )
-						{
-							Log::debug( '-- Listener registered for "' . $_eventTag . '": ' . $_mirror->getName() . '->' . $_name . ' [' . $object->getId() . ']' );
-						}
-
-						$_listeners[$_eventTag] = array();
-					}
-
-					//	Create a closure to house the call.
-					$_listeners[$_eventTag][] = function ( $event ) use ( $object, $_name )
-					{
-						if ( EventManager::getDebug() )
-						{
-							Log::debug( '---- Closure handler called: ' . get_class( $object ) . '->' . $_name . ' [' . $object->getId() . ']',
-								array( 'tag' => Inflector::tag( str_ireplace( 'Kisma\\Core\\', null, __CLASS__ ), true ) . '::{closure}' ) );
-						}
-
-						return call_user_func( array( $object, $_name ), $event );
-					};
+					$_eventTag = Inflector::tag( $_matches[1], true );
 				}
+
+				self::on(
+					$object,
+					$_eventTag,
+					function ( $event ) use ( $object, $_name )
+					{
+						return call_user_func( array( $object, $_name ), $event );
+					}
+				);
 
 				unset( $_eventTag, $_matches, $_method );
 			}
@@ -158,10 +152,93 @@ class EventManager
 			$_discovered[spl_object_hash( $object )] = true;
 		}
 
-		Log::debug( 'Event discovery complete' );
+		Log::debug( 'END event discovery' );
 
 		//	Return the current map
 		return $_listeners;
+	}
+
+	/**
+	 * @param \Kisma\Core\Interfaces\Subscriber  $object
+	 * @param string                             $tag
+	 * @param callable|null                      $listener
+	 */
+	public static function on( $object, $tag, $listener = null )
+	{
+		if ( null === $listener )
+		{
+			self::unsubscribe( $object, $tag );
+
+			return;
+		}
+
+		$_objectId = $object->getId();
+
+		if ( !isset( self::$_eventMap[$tag] ) )
+		{
+			self::$_eventMap[$tag] = array();
+		}
+
+		if ( !isset( self::$_eventMap[$tag][$_objectId] ) )
+		{
+			$_listeners[$tag][$_objectId] = array();
+		}
+
+		self::$_eventMap[$tag][$_objectId][] = $listener;
+	}
+
+	/**
+	 * @param \Kisma\Core\Interfaces\Subscriber $object
+	 * @param string                            $eventName
+	 */
+	public static function unsubscribe( $object, $eventName = null )
+	{
+		$_objectId = $object->getId();
+		$eventName = Inflector::tag( $eventName, true );
+
+		foreach ( self::$_eventMap as $_eventTag => $_subscribers )
+		{
+			\Kisma\Core\Utility\Log::debug( '---- Unsub "' . $_objectId . '" from "' . $_eventTag . '"' );
+
+			foreach ( $_subscribers as $_subscriberId => $_closures )
+			{
+				if ( $_objectId == $_subscriberId )
+				{
+					/** @var $_closures \Closure[] */
+					foreach ( Option::clean( $_closures ) as $_index => $_closure )
+					{
+						if ( version_compare( PHP_VERSION, '5.4.0', '>=' ) )
+						{
+							\Closure::bind( $_closure, null );
+						}
+
+						//	Remove and reindex the map
+						unset( self::$_eventMap[$_eventTag][$_subscriberId][$_index] );
+						self::$_eventMap[$_eventTag][$_subscriberId] = array_values( self::$_eventMap[$_eventTag][$_subscriberId] );
+					}
+				}
+			}
+
+			if ( $_eventTag == $eventName )
+			{
+				break;
+			}
+		}
+
+//		foreach ( self::$_eventMap as $_eventTag => $_subscriberId )
+//		{
+//			if ( $_objectId == $_subscriberId )
+//			{
+//				unset( self::$_eventMap[$_eventTag][$_objectId] );
+//
+//				Log::debug(
+//					'-- "' . $object->getTag() . '" unsubscribed from "' . $_eventTag . '"',
+//					array(
+//						'tag'     => $_subscriberId,
+//					)
+//				);
+//			}
+//		}
 	}
 
 	/**
@@ -202,59 +279,76 @@ class EventManager
 				:
 				new \Kisma\Core\Events\SeedEvent( $publisher, $eventData );
 
+		$_event->setEventTag( $_eventTag );
+
 		//	Call each handler in order
-		foreach ( self::$_eventMap[$_eventTag] as $_callback )
+		if ( isset( self::$_eventMap[$_eventTag] ) && !empty( self::$_eventMap[$_eventTag] ) )
 		{
-			//	Stop further handling if the event has been handled...
-			if ( $_event->wasKilled() )
-			{
-				break;
-			}
+			$_publisherId = $publisher->getId();
 
-			//	Call the handler
-			$_eventId = self::$_lastEventId++;
+			\Kisma\Core\Utility\Log::debug( '---- Publish "' . $_eventTag . '" from "' . $_publisherId . '"' );
 
-			if ( is_string( $_callback ) || is_callable( $_callback ) )
+			foreach ( self::$_eventMap[$_eventTag] as $_listenerIndex => $_listeners )
 			{
-				if ( self::$_debug )
+				foreach ( $_listeners as $_subscriberId => $_closures )
 				{
-					Log::debug( '-- Firing direct event "' . $_eventTag . '" (ID#' . $_eventId . ') from: ' . get_class( $publisher ) . ' [' . $publisher->getId() . ']' );
+					/** @var $_closures \Closure[] */
+					foreach ( Option::clean( $_closures ) as $_closure )
+					{
+						//	Stop further handling if the event has been kilt...
+						if ( $_event->wasKilled() )
+						{
+							return true;
+						}
+
+						//	Generate an id...
+						$_event->setEventId( self::generateEventId( $_event ) );
+
+						//	Call the handler
+						if ( is_string( $_closure ) || is_callable( $_closure ) )
+						{
+							//	Call the method
+							$_result = call_user_func( $_closure, $_event );
+
+//							Log::debug(
+//								'-- "' . $publisher->getTag() . '" handler for "' . $_event->getEventTag() . '" called',
+//								array(
+//									'tag'     => $_subscriberId,
+//									'result'  => print_r( $_result, true ),
+//									'eventId' => $_event->getEventId(),
+//								)
+//							);
+						}
+						elseif ( is_array( $_closure ) && 1 == count( $_closure ) && $_closure[0] instanceof \Closure )
+						{
+							//	Call the closure...
+							if ( false === $_closure[0]( $_event ) )
+							{
+								return false;
+							}
+						}
+						else
+						{
+							//	Oops!
+							throw new InvalidEventHandlerException(
+								'Event "' .
+									( is_object( $_closure[0] )
+										?
+										get_class( $_closure[0] )
+										:
+										'<unknownClass>' ) .
+									'.' . $_eventTag . ' has an invalid listener subscribed to it.'
+							);
+						}
+
+						unset( $_closure );
+					}
+
+					unset( $_closures );
 				}
 
-				//	Call the method
-				if ( false === call_user_func( $_callback, $_event ) )
-				{
-					return false;
-				}
+				unset( $_listeners );
 			}
-			elseif ( is_array( $_callback ) && 1 == count( $_callback ) && $_callback[0] instanceof \Closure )
-			{
-				if ( self::$_debug )
-				{
-					Log::debug( '-- Firing closure event "' . $_eventTag . '" (ID#' . $_eventId . ') from: ' . get_class( $publisher ) . ' [' . $publisher->getId() . ']' );
-				}
-
-				//	Call the closure...
-				if ( false === $_callback[0]( $_event ) )
-				{
-					return false;
-				}
-			}
-			else
-			{
-				//	Oops!
-				throw new InvalidEventHandlerException(
-					'Event "' .
-						( is_object( $_callback[0] )
-							?
-							get_class( $_callback[0] )
-							:
-							'<unknownClass>' ) .
-						'.' . $_eventTag . ' has an invalid listener subscribed to it.'
-				);
-			}
-
-			unset( $_callback );
 		}
 
 		return true;
@@ -271,6 +365,16 @@ class EventManager
 		return ( $object instanceof \Kisma\Core\Interfaces\Events\Publisher );
 	}
 
+	/**
+	 * @param \Kisma\Core\Events\SeedEvent $event
+	 *
+	 * @return string
+	 */
+	public static function generateEventId( $event )
+	{
+		return sha1( $event->getSource()->getId() . getmypid() . microtime( true ) ) . '.' . self::$_lastEventId++;
+	}
+
 	//*************************************************************************
 	//* Properties
 	//*************************************************************************
@@ -281,22 +385,6 @@ class EventManager
 	public static function getEventMap()
 	{
 		return self::$_eventMap;
-	}
-
-	/**
-	 * @param boolean $debug
-	 */
-	public static function setDebug( $debug )
-	{
-		self::$_debug = $debug;
-	}
-
-	/**
-	 * @return boolean
-	 */
-	public static function getDebug()
-	{
-		return self::$_debug;
 	}
 
 }

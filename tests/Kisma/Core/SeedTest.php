@@ -29,12 +29,41 @@ class SeedTest extends \PHPUnit_Framework_TestCase
 	 */
 	protected function setUp()
 	{
+		if ( null !== $this->_object )
+		{
+			unset( $this->_object );
+		}
+
 		$this->_object = new \SeedTest_Object(
 			array(
 				'tester' => $this
 			)
 		);
+	}
 
+	protected function tearDown()
+	{
+		$this->_object = null;
+
+//		foreach ( \Kisma\Core\Utility\EventManager::getEventMap() as $_eventTag => $_subscribers )
+//		{
+//			\Kisma\Core\Utility\Log::debug( 'Event "' . $_eventTag . '" listener dump:' );
+//
+//			foreach ( $_subscribers as $_listeners )
+//			{
+//				/** @var $_listener \Closure */
+//				foreach ( $_listeners as $_subscriberId => $_closures )
+//				{
+//					foreach ( $_closures as $_closure )
+//					{
+//						\Kisma\Core\Utility\Log::debug( '-- "' . $_subscriberId . '" of ' . ( is_object( $_closure ) ? get_class( $_closure ) :
+//							gettype( $_closure ) ) );
+//					}
+//				}
+//			}
+//		}
+
+//		\Kisma\Core\Utility\Log::debug( 'Eventmap dump:' . json_encode( \Kisma\Core\Utility\EventManager::getEventMap() ) );
 	}
 
 	/**
@@ -91,8 +120,8 @@ class SeedTest extends \PHPUnit_Framework_TestCase
 	}
 
 	/**
-	 * @covers Kisma\Core\Seed::getEventManager
 	 * @covers Kisma\Core\Seed::setEventManager
+	 * @covers Kisma\Core\Seed::getEventManager
 	 */
 	public function testGetEventManager()
 	{
@@ -112,4 +141,30 @@ class SeedTest extends \PHPUnit_Framework_TestCase
 		$this->assertTrue( false === $this->_object->getDiscoverEvents() );
 	}
 
+	/**
+	 * @covers Kisma\Core\Seed::subscribe
+	 * @covers Kisma\Core\Seed::unsubscribe
+	 */
+	public function testUnsubscribe()
+	{
+		$_eventFired = false;
+
+		//	Subscribe and publish to set flag
+		$this->_object->subscribe(
+			'crazy.event',
+			function ( $event ) use ( &$_eventFired )
+			{
+				$_eventFired = true;
+			}
+		);
+		$this->_object->publish( 'crazy.event' );
+		$this->assertTrue( $_eventFired );
+
+		//	Clear, unsub, and publish. Flag should not be set...
+		$_eventFired = false;
+		$this->_object->unsubscribe( 'crazy.event' );
+		$this->_object->publish( 'crazy.event' );
+
+		$this->assertTrue( false === $_eventFired );
+	}
 }

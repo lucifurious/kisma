@@ -31,6 +31,14 @@ class SeedEvent
 	 * @var mixed Any event data the sender wants to convey
 	 */
 	protected $_data;
+	/**
+	 * @var string
+	 */
+	protected $_eventTag = null;
+	/**
+	 * @var string A user-defined event ID
+	 */
+	protected $_eventId = null;
 
 	//**************************************************************************
 	//* Public Methods
@@ -112,4 +120,45 @@ class SeedEvent
 	{
 		return $this->_source;
 	}
+
+	/**
+	 * @param string $eventId
+	 *
+	 * @return SeedEvent
+	 */
+	public function setEventId( $eventId )
+	{
+		$this->_eventId = $eventId;
+
+		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getEventId()
+	{
+		return $this->_eventId;
+	}
+
+	/**
+	 * @param string $eventTag
+	 *
+	 * @return SeedEvent
+	 */
+	public function setEventTag( $eventTag )
+	{
+		$this->_eventTag = $eventTag;
+
+		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getEventTag()
+	{
+		return $this->_eventTag;
+	}
+
 }
