@@ -17,6 +17,10 @@ class SeedBag extends Seed implements \ArrayAccess, \Countable, \IteratorAggrega
 	 * @var array The contents
 	 */
 	protected $_bag = array();
+	/**
+	 * @var array A map of key hashes
+	 */
+	protected $_keyMap = array();
 
 	//*************************************************************************
 	//* Public Methods
@@ -24,21 +28,22 @@ class SeedBag extends Seed implements \ArrayAccess, \Countable, \IteratorAggrega
 
 	/**
 	 * @param array $contents
+	 *
+	 * @return \Kisma\Core\SeedBag
 	 */
 	public function __construct( $contents = array() )
 	{
-		if ( empty( $contents ) )
-		{
-			$contents = array();
-		}
-
-		foreach ( $contents as $_key => $_value )
-		{
-			$this->add( $_key, $_value );
-			unset( $contents[$_key] );
-		}
-
 		parent::__construct( $contents );
+
+		//	Anything left, goes in the bag
+		if ( !empty( $contents ) && ( is_array( $contents ) || $contents instanceof \Traversable ) )
+		{
+			foreach ( $contents as $_key => $_value )
+			{
+				$this->set( $_key, $_value );
+				unset( $contents[$_key] );
+			}
+		}
 	}
 
 	/**
@@ -46,7 +51,7 @@ class SeedBag extends Seed implements \ArrayAccess, \Countable, \IteratorAggrega
 	 */
 	public function keys()
 	{
-		return array_keys( $this->_bag );
+		return array_values( $this->_keyMap );
 	}
 
 	/**
@@ -60,7 +65,7 @@ class SeedBag extends Seed implements \ArrayAccess, \Countable, \IteratorAggrega
 	/**
 	 * Retrieves a value at the given key location, or the default value if key isn't found.
 	 * Setting $burnAfterReading to true will remove the key-value pair from the bag after it
-	 * is retrieved.
+	 * is retrieved. Call with no arguments to get back a KVP array of contents
 	 *
 	 * @param string $key
 	 * @param mixed  $defaultValue
@@ -70,18 +75,28 @@ class SeedBag extends Seed implements \ArrayAccess, \Countable, \IteratorAggrega
 	 */
 	public function get( $key = null, $defaultValue = null, $burnAfterReading = false )
 	{
-		return \Kisma\Core\Utility\Option::get( $this->_bag, $key, $defaultValue, $burnAfterReading );
+		return \Kisma\Core\Utility\Option::get( $this->_bag, $this->hashKey( $key ), $defaultValue, $burnAfterReading );
 	}
 
 	/**
 	 * @param string $key
 	 * @param mixed  $value
+	 * @param bool   $overwrite
 	 *
+	 * @throws \Kisma\Core\Exceptions\DuplicateKeyException
 	 * @return SeedBag
 	 */
-	public function add( $key, $value )
+	public function set( $key, $value, $overwrite = true )
 	{
-		\Kisma\Core\Utility\Option::set( $this->_bag, $key, $value );
+		if ( false === $overwrite && !$this->contains( $key ) )
+		{
+			throw new \Kisma\Core\Exceptions\DuplicateKeyException( 'The key "' . $key . '" is already in the bag.' );
+		}
+
+		$_hash = $this->hashKey( $key );
+
+		$this->_keyMap[$_hash] = $key;
+		\Kisma\Core\Utility\Option::set( $this->_bag, $_hash, $value );
 
 		return $this;
 	}
@@ -93,7 +108,13 @@ class SeedBag extends Seed implements \ArrayAccess, \Countable, \IteratorAggrega
 	 */
 	public function remove( $key )
 	{
-		\Kisma\Core\Utility\Option::remove( $this->_bag, $key );
+		$_hash = $this->hashKey( $key );
+
+		if ( $this->contains( $key ) )
+		{
+			unset( $this->_keyMap[$_hash] );
+			\Kisma\Core\Utility\Option::remove( $this->_bag, $_hash );
+		}
 
 		return $this;
 	}
@@ -103,7 +124,7 @@ class SeedBag extends Seed implements \ArrayAccess, \Countable, \IteratorAggrega
 	 */
 	public function clear()
 	{
-		$this->_bag = array();
+		unset( $this->_bag, $this->_keyMap );
 
 		return $this;
 	}
@@ -121,13 +142,21 @@ class SeedBag extends Seed implements \ArrayAccess, \Countable, \IteratorAggrega
 			throw new \InvalidArgumentException( 'The source must be an array or an object.' );
 		}
 
-		\Kisma\Core\Utility\Option::merge( $this->_bag, $source );
+		//	Hash the keys
+		$_data = array();
+
+		foreach ( $source as $_key => $_value )
+		{
+			$_data[$this->hashKey( $_key )] = $_value;
+		}
+
+		\Kisma\Core\Utility\Option::merge( $this->_bag, $_data );
 
 		return $this;
 	}
 
 	/**
-	 * Checks to see if a key is in the bag
+	 * Checks to see if a key is in the bag.
 	 *
 	 * @param string $key
 	 *
@@ -135,7 +164,27 @@ class SeedBag extends Seed implements \ArrayAccess, \Countable, \IteratorAggrega
 	 */
 	public function contains( $key )
 	{
-		return in_array( $key, array_keys( $this->_bag ) );
+		$_hash = $this->hashKey( $key );
+
+		return in_array( $_hash, array_keys( $this->_keyMap ) );
+	}
+
+	/**
+	 * Called before methods to allow for key munging downstream.
+	 * Default implementation doesn't do anything to the key
+	 *
+	 * @param string $key
+	 *
+	 * @return string
+	 */
+	public function hashKey( $key )
+	{
+		if ( null === $key )
+		{
+			return array_values( $this->_keyMap );
+		}
+
+		return $key;
 	}
 
 	//*************************************************************************
@@ -163,7 +212,7 @@ class SeedBag extends Seed implements \ArrayAccess, \Countable, \IteratorAggrega
 	 */
 	public function offsetSet( $offset, $item )
 	{
-		$this->add( $offset, $item );
+		$this->set( $offset, $item );
 	}
 
 	/**
