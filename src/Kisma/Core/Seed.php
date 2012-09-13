@@ -108,7 +108,14 @@ class Seed implements \Kisma\Core\Interfaces\Seed, \Kisma\Core\Interfaces\Publis
 		}
 
 		//	Otherwise, set the rest
-		\Kisma\Core\Utility\Option::set( $this, $settings );
+		foreach ( $settings as $_key => $_value )
+		{
+			if ( property_exists( $this, $_key ) || property_exists( $this, '_' . $_key ) )
+			{
+				\Kisma\Core\Utility\Option::set( $this, $_key, $_value );
+				unset( $settings, $_key );
+			}
+		}
 
 		//	Wake-up the events
 		$this->__wakeup();
@@ -134,14 +141,14 @@ class Seed implements \Kisma\Core\Interfaces\Seed, \Kisma\Core\Interfaces\Publis
 		}
 
 		//	Add the event service and attach any event handlers we find...
-		if ( $this instanceof \Kisma\Core\Interfaces\Subscriber && false !== $this->getEventManager() )
+		if ( false !== $this->_eventManager && $this instanceof \Kisma\Core\Interfaces\Subscriber )
 		{
 			//	Wire in the event service if we're a subscriber
-			if ( false !== $this->getDiscoverEvents() )
+			if ( false !== $this->_discoverEvents )
 			{
 				//	Subscribe to events...
 				call_user_func(
-					array( $this->getEventManager(), 'subscribe' ),
+					array( $this->_eventManager, 'subscribe' ),
 					$this
 				);
 			}
@@ -149,8 +156,8 @@ class Seed implements \Kisma\Core\Interfaces\Seed, \Kisma\Core\Interfaces\Publis
 		else
 		{
 			//	Ignore event junk later
-			$this->getEventManager( false );
-			$this->setDiscoverEvents( false );
+			$this->_eventManager = false;
+			$this->_discoverEvents = false;
 		}
 
 		//	Publish after_construct event
@@ -164,14 +171,8 @@ class Seed implements \Kisma\Core\Interfaces\Seed, \Kisma\Core\Interfaces\Publis
 	{
 		try
 		{
-			//	Publish my demise
+			//	Publish after_destruct event
 			$this->publish( self::BeforeDestruct );
-
-			/**
-			 * Unsubscribe from all events...
-			 * If we don't do this after the publish, we won't get our own before_destruct event
-			 */
-			$this->unsubscribe();
 		}
 		catch ( \Exception $_ex )
 		{
@@ -185,44 +186,6 @@ class Seed implements \Kisma\Core\Interfaces\Seed, \Kisma\Core\Interfaces\Publis
 	//*************************************************************************
 
 	/**
-	 * @param string              $eventName
-	 * @param callable|callable[] $listeners
-	 */
-	public function subscribe( $eventName, $listeners = null )
-	{
-		//	Add the event service and attach any event handlers we find...
-		if ( $this instanceof \Kisma\Core\Interfaces\Subscriber && false !== $this->getEventManager() )
-		{
-			//	Wire in the event service if we're a subscriber
-			if ( null === $listeners && false !== $this->_discoverEvents )
-			{
-				//	Subscribe to events...
-				call_user_func(
-					array( $this->getEventManager(), 'subscribe' ),
-					$this
-				);
-			}
-			elseif ( !empty( $listeners ) )
-			{
-				//	Attach listeners
-				call_user_func(
-					array( $this->getEventManager(), 'subscribe' ),
-					$this,
-					array(
-						$eventName => \Kisma\Core\Utility\Option::clean( $listeners )
-					)
-				);
-			}
-		}
-		else
-		{
-			//	Ignore event junk later
-			$this->setEventManager( false );
-			$this->setDiscoverEvents( false );
-		}
-	}
-
-	/**
 	 * Triggers an object event to all subscribers. Convenient wrapper on EM::publish
 	 *
 	 * @param string $eventName
@@ -234,26 +197,9 @@ class Seed implements \Kisma\Core\Interfaces\Seed, \Kisma\Core\Interfaces\Publis
 	{
 		//	A little chicanery...
 		return
-			false !== $this->getEventManager()
+			false !== $this->_eventManager
 				?
-				call_user_func( array( $this->getEventManager(), 'publish' ), $this, $eventName, $eventData )
-				:
-				false;
-	}
-
-	/**
-	 * Unsubscribes object from events
-	 *
-	 * @param string $eventName
-	 *
-	 * @return bool|int
-	 */
-	public function unsubscribe( $eventName = null )
-	{
-		return
-			false !== $this->getEventManager()
-				?
-				call_user_func( array( $this->getEventManager(), 'unsubscribe' ), $this, $eventName )
+				call_user_func( array( $this->_eventManager, 'publish' ), $this, $eventName, $eventData )
 				:
 				false;
 	}
