@@ -137,16 +137,18 @@ class SeedBag extends Seed implements \ArrayAccess, \Countable, \IteratorAggrega
 	/**
 	 * @param string $key
 	 *
-	 * @return SeedBag
+	 * @return bool
 	 */
 	public function remove( $key )
 	{
-		if ( Utility\Option::contains( $this->_bag, $key ) )
+		if ( !Utility\Option::contains( $this->_bag, $key ) )
 		{
-			Utility\Option::remove( $this->_bag, $key );
+			return false;
 		}
 
-		return $this;
+		Utility\Option::remove( $this->_bag, $key );
+
+		return true;
 	}
 
 	/**
