@@ -17,6 +17,10 @@ class SeedBag extends Seed implements \ArrayAccess, \Countable, \IteratorAggrega
 	 * @var array The contents
 	 */
 	private $_bag = array();
+	/**
+	 * @var bool If true, no new keys will be allowed
+	 */
+	private $_fixedSize = false;
 
 	//*************************************************************************
 	//* Public Methods
@@ -59,6 +63,14 @@ class SeedBag extends Seed implements \ArrayAccess, \Countable, \IteratorAggrega
 	}
 
 	/**
+	 * @return array The contents of the bag
+	 */
+	public function contents()
+	{
+		return $this->_bag;
+	}
+
+	/**
 	 * Retrieves a value at the given key location, or the default value if key isn't found.
 	 * Setting $burnAfterReading to true will remove the key-value pair from the bag after it
 	 * is retrieved. Call with no arguments to get back a KVP array of contents
@@ -67,20 +79,23 @@ class SeedBag extends Seed implements \ArrayAccess, \Countable, \IteratorAggrega
 	 * @param mixed  $defaultValue
 	 * @param bool   $burnAfterReading
 	 *
+	 * @throws Exceptions\BagException
 	 * @return mixed
 	 */
 	public function get( $key = null, $defaultValue = null, $burnAfterReading = false )
 	{
+		$_exists = Utility\Option::contains( $this->_bag, $key );
+
+		if ( false !== $this->_fixedSize && !$_exists )
+		{
+			throw new Exceptions\BagException( 'This class does not have a property named "' . $key . '"' );
+		}
+
 		$_value = $defaultValue;
 
-		if ( isset( $this->_bag[$key] ) )
+		if ( $_exists )
 		{
-			$_value = $this->_bag[$key];
-
-			if ( false !== $burnAfterReading )
-			{
-				unset( $this->_bag[$key] );
-			}
+			$_value = Utility\Option::get( $this->_bag, $key, $defaultValue, $burnAfterReading );
 		}
 
 		return $_value;
@@ -91,17 +106,30 @@ class SeedBag extends Seed implements \ArrayAccess, \Countable, \IteratorAggrega
 	 * @param mixed  $value
 	 * @param bool   $overwrite
 	 *
-	 * @throws \Kisma\Core\Exceptions\DuplicateKeyException
+	 * @throws Exceptions\BagException
 	 * @return SeedBag
 	 */
 	public function set( $key, $value, $overwrite = true )
 	{
-		if ( false === $overwrite && isset( $this->_bag[$key] ) )
+		if ( null === $value && $key instanceof Interfaces\Seed )
 		{
-			throw new \Kisma\Core\Exceptions\DuplicateKeyException( 'The key "' . $key . '" is already in the bag.' );
+			$value = $key;
+			$key = $value->getId();
 		}
 
-		$this->_bag[$key] = $value;
+		$_exists = Utility\Option::contains( $this->_bag, $key );
+
+		if ( false === $overwrite && $_exists && ( null !== ( $_oldValue = Utility\Option::get( $this->_bag, $key ) ) ) )
+		{
+			throw new Exceptions\BagException( 'The property "' . $key . '" is read-only.' );
+		}
+
+		if ( false !== $this->_fixedSize && !$_exists )
+		{
+			throw new Exceptions\BagException( 'This class does not have a property named "' . $key . '"' );
+		}
+
+		Utility\Option::set( $this->_bag, $key, $value );
 
 		return $this;
 	}
@@ -113,9 +141,9 @@ class SeedBag extends Seed implements \ArrayAccess, \Countable, \IteratorAggrega
 	 */
 	public function remove( $key )
 	{
-		if ( isset( $this->_bag[$key] ) )
+		if ( Utility\Option::contains( $this->_bag, $key ) )
 		{
-			unset( $this->_bag[$key] );
+			Utility\Option::remove( $this->_bag, $key );
 		}
 
 		return $this;
@@ -145,7 +173,7 @@ class SeedBag extends Seed implements \ArrayAccess, \Countable, \IteratorAggrega
 			throw new \InvalidArgumentException( 'The source must be an array or an object.' );
 		}
 
-		\Kisma\Core\Utility\Option::merge( $this->_bag, $source );
+		Utility\Option::merge( $this->_bag, $source );
 
 		return $this;
 	}
@@ -159,7 +187,29 @@ class SeedBag extends Seed implements \ArrayAccess, \Countable, \IteratorAggrega
 	 */
 	public function contains( $key )
 	{
-		return isset( $this->_bag[$key] );
+		return Utility\Option::contains( $this->_bag, $key );
+	}
+
+	/**
+	 * @param boolean $fixedSize
+	 *
+	 * @return SeedBag
+	 * @codeCoverageIgnore
+	 */
+	public function setFixedSize( $fixedSize )
+	{
+		$this->_fixedSize = $fixedSize;
+
+		return $this;
+	}
+
+	/**
+	 * @return boolean
+	 * @codeCoverageIgnore
+	 */
+	public function getFixedSize()
+	{
+		return $this->_fixedSize;
 	}
 
 	//*************************************************************************
@@ -168,6 +218,8 @@ class SeedBag extends Seed implements \ArrayAccess, \Countable, \IteratorAggrega
 
 	/**
 	 * {@InheritDoc}
+	 *
+	 * @codeCoverageIgnore
 	 */
 	public function offsetExists( $offset )
 	{
@@ -176,6 +228,8 @@ class SeedBag extends Seed implements \ArrayAccess, \Countable, \IteratorAggrega
 
 	/**
 	 * {@InheritDoc}
+	 *
+	 * @codeCoverageIgnore
 	 */
 	public function offsetGet( $offset )
 	{
@@ -184,6 +238,8 @@ class SeedBag extends Seed implements \ArrayAccess, \Countable, \IteratorAggrega
 
 	/**
 	 * {@InheritDoc}
+	 *
+	 * @codeCoverageIgnore
 	 */
 	public function offsetSet( $offset, $item )
 	{
@@ -192,6 +248,8 @@ class SeedBag extends Seed implements \ArrayAccess, \Countable, \IteratorAggrega
 
 	/**
 	 * {@InheritDoc}
+	 *
+	 * @codeCoverageIgnore
 	 */
 	public function offsetUnset( $offset )
 	{

@@ -13,12 +13,13 @@ class SeedBagTest extends \PHPUnit_Framework_TestCase
 	/**
 	 * Sets up the fixture, for example, opens a network connection.
 	 * This method is called before a test is executed.
+	 *
 	 * @covers Kisma\Core\SeedBag::__construct
 	 */
 	protected function setUp()
 	{
 		$this->object = new SeedBag;
-		$this->object->add( 'testItem', 'testValue' );
+		$this->object->set( 'testItem', 'testValue' );
 	}
 
 	/**
@@ -49,22 +50,35 @@ class SeedBagTest extends \PHPUnit_Framework_TestCase
 
 	/**
 	 * @covers Kisma\Core\SeedBag::get
+	 * @covers Kisma\Core\SeedBag::offsetGet
 	 */
 	public function testGet()
 	{
 		$this->assertTrue( 'testValue' == $this->object->get( 'testItem' ) );
+		$this->assertTrue( 'testValue' == $this->object->offsetGet( 'testItem' ) );
 	}
 
 	/**
-	 * @covers Kisma\Core\SeedBag::add
+	 * @covers Kisma\Core\SeedBag::set
+	 * @covers Kisma\Core\SeedBag::offsetSet
 	 * @covers Kisma\Core\SeedBag::remove
+	 * @covers Kisma\Core\SeedBag::offsetUnset
 	 */
-	public function testAdd()
+	public function testSet()
 	{
-		$this->object->add( 'newTestItem', 'newTestValue' );
+		//	Regular
+		$this->object->set( 'newTestItem', 'newTestValue' );
 		$this->assertTrue( 'newTestValue' == $this->object->get( 'newTestItem' ) );
+
 		$this->object->remove( 'newTestItem' );
 		$this->assertTrue( false === $this->object->contains( 'newTestItem' ) );
+
+		//	Offsets...
+		$this->object->offsetSet( 'newTestItem', 'newTestValue' );
+		$this->assertTrue( 'newTestValue' == $this->object->offsetGet( 'newTestItem' ) );
+
+		$this->object->offsetUnset( 'newTestItem' );
+		$this->assertTrue( false === $this->object->offsetExists( 'newTestItem' ) );
 	}
 
 	/**
@@ -85,39 +99,21 @@ class SeedBagTest extends \PHPUnit_Framework_TestCase
 
 	/**
 	 * @covers Kisma\Core\SeedBag::contains
+	 * @covers Kisma\Core\SeedBag::offsetExists
 	 */
 	public function testContains()
 	{
-	}
+		//	Yes
+		$this->assertTrue( $this->object->contains( 'TestItem' ) );
 
-	/**
-	 * @covers Kisma\Core\SeedBag::offsetExists
-	 */
-	public function testOffsetExists()
-	{
-	}
+		//	No
+		$this->assertTrue( !$this->object->contains( 'newTestItem' ) );
 
-	/**
-	 * @covers Kisma\Core\SeedBag::offsetGet
-	 */
-	public function testOffsetGet()
-	{
-	}
+		//	Yes
+		$this->assertTrue( $this->object->offsetExists( 'TestItem' ) );
 
-	/**
-	 * @covers Kisma\Core\SeedBag::offsetSet
-	 * @todo   Implement testOffsetSet().
-	 */
-	public function testOffsetSet()
-	{
-	}
-
-	/**
-	 * @covers Kisma\Core\SeedBag::offsetUnset
-	 * @todo   Implement testOffsetUnset().
-	 */
-	public function testOffsetUnset()
-	{
+		//	No
+		$this->assertTrue( !$this->object->offsetExists( 'newTestItem' ) );
 	}
 
 	/**
