@@ -1,20 +1,20 @@
 <?php
 /**
  * @file
- * Provides Inflector manipulation utilities
+ *            Provides Inflector manipulation utilities
  *
  * Kisma(tm) : PHP Fun-Size Framework (http://github.com/lucifurious/kisma/)
  * Copyright 2009-2011, Jerry Ablan, All Rights Reserved
  *
  * @copyright Copyright (c) 2009-2011 Jerry Ablan
- * @license http://github.com/lucifurious/kisma/blob/master/LICENSE
+ * @license   http://github.com/lucifurious/kisma/blob/master/LICENSE
  *
- * @author Jerry Ablan <kisma@pogostick.com>
- * @category Utilities
- * @package kisma.utility
- * @since 1.0.0
+ * @author    Jerry Ablan <kisma@pogostick.com>
+ * @category  Utilities
+ * @package   kisma.utility
+ * @since     1.0.0
  *
- * @ingroup utilities
+ * @ingroup   utilities
  */
 namespace Kisma\Core\Utility;
 
@@ -32,7 +32,7 @@ class Inflector implements \Kisma\Core\Interfaces\SeedUtility
 	 * Given a Kisma identifier, return it to neutral format (lowercase, period and underscores)
 	 *
 	 * Examples:
-	 *	   Class Name:			\Kisma\Core\Events\SeedEvent becomes "kisma.components.component_event"
+	 *       Class Name:            \Kisma\Core\Events\SeedEvent becomes "kisma.components.component_event"
 	 *
 	 * @param string $tag
 	 *
@@ -42,13 +42,54 @@ class Inflector implements \Kisma\Core\Interfaces\SeedUtility
 	{
 		$_parts = explode( '\\', $tag );
 
-		array_walk( $_parts, function( &$part )
-		{
-			//      Replace
-			$part = strtolower( preg_replace( '/(?<=\\w)([A-Z])/', '_\\1', $part ) );
-		} );
+		array_walk( $_parts,
+			function ( &$part )
+			{
+				//      Replace
+				$part = strtolower(
+					$part == strtoupper( $part )
+						?
+						$part
+						:
+						preg_replace( '/(?<=\\w)([A-Z])/', '_\\1', $part )
+				);
+			}
+		);
 
 		return implode( '.', $_parts );
+	}
+
+	/**
+	 * Smarter ucwords()
+	 *
+	 * @param string $words
+	 * @param string $convertDelimiter Set to the delimiter you'd like replaced with spaces before conversion
+	 *
+	 * @internal param bool $dotted If true, dots will be replaced with spaces before the UCing
+	 *
+	 * @return string
+	 */
+	public static function ucWordsBetter( $words, $convertDelimiter = null )
+	{
+		$_cleaned = null;
+
+		if ( null !== $convertDelimiter )
+		{
+			//	Convert dots to spaces, then spaces to namespace separators.
+			$words = trim( str_replace( $convertDelimiter, ' ', $words ) );
+		}
+
+		$_parts = explode( ' ', $words );
+
+		if ( !empty( $_parts ) )
+		{
+			foreach ( $_parts as $_part )
+			{
+				$_cleaned .= ' ' . ( $_part != strtoupper( $_part ) ? ucwords( $_part ) : $_part );
+			}
+		}
+
+		return trim( $_cleaned );
 	}
 
 	/**
@@ -58,11 +99,11 @@ class Inflector implements \Kisma\Core\Interfaces\SeedUtility
 	 * Underscores should be used to separate identifier words
 	 *
 	 * Examples:
-	 *	   Class Name:			kisma.aspects.event_handling => \Kisma\Aspects\EventHandling
-	 *	   Array Key:			my_event => MyEvent
+	 *       Class Name:            kisma.aspects.event_handling => \Kisma\Aspects\EventHandling
+	 *       Array Key:            my_event => MyEvent
 	 *
 	 * @param string $tag
-	 * @param bool   $isKey If true, the $tag will be converted to a format suitable for use as an array key
+	 * @param bool   $isKey        If true, the $tag will be converted to a format suitable for use as an array key
 	 * @param bool   $baseNameOnly If true, only the final, base of the tag will be returned.
 	 * @param array  $keyParts
 	 *
@@ -73,18 +114,18 @@ class Inflector implements \Kisma\Core\Interfaces\SeedUtility
 		//	If we're dotted, clean up
 		if ( false !== strpos( $tag, '.' ) )
 		{
-			//	Convert dots to spaces, then spaces to namespace separators.
-			$tag = str_replace( ' ', '\\', ucwords( trim( str_replace( '.', ' ', $tag ) ) ) );
+			//	Now spaces to slashes
+			$tag = str_replace( ' ', '\\', self::ucWordsBetter( $tag, '.' ) );
 		}
 
 		//	Convert underscores to spaces, then remove spaces
-		$_tag = str_replace( ' ', null, ucwords( trim( str_replace( '_', ' ', $tag ) ) ) );
+		$_tag = str_replace( ' ', null, self::ucWordsBetter( $tag, '_' ) );
 
 		//	Only the base?
 		if ( false !== $baseNameOnly )
 		{
 			//	If this is a key, just get the last part
-			$_tag = end( explode( '\\', $_tag ) );
+			$_tag = @end( @explode( '\\', $_tag ) );
 		}
 
 		//	Make it a key?
@@ -109,6 +150,7 @@ class Inflector implements \Kisma\Core\Interfaces\SeedUtility
 	public static function camelize( $string, $separator = '_', $preserveWhiteSpace = false )
 	{
 		$_newString = ucwords( str_replace( $separator, ' ', $string ) );
+
 		return ( false === $preserveWhiteSpace ? str_replace( ' ', '', $_newString ) : $_newString );
 	}
 

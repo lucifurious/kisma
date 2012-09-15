@@ -259,17 +259,26 @@ class Option
 	}
 
 	/**
-	 * Ensures the argument passed in is actually an array
+	 * Ensures the argument passed in is actually an array with optional iteration callback
 	 *
 	 * @static
 	 *
-	 * @param array $array
+	 * @param array             $array
+	 * @param callable|\Closure $callback
 	 *
 	 * @return array
 	 */
-	public static function clean( $array = null )
+	public static function clean( $array = null, $callback = null )
 	{
-		return ( empty( $array ) ? array() : ( !is_array( $array ) ? array( $array ) : $array ) );
+		$_result = ( empty( $array ) ? array() : ( !is_array( $array ) ? array( $array ) : $array ) );
+
+		if ( null !== $callback && is_callable( $callback ) )
+		{
+			foreach ( $_result as $_item )
+			{
+				call_user_func( $callback, $_item );
+			}
+		}
 	}
 
 	/**

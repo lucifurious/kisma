@@ -141,6 +141,11 @@ class SeedBag extends Seed implements \ArrayAccess, \Countable, \IteratorAggrega
 	 */
 	public function remove( $key )
 	{
+		if ( $key instanceof Interfaces\Seed )
+		{
+			$key = $key->getId();
+		}
+
 		if ( !Utility\Option::contains( $this->_bag, $key ) )
 		{
 			return false;
@@ -189,6 +194,11 @@ class SeedBag extends Seed implements \ArrayAccess, \Countable, \IteratorAggrega
 	 */
 	public function contains( $key )
 	{
+		if ( $key instanceof Interfaces\Seed )
+		{
+			$key = $key->getId();
+		}
+
 		return Utility\Option::contains( $this->_bag, $key );
 	}
 
