@@ -14,6 +14,45 @@ class Scalar implements \Kisma\Core\Interfaces\SeedUtility
 	//*************************************************************************
 
 	/**
+	 * Ensures the end of a string has only one of something
+	 *
+	 * @param string $search
+	 * @param string $oneWhat
+	 *
+	 * @return string
+	 */
+	public static function trimSingle( $search, $oneWhat = ' ' )
+	{
+		return trim( $oneWhat . $search . $oneWhat, $oneWhat );
+	}
+
+	/**
+	 * Ensures the end of a string has only one of something
+	 *
+	 * @param string $search
+	 * @param string $oneWhat
+	 *
+	 * @return string
+	 */
+	public static function rtrimSingle( $search, $oneWhat = ' ' )
+	{
+		return rtrim( $search . $oneWhat, $oneWhat );
+	}
+
+	/**
+	 * Ensures the front of a string has only one of something
+	 *
+	 * @param string $search
+	 * @param string $oneWhat
+	 *
+	 * @return string
+	 */
+	public static function ltrimSingle( $search, $oneWhat = ' ' )
+	{
+		return ltrim( $oneWhat . $search, $oneWhat );
+	}
+
+	/**
 	 * Multi-argument is_array helper
 	 *
 	 * Usage: is_array( $array1[, $array2][, ...])
@@ -148,6 +187,7 @@ class Scalar implements \Kisma\Core\Interfaces\SeedUtility
 	public static function serialized( $value )
 	{
 		$_result = @unserialize( $value );
+
 		return !( false === $_result && $value != serialize( false ) );
 	}
 
@@ -182,6 +222,7 @@ class Scalar implements \Kisma\Core\Interfaces\SeedUtility
 				}
 
 				$options[$_key] = $_value;
+
 				return true;
 			}
 
@@ -193,6 +234,7 @@ class Scalar implements \Kisma\Core\Interfaces\SeedUtility
 				}
 
 				$options->{$_key} = $_value;
+
 				return true;
 			}
 		}
