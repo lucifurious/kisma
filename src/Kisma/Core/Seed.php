@@ -141,10 +141,9 @@ class Seed implements \Kisma\Core\Interfaces\Seed, \Kisma\Core\Interfaces\Publis
 		}
 
 		//	Add the event service and attach any event handlers we find...
-		if ( false !== $this->_eventManager && $this instanceof \Kisma\Core\Interfaces\Subscriber )
+		if ( $this instanceof \Kisma\Core\Interfaces\Subscriber && false !== $this->_eventManager )
 		{
-			//	Wire in the event service if we're a subscriber
-			if ( false !== $this->_discoverEvents )
+			if ( null !== $this->_eventManager && false !== $this->_discoverEvents )
 			{
 				//	Subscribe to events...
 				call_user_func(
@@ -202,6 +201,38 @@ class Seed implements \Kisma\Core\Interfaces\Seed, \Kisma\Core\Interfaces\Publis
 				call_user_func( array( $this->_eventManager, 'publish' ), $this, $eventName, $eventData )
 				:
 				false;
+	}
+
+	/**
+	 * @param string        $tag
+	 * @param callable|null $listener
+	 *
+	 * @return bool
+	 */
+	public function on( $tag, $listener = null )
+	{
+		if ( empty( $this->_eventManager ) || !( $this instanceof \Kisma\Core\Interfaces\Subscriber ) )
+		{
+			return false;
+		}
+
+		if ( null === $listener )
+		{
+			call_user_func(
+				array( $this->_eventManager, 'unsubscribe' ),
+				$this,
+				$tag
+			);
+
+			return;
+		}
+
+		return call_user_func(
+			array( $this->_eventManager, 'on' ),
+			$this,
+			$tag,
+			$listener
+		);
 	}
 
 	//*************************************************************************
