@@ -10,6 +10,15 @@
 class Kisma implements \Kisma\Core\Interfaces\Publisher, \Kisma\Core\Interfaces\Events\Kisma
 {
 	//*************************************************************************
+	//* Constants
+	//*************************************************************************
+
+	/**
+	 * @var string The current version
+	 */
+	const KismaVersion = '0.666';
+
+	//*************************************************************************
 	//* Private Members
 	//*************************************************************************
 
@@ -17,9 +26,12 @@ class Kisma implements \Kisma\Core\Interfaces\Publisher, \Kisma\Core\Interfaces\
 	 * @var array The library configuration options
 	 */
 	protected static $_options = array(
-		'base_path'   => __DIR__,
-		'auto_loader' => null,
-		'conception'  => false,
+		'app.base_path'   => __DIR__,
+		'app.auto_loader' => null,
+		'app.conception'  => false,
+		'app.version'     => self::KismaVersion,
+		'app.name'        => 'App',
+		'app.navbar'      => null,
 	);
 
 	//**************************************************************************
@@ -50,11 +62,11 @@ class Kisma implements \Kisma\Core\Interfaces\Publisher, \Kisma\Core\Interfaces\
 			 * Set up the autoloader
 			 */
 			$_autoLoader = require( dirname( __DIR__ ) . '/vendor/autoload.php' );
-			self::set( 'auto_loader', $_autoLoader );
+			self::set( 'app.auto_loader', $_autoLoader );
 		}
 
 		//	Register our faux-destructor
-		if ( false === ( $_conceived = self::get( 'conception' ) ) )
+		if ( false === ( $_conceived = self::get( 'app.conception' ) ) )
 		{
 			\register_shutdown_function(
 				function ( $eventName = \Kisma\Core\Interfaces\Events\Kisma::Death )
@@ -64,7 +76,7 @@ class Kisma implements \Kisma\Core\Interfaces\Publisher, \Kisma\Core\Interfaces\
 			);
 
 			//	We done baby!
-			self::set( 'conception', $_conceived = true );
+			self::set( 'app.conception', $_conceived = true );
 		}
 
 		//	And let the world know we're alive
@@ -134,7 +146,7 @@ class Kisma implements \Kisma\Core\Interfaces\Publisher, \Kisma\Core\Interfaces\
 	 */
 	public static function getAutoLoader()
 	{
-		return self::get( 'auto_loader' );
+		return self::get( 'app.auto_loader' );
 	}
 
 	/**
@@ -142,7 +154,7 @@ class Kisma implements \Kisma\Core\Interfaces\Publisher, \Kisma\Core\Interfaces\
 	 */
 	public static function getBasePath()
 	{
-		return self::get( 'base_path' );
+		return self::get( 'app.base_path' );
 	}
 
 	/**

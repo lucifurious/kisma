@@ -170,7 +170,7 @@ class ErrorHandler
 					'page_header'       => 'Something has gone awry...',
 					'page_header_small' => 'Not cool. :(',
 					'navbar'            => array(
-						'brand' => 'Kisma v0.666',
+						'brand' => 'Kisma v' . \Kisma::KismaVersion,
 						'items' => array(
 							array(
 								'title'  => 'Kisma on GitHub!',

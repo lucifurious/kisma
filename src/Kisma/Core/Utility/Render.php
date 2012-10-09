@@ -31,17 +31,6 @@ class Render
 	//*************************************************************************
 
 	/**
-	 * Initialize the renderer
-	 */
-	public static function initialize()
-	{
-		if ( null === self::$_twigLoader )
-		{
-			self::addViewPath( dirname( __DIR__ ) . '/Views' );
-		}
-	}
-
-	/**
 	 * Adds a path to the view path
 	 *
 	 * @param string $path
@@ -114,7 +103,7 @@ class Render
 			'app_root'    => \Kisma::get( 'app.root' ),
 			'app_version' => \Kisma::get( 'app.version' ),
 			'page_date'   => date( 'Y-m-d H:i:s' ),
-			'vendor_path' => \Kisma::get( 'app.vendor_path' ),
+			'vendor_path' => \Kisma::get( 'app.base_path' ) . '/vendor',
 			'navbar'      => \Kisma::get( 'app.navbar' ),
 		);
 
@@ -174,4 +163,4 @@ class Render
 /**
  * Energize!
  */
-Render::initialize();
+Render::addViewPath( dirname( __DIR__ ) . '/Views' );
