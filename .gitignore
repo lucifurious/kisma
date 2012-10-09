@@ -4,3 +4,5 @@ examples/blog/app/cache/
 .gitignore
 vendor
 Original/
+.idea/workspace.xml
+.idea/tasks.xml
