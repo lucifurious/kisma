@@ -1,8 +1,0 @@
-<component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="OptionTest" type="PHPUnitRunConfigurationType" factoryName="PHPUnit">
-    <TestRunner class="Kisma\Utility\OptionTest" file="$PROJECT_DIR$/tests/Kisma/Utility/OptionTest.php" scope="Class" />
-    <RunnerSettings RunnerId="PhpUnitDebugRunner" />
-    <ConfigurationWrapper RunnerId="PhpUnitDebugRunner" />
-    <method />
-  </configuration>
-</component>
