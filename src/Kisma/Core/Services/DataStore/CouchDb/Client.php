@@ -5,6 +5,7 @@
 namespace Kisma\Core\Services\DataStore\CouchDb;
 
 use Kisma\Core\Utility\Curl;
+use Kisma\Core\Utility\Option;
 use Kisma\Core\Exceptions\CouchDbException;
 
 /**
@@ -60,7 +61,7 @@ class Client extends Curl
 	 * @param string $databaseName
 	 * @param bool   $createIfNotFound
 	 *
-	 * @throws \Kisma\CouchDbException
+	 * @throws \Kisma\Core\Exceptions\CouchDbException
 	 * @return bool|mixed
 	 */
 	public function databaseExists( $databaseName, $createIfNotFound = true )
@@ -94,6 +95,7 @@ class Client extends Curl
 				}
 
 				$this->_createDesignDocument();
+
 				return $_response;
 			}
 
@@ -119,6 +121,7 @@ class Client extends Curl
 		}
 
 		$_document = $this->_curl( self::Get, $id );
+
 		return empty( $_document ) ? false : $_document;
 
 	}
@@ -432,7 +435,7 @@ class Client extends Curl
 	 * password            null
 	 * database_name       null
 	 *
-	 * @return \Kisma\Core\Utility\CouchDbClient
+	 * @return Client
 	 */
 	public static function create( $options = array() )
 	{
@@ -459,12 +462,13 @@ class Client extends Curl
 	 * @param string $databaseName
 	 * @param bool   $createIfNotFound
 	 *
-	 * @return \Kisma\Core\Utility\CouchDbClient
+	 * @return Client
 	 */
 	public function setDatabaseName( $databaseName, $createIfNotFound = true )
 	{
 		$this->_databaseName = $databaseName;
 		$this->databaseExists( $databaseName, $createIfNotFound );
+
 		return $this;
 	}
 
@@ -479,11 +483,12 @@ class Client extends Curl
 	/**
 	 * @param string $hostName
 	 *
-	 * @return \Kisma\Core\Utility\CouchDbClient
+	 * @return Client
 	 */
 	public function setHostName( $hostName )
 	{
 		$this->_hostName = $hostName;
+
 		return $this;
 	}
 
