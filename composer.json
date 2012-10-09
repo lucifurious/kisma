@@ -14,11 +14,11 @@
 		}
 	],
 	"require":      {
-    },
-    "suggest":{
-		"monolog/monolog": "1.*",
 		"twig/twig":       "1.*",
 		"twig/extensions": "dev-master"
+	},
+	"suggest":      {
+		"monolog/monolog": "1.*"
 	},
 	"repositories": [
 		{
@@ -36,7 +36,7 @@
 	],
 	"autoload":     {
 		"psr-0": {
-			"Kisma":            "src/"
+			"Kisma": "src/"
 		}
 	}
 }

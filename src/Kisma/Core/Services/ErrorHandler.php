@@ -1,0 +1,364 @@
+<?php
+/**
+ * ErrorHandler.php
+ * Provides a base for data ErrorHandler services
+ *
+ * @description Kisma(tm) : PHP Fun-Size Framework (http://github.com/lucifurious/kisma/)
+ * @copyright   Copyright (c) 2009-2012 Jerry Ablan
+ * @license     http://github.com/lucifurious/kisma/blob/master/LICENSE
+ * @author      Jerry Ablan <get.kisma@gmail.com>
+ */
+namespace Kisma\Core\Utility;
+/**
+ * ErrorHandler
+ * A dead-simple error handler class
+ */
+class ErrorHandler
+{
+	//*************************************************************************
+	//* Private Members
+	//*************************************************************************
+
+	/**
+	 * @var int
+	 */
+	protected static $_backtraceLines = 10;
+	/**
+	 * @var int
+	 */
+	protected static $_sourceLines = 25;
+	/**
+	 * @var string
+	 */
+	protected static $_viewRoute;
+	/**
+	 * @var string|\Exception
+	 */
+	protected static $_error;
+	/**
+	 * @var int
+	 */
+	protected static $_startLine;
+	/**
+	 * @var bool Logs notices instead of generated error
+	 */
+	protected static $_ignoreNotices = true;
+	/**
+	 * @var callable
+	 */
+	protected static $_priorHandler = null;
+	/**
+	 * @var callable
+	 */
+	protected static $_priorExceptionHandler = null;
+
+	//*************************************************************************
+	//* Public Methods
+	//*************************************************************************
+
+	/**
+	 *
+	 */
+	public static function register()
+	{
+		self::$_priorHandler = \set_error_handler( array( __CLASS__, 'onError' ) );
+		self::$_priorExceptionHandler = \set_exception_handler( array( __CLASS__, 'onException' ) );
+	}
+
+	/**
+	 *
+	 */
+	public static function unregister()
+	{
+		if ( !empty( self::$_priorHandler ) )
+		{
+			\set_error_handler( self::$_priorHandler );
+		}
+
+		if ( !empty( self::$_priorExceptionHandler ) )
+		{
+			\set_exception_handler( self::$_priorExceptionHandler );
+		}
+	}
+
+	/**
+	 * @param int    $code
+	 * @param string $message
+	 * @param string $file
+	 * @param int    $line
+	 * @param array  $context
+	 *
+	 * @return bool
+	 */
+	public static function onError( $code, $message, $file = null, $line = null, $context = null )
+	{
+		$_trace = \debug_backtrace( 0, self::$_backtraceLines );
+		$_traceText = self::_cleanTrace( $_trace, 3 );
+
+		if ( E_NOTICE == $code )
+		{
+			return false;
+		}
+
+		self::$_error = array(
+			'code'       => $code,
+			'type'       => null,
+			'message'    => $message,
+			'file'       => $file,
+			'line'       => $line,
+			'trace'      => $_traceText,
+			'traces'     => $_trace,
+			'source'     => self::_getCodeLines( $file, $line, self::$_sourceLines ),
+			'start_line' => self::$_startLine,
+		);
+
+		Log::error( self::$_error['message'] . ' (' . self::$_error['code'] . ')' );
+
+		return self::renderError();
+	}
+
+	/**
+	 * @param \Exception $exception
+	 *
+	 * @return bool
+	 */
+	public static function onException( $exception )
+	{
+		$_trace = $exception->getTrace();
+		$_traceText = self::_cleanTrace( $_trace, 3 );
+
+		if ( E_NOTICE == $exception->getCode() )
+		{
+			return false;
+		}
+
+		self::$_error = array(
+			'code'       => $exception->getCode(),
+			'type'       => '',
+			'message'    => $exception->getMessage(),
+			'file'       => $exception->getFile(),
+			'line'       => $exception->getLine(),
+			'trace'      => $_traceText,
+			'traces'     => $exception->getTrace(),
+			'source'     => self::_getCodeLines( $exception->getFile(), $exception->getLine(), self::$_sourceLines ),
+			'start_line' => self::$_startLine,
+		);
+
+		Log::error( self::$_error['message'] . ' (' . self::$_error['code'] . ')' );
+
+		return self::renderError();
+	}
+
+	/**
+	 * Renders an error
+	 *
+	 * @return bool
+	 */
+	public static function renderError()
+	{
+		try
+		{
+			$_errorTemplate = \Kisma::get( 'app.error_template', '_error.twig' );
+
+			Render::twigView(
+				$_errorTemplate,
+				array(
+					'base_path'         => \Kisma::get( 'app.base_path' ),
+					'app_root'          => \Kisma::get( 'app.root' ),
+					'page_title'        => 'Error',
+					'error'             => self::$_error,
+					'page_header'       => 'Something has gone awry...',
+					'page_header_small' => 'Not cool. :(',
+					'navbar'            => array(
+						'brand' => 'Kisma v0.666',
+						'items' => array(
+							array(
+								'title'  => 'Kisma on GitHub!',
+								'href'   => 'http://github.com/kisma/kisma/',
+								'target' => '_blank',
+								'active' => 'active',
+							),
+						),
+					),
+				)
+			);
+
+			return true;
+		}
+		catch ( \Exception $_ex )
+		{
+			Log::error( 'Exception during rendering of error: ' . print_r( self::$_error, true ) );
+		}
+
+		return false;
+	}
+
+	//*************************************************************************
+	//* Private Methods
+	//*************************************************************************
+
+	/**
+	 * Cleans up a trace array
+	 *
+	 * @param array $trace
+	 * @param int   $skipLines
+	 * @param null  $basePath
+	 *
+	 * @return null|string
+	 */
+	protected static function _cleanTrace( array &$trace, $skipLines = null, $basePath = null )
+	{
+		$_trace = array();
+		$_basePath = $basePath ? : \Kisma::get( 'app.base_path' );
+
+		//	Skip some lines
+		if ( !empty( $skipLines ) && count( $trace ) > $skipLines )
+		{
+			$trace = array_slice( $trace, $skipLines );
+		}
+
+		foreach ( $trace as $_index => $_code )
+		{
+			$_traceItem = array();
+
+			Scalar::sins( $trace[$_index], 'file', 'Unspecified' );
+			Scalar::sins( $trace[$_index], 'line', 0 );
+			Scalar::sins( $trace[$_index], 'function', 'Unspecified' );
+
+			$_traceItem['file_name'] = trim(
+				str_replace(
+					array(
+						$_basePath,
+						"\t",
+						"\r",
+						"\n",
+						PHP_EOL,
+						'phar://',
+					),
+					array(
+						null,
+						'    ',
+						null,
+						null,
+						null,
+						null,
+					),
+					$trace[$_index]['file']
+				)
+			);
+
+			$_args = null;
+
+			if ( isset( $_code['args'] ) && !empty( $_code['args'] ) )
+			{
+				foreach ( $_code['args'] as $_arg )
+				{
+					if ( is_object( $_arg ) )
+					{
+						$_args .= get_class( $_arg ) . ', ';
+					}
+					else if ( is_array( $_arg ) )
+					{
+						$_args .= '[array], ';
+
+					}
+					else if ( is_bool( $_arg ) )
+					{
+						if ( $_arg )
+						{
+							$_args .= 'true, ';
+						}
+						else
+						{
+							$_args .= 'false, ';
+						}
+					}
+					else if ( is_numeric( $_arg ) )
+					{
+						$_args .= $_arg . ', ';
+					}
+					else if ( is_scalar( $_arg ) )
+					{
+						$_args .= '"' . $_arg . '", ';
+					}
+					else
+					{
+						$_args .= '"' . gettype( $_arg ) . '", ';
+					}
+				}
+			}
+
+			$_traceItem['line'] = $trace[$_index]['line'];
+
+			if ( isset( $_code['type'] ) )
+			{
+				$_traceItem['function'] = ( isset( $_code['class'] ) ? $_code['class'] :
+					null ) . $_code['type'] . $_code['function'];
+			}
+			else
+			{
+				$_traceItem['function'] = $_code['function'];
+			}
+
+			$_traceItem['function'] .= '(' . ( $_args ? ' ' . trim( $_args, ', ' ) . ' ' : null ) . ')';
+			$_traceItem['index'] = $_index;
+			$_trace[] = $_traceItem;
+		}
+
+		return $_trace;
+	}
+
+	/**
+	 * @param string $fileName
+	 * @param int    $line
+	 * @param int    $maxLines
+	 * @param bool   $html If true, return each line terminated with <BR/> instead of PHP_EOL
+	 *
+	 * @return string
+	 * @return null|string
+	 */
+	protected static function _getCodeLines( $fileName, $line, $maxLines, $html = false )
+	{
+		$line--;
+
+		if ( $line <= 0 || false === ( $_source = @file( $fileName ) ) )
+		{
+			return null;
+		}
+
+		$_result = null;
+		$_window = intval( $maxLines / 2 );
+
+		$_start = ( 0 > ( $line - $_window ) ? 0 : ( $line - $_window ) );
+
+		/**
+		 * Set starting line to pass to syntax highlighter. If $maxLines is odd, we lose a half a line. The modulo corrects for that.
+		 */
+		self::$_startLine = $_start + ( $maxLines % 2 );
+
+		while ( $_start <= ( $line + $_window ) )
+		{
+			if ( !isset( $_source[$_start] ) )
+			{
+				break;
+			}
+
+			$_line =
+				str_replace( array( "\r", "\n", "\t", PHP_EOL ),
+					array( null, null, '    ', null ),
+					$_source[$_start++] );
+
+			if ( false === $html )
+			{
+				$_result .= $_line . PHP_EOL;
+			}
+			else
+			{
+				$_result .= $_line . '<br />';
+			}
+		}
+
+		return $_result;
+	}
+
+}

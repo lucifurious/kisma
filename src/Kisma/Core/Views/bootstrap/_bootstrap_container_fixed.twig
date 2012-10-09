@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+{% block html_head %}
+    {% include "bootstrap/_bootstrap_container.html_head.twig" %}
+{% endblock %}
+
+<body>
+
+{% block topbar %}
+    {% include 'bootstrap/_bootstrap_container.navbar.twig' %}
+{% endblock %}
+
+<div class="container">
+
+    {% if page_header %}
+        {% block page_header %}
+            {% include 'bootstrap/_bootstrap_container.page_header.twig' %}
+        {% endblock %}
+    {% endif %}
+
+    {% block all_content %}
+        {{ main_content }}
+    {% endblock %}
+
+    {% block footer %}
+        {% include 'bootstrap/_bootstrap_container.page_footer.twig' %}
+    {% endblock %}
+
+</div>
+
+<!-- Late Scripts -->
+<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+<script type="text/javascript" src="/public/vendor/bootstrap/js/bootstrap.min.js"></script>
+{% block page_scripts %}
+    <script type="text/javascript">
+    $(function() {
+
+    });
+    </script>
+{% endblock %}
+</body>
+</html>
