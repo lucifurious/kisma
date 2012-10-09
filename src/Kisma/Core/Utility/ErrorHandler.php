@@ -92,12 +92,12 @@ class ErrorHandler
 	 */
 	public static function onError( $code, $message, $file = null, $line = null, $context = null )
 	{
-		$_trace = \debug_backtrace( 0, self::$_backtraceLines );
+		$_trace = \debug_backtrace();
 		$_traceText = self::_cleanTrace( $_trace, 3 );
 
 		if ( E_NOTICE == $code )
 		{
-			return false;
+			//return false;
 		}
 
 		self::$_error = array(
