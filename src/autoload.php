@@ -9,7 +9,7 @@ $_kismaOptions = array();
 //	Some basics for all
 if ( !class_exists( '\\Kisma' ) )
 {
-	$_kismaOptions['auto_loader'] = require_once( dirname( __DIR__ ) . '/vendor/autoload.php' );
+	$_kismaOptions['app.auto_loader'] = require_once( dirname( __DIR__ ) . '/vendor/autoload.php' );
 }
 
 //	Initialize
