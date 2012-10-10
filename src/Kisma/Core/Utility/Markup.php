@@ -84,11 +84,7 @@ class Markup
 				strtolower( $name ) )
 		);
 
-		foreach ( Option::clean( $attributes ) as $_key => $_value )
-		{
-			$_tags[] = ( self::$_uppercaseTags ? strtoupper( $_key ) : strtolower( $_key ) ) . '="' . $_value . '"';
-		}
-
+		$_tags[] = self::kvpToString( $attributes );
 		$_tags[] = self::$_delimiters[( $selfClose ? self::SelfCloseEnd : self::OpenEnd )];
 
 		if ( !$selfClose )
@@ -105,6 +101,115 @@ class Markup
 		}
 
 		return trim( implode( ' ', $_tags ) );
+	}
+
+	/**
+	 * @param string $tag
+	 * @param string $value
+	 * @param bool   $selfClose
+	 *
+	 * @return string
+	 */
+	public static function wrap( $tag, $value = null, $selfClose = false )
+	{
+		$_tags = array(
+			self::$_delimiters[( $selfClose ? self::SelfCloseStart : self::OpenStart )] . ( self::$_uppercaseTags ? strtoupper( $tag ) :
+				strtolower( $tag ) )
+		);
+
+		$_tags[] = self::$_delimiters[( $selfClose ? self::SelfCloseEnd : self::OpenEnd )];
+
+		if ( !$selfClose )
+		{
+			if ( null !== $value )
+			{
+				$_tags[] = $value;
+			}
+
+			$_tags[] = self::$_delimiters[self::CloseStart] . ( self::$_uppercaseTags ? strtoupper( $tag ) : strtolower( $tag ) );
+		}
+
+		return trim( implode( ' ', $_tags ) );
+	}
+
+	/**
+	 * Adds items to a list, ensuring uniqueness
+	 *
+	 * @param string|array $original   The original value
+	 * @param string|array $value      The thing(s) to add
+	 *
+	 * @return array|string
+	 */
+	public static function addValue( $original, $value )
+	{
+		$_list = ( !is_array( $original ) ? explode( ' ', trim( $original ) ) : $original );
+
+		foreach ( Option::clean( $value ) as $_value )
+		{
+			if ( !in_array( $_value, $_list ) )
+			{
+				$_list[] = $_value;
+			}
+		}
+
+		return is_array( $original ) ? $_list : implode( ' ', $_list );
+	}
+
+	/**
+	 * Removes an item from a list of things.
+	 *
+	 * @param string|array $original The existing class(es). If a string is passed in, a string is returned. If an array is passed in, an array is returned.
+	 * @param string|array $value
+	 *
+	 * @return array|string
+	 */
+	public static function removeValue( $original, $value )
+	{
+		$_list = ( !is_array( $original ) ? explode( ' ', trim( $original ) ) : $original );
+		$_oldList = Option::clean( $value );
+
+		foreach ( $_list as $_index=> $_value )
+		{
+			if ( in_array( $_value, $_oldList ) )
+			{
+				unset( $_list[$_index] );
+			}
+		}
+
+		return is_array( $original ) ? $_list : implode( ' ', $_list );
+	}
+
+	/**
+	 * Takes a kvp traversable and converts to a ' key="value" ' string suitable for framing.
+	 *
+	 * @param array|object $array
+	 * @param int          $trueConvert  The value to substitute for boolean true
+	 * @param int          $falseConvert The value to substitute for boolean false
+	 *
+	 * @return string
+	 */
+	public static function kvpToString( $array, $trueConvert = 1, $falseConvert = 0 )
+	{
+		$_result = array();
+
+		foreach ( Option::clean( $array ) as $_key => $_value )
+		{
+			if ( null !== $_value )
+			{
+				if ( false === $_value )
+				{
+					$_value = $falseConvert;
+				}
+				else if ( true === $_value )
+				{
+					$_value = $trueConvert;
+				}
+
+				$_result[] = ( self::$_uppercaseTags ? strtoupper( $_key ) : strtolower( $_key ) ) . '="' . $_value . '"';
+			}
+		}
+
+		return trim( implode( ' ', $_result ) );
 	}
 
 	/**
