@@ -47,7 +47,7 @@ class Markup
 	 */
 	protected static $_delimiters = array(
 		self::OpenStart      => '<',
-		self::OpenEnd        => '<',
+		self::OpenEnd        => '>',
 		self::CloseStart     => '</',
 		self::CloseEnd       => '>',
 		self::SelfCloseStart => '<',
