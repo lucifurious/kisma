@@ -46,6 +46,32 @@ class Bootstrap extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\FormT
 		parent::__construct( $settings );
 	}
 
+	public function select( array $attributes = array() )
+	{
+		$this->cleanNames( $attributes );
+		$_id = Option::get( $attributes, 'id' );
+		$_label = Option::get( $attributes, 'label', null, true );
+		$_data = Option::get( $attributes, 'data', array(), true );
+		$_options = null;
+
+		foreach ( Option::clean( $_data ) as $_key => $_value )
+		{
+			$_options .= Markup::tag(
+				'option',
+				array(
+					'value' => $_key,
+				),
+				$_value
+			);
+		}
+
+		return Markup::wrap(
+			'select',
+			$_options,
+			$attributes
+		);
+	}
+
 	/**
 	 * @param string $type
 	 * @param array  $attributes
@@ -54,32 +80,26 @@ class Bootstrap extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\FormT
 	 */
 	public function input( $type, array $attributes = array() )
 	{
-		$_type = trim( strtolower( $type ) );
+		$_html = null;
+
+		if ( false !== strpos( $type, '</' ) )
+		{
+			$_html = $type;
+			$_type = 'html';
+		}
+		else
+		{
+			$_type = trim( strtolower( $type ) );
+		}
+
 		$_labelAttributes = Option::get( $attributes, 'labelAttributes', array(), true );
 		$_wrapInput = Scalar::in( $_type, 'checkbox', 'radio' );
 
 		$_labelEnd = null;
 
+		$this->cleanNames( $attributes );
 		$_id = Option::get( $attributes, 'id' );
-		$_name = Option::get( $attributes, 'name' );
-
-		if ( null === $_id )
-		{
-			$_id = $_name;
-		}
-
-		if ( null === ( $_label = Option::get( $attributes, 'label', null, true ) ) )
-		{
-			$_label = ucwords( str_replace( '_', ' ', $_name ) );
-		}
-
-		if ( null !== $this->_prefix )
-		{
-			$_id = $this->_prefix . '_' . $_id;
-			$_name = $this->_prefix . '[' . $_name . ']';
-			$attributes['id'] = $_id;
-			$attributes['name'] = $_name;
-		}
+		$_label = Option::get( $attributes, 'label' );
 
 		if ( null !== $_id && !isset( $_labelAttributes['for'] ) )
 		{
@@ -124,10 +144,31 @@ class Bootstrap extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\FormT
 				break;
 		}
 
-		$attributes = Markup::kvpToString( $attributes );
+		if ( 'html' == $_type )
+		{
+			$_input = $_html;
+		}
+		else
+		{
+			if ( 'textarea' == $_type )
+			{
+				$_input = Markup::wrap(
+					$_type,
+					Option::get( $attributes, 'value', null, true ),
+					$attributes
+				);
+			}
+			else
+			{
+				$attributes = Markup::kvpToString( $attributes );
+				$_input = <<<HTML
+<input type="{$_type}" {$attributes}>
+HTML;
+			}
+		}
 
 		$_html = <<<HTML
-{$_blockStart}{$_inputStart}{$_label}<input type="{$_type}" {$attributes}>{$_labelEnd}{$_hint}{$_inputEnd}{$_blockEnd}
+{$_blockStart}{$_inputStart}{$_label}{$_input}{$_labelEnd}{$_hint}{$_inputEnd}{$_blockEnd}
 HTML;
 
 		$this->_contents .= $_html;
@@ -201,6 +242,35 @@ HTML;
 HTML;
 
 		return $_html;
+	}
+
+	/**
+	 * @param array $attributes
+	 */
+	public function cleanNames( array &$attributes = array() )
+	{
+		$_id = Option::get( $attributes, 'id' );
+		$_name = Option::get( $attributes, 'name' );
+
+		if ( null === $_id )
+		{
+			$_id = $_name;
+		}
+
+		if ( null === ( $_label = Option::get( $attributes, 'label', null, true ) ) )
+		{
+			$_label = ucwords( str_replace( '_', ' ', $_name ) );
+		}
+
+		if ( null !== $this->_prefix )
+		{
+			$_id = $this->_prefix . '_' . $_id;
+			$_name = $this->_prefix . '[' . $_name . ']';
+			$attributes['id'] = $_id;
+			$attributes['name'] = $_name;
+		}
+
+		$attributes['label'] = $_label;
 	}
 
 	//*************************************************************************

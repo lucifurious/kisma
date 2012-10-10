@@ -79,44 +79,63 @@ class Markup
 			$selfClose = false;
 		}
 
-		$_tags = array(
-			self::$_delimiters[( $selfClose ? self::SelfCloseStart : self::OpenStart )] . ( self::$_uppercaseTags ? strtoupper( $name ) :
-				strtolower( $name ) )
-		);
-
-		$_tags[] = self::kvpToString( $attributes );
-		$_tags[] = self::$_delimiters[( $selfClose ? self::SelfCloseEnd : self::OpenEnd )];
+		$_html = self::openTag( $name, $attributes, $selfClose );
 
 		if ( !$selfClose )
 		{
 			if ( null !== $value )
 			{
-				$_tags[] = $value;
+				$_html .= trim( $value );
 			}
 
 			if ( $close )
 			{
-				$_tags[] = self::$_delimiters[self::CloseStart] .
-					( self::$_uppercaseTags ? strtoupper( $name ) : strtolower( $name ) )
-					. self::$_delimiters[self::CloseEnd];
+				$_html .= self::closeTag( $name );
 			}
 		}
 
-		return trim( implode( ' ', $_tags ) );
+		return trim( $_html );
+	}
+
+	/**
+	 * @param       $tag
+	 * @param array $attributes
+	 * @param bool  $selfClose
+	 *
+	 * @return string
+	 */
+	public static function openTag( $tag, array $attributes = array(), $selfClose = false )
+	{
+		$_attributes = self::kvpToString( $attributes );
+
+		return self::$_delimiters[( $selfClose ? self::SelfCloseStart : self::OpenStart )] .
+			( self::$_uppercaseTags ? strtoupper( $tag ) : strtolower( $tag ) ) .
+			' ' . $_attributes . self::$_delimiters[( $selfClose ? self::SelfCloseEnd : self::OpenEnd )];
+	}
+
+	/**
+	 * @param $tag
+	 *
+	 * @return string
+	 */
+	public static function closeTag( $tag )
+	{
+		return self::$_delimiters[self::CloseStart] .
+			( self::$_uppercaseTags ? strtoupper( $tag ) : strtolower( $tag ) ) .
+			self::$_delimiters[self::CloseEnd];
 	}
 
 	/**
 	 * @param string $tag
 	 * @param string $value
+	 * @param array  $attributes
 	 * @param bool   $selfClose
 	 *
 	 * @return string
 	 */
-	public static function wrap( $tag, $value = null, $selfClose = false )
+	public static function wrap( $tag, $value = null, array $attributes = array(), $selfClose = false )
 	{
-		$_html = self::$_delimiters[( $selfClose ? self::SelfCloseStart : self::OpenStart )] .
-			( self::$_uppercaseTags ? strtoupper( $tag ) : strtolower( $tag ) ) .
-			self::$_delimiters[( $selfClose ? self::SelfCloseEnd : self::OpenEnd )];
+		$_html = self::openTag( $tag, $attributes, $selfClose );
 
 		if ( !$selfClose )
 		{
@@ -125,9 +144,7 @@ class Markup
 				$_html .= $value;
 			}
 
-			$_html .= self::$_delimiters[self::CloseStart] .
-				( self::$_uppercaseTags ? strtoupper( $tag ) : strtolower( $tag ) ) .
-				self::$_delimiters[self::CloseEnd];
+			$_html .= self::closeTag( $tag );
 		}
 
 		return trim( $_html );
