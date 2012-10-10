@@ -68,6 +68,11 @@ class Bootstrap extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\FormT
 			$_id = $_name;
 		}
 
+		if ( null === ( $_label = Option::get( $attributes, 'label', null, true ) ) )
+		{
+			$_label = ucwords( str_replace( '_', ' ', $_name ) );
+		}
+
 		if ( null !== $this->_prefix )
 		{
 			$_id = $this->_prefix . '_' . $_id;
@@ -76,23 +81,20 @@ class Bootstrap extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\FormT
 			$attributes['name'] = $_name;
 		}
 
-		if ( null !== ( $_label = Option::get( $attributes, 'label', null, true ) ) )
+		if ( null !== $_id && !isset( $_labelAttributes['for'] ) )
 		{
-			if ( null !== $_id && !isset( $_labelAttributes['for'] ) )
-			{
-				$_labelAttributes['for'] = $_id;
-			}
-
-			//	Add .control-label for the class to labels
-			if ( self::Horizontal == $this->_formType )
-			{
-				$_class = Option::get( $attributes, 'class', null );
-				$_labelAttributes['class'] = Markup::addValue( $_class, ( $_wrapInput ? $_type : 'control-label' ) );
-			}
-
-			$_label = Markup::tag( 'label', $_labelAttributes, ( $_wrapInput ? null : $_label ), !$_wrapInput );
-			$_labelEnd = ( $_wrapInput ? $_label . '</label>' : null );
+			$_labelAttributes['for'] = $_id;
 		}
+
+		//	Add .control-label for the class to labels
+		if ( self::Horizontal == $this->_formType )
+		{
+			$_class = Option::get( $attributes, 'class', null );
+			$_labelAttributes['class'] = Markup::addValue( $_class, ( $_wrapInput ? $_type : 'control-label' ) );
+		}
+
+		$_label = Markup::tag( 'label', $_labelAttributes, ( $_wrapInput ? null : $_label ), !$_wrapInput );
+		$_labelEnd = ( $_wrapInput ? $_label . '</label>' : null );
 
 		if ( null !== ( $_hint = Option::get( $attributes, 'hint', null, true ) ) )
 		{
@@ -108,6 +110,12 @@ class Bootstrap extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\FormT
 				$_blockStart = Markup::tag( 'div', array( 'class'=> 'control-group' ), null, false );
 				$_inputStart = Markup::tag( 'div', array( 'class'=> 'controls' ), null, false );
 				$_inputEnd = $_blockEnd = '</div>';
+
+				if ( !$_wrapInput )
+				{
+					$_blockStart .= $_label . $_labelEnd;
+					$_label = $_labelEnd = null;
+				}
 				break;
 
 			case self::Search:
