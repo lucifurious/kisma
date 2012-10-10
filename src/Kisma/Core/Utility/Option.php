@@ -272,13 +272,19 @@ class Option
 	{
 		$_result = ( empty( $array ) ? array() : ( !is_array( $array ) ? array( $array ) : $array ) );
 
-		if ( null !== $callback && is_callable( $callback ) )
+		if ( null === $callback || is_callable( $callback ) )
 		{
-			foreach ( $_result as $_item )
-			{
-				call_user_func( $callback, $_item );
-			}
+			return $_result;
 		}
+
+		$_response = array();
+
+		foreach ( $_result as $_item )
+		{
+			$_response[] = call_user_func( $callback, $_item );
+		}
+
+		return $_response;
 	}
 
 	/**
