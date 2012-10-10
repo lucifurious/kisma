@@ -207,7 +207,7 @@ class Markup
 				}
 				else if ( is_array( $_value ) )
 				{
-					$_value = implode( ' ', $_value );
+					$_value = trim( implode( ' ', $_value ) );
 				}
 
 				$_result[] = ( self::$_uppercaseTags ? strtoupper( $_key ) : strtolower( $_key ) ) . '="' . $_value . '"';
