@@ -32,11 +32,11 @@ class Markup
 	/**
 	 * @var int The delimiter position
 	 */
-	const SelfCloseStart = 2;
+	const SelfCloseStart = 4;
 	/**
 	 * @var int The delimiter position
 	 */
-	const SelfCloseEnd = 3;
+	const SelfCloseEnd = 5;
 
 	//*************************************************************************
 	//* Private Members
@@ -96,7 +96,9 @@ class Markup
 
 			if ( $close )
 			{
-				$_tags[] = self::$_delimiters[self::CloseStart] . ( self::$_uppercaseTags ? strtoupper( $name ) : strtolower( $name ) );
+				$_tags[] = self::$_delimiters[self::CloseStart] .
+					( self::$_uppercaseTags ? strtoupper( $name ) : strtolower( $name ) )
+					. self::$_delimiters[self::CloseEnd];
 			}
 		}
 
@@ -112,24 +114,23 @@ class Markup
 	 */
 	public static function wrap( $tag, $value = null, $selfClose = false )
 	{
-		$_tags = array(
-			self::$_delimiters[( $selfClose ? self::SelfCloseStart : self::OpenStart )] . ( self::$_uppercaseTags ? strtoupper( $tag ) :
-				strtolower( $tag ) )
-		);
-
-		$_tags[] = self::$_delimiters[( $selfClose ? self::SelfCloseEnd : self::OpenEnd )];
+		$_html = self::$_delimiters[( $selfClose ? self::SelfCloseStart : self::OpenStart )] .
+			( self::$_uppercaseTags ? strtoupper( $tag ) : strtolower( $tag ) ) .
+			self::$_delimiters[( $selfClose ? self::SelfCloseEnd : self::OpenEnd )];
 
 		if ( !$selfClose )
 		{
 			if ( null !== $value )
 			{
-				$_tags[] = $value;
+				$_html .= $value;
 			}
 
-			$_tags[] = self::$_delimiters[self::CloseStart] . ( self::$_uppercaseTags ? strtoupper( $tag ) : strtolower( $tag ) );
+			$_html .= self::$_delimiters[self::CloseStart] .
+				( self::$_uppercaseTags ? strtoupper( $tag ) : strtolower( $tag ) ) .
+				self::$_delimiters[self::CloseEnd];
 		}
 
-		return trim( implode( ' ', $_tags ) );
+		return trim( $_html );
 	}
 
 	/**
