@@ -273,6 +273,25 @@ HTML;
 		$attributes['label'] = $_label;
 	}
 
+	/**
+	 * @param array $items
+	 */
+	public static function buildMenuItems( array $items = array() )
+	{
+		$_liTags = null;
+
+		foreach ( $items as $_linkName => $_menuItem )
+		{
+			$_class = $_menuItem['active'] ? 'active' : 'inactive';
+
+			$_liTags .= <<<HTML
+<li class="{$_class}"><a href="{$_menuItem['href']}">{$_linkName}</a></li>
+HTML;
+		}
+
+		return $_liTags;
+	}
+
 	//*************************************************************************
 	//* [GS]etters
 	//*************************************************************************
