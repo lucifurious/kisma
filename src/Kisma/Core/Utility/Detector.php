@@ -14,24 +14,27 @@ class Detector implements \Kisma\Core\Interfaces\PhpFrameworks
 	//*************************************************************************
 
 	/**
+	 * Extensible framework sniffer.
+	 * Subclass and add a YourClass::sniff_[framework]() method.
+	 *
 	 * @param string $path
 	 */
 	public static function framework( $path = null )
 	{
 		foreach ( \Kisma\Core\Enums\PhpFrameworks::getDefinedConstants() as $_constant => $_value )
 		{
-			if ( method_exists( 'Detector', 'sniff_' . $_constant ) )
+			if ( method_exists( get_called_class(), 'sniff_' . $_value ) )
 			{
-				if ( call_user_func( array( __CLASS__, 'sniff_' . $_value ) ) )
+				if ( call_user_func( array( get_called_class(), 'sniff_' . $_value ) ) )
 				{
-					\Kisma::set( 'app.framework', $_constant );
-					Log::debug( 'PHP framework detected: ' . $_constant );
+					\Kisma::set( 'app.framework', $_value );
+					Log::debug( 'PHP framework detected: ' . $_constant . ' (' . $_value . ')' );
 
 					switch ( $_constant )
 					{
 						case \Kisma\Core\Enums\PhpFrameworks::Yii:
 							/**
-							 * Pull in all the parameters from the Yii application into the Kisma bag...
+							 * Pull in all the parameters from the Yii app into the bag...
 							 */
 							foreach ( \Yii::app()->getParams()->toArray() as $_parameterName => $_parameterValue )
 							{
