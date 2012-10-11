@@ -96,49 +96,63 @@ class Scalar implements \Kisma\Core\Interfaces\SeedUtility
 	}
 
 	/**
-	 * NVL = Null VaLue. Copycat function from PL/SQL. Pass in a list of arguments and the first non-null
-	 * item is returned. Good for setting default values, etc. Last non-null value in list becomes the
-	 * new "default value".
-	 * NOTE: Since PHP evaluates the arguments before calling a function, this is NOT a short-circuit method.
+	 * Returns the first non-empty argument or null if none found.
+	 * Allows for multiple nvl chains. Example:
 	 *
-	 * @param mixed [optional]
+	 *<code>
+	 *    if ( null !== Option::nvl( $x, $y, $z ) ) {
+	 *        //    none are null
+	 *    } else {
+	 *        //    One of them is null
+	 *    }
+	 *
+	 * IMPORTANT NOTE!
+	 * Since PHP evaluates the arguments before calling a function, this is NOT a short-circuit method.
 	 *
 	 * @return mixed
 	 */
 	public static function nvl()
 	{
-		$_defaultValue = null;
+		$_default = null;
+		$_args = func_num_args();
+		$_haystack = func_get_args();
 
-		foreach ( func_get_args() as $_argument )
+		for ( $_i = 0; $_i < $_args; $_i++ )
 		{
-			if ( null === $_argument )
+			if ( null !== ( $_default = self::o( $_haystack, $_i ) ) )
 			{
-				continue;
+				break;
 			}
-
-			$_defaultValue = $_argument;
 		}
 
-		return $_defaultValue;
+		return $_default;
 	}
 
 	/**
 	 * Convenience "in_array" method. Takes variable args.
+	 *
 	 * The first argument is the needle, the rest are considered in the haystack. For example:
-	 * Kisma::in( 'x', 'x', 'y', 'z' ) returns true
-	 * Kisma::in( 'a', 'x', 'y', 'z' ) returns false
 	 *
-	 * @param mixed [optional]
+	 * Option::in( 'x', 'x', 'y', 'z' ) returns true
+	 * Option::in( 'a', 'x', 'y', 'z' ) returns false
 	 *
-	 * @return boolean
+	 * @internal param mixed $needle
+	 * @internal param mixed $haystack
+	 *
+	 * @return bool
 	 */
 	public static function in()
 	{
-		//	Clever or dumb? Dunno...
 		$_haystack = func_get_args();
-		$_needle = array_shift( $_haystack );
 
-		return in_array( $_needle, $_haystack );
+		if ( !empty( $_haystack ) && count( $_haystack ) > 1 )
+		{
+			$_needle = array_shift( $_haystack );
+
+			return in_array( $_needle, $_haystack );
+		}
+
+		return false;
 	}
 
 	/**

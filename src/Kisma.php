@@ -32,6 +32,7 @@ class Kisma implements \Kisma\Core\Interfaces\Publisher, \Kisma\Core\Interfaces\
 		'app.version'     => self::KismaVersion,
 		'app.name'        => 'App',
 		'app.navbar'      => null,
+		'app.framework'   => null,
 	);
 
 	//**************************************************************************
@@ -74,6 +75,9 @@ class Kisma implements \Kisma\Core\Interfaces\Publisher, \Kisma\Core\Interfaces\
 					\Kisma\Core\Utility\EventManager::publish( null, $eventName );
 				}
 			);
+
+			//	Try and detect the framework being used...
+			\Kisma\Core\Utility\Detector::framework();
 
 			//	We done baby!
 			self::set( 'app.conception', $_conceived = true );

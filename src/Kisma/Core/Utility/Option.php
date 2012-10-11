@@ -199,66 +199,6 @@ class Option
 	}
 
 	/**
-	 * Convenience "in_array" method. Takes variable args.
-	 *
-	 * The first argument is the needle, the rest are considered in the haystack. For example:
-	 *
-	 * Option::in( 'x', 'x', 'y', 'z' ) returns true
-	 * Option::in( 'a', 'x', 'y', 'z' ) returns false
-	 *
-	 * @internal param mixed $needle
-	 * @internal param mixed $haystack
-	 *
-	 * @return bool
-	 */
-	public static function in()
-	{
-		$_haystack = func_get_args();
-
-		if ( !empty( $_haystack ) && count( $_haystack ) > 1 )
-		{
-			$_needle = array_shift( $_haystack );
-
-			return in_array( $_needle, $_haystack );
-		}
-
-		return false;
-	}
-
-	/**
-	 * Returns the first non-empty argument or null if none found.
-	 * Allows for multiple nvl chains. Example:
-	 *
-	 *<code>
-	 *    if ( null !== Option::nvl( $x, $y, $z ) ) {
-	 *        //    none are null
-	 *    } else {
-	 *        //    One of them is null
-	 *    }
-	 *
-	 * IMPORTANT NOTE!
-	 * Since PHP evaluates the arguments before calling a function, this is NOT a short-circuit method.
-	 *
-	 * @return mixed
-	 */
-	public static function nvl()
-	{
-		$_default = null;
-		$_args = func_num_args();
-		$_haystack = func_get_args();
-
-		for ( $_i = 0; $_i < $_args; $_i++ )
-		{
-			if ( null !== ( $_default = self::o( $_haystack, $_i ) ) )
-			{
-				break;
-			}
-		}
-
-		return $_default;
-	}
-
-	/**
 	 * Ensures the argument passed in is actually an array with optional iteration callback
 	 *
 	 * @static
@@ -335,4 +275,31 @@ class Option
 		return $_target;
 	}
 
+	/**
+	 * Wrapper for a self::get on $_SERVER
+	 *
+	 * @param string $key
+	 * @param string $defaultValue
+	 * @param bool   $unsetValue
+	 *
+	 * @return mixed
+	 */
+	public static function server( $key, $defaultValue = null, $unsetValue = false )
+	{
+		return self::get( $_SERVER, $key, $defaultValue, $unsetValue );
+	}
+
+	/**
+	 * Wrapper for a self::get on $_REQUEST
+	 *
+	 * @param string $key
+	 * @param string $defaultValue
+	 * @param bool   $unsetValue
+	 *
+	 * @return mixed
+	 */
+	public static function request( $key, $defaultValue = null, $unsetValue = false )
+	{
+		return self::get( $_REQUEST, $key, $defaultValue, $unsetValue );
+	}
 }
