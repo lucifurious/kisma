@@ -62,8 +62,11 @@ class Kisma implements \Kisma\Core\Interfaces\Publisher, \Kisma\Core\Interfaces\
 			/**
 			 * Set up the autoloader
 			 */
-			$_autoLoader = require( dirname( __DIR__ ) . '/vendor/autoload.php' );
-			self::set( 'app.auto_loader', $_autoLoader );
+			if ( file_exists( __DIR__ . '/../vendor/autoload.php' ) )
+			{
+				$_autoLoader = require( __DIR__ . '/../vendor/autoload.php' );
+				self::set( 'app.auto_loader', $_autoLoader );
+			}
 		}
 
 		//	Register our faux-destructor
