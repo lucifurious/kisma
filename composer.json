@@ -37,6 +37,7 @@
 	"autoload":     {
 		"psr-0": {
 			"Kisma": "src/"
-		}
+		},
+		"files": ["src/autoload.php"]
 	}
 }
