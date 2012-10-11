@@ -57,18 +57,6 @@ class Kisma implements \Kisma\Core\Interfaces\Publisher, \Kisma\Core\Interfaces\
 		//	Set any application-level options passed in
 		self::$_options = \Kisma\Core\Utility\Option::merge( self::$_options, $options );
 
-		if ( null === ( $_autoLoader = self::getAutoLoader() ) )
-		{
-			/**
-			 * Set up the autoloader
-			 */
-			if ( file_exists( __DIR__ . '/../vendor/autoload.php' ) )
-			{
-				$_autoLoader = require( __DIR__ . '/../vendor/autoload.php' );
-				self::set( 'app.auto_loader', $_autoLoader );
-			}
-		}
-
 		//	Register our faux-destructor
 		if ( false === ( $_conceived = self::get( 'app.conception' ) ) )
 		{
@@ -84,10 +72,10 @@ class Kisma implements \Kisma\Core\Interfaces\Publisher, \Kisma\Core\Interfaces\
 
 			//	We done baby!
 			self::set( 'app.conception', $_conceived = true );
-		}
 
-		//	And let the world know we're alive
-		\Kisma\Core\Utility\EventManager::publish( null, self::Birth );
+			//	And let the world know we're alive
+			\Kisma\Core\Utility\EventManager::publish( null, self::Birth );
+		}
 
 		return $_conceived;
 	}
