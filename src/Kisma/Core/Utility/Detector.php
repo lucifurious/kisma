@@ -25,6 +25,7 @@ class Detector implements \Kisma\Core\Interfaces\PhpFrameworks
 				if ( call_user_func( array( __CLASS__, 'sniff_' . $_constant ) ) )
 				{
 					\Kisma::set( 'app.framework', $_constant );
+					Log::debug( 'PHP framework detected: ' . $_constant );
 
 					switch ( $_constant )
 					{
