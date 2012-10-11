@@ -23,28 +23,28 @@ class Detector implements \Kisma\Core\Interfaces\PhpFrameworks
 	{
 		foreach ( \Kisma\Core\Enums\PhpFrameworks::getDefinedConstants() as $_constant => $_value )
 		{
-			if ( method_exists( get_called_class(), 'sniff_' . $_value ) )
+			$_thisClass = get_called_class();
+			$_method = 'sniff_' . $_value;
+
+			if ( method_exists( $_thisClass, $_method ) && call_user_func( array( $_thisClass, $_method ) ) )
 			{
-				if ( call_user_func( array( get_called_class(), 'sniff_' . $_value ) ) )
+				\Kisma::set( 'app.framework', $_value );
+				Log::debug( 'PHP framework detected: ' . $_constant . ' (' . $_value . ')' );
+
+				switch ( $_constant )
 				{
-					\Kisma::set( 'app.framework', $_value );
-					Log::debug( 'PHP framework detected: ' . $_constant . ' (' . $_value . ')' );
-
-					switch ( $_constant )
-					{
-						case \Kisma\Core\Enums\PhpFrameworks::Yii:
-							/**
-							 * Pull in all the parameters from the Yii app into the bag...
-							 */
-							foreach ( \Yii::app()->getParams()->toArray() as $_parameterName => $_parameterValue )
-							{
-								\Kisma::set( $_parameterName, $_parameterValue );
-							}
-							break;
-					}
-
-					return $_value;
+					case \Kisma\Core\Enums\PhpFrameworks::Yii:
+						/**
+						 * Pull in all the parameters from the Yii app into the bag...
+						 */
+						foreach ( \Yii::app()->getParams()->toArray() as $_parameterName => $_parameterValue )
+						{
+							\Kisma::set( $_parameterName, $_parameterValue );
+						}
+						break;
 				}
+
+				return $_value;
 			}
 		}
 	}
