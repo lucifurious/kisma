@@ -34,6 +34,12 @@
 			}
 		}
 	],
+	"scripts":      {
+		"post-update-cmd":      "\\Kisma\\Utility\\Composer::postUpdate",
+		"post-package-install": [
+			"\\Kisma\\Utility\\Composer::postPackageInstall"
+		]
+	},
 	"autoload":     {
 		"psr-0": {
 			"Kisma": "src/"

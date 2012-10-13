@@ -7,7 +7,7 @@ namespace Kisma\Core;
  * SeedBag
  * A generic collection class
  */
-class SeedBag extends Seed implements \ArrayAccess, \Countable, \IteratorAggregate
+class SeedBag extends Seed implements \ArrayAccess, \Countable, \IteratorAggregate, \Kisma\Core\Interfaces\BagLike
 {
 	//*************************************************************************
 	//* Private Members
