@@ -27,6 +27,38 @@ class FilterInput implements \Kisma\Core\Interfaces\SeedUtility
 	}
 
 	/**
+	 * Filter chooser based on number or string. Not very smart really.
+	 *
+	 * @param mixed $value
+	 *
+	 * @return mixed
+	 */
+	public static function smart( $value )
+	{
+		switch ( getType( $value ) )
+		{
+			case 'double':
+			case 'float':
+				$_filter = FILTER_SANITIZE_NUMBER_FLOAT;
+				break;
+
+			case 'integer':
+				$_filter = FILTER_SANITIZE_NUMBER_INT;
+				break;
+
+			case 'string':
+				$_filter = FILTER_SANITIZE_STRING;
+				break;
+
+			default:
+				$_filter = FILTER_DEFAULT;
+				break;
+		}
+
+		return filter_var( $value, $_filter );
+	}
+
+	/**
 	 * The master function, performs all filters and gets. Gets around lack of INPUT_SESSION and INPUT_REQUEST
 	 * support.
 	 *
