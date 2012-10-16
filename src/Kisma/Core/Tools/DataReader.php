@@ -67,11 +67,12 @@ class DataReader extends \Kisma\Core\Seed implements \Iterator, \Countable
 	 */
 	public function __construct( \PDOStatement $statement )
 	{
-		parent::__construct(
-			array(
-				'statement' => $statement,
-			)
-		);
+		parent::__construct();
+
+		if ( null !== $statement )
+		{
+			$this->_statement = $statement;
+		}
 	}
 
 	/**
@@ -244,6 +245,7 @@ class DataReader extends \Kisma\Core\Seed implements \Iterator, \Countable
 
 	/**
 	 * @param bool $closed
+	 *
 	 * @return \Kisma\Core\Tools\DataReader
 	 */
 	public function setClosed( $closed )
