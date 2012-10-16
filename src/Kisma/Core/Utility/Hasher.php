@@ -367,8 +367,7 @@ class Hasher extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\SeedUtil
 	public static function generate( $hashLength = 20, $hashSeed = self::All )
 	{
 		//	If we ain't got what you're looking for, return simple md5 hash...
-		if ( !isset( self::$_hashSeeds, self::$_hashSeeds[$hashSeed] ) || !is_array( self::$_hashSeeds[$hashSeed] )
-		)
+		if ( !isset( self::$_hashSeeds, self::$_hashSeeds[$hashSeed] ) || !is_array( self::$_hashSeeds[$hashSeed] ) )
 		{
 			return md5( time() . mt_rand() . time() );
 		}
@@ -380,6 +379,31 @@ class Hasher extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\SeedUtil
 		}
 
 		return $_hash;
+	}
+
+	/**
+	 * Generates a unique hash code
+	 *
+	 * @param string $seed
+	 * @param int    $length
+	 * @param string $algorithm
+	 *
+	 * @return string
+	 */
+	public static function generateUnique( $seed = null, $length = 32, $algorithm = 'sha512' )
+	{
+		if ( file_exists( '/dev/urandom' ) )
+		{
+			$_fp = @fopen( '/dev/urandom', 'rb' );
+			$_entropy = fread( $_fp, $length * 10 );
+			@fclose( $_fp );
+		}
+		else
+		{
+			$_entropy = md5( time() . mt_rand() . time() );
+		}
+
+		return substr( hash( $algorithm, $_entropy ), 0, $length );
 	}
 
 	/**
