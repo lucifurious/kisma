@@ -11,7 +11,7 @@ use Kisma\Core\Utility\Option;
  * Sql
  * A mess o' sql goodies
  */
-class Sql extends BaseUtility
+class Sql extends \Kisma\Core\SeedUtility
 {
 	//*************************************************************************
 	//* Constants
