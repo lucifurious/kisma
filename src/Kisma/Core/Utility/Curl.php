@@ -46,6 +46,14 @@ class Curl extends \Kisma\Core\Enums\HttpMethod
 	 * @var bool Enable/disable logging
 	 */
 	protected static $_debug = true;
+	/**
+	 * @var bool If true, and response is "application/json" content-type, it will be returned decoded
+	 */
+	protected static $_autoDecodeJson = true;
+	/**
+	 * @var bool If true, auto-decoded response is returned as an array
+	 */
+	protected static $_decodeToArray = false;
 
 	//*************************************************************************
 	//* Public Methods
@@ -290,11 +298,11 @@ class Curl extends \Kisma\Core\Enums\HttpMethod
 		}
 
 		//	Attempt to auto-decode inbound JSON
-		if ( !empty( $_result ) )
+		if ( !empty( $_result ) && 'application/json' == Option::get( self::$_info, 'content_type' ) )
 		{
 			try
 			{
-				if ( false !== ( $_json = @json_decode( $_result ) ) )
+				if ( false !== ( $_json = @json_decode( $_result, self::$_decodeToArray ) ) )
 				{
 					$_result = $_json;
 				}
@@ -471,6 +479,38 @@ class Curl extends \Kisma\Core\Enums\HttpMethod
 	public static function getDebug()
 	{
 		return self::$_debug;
+	}
+
+	/**
+	 * @param boolean $autoDecodeJson
+	 */
+	public static function setAutoDecodeJson( $autoDecodeJson )
+	{
+		self::$_autoDecodeJson = $autoDecodeJson;
+	}
+
+	/**
+	 * @return boolean
+	 */
+	public static function getAutoDecodeJson()
+	{
+		return self::$_autoDecodeJson;
+	}
+
+	/**
+	 * @param boolean $decodeToArray
+	 */
+	public static function setDecodeToArray( $decodeToArray )
+	{
+		self::$_decodeToArray = $decodeToArray;
+	}
+
+	/**
+	 * @return boolean
+	 */
+	public static function getDecodeToArray()
+	{
+		return self::$_decodeToArray;
 	}
 
 }
