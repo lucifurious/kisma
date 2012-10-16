@@ -62,7 +62,7 @@ class FilterInput implements \Kisma\Core\Interfaces\SeedUtility
 	 * The master function, performs all filters and gets. Gets around lack of INPUT_SESSION and INPUT_REQUEST
 	 * support.
 	 *
-	 * @param int            $type          One of INPUT_GET, INPUT_POST, INPUT_COOKIE, INPUT_SERVER, INPUT_ENV,
+	 * @param int|array      $type          One of INPUT_GET, INPUT_POST, INPUT_COOKIE, INPUT_SERVER, INPUT_ENV,
 	 *                                      INPUT_SESSION and INPUT_REQUEST. You may also pass in an array and use this
 	 *                                      method to call filter_var with the value found in the array
 	 * @param string         $key           The name of a variable to get.
@@ -82,24 +82,24 @@ class FilterInput implements \Kisma\Core\Interfaces\SeedUtility
 		//	Allow usage as filter_var()
 		if ( is_array( $type ) )
 		{
-			return filter_var( Option::get( $type, $key, $defaultValue ), $filter, $filterOptions );
+			return trim( filter_var( Option::get( $type, $key, $defaultValue ), $filter, $filterOptions ) );
 		}
 
 		//	Based on the type, pull the right value
 		switch ( $type )
 		{
 			case INPUT_REQUEST:
-				return filter_var( Option::get( $_REQUEST, $key, $defaultValue ), $filter, $filterOptions );
+				return trim( filter_var( Option::get( $_REQUEST, $key, $defaultValue ), $filter, $filterOptions ) );
 
 			case INPUT_SESSION:
-				return filter_var( Option::get( $_SESSION, $key, $defaultValue ), $filter, $filterOptions );
+				return trim( filter_var( Option::get( $_SESSION, $key, $defaultValue ), $filter, $filterOptions ) );
 
 			case INPUT_GET:
 			case INPUT_POST:
 			case INPUT_COOKIE:
 			case INPUT_SERVER:
 			case INPUT_ENV:
-				return filter_input( $type, $key, $filter, $filterOptions );
+				return trim( filter_input( $type, $key, $filter, $filterOptions ) );
 		}
 
 		//	No clue what you want man...
@@ -208,4 +208,3 @@ class FilterInput implements \Kisma\Core\Interfaces\SeedUtility
 		return self::get( INPUT_REQUEST, $key, $defaultValue, $filter, $filterOptions );
 	}
 }
-
