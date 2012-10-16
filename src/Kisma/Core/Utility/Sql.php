@@ -214,7 +214,7 @@ class Sql extends \Kisma\Core\SeedUtility
 	{
 		if ( null !== self::$_connection )
 		{
-			unset( self::$_connection );
+			self::$_connection = null;
 		}
 
 		self::$_connection = $connection;
