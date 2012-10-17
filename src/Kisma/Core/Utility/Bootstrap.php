@@ -118,7 +118,7 @@ class Bootstrap extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\FormT
 
 		if ( null !== ( $_hint = Option::get( $attributes, 'hint', null, true ) ) )
 		{
-			$_hint = Markup::tag( 'span', array( 'class'=> 'help-block' ), $_hint );
+			$_hint = Markup::tag( 'span', array( 'class' => 'help-block' ), $_hint );
 		}
 
 		$_blockStart = $_blockEnd = null;
@@ -127,8 +127,8 @@ class Bootstrap extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\FormT
 		switch ( $this->_formType )
 		{
 			case self::Horizontal:
-				$_blockStart = Markup::tag( 'div', array( 'class'=> 'control-group' ), null, false );
-				$_inputStart = Markup::tag( 'div', array( 'class'=> 'controls' ), null, false );
+				$_blockStart = Markup::tag( 'div', array( 'class' => 'control-group' ), null, false );
+				$_inputStart = Markup::tag( 'div', array( 'class' => 'controls' ), null, false );
 				$_inputEnd = $_blockEnd = '</div>';
 
 				if ( !$_wrapInput )
@@ -275,8 +275,11 @@ HTML;
 
 	/**
 	 * @param array $items
+	 * @param bool  $logout If true, a "logout" item will be appended to the menu bar
+	 *
+	 * @return null|string
 	 */
-	public static function buildMenuItems( array $items = array() )
+	public static function buildMenuItems( array $items = array(), $logout = false )
 	{
 		$_liTags = null;
 
@@ -287,6 +290,14 @@ HTML;
 			$_liTags .= <<<HTML
 <li class="{$_class}"><a href="{$_menuItem['href']}">{$_linkName}</a></li>
 HTML;
+		}
+
+		if ( false !== $logout )
+		{
+			$_liTags .= <<<HTML
+<li class="pull-right"><a href="/app/logout/">Logout</a></li>
+HTML;
+
 		}
 
 		return $_liTags;
