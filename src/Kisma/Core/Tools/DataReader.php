@@ -107,6 +107,7 @@ class DataReader extends \Kisma\Core\Seed implements \Iterator, \Countable
 	 * @param string $name
 	 * @param array  $arguments
 	 *
+	 * @throws \Exception
 	 * @return mixed
 	 */
 	public function __call( $name, $arguments )
@@ -117,11 +118,17 @@ class DataReader extends \Kisma\Core\Seed implements \Iterator, \Countable
 			{
 				$_result = call_user_func_array( array( $this->_statement, $name ), $arguments );
 
+				if ( is_resource( $_result ) && 'stream' == get_resource_type( $_result ) )
+				{
+					return stream_get_contents( $_result );
+				}
+
 				return $_result;
 			}
 			catch ( \Exception $_ex )
 			{
 				\Kisma\Core\Utility\Log::error( 'PDO exception: ' . $_ex->getMessage() );
+				throw $_ex;
 			}
 		}
 	}
