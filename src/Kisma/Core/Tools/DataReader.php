@@ -113,7 +113,16 @@ class DataReader extends \Kisma\Core\Seed implements \Iterator, \Countable
 	{
 		if ( !empty( $this->_statement ) && method_exists( $this->_statement, $name ) )
 		{
-			return call_user_func_array( array( $this->_statement, $name ), $arguments );
+			try
+			{
+				$_result = call_user_func_array( array( $this->_statement, $name ), $arguments );
+
+				return $_result;
+			}
+			catch ( \Exception $_ex )
+			{
+				\Kisma\Core\Utility\Log::error( 'PDO exception: ' . $_ex->getMessage() );
+			}
 		}
 	}
 
