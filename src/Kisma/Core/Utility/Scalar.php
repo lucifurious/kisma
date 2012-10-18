@@ -76,6 +76,44 @@ class Scalar implements \Kisma\Core\Interfaces\SeedUtility
 	}
 
 	/**
+	 * Prepend an array
+	 *
+	 * @param array  $array
+	 * @param string $string
+	 * @param bool   $deep
+	 *
+	 * @return array
+	 */
+	public static function array_prepend( $array, $string, $deep = false )
+	{
+		if ( empty( $array ) || empty( $string ) )
+		{
+			return $array;
+		}
+
+		foreach ( $array as $key => $element )
+		{
+			if ( is_array( $element ) )
+			{
+				if ( $deep )
+				{
+					$array[$key] = self::array_prepend( $element, $string, $deep );
+				}
+				else
+				{
+					trigger_error( 'array_prepend: array element', E_USER_WARNING );
+				}
+			}
+			else
+			{
+				$array[$key] = $string . $element;
+			}
+		}
+
+		return $array;
+	}
+
+	/**
 	 * Takes a list of things and returns them in an array as the values. Keys are maintained.
 	 *
 	 * @param ...
