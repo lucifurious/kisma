@@ -58,8 +58,10 @@ class Log extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\SeedUtility
 	 */
 	public static function log( $message, $level = self::Info, $context = array(), $extra = null, $tag = null )
 	{
+		self::_checkLogFile();
+
 		//	If we're not debugging, don't log debug statements
-		if ( self::Debug == $level && !\Kisma::get( 'debug', false ) )
+		if ( self::Debug == $level && false === \Kisma::get( 'app.debug', false ) )
 		{
 			return true;
 		}
@@ -135,8 +137,7 @@ class Log extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\SeedUtility
 			self::DefaultLogFormat
 		) . PHP_EOL;
 
-		@error_log( $_entry, 3, self::$_defaultLog );
-		@flush();
+		error_log( $_entry, 3, self::$_defaultLog );
 
 		//	Set indent level...
 		self::$_currentIndent += $_newIndent;
@@ -407,9 +408,16 @@ class Log extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\SeedUtility
 		return self::$_defaultLog;
 	}
 
-}
+	/**
+	 * Makes sure we have a log file name and path
+	 */
+	protected static function _checkLogFile()
+	{
+		//	Set a name for the default log
+		if ( null === self::$_defaultLog )
+		{
+			Log::setDefaultLog( dirname( \Kisma::getBasePath() ) . '/log/kisma.log' );
+		}
+	}
 
-/**
- * Set a name for the default log
- */
-Log::setDefaultLog( dirname( \Kisma::getBasePath() ) . '/log/kisma.log' );
+}
