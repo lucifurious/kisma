@@ -185,6 +185,19 @@ class Seed implements \Kisma\Core\Interfaces\Seed, \Kisma\Core\Interfaces\Publis
 	//*************************************************************************
 
 	/**
+	 * @param      $eventName
+	 * @param null $eventData
+	 *
+	 * @return bool|int
+	 * @deprecated Use Seed::publish() instead
+	 * @see        Seed::publish()
+	 */
+	public function trigger( $eventName, $eventData = null )
+	{
+		return $this->publish( $eventName, $eventData );
+	}
+
+	/**
 	 * Triggers an object event to all subscribers. Convenient wrapper on EM::publish
 	 *
 	 * @param string $eventName
@@ -218,13 +231,11 @@ class Seed implements \Kisma\Core\Interfaces\Seed, \Kisma\Core\Interfaces\Publis
 
 		if ( null === $listener )
 		{
-			call_user_func(
+			return call_user_func(
 				array( $this->_eventManager, 'unsubscribe' ),
 				$this,
 				$tag
 			);
-
-			return;
 		}
 
 		return call_user_func(

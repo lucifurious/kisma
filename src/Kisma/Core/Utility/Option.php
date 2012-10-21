@@ -185,17 +185,33 @@ class Option
 	 */
 	public static function remove( &$options = array(), $key )
 	{
+		$_originalValue = null;
+
 		if ( self::contains( $options, $key ) )
 		{
 			if ( is_array( $options ) )
 			{
-				unset( $options[Inflector::tag( $key, true )] );
+				$key = Inflector::tag( $key, true );
+
+				if ( isset( $options[$key] ) )
+				{
+					$_originalValue = $options[$key];
+				}
+
+				unset( $options[$key] );
 			}
 			else
 			{
+				if ( isset( $options->$key ) )
+				{
+					$_originalValue = $options->{$key};
+				}
+
 				unset( $options->{$key} );
 			}
 		}
+
+		return $_originalValue;
 	}
 
 	/**
