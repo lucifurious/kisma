@@ -132,12 +132,28 @@ class Kisma implements \Kisma\Core\Interfaces\Publisher, \Kisma\Core\Interfaces\
 		return true;
 	}
 
+	/**
+	 * @param Composer\Script\Event $event
+	 */
+	public static function postInstall(\Composer\Script\Event $event )
+	{
+		//	Nada
+	}
+
+	/**
+	 * @param Composer\Script\Event $event
+	 */
+	public static function postUpdate( \Composer\Script\Event $event )
+	{
+		//	Nada
+	}
+
 	//*************************************************************************
 	//* Properties
 	//*************************************************************************
 
 	/**
-	 * @return null|\Composer\Autoload\ClassLoader
+	 * @return \Composer\Autoload\ClassLoader
 	 */
 	public static function getAutoLoader()
 	{

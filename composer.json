@@ -41,9 +41,9 @@
 		}
 	],
 	"scripts":      {
-		"post-update-cmd":      "\\Kisma\\Utility\\Composer::postUpdate",
+		"post-update-cmd":      "\\Kisma::postUpdate",
 		"post-package-install": [
-			"\\Kisma\\Utility\\Composer::postPackageInstall"
+			"\\Kisma::postInstall"
 		]
 	}
 }

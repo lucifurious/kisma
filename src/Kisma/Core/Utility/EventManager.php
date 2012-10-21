@@ -286,7 +286,7 @@ class EventManager extends \Kisma\Core\SeedUtility
 		{
 			$_publisherId = $publisher->getId();
 
-			\Kisma\Core\Utility\Log::debug( '---- Publish "' . $_eventTag . '" from "' . $_publisherId . '"' );
+			Log::debug( '---- Publish "' . $_eventTag . '" from "' . $_publisherId . '"' );
 
 			foreach ( self::$_eventMap[$_eventTag] as $_listenerIndex => $_listeners )
 			{
