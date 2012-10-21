@@ -11,19 +11,25 @@ class Composer
 {
 	/**
 	 * @param \Composer\Script\Event $event
+	 *
+	 * @internal param $
 	 */
-	public static function postUpdate( Event $event )
+	public static function postUpdate( \Composer\Script\Event $event )
 	{
 		$_composer = $event->getComposer();
+		$_package = $_composer->getPackage();
+
 		// do stuff
 	}
 
 	/**
 	 * @param \Composer\Script\Event $event
 	 */
-	public static function postPackageInstall( Event $event )
+	public static function postPackageInstall( \Composer\Script\Event $event )
 	{
-		$_installedPackage = $event->getOperation()->getPackage();
+		$_composer = $event->getComposer();
+		$_package = $_composer->getPackage();
+
 		// do stuff
 	}
 }

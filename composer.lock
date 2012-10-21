@@ -1,5 +1,5 @@
 {
-    "hash": "4fc730c18204c876f3afba36410d0bd8",
+    "hash": "56dc30d19a7994faa66ee3b59c3e6b2a",
     "packages": [
         {
             "name": "twig/extensions",
@@ -50,22 +50,22 @@
         },
         {
             "name": "twig/twig",
-            "version": "v1.10.0",
+            "version": "v1.10.3",
             "source": {
                 "type": "git",
                 "url": "git://github.com/fabpot/Twig.git",
-                "reference": "v1.10.0"
+                "reference": "v1.10.3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/fabpot/Twig/zipball/v1.10.0",
-                "reference": "v1.10.0",
+                "url": "https://github.com/fabpot/Twig/zipball/v1.10.3",
+                "reference": "v1.10.3",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.2.4"
             },
-            "time": "2012-09-28 20:11:39",
+            "time": "2012-10-19 03:45:49",
             "type": "library",
             "extra": {
                 "branch-alias": {
