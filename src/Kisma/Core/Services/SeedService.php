@@ -13,7 +13,6 @@ namespace Kisma\Core\Services;
  *
  * @property bool|int                        $state       The current state of the service
  * @property \Kisma\Core\Interfaces\Consumer $consumer    The consumer, if any, who owns this service.
- * @property SeedRequest                     $request     The request
  */
 abstract class SeedService extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\Service, \Kisma\Core\Interfaces\Services\ServiceState
 {
@@ -26,10 +25,6 @@ abstract class SeedService extends \Kisma\Core\Seed implements \Kisma\Core\Inter
 	 */
 	protected $_consumer = null;
 	/**
-	 * @var \Kisma\Core\Services\SeedRequest
-	 */
-	protected $_request = null;
-	/**
 	 * @var bool|int The current state of the service
 	 */
 	protected $_state = self::Uninitialized;
@@ -41,18 +36,12 @@ abstract class SeedService extends \Kisma\Core\Seed implements \Kisma\Core\Inter
 	/**
 	 * {@InheritDoc}
 	 */
-	public function initialize( $consumer = null, $request = null )
+	public function initialize( $consumer = null )
 	{
 		$this->_consumer = $consumer;
-		$this->_request = $request;
 
 		return true;
 	}
-
-	/**
-	 * {@InheritDoc}
-	 */
-	abstract public function processRequest( $request );
 
 	//*************************************************************************
 	//* Default Event Handlers
@@ -113,26 +102,6 @@ abstract class SeedService extends \Kisma\Core\Seed implements \Kisma\Core\Inter
 	public function getConsumer()
 	{
 		return $this->_consumer;
-	}
-
-	/**
-	 * @param \Kisma\Core\Services\SeedRequest $request
-	 *
-	 * @return SeedService
-	 */
-	public function setRequest( $request )
-	{
-		$this->_request = $request;
-
-		return $this;
-	}
-
-	/**
-	 * @return \Kisma\Core\Services\SeedRequest
-	 */
-	public function getRequest()
-	{
-		return $this->_request;
 	}
 
 	/**
