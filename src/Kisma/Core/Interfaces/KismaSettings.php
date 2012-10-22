@@ -14,6 +14,10 @@ interface KismaSettings
 	//*************************************************************************
 
 	/**
+	 * @var string Set to non-empty to enable debug logging
+	 */
+	const Debug = 'app.debug';
+	/**
 	 * @var string The base path of the Kisma library
 	 */
 	const BasePath = 'app.base_path';

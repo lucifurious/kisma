@@ -7,7 +7,7 @@ namespace Kisma\Core\Utility;
  * FilterInput
  * Helpers for working with filter_input and filter_var
  */
-class FilterInput implements \Kisma\Core\Interfaces\SeedUtility
+class FilterInput implements \Kisma\Core\Interfaces\UtilityLike
 {
 	//*************************************************************************
 	//* Filter Getters

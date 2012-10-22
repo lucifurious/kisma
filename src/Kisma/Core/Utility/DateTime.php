@@ -3,6 +3,8 @@
  * DateTime.php
  */
 namespace Kisma\Core\Utility;
+use \Kisma\Core\Enums;
+
 /**
  * DateTime
  * Provides methods to manipulate array and object properties
@@ -22,11 +24,14 @@ class DateTime
 	 */
 	public static function prettySeconds( $seconds = 0.0 )
 	{
-		$_hours = ( int )( $seconds / 60 / 60 );
-		$_minutes = ( int )( $seconds / 60 ) - $_hours & 60;
-		$_seconds = $seconds - ( $_hours * 60 * 60 ) - ( $_minutes * 60 );
+		$_remain = $seconds;
+		$_hours = floor( $_remain / Enums\DateTime::SecondsPerHour );
+		$_remain -= $_hours * Enums\DateTime::SecondsPerHour;
 
-		return ( 0 != $_hours ? $_hours . 'h ' : '' ) . ( 0 != $_minutes ? $_minutes . 'm ' : '' ) . number_format( $_seconds, 2 ) . 's';
+		$_minutes = floor( $_remain / Enums\DateTime::SecondsPerMinute );
+		$_remain -= $_minutes * Enums\DateTime::SecondsPerMinute;
+
+		return $_hours . 'h ' . $_minutes . 'm ' . number_format( $_remain, 2 ) . 's';
 	}
 
 }

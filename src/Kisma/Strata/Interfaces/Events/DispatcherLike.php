@@ -7,7 +7,7 @@ namespace Kisma\Strata\Interfaces\Events;
  * DispatcherLike
  * Events thrown by DispatcherLike things
  */
-interface DispatcherLike extends \Kisma\Core\Interfaces\Seed
+interface DispatcherLike extends \Kisma\Core\Interfaces\SeedLike
 {
 	//*************************************************************************
 	//* Constants

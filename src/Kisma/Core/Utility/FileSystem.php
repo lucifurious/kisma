@@ -13,7 +13,7 @@ use Kisma\Core\Exceptions\UtilityException;
  * @property-read $fileHandle The handle of the current file
  * @property-read $fileName   The name of the current file
  */
-class FileSystem extends Seed implements \Kisma\Core\Interfaces\SeedUtility, \Kisma\Core\Interfaces\GlobFlags
+class FileSystem extends Seed implements \Kisma\Core\Interfaces\UtilityLike, \Kisma\Core\Interfaces\GlobFlags
 {
 	//********************************************************************************
 	//* Members

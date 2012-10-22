@@ -2,7 +2,7 @@
 /**
  * SeedTest_Object
  */
-class SeedTest_Object extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\Subscriber
+class SeedTest_Object extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\SubscriberLike
 {
 	//*************************************************************************
 	//* Public Members
@@ -20,6 +20,10 @@ class SeedTest_Object extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces
 	 * @var \Kisma\Core\SeedTest
 	 */
 	public $tester = null;
+	/**
+	 * @var int
+	 */
+	public static $counter = 0;
 
 	//*************************************************************************
 	//* Public Methods
@@ -39,6 +43,7 @@ class SeedTest_Object extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces
 	public function onBeforeDestruct( $event = null )
 	{
 		$this->tester->destructorEventFired( 1 );
+
 		return true;
 	}
 }

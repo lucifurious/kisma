@@ -11,17 +11,17 @@ namespace Kisma\Core\Services;
  *
  * onSuccess, onFailure, and onComplete
  *
- * @property bool|int                        $state       The current state of the service
- * @property \Kisma\Core\Interfaces\Consumer $consumer    The consumer, if any, who owns this service.
+ * @property bool|int                            $state       The current state of the service
+ * @property \Kisma\Core\Interfaces\ConsumerLike $consumer    The consumer, if any, who owns this service.
  */
-abstract class SeedService extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\Service, \Kisma\Core\Interfaces\Services\ServiceState
+abstract class SeedService extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\ServiceLike, \Kisma\Core\Interfaces\Services\ServiceState
 {
 	//*************************************************************************
 	//* Private Members
 	//*************************************************************************
 
 	/**
-	 * @var \Kisma\Core\Interfaces\Consumer
+	 * @var \Kisma\Core\Interfaces\ConsumerLike
 	 */
 	protected $_consumer = null;
 	/**
@@ -85,7 +85,7 @@ abstract class SeedService extends \Kisma\Core\Seed implements \Kisma\Core\Inter
 	//*************************************************************************
 
 	/**
-	 * @param \Kisma\Core\Interfaces\Consumer $consumer
+	 * @param \Kisma\Core\Interfaces\ConsumerLike $consumer
 	 *
 	 * @return SeedService
 	 */
@@ -97,7 +97,7 @@ abstract class SeedService extends \Kisma\Core\Seed implements \Kisma\Core\Inter
 	}
 
 	/**
-	 * @return \Kisma\Core\Interfaces\Consumer
+	 * @return \Kisma\Core\Interfaces\ConsumerLike
 	 */
 	public function getConsumer()
 	{

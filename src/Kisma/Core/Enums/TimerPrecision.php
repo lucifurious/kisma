@@ -2,12 +2,11 @@
 /**
  * TimerPrecision.php
  */
-namespace Kisma\Core\Interfaces;
-
+namespace Kisma\Core\Enums;
 /**
  * TimerPrecision
  */
-interface TimerPrecision
+class TimerPrecision extends SeedEnum
 {
 	//*************************************************************************
 	//* Constants

@@ -3,6 +3,8 @@
  * Seed.php
  */
 namespace Kisma\Core;
+use \Kisma\Core\Utility;
+
 /**
  * Seed
  * A nugget of goodness that grows into something wonderful
@@ -54,17 +56,8 @@ namespace Kisma\Core;
  * @property bool        $discoverEvents  Defaults to true.
  * @property string      $eventManager    Defaults to \Kisma\Core\Utility\EventManager
  */
-class Seed implements \Kisma\Core\Interfaces\Seed, \Kisma\Core\Interfaces\Publisher
+class Seed implements \Kisma\Core\Interfaces\SeedLike, \Kisma\Core\Interfaces\PublisherLike
 {
-	//*************************************************************************
-	//* Constants
-	//*************************************************************************
-
-	/**
-	 * @var string The default event manager for an object
-	 */
-	const DefaultEventManager = '\\Kisma\\Core\\Utility\\EventManager';
-
 	//********************************************************************************
 	//* Member Variables
 	//********************************************************************************
@@ -102,9 +95,9 @@ class Seed implements \Kisma\Core\Interfaces\Seed, \Kisma\Core\Interfaces\Publis
 	public function __construct( $settings = array() )
 	{
 		//	Since $_id is read-only we remove if you try to set it
-		if ( null !== \Kisma\Core\Utility\Option::get( $settings, 'id' ) )
+		if ( null !== ( $_id = Utility\Option::get( $settings, 'id' ) ) )
 		{
-			\Kisma\Core\Utility\Option::remove( $settings, 'id' );
+			Utility\Option::remove( $settings, 'id' );
 		}
 
 		//	Otherwise, set the rest
@@ -112,7 +105,7 @@ class Seed implements \Kisma\Core\Interfaces\Seed, \Kisma\Core\Interfaces\Publis
 		{
 			if ( property_exists( $this, $_key ) || property_exists( $this, '_' . $_key ) )
 			{
-				\Kisma\Core\Utility\Option::set( $this, $_key, $_value );
+				Utility\Option::set( $this, $_key, $_value );
 				unset( $settings, $_key );
 			}
 		}
@@ -127,7 +120,8 @@ class Seed implements \Kisma\Core\Interfaces\Seed, \Kisma\Core\Interfaces\Publis
 	public function __wakeup()
 	{
 		//	This is my hash. There are many like it, but this one is mine.
-		$this->_id = sha1( spl_object_hash( $this ) . getmypid() . microtime( true ) ) . microtime( true );
+		$this->_id = hash( 'sha512', spl_object_hash( $this ) . getmypid() . microtime( true ) );
+		Utility\Log::debug( 'New seed spawned: ' . $this->_id );
 
 		//	Auto-set tag and name if they're empty
 		if ( null === $this->_tag )
@@ -140,23 +134,21 @@ class Seed implements \Kisma\Core\Interfaces\Seed, \Kisma\Core\Interfaces\Publis
 			$this->_name = \Kisma\Core\Utility\Inflector::tag( get_called_class() );
 		}
 
-		//	Add the event service and attach any event handlers we find...
-		if ( $this instanceof \Kisma\Core\Interfaces\Subscriber && false !== $this->_eventManager )
-		{
-			if ( null !== $this->_eventManager && false !== $this->_discoverEvents )
-			{
-				//	Subscribe to events...
-				call_user_func(
-					array( $this->_eventManager, 'subscribe' ),
-					$this
-				);
-			}
-		}
-		else
+		if ( !( $this instanceof \Kisma\Core\Interfaces\SubscriberLike ) || empty( $this->_eventManager ) )
 		{
 			//	Ignore event junk later
 			$this->_eventManager = false;
 			$this->_discoverEvents = false;
+		}
+
+		//	Add the event service and attach any event handlers we find...
+		if ( false !== $this->_discoverEvents )
+		{
+			//	Subscribe to events...
+			call_user_func(
+				array( $this->_eventManager, 'subscribe' ),
+				$this
+			);
 		}
 
 		//	Publish after_construct event
@@ -185,19 +177,6 @@ class Seed implements \Kisma\Core\Interfaces\Seed, \Kisma\Core\Interfaces\Publis
 	//*************************************************************************
 
 	/**
-	 * @param      $eventName
-	 * @param null $eventData
-	 *
-	 * @return bool|int
-	 * @deprecated Use Seed::publish() instead
-	 * @see        Seed::publish()
-	 */
-	public function trigger( $eventName, $eventData = null )
-	{
-		return $this->publish( $eventName, $eventData );
-	}
-
-	/**
 	 * Triggers an object event to all subscribers. Convenient wrapper on EM::publish
 	 *
 	 * @param string $eventName
@@ -224,20 +203,12 @@ class Seed implements \Kisma\Core\Interfaces\Seed, \Kisma\Core\Interfaces\Publis
 	 */
 	public function on( $tag, $listener = null )
 	{
-		if ( empty( $this->_eventManager ) || !( $this instanceof \Kisma\Core\Interfaces\Subscriber ) )
+		if ( !( $this instanceof \Kisma\Core\Interfaces\SubscriberLike ) || empty( $this->_eventManager ) )
 		{
 			return false;
 		}
 
-		if ( null === $listener )
-		{
-			return call_user_func(
-				array( $this->_eventManager, 'unsubscribe' ),
-				$this,
-				$tag
-			);
-		}
-
+		//	Otherwise add handler
 		return call_user_func(
 			array( $this->_eventManager, 'on' ),
 			$this,

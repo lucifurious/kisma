@@ -7,7 +7,7 @@ namespace Kisma\Strata\Interfaces\Events;
  * RouteLike
  * Events thrown by RouteLike things
  */
-interface RouteLike extends \Kisma\Core\Interfaces\Seed
+interface RouteLike extends \Kisma\Core\Interfaces\SeedLike
 {
 	//*************************************************************************
 	//* Constants

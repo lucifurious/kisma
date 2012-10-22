@@ -7,7 +7,7 @@ namespace Kisma\Core;
  * SeedUtility
  * The base class for utilities
  */
-class SeedUtility implements \Kisma\Core\Interfaces\SeedUtility
+class SeedUtility implements \Kisma\Core\Interfaces\UtilityLike
 {
 	//*************************************************************************
 	//* Private Members

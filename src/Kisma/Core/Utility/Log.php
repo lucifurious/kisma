@@ -10,7 +10,7 @@ namespace Kisma\Core\Utility;
  * Log
  * A generic log helper
  */
-class Log extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\SeedUtility, \Kisma\Core\Interfaces\Levels
+class Log extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\UtilityLike, \Kisma\Core\Interfaces\Levels
 {
 	//*************************************************************************
 	//* Constants
@@ -58,13 +58,23 @@ class Log extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\SeedUtility
 	 */
 	public static function log( $message, $level = self::Info, $context = array(), $extra = null, $tag = null )
 	{
-		self::_checkLogFile();
-
 		//	If we're not debugging, don't log debug statements
-		if ( self::Debug == $level && false === \Kisma::get( 'app.debug', false ) )
+		if ( self::Debug == $level )
 		{
-			return true;
+			$_debug = \Kisma::getDebug();
+
+			if ( is_callable( $_debug ) )
+			{
+				$_debug = call_user_func( $_debug, $message, $level, $context, $extra, $tag );
+			}
+
+			if ( false === $_debug )
+			{
+				return true;
+			}
 		}
+
+		self::_checkLogFile();
 
 		$_timestamp = time();
 
@@ -85,31 +95,6 @@ class Log extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\SeedUtility
 		}
 
 		$_levelName = self::_getLogLevel( $level );
-
-		if ( null !== ( $_result = Option::get( $context, 'result' ) ) )
-		{
-			if ( is_scalar( $_result ) )
-			{
-				if ( is_bool( $_result ) )
-				{
-					$_result = ( $_result ? '[TRUE]' : '[FALSE]' );
-				}
-				else
-				{
-					$_result = '[' . $_result . ']';
-				}
-
-			}
-			else
-			{
-				$_result = print_r( $_result, true );
-			}
-		}
-
-		if ( null !== ( $_eventId = Option::get( $context, 'event_id' ) ) )
-		{
-			$_eventId = '[' . $_eventId . ']';
-		}
 
 		$_entry = self::formatLogEntry(
 			array(

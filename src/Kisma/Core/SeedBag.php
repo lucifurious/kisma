@@ -111,7 +111,7 @@ class SeedBag extends Seed implements \ArrayAccess, \Countable, \IteratorAggrega
 	 */
 	public function set( $key, $value, $overwrite = true )
 	{
-		if ( null === $value && $key instanceof Interfaces\Seed )
+		if ( null === $value && $key instanceof Interfaces\SeedLike )
 		{
 			$value = $key;
 			$key = $value->getId();
@@ -141,7 +141,7 @@ class SeedBag extends Seed implements \ArrayAccess, \Countable, \IteratorAggrega
 	 */
 	public function remove( $key )
 	{
-		if ( $key instanceof Interfaces\Seed )
+		if ( $key instanceof Interfaces\SeedLike )
 		{
 			$key = $key->getId();
 		}
@@ -194,7 +194,7 @@ class SeedBag extends Seed implements \ArrayAccess, \Countable, \IteratorAggrega
 	 */
 	public function contains( $key )
 	{
-		if ( $key instanceof Interfaces\Seed )
+		if ( $key instanceof Interfaces\SeedLike )
 		{
 			$key = $key->getId();
 		}
