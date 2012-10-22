@@ -7,7 +7,7 @@ namespace Kisma\Core\Interfaces;
  * BagLike
  * Something that can contain KVPs. Ya know, like a bag?
  */
-interface BagLike extends Seed
+interface BagLike extends \Kisma\Core\Interfaces\Events\SeedLike
 {
 	//*************************************************************************
 	//* Public Methods
