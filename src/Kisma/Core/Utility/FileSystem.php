@@ -29,27 +29,6 @@ class FileSystem extends Seed implements \Kisma\Core\Interfaces\UtilityLike, \Ki
 	protected $_fileHandle = false;
 
 	//*************************************************************************
-	//* Constants
-	//*************************************************************************
-
-	/**
-	 * @var int
-	 */
-	const GLOB_NODIR = 0x0100;
-	/**
-	 * @var int
-	 */
-	const GLOB_PATH = 0x0200;
-	/**
-	 * @var int
-	 */
-	const GLOB_NODOTS = 0x0400;
-	/**
-	 * @var int
-	 */
-	const GLOB_RECURSE = 0x0800;
-
-	//*************************************************************************
 	//* Public Methods
 	//*************************************************************************
 
