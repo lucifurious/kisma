@@ -1,14 +1,13 @@
 <?php
 /**
- * Seed.php
+ * PublisherLike.php
  */
 namespace Kisma\Core\Interfaces\Events;
-
 /**
- * Seed
- * Defines the event interface for all seeds
+ * PublisherLike
+ * Events for event publishers
  */
-interface Seed
+interface PublisherLike
 {
 	//*************************************************************************
 	//* Constants
@@ -17,10 +16,10 @@ interface Seed
 	/**
 	 * @var string
 	 */
-	const AfterConstruct = 'kisma.core.seed.after_construct';
+	const BeforePublish = 'kisma.core.publisher.before_publish';
 	/**
 	 * @var string
 	 */
-	const BeforeDestruct = 'kisma.core.seed.before_destruct';
+	const AfterPublish = 'kisma.core.publisher.after_publish';
 
 }

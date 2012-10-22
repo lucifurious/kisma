@@ -22,7 +22,7 @@ namespace Kisma\Core\Utility;
  * Inflector
  * Provides Inflector manipulation routines
  */
-class Inflector implements \Kisma\Core\Interfaces\SeedUtility
+class Inflector implements \Kisma\Core\Interfaces\UtilityLike
 {
 	//*************************************************************************
 	//* Public Methods

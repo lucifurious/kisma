@@ -7,7 +7,7 @@ namespace Kisma\Core\Utility;
  * Hasher
  * Hashing utility class
  */
-class Hasher extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\SeedUtility, \Kisma\Core\Interfaces\HashSeed, \Kisma\Core\Interfaces\HashType
+class Hasher extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\UtilityLike, \Kisma\Core\Interfaces\HashSeed, \Kisma\Core\Interfaces\HashType
 {
 	//********************************************************************************
 	//* Private Members

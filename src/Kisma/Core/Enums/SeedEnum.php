@@ -36,10 +36,11 @@ abstract class SeedEnum
 	 * Returns a hash of the called class's constants. Caches for speed
 	 * (class cache hash, say that ten times fast!).
 	 *
-	 * @static
+	 * @param bool $flipped If true, the array is flipped before return
+	 *
 	 * @return array
 	 */
-	public static function getDefinedConstants()
+	public static function getDefinedConstants( $flipped = false )
 	{
 		static $_constants = null;
 
@@ -49,7 +50,7 @@ abstract class SeedEnum
 			$_constants = $_mirror->getConstants();
 		}
 
-		return $_constants;
+		return false === $flipped ? $_constants : array_flip( $_constants );
 	}
 
 	/**
@@ -80,15 +81,14 @@ abstract class SeedEnum
 	 */
 	public static function nameOf( $constant )
 	{
-		return
-			\Kisma\Core\Utility\Option::get(
-				self::getDefinedConstants(),
-				$constant,
-				function () use ( $constant )
-				{
-					throw new \InvalidArgumentException( 'The constant "' . $constant . '" is not defined.' );
-				}
-			);
+		$_constants = self::getDefinedConstants( true );
+
+		if ( !\Kisma\Core\Utility\Option::contains( $_constants, $constant ) )
+		{
+			throw new \InvalidArgumentException( 'The constant "' . $constant . '" is not defined.' );
+		}
+
+		return \Kisma\Core\Utility\Option::get( $_constants, $constant );
 	}
 
 	/**

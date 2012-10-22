@@ -10,12 +10,12 @@
  * @license   http://github.com/lucifurious/kisma/blob/master/LICENSE
  * @author    Jerry Ablan <get.kisma@gmail.com>
  */
-namespace Kisma\Core\Interfaces;
+namespace Kisma\Core\Enums;
 
 /**
  * Standard ANSI color attributes
  */
-interface AnsiColor
+class AnsiColor extends SeedEnum
 {
 	//*************************************************************************
 	//* Constants

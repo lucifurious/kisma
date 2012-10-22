@@ -1,13 +1,14 @@
 <?php
 /**
- * Controller.php
+ * SeedLike.php
  */
 namespace Kisma\Core\Interfaces\Events;
+
 /**
- * Controller
- * Events for Controllers
+ * SeedLike
+ * Defines the event interface for all seeds
  */
-interface Controller
+interface SeedLike
 {
 	//*************************************************************************
 	//* Constants
@@ -16,10 +17,10 @@ interface Controller
 	/**
 	 * @var string
 	 */
-	const NewRequest = 'kisma.core.Controller.new_request';
+	const AfterConstruct = 'kisma.core.seed_like.after_construct';
 	/**
 	 * @var string
 	 */
-	const AfterDispatch = 'kisma.core.Controller.after_dispatch';
+	const BeforeDestruct = 'kisma.core.seed_like.before_destruct';
 
 }

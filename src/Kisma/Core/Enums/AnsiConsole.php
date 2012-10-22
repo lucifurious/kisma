@@ -3,12 +3,12 @@
  * @file
  * Standard ANSI console attributes
  */
-namespace Kisma\Core\Interfaces;
+namespace Kisma\Core\Enums;
 
 /**
  * Standard ANSI console attributes
  */
-interface AnsiConsole
+class AnsiConsole extends SeedEnum
 {
 	//*************************************************************************
 	//* Constants

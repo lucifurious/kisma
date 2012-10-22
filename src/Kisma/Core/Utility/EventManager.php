@@ -42,9 +42,9 @@ class EventManager extends \Kisma\Core\SeedUtility
 	/**
 	 * Wires up any event handlers automatically
 	 *
-	 * @param \Kisma\Core\Interfaces\Subscriber $object
-	 * @param array|null                        $listeners Array of 'event.name' => callback/closure pairs
-	 * @param string                            $signature
+	 * @param \Kisma\Core\Interfaces\SubscriberLike $object
+	 * @param array|null                            $listeners Array of 'event.name' => callback/closure pairs
+	 * @param string                                $signature
 	 *
 	 * @return void
 	 */
@@ -86,8 +86,8 @@ class EventManager extends \Kisma\Core\SeedUtility
 	 * Builds a hash of events and handlers that are present in this object based on the event handler signature.
 	 * This merely builds the hash, nothing is done with it.
 	 *
-	 * @param \Kisma\Core\Interfaces\Subscriber $object
-	 * @param string                            $signature
+	 * @param \Kisma\Core\Interfaces\SubscriberLike $object
+	 * @param string                                $signature
 	 *
 	 * @internal param bool $appendToList
 	 *
@@ -99,7 +99,7 @@ class EventManager extends \Kisma\Core\SeedUtility
 
 		$_objectId = $object->getId();
 
-		if ( !( $object instanceof \Kisma\Core\Interfaces\Subscriber ) )
+		if ( !( $object instanceof \Kisma\Core\Interfaces\SubscriberLike ) )
 		{
 			//	Not a subscriber, beat it...
 			$_discovered[$_objectId] = true;
@@ -159,9 +159,9 @@ class EventManager extends \Kisma\Core\SeedUtility
 	}
 
 	/**
-	 * @param \Kisma\Core\Interfaces\Subscriber  $object
-	 * @param string                             $tag
-	 * @param callable|null                      $listener
+	 * @param \Kisma\Core\Interfaces\SubscriberLike  $object
+	 * @param string                                 $tag
+	 * @param callable|null                          $listener
 	 */
 	public static function on( $object, $tag, $listener = null )
 	{
@@ -172,29 +172,30 @@ class EventManager extends \Kisma\Core\SeedUtility
 			return;
 		}
 
+		$_tag = Inflector::tag( $tag, true );
 		$_objectId = $object->getId();
 
-		if ( !isset( self::$_eventMap[$tag] ) )
+		if ( !isset( self::$_eventMap[$_tag] ) )
 		{
-			self::$_eventMap[$tag] = array();
+			self::$_eventMap[$_tag] = array();
 		}
 
-		if ( !isset( self::$_eventMap[$tag][$_objectId] ) )
+		if ( !isset( self::$_eventMap[$_tag][$_objectId] ) )
 		{
-			$_listeners[$tag][$_objectId] = array();
+			$_listeners[$_tag][$_objectId] = array();
 		}
 
-		self::$_eventMap[$tag][$_objectId][] = $listener;
+		self::$_eventMap[$_tag][$_objectId][] = $listener;
 	}
 
 	/**
-	 * @param \Kisma\Core\Interfaces\Subscriber $object
-	 * @param string                            $eventName
+	 * @param \Kisma\Core\Interfaces\SubscriberLike $object
+	 * @param string                                $eventName
 	 */
 	public static function unsubscribe( $object, $eventName = null )
 	{
 		$_objectId = $object->getId();
-		$eventName = Inflector::tag( $eventName, true );
+		$_tag = Inflector::tag( $eventName, true );
 
 		foreach ( self::$_eventMap as $_eventTag => $_subscribers )
 		{
@@ -204,41 +205,41 @@ class EventManager extends \Kisma\Core\SeedUtility
 			{
 				if ( $_objectId == $_subscriberId )
 				{
-					/** @var $_closures \Closure[] */
 					foreach ( Option::clean( $_closures ) as $_index => $_closure )
 					{
 						if ( version_compare( PHP_VERSION, '5.4.0', '>=' ) )
 						{
-							\Closure::bind( $_closure, null );
+							/** @noinspection PhpUndefinedMethodInspection */
+							$_closure->bindTo( null );
 						}
 
 						//	Remove and reindex the map
-						unset( self::$_eventMap[$_eventTag][$_subscriberId][$_index] );
+						unset( self::$_eventMap[$_eventTag][$_subscriberId][$_index], $_closure );
 						self::$_eventMap[$_eventTag][$_subscriberId] = array_values( self::$_eventMap[$_eventTag][$_subscriberId] );
 					}
 				}
 			}
 
-			if ( $_eventTag == $eventName )
+			if ( $_eventTag == $_tag )
 			{
 				break;
 			}
 		}
 
-//		foreach ( self::$_eventMap as $_eventTag => $_subscriberId )
-//		{
-//			if ( $_objectId == $_subscriberId )
-//			{
-//				unset( self::$_eventMap[$_eventTag][$_objectId] );
-//
-//				Log::debug(
-//					'-- "' . $object->getTag() . '" unsubscribed from "' . $_eventTag . '"',
-//					array(
-//						'tag'     => $_subscriberId,
-//					)
-//				);
-//			}
-//		}
+		foreach ( self::$_eventMap as $_eventTag => $_subscriberId )
+		{
+			if ( $_objectId == $_subscriberId )
+			{
+				unset( self::$_eventMap[$_eventTag][$_objectId] );
+
+				Log::debug(
+					'-- "' . $object->getTag() . '" unsubscribed from "' . $_eventTag . '"',
+					array(
+						'tag' => $_subscriberId,
+					)
+				);
+			}
+		}
 	}
 
 	/**
@@ -246,9 +247,9 @@ class EventManager extends \Kisma\Core\SeedUtility
 	 *
 	 * @static
 	 *
-	 * @param null|\Kisma\Core\Interfaces\Subscriber $publisher
-	 * @param string                                 $eventName
-	 * @param mixed                                  $eventData
+	 * @param null|\Kisma\Core\Interfaces\SubscriberLike $publisher
+	 * @param string                                     $eventName
+	 * @param mixed                                      $eventData
 	 *
 	 * @throws \Kisma\Core\Exceptions\InvalidEventHandlerException
 	 * @return bool|int
@@ -286,7 +287,7 @@ class EventManager extends \Kisma\Core\SeedUtility
 		{
 			$_publisherId = $publisher->getId();
 
-			\Kisma\Core\Utility\Log::debug( '---- Publish "' . $_eventTag . '" from "' . $_publisherId . '"' );
+			Log::debug( '---- Publish "' . $_eventTag . '" from "' . $_publisherId . '"' );
 
 			foreach ( self::$_eventMap[$_eventTag] as $_listenerIndex => $_listeners )
 			{
@@ -362,7 +363,18 @@ class EventManager extends \Kisma\Core\SeedUtility
 	public static function canPublish( $object )
 	{
 		//	Publisher with an event manager?
-		return ( $object instanceof \Kisma\Core\Interfaces\Events\Publisher );
+		return ( $object instanceof \Kisma\Core\Interfaces\Events\PublisherLike );
+	}
+
+	/**
+	 * @param object $object
+	 *
+	 * @return bool|string
+	 */
+	public static function isSubscriber( $object )
+	{
+		//	A subscriber?
+		return ( $object instanceof \Kisma\Core\Interfaces\SubscriberLike );
 	}
 
 	/**
@@ -372,7 +384,7 @@ class EventManager extends \Kisma\Core\SeedUtility
 	 */
 	public static function generateEventId( $event )
 	{
-		return sha1( $event->getSource()->getId() . getmypid() . microtime( true ) ) . '.' . self::$_lastEventId++;
+		return hash( 'sha256', $event->getSource()->getId() . getmypid() . microtime( true ) ) . '.' . self::$_lastEventId++;
 	}
 
 	//*************************************************************************

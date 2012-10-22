@@ -10,7 +10,7 @@ namespace Kisma\Core\Utility;
  * Log
  * A generic log helper
  */
-class Log extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\SeedUtility, \Kisma\Core\Interfaces\Levels
+class Log extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\UtilityLike, \Kisma\Core\Interfaces\Levels
 {
 	//*************************************************************************
 	//* Constants
@@ -19,11 +19,7 @@ class Log extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\SeedUtility
 	/**
 	 * @var string The default log line format
 	 */
-	const DefaultLogFormat = '%%level%% %%date%% %%time%% %%context_tag%%: %%message%% %%result%% %%event_id%%';
-	/**
-	 * @var string The default log line format
-	 */
-	const AlternateLogFormat = '%%level%% %%date%% %%time%% %%host_name%% %%context_tag%%%%process_id%%: %%message%%';
+	const DefaultLogFormat = '%%date%% %%time%% %%level%% %%message%% %%extra%%';
 
 	//********************************************************************************
 	//* Private Members
@@ -48,6 +44,10 @@ class Log extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\SeedUtility
 	 * @var string
 	 */
 	protected static $_defaultLog = null;
+	/**
+	 * @var string The format of the log entries
+	 */
+	protected static $_logFormat = self::DefaultLogFormat;
 
 	//********************************************************************************
 	//* Public Methods
@@ -58,13 +58,23 @@ class Log extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\SeedUtility
 	 */
 	public static function log( $message, $level = self::Info, $context = array(), $extra = null, $tag = null )
 	{
-		self::_checkLogFile();
-
 		//	If we're not debugging, don't log debug statements
-		if ( self::Debug == $level && false === \Kisma::get( 'app.debug', false ) )
+		if ( self::Debug == $level )
 		{
-			return true;
+			$_debug = \Kisma::getDebug();
+
+			if ( is_callable( $_debug ) )
+			{
+				$_debug = call_user_func( $_debug, $message, $level, $context, $extra, $tag );
+			}
+
+			if ( false === $_debug )
+			{
+				return true;
+			}
 		}
+
+		self::_checkLogFile();
 
 		$_timestamp = time();
 
@@ -86,56 +96,15 @@ class Log extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\SeedUtility
 
 		$_levelName = self::_getLogLevel( $level );
 
-		if ( null !== ( $_result = Option::get( $context, 'result' ) ) )
-		{
-			if ( is_scalar( $_result ) )
-			{
-				if ( is_bool( $_result ) )
-				{
-					$_result = ( $_result ? '[TRUE]' : '[FALSE]' );
-				}
-				else
-				{
-					$_result = '[' . $_result . ']';
-				}
-
-			}
-			else
-			{
-				$_result = print_r( $_result, true );
-			}
-		}
-
-		if ( null !== ( $_eventId = Option::get( $context, 'event_id' ) ) )
-		{
-			$_eventId = '[' . $_eventId . ']';
-		}
-
-		$_entry = str_ireplace(
+		$_entry = self::formatLogEntry(
 			array(
-				'%%level%%',
-				'%%date%%',
-				'%%time%%',
-				'%%host_name%%',
-				'%%context_tag%%',
-				'%%process_id%%',
-				'%%message%%',
-				'%%result%%',
-				'%%event_id%%'
-			),
-			array(
-				$_levelName,
-				date( 'M d', $_timestamp ),
-				date( 'H:i:s', $_timestamp ),
-				gethostname(),
-				Option::get( $context, 'tag', $tag ),
-				'[' . getmypid() . ']',
-				self::$_prefix . str_repeat( '  ', $_tempIndent ) . $message,
-				$_result,
-				$_eventId,
-			),
-			self::DefaultLogFormat
-		) . PHP_EOL;
+				'level'     => $_levelName,
+				'message'   => self::$_prefix . str_repeat( '  ', $_tempIndent ) . $message,
+				'timestamp' => $_timestamp,
+				'context'   => $context,
+				'extra'     => $extra,
+			)
+		);
 
 		error_log( $_entry, 3, self::$_defaultLog );
 
@@ -144,6 +113,62 @@ class Log extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\SeedUtility
 
 		//	Anything over a warning returns false so you can chain
 		return ( self::Warning > $level );
+	}
+
+	/**
+	 * Formats the log entry. You can override this method to provide you own formatting.
+	 *
+	 * @param array $entry Read the code, data in the array
+	 * @param bool  $newline
+	 *
+	 * @return string
+	 */
+	public static function formatLogEntry( array $entry, $newline = true )
+	{
+		$_level = Option::get( $entry, 'level' );
+		$_timestamp = Option::get( $entry, 'timestamp' );
+		$_message = Option::get( $entry, 'message' );
+		$_context = Option::get( $entry, 'context' );
+		$_extra = Option::get( $entry, 'extra' );
+
+		$_blob = new \stdClass();
+		$_blob->pid = getmypid();
+		$_blob->uid = getmyuid();
+		$_blob->hostname = gethostname();
+
+		if ( !empty( $_context ) || !empty( $_extra ) )
+		{
+			if ( null !== $_context )
+			{
+				$_blob->context = $_context;
+			}
+
+			if ( null !== $_extra )
+			{
+				$_context->extra = $_extra;
+			}
+		}
+
+		$_replacements =
+			array(
+				0 => $_level,
+				1 => date( 'M d', $_timestamp ),
+				2 => date( 'H:i:s', $_timestamp ),
+				3 => $_message,
+				4 => json_encode( $_blob ),
+			);
+
+		return str_ireplace(
+			array(
+				'%%level%%',
+				'%%date%%',
+				'%%time%%',
+				'%%message%%',
+				'%%extra%%',
+			),
+			$_replacements,
+			self::$_logFormat
+		) . ( $newline ? PHP_EOL : null );
 	}
 
 	//*************************************************************************
@@ -406,6 +431,22 @@ class Log extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\SeedUtility
 	public static function getDefaultLog()
 	{
 		return self::$_defaultLog;
+	}
+
+	/**
+	 * @param string $logFormat
+	 */
+	public static function setLogFormat( $logFormat )
+	{
+		self::$_logFormat = $logFormat;
+	}
+
+	/**
+	 * @return string
+	 */
+	public static function getLogFormat()
+	{
+		return self::$_logFormat;
 	}
 
 	/**

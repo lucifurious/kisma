@@ -45,25 +45,25 @@ class SeedTest extends \PHPUnit_Framework_TestCase
 	{
 		$this->_object = null;
 
-//		foreach ( \Kisma\Core\Utility\EventManager::getEventMap() as $_eventTag => $_subscribers )
-//		{
-//			\Kisma\Core\Utility\Log::debug( 'Event "' . $_eventTag . '" listener dump:' );
-//
-//			foreach ( $_subscribers as $_listeners )
-//			{
-//				/** @var $_listener \Closure */
-//				foreach ( $_listeners as $_subscriberId => $_closures )
-//				{
-//					foreach ( $_closures as $_closure )
-//					{
-//						\Kisma\Core\Utility\Log::debug( '-- "' . $_subscriberId . '" of ' . ( is_object( $_closure ) ? get_class( $_closure ) :
-//							gettype( $_closure ) ) );
-//					}
-//				}
-//			}
-//		}
+		foreach ( \Kisma\Core\Utility\EventManager::getEventMap() as $_eventTag => $_subscribers )
+		{
+			\Kisma\Core\Utility\Log::debug( 'Event "' . $_eventTag . '" listener dump:' );
 
-//		\Kisma\Core\Utility\Log::debug( 'Eventmap dump:' . json_encode( \Kisma\Core\Utility\EventManager::getEventMap() ) );
+			foreach ( $_subscribers as $_listeners )
+			{
+				/** @var $_listener \Closure */
+				foreach ( $_listeners as $_subscriberId => $_closures )
+				{
+					foreach ( $_closures as $_closure )
+					{
+						\Kisma\Core\Utility\Log::debug( '-- "' . $_subscriberId . '" of ' . ( is_object( $_closure ) ? get_class( $_closure ) :
+							gettype( $_closure ) ) );
+					}
+				}
+			}
+		}
+
+		\Kisma\Core\Utility\Log::debug( 'Eventmap dump:' . json_encode( \Kisma\Core\Utility\EventManager::getEventMap() ) );
 	}
 
 	/**
@@ -150,19 +150,20 @@ class SeedTest extends \PHPUnit_Framework_TestCase
 		$_eventFired = false;
 
 		//	Subscribe and publish to set flag
-		$this->_object->subscribe(
+		$this->_object->on(
 			'crazy.event',
 			function ( $event ) use ( &$_eventFired )
 			{
 				$_eventFired = true;
 			}
 		);
+
 		$this->_object->publish( 'crazy.event' );
 		$this->assertTrue( $_eventFired );
 
 		//	Clear, unsub, and publish. Flag should not be set...
 		$_eventFired = false;
-		$this->_object->unsubscribe( 'crazy.event' );
+		$this->_object->on( 'crazy.event', null );
 		$this->_object->publish( 'crazy.event' );
 
 		$this->assertTrue( false === $_eventFired );

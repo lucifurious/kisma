@@ -6,8 +6,15 @@
 /**
  * Kisma
  * Contains a few core functions implemented statically to be lightweight and single instance.
+ *
+ * @method static bool getConception() Gets the conception flag
+ * @method static bool setConception( bool $how ) Sets the conception flag
+ * @method static mixed getDebug() Gets the debug setting( s )
+ * @method static mixed setDebug( mixed $how ) Sets the debug setting( s )
+ * @method static mixed getAutoLoader()
+ * @method static mixed setAutoLoader( mixed $autoLoader )
  */
-class Kisma implements \Kisma\Core\Interfaces\Publisher, \Kisma\Core\Interfaces\Events\Kisma
+class Kisma implements \Kisma\Core\Interfaces\PublisherLike, \Kisma\Core\Interfaces\Events\Kisma, \Kisma\Core\Interfaces\KismaSettings
 {
 	//*************************************************************************
 	//* Constants
@@ -26,13 +33,13 @@ class Kisma implements \Kisma\Core\Interfaces\Publisher, \Kisma\Core\Interfaces\
 	 * @var array The library configuration options
 	 */
 	protected static $_options = array(
-		'app.base_path'   => __DIR__,
-		'app.auto_loader' => null,
-		'app.conception'  => false,
-		'app.version'     => self::KismaVersion,
-		'app.name'        => 'App',
-		'app.navbar'      => null,
-		'app.framework'   => null,
+		self::BasePath   => __DIR__,
+		self::AutoLoader => null,
+		self::Conception => false,
+		self::Version    => self::KismaVersion,
+		self::Name       => 'App',
+		self::NavBar     => null,
+		self::Framework  => null,
 	);
 
 	//**************************************************************************
@@ -55,13 +62,13 @@ class Kisma implements \Kisma\Core\Interfaces\Publisher, \Kisma\Core\Interfaces\
 		}
 
 		//	Set any application-level options passed in
-		self::$_options = \Kisma\Core\Utility\Option::merge( self::$_options, $options );
+		static::$_options = \Kisma\Core\Utility\Option::merge( static::$_options, $options );
 
 		//	Register our faux-destructor
-		if ( false === ( $_conceived = self::get( 'app.conception' ) ) )
+		if ( false === ( $_conceived = Kisma::getConception() ) )
 		{
 			\register_shutdown_function(
-				function ( $eventName = \Kisma\Core\Interfaces\Events\Kisma::Death )
+				function ( $eventName = Kisma::Death )
 				{
 					\Kisma\Core\Utility\EventManager::publish( null, $eventName );
 				}
@@ -71,10 +78,11 @@ class Kisma implements \Kisma\Core\Interfaces\Publisher, \Kisma\Core\Interfaces\
 			\Kisma\Core\Utility\Detector::framework();
 
 			//	We done baby!
-			self::set( 'app.conception', $_conceived = true );
+			static::setConception( true );
+			static::setAutoLoader( ComposerAutoloaderInit::getLoader() );
 
 			//	And let the world know we're alive
-			\Kisma\Core\Utility\EventManager::publish( null, self::Birth );
+			\Kisma\Core\Utility\EventManager::publish( null, Kisma::Birth );
 		}
 
 		return $_conceived;
@@ -88,11 +96,11 @@ class Kisma implements \Kisma\Core\Interfaces\Publisher, \Kisma\Core\Interfaces\
 	 */
 	public static function set( $key, $value = null )
 	{
-		\Kisma\Core\Utility\Option::set( self::$_options, $key, $value );
+		\Kisma\Core\Utility\Option::set( static::$_options, $key, $value );
 	}
 
 	/**
-	 * @param string $key If you pass in a null, you'll get an array of all keys in return.
+	 * @param string $key If you pass in a null, you'll get the entire array of options
 	 * @param mixed  $defaultValue
 	 * @param bool   $removeIfFound
 	 *
@@ -102,10 +110,36 @@ class Kisma implements \Kisma\Core\Interfaces\Publisher, \Kisma\Core\Interfaces\
 	{
 		if ( null === $key )
 		{
-			return self::$_options;
+			return static::$_options;
 		}
 
-		return \Kisma\Core\Utility\Option::get( self::$_options, $key, $defaultValue, $removeIfFound );
+		return \Kisma\Core\Utility\Option::get( static::$_options, $key, $defaultValue, $removeIfFound );
+	}
+
+	/**
+	 * An easy way to get Kisma settings out of the bag
+	 *
+	 * @param string $name
+	 * @param array  $arguments
+	 *
+	 * @throws \BadMethodCallException
+	 * @return mixed
+	 */
+	public static function __callStatic( $name, $arguments )
+	{
+		if ( \Kisma\Core\Utility\Scalar::in( $_type = strtolower( substr( $name, 0, 3 ) ), 'get', 'set' ) )
+		{
+			$_tag = 'app.' . \Kisma\Core\Utility\Inflector::tag( substr( $name, 3 ), true );
+
+			if ( \Kisma\Core\Enums\KismaSettings::contains( $_tag ) )
+			{
+				array_unshift( $arguments, $_tag );
+
+				return call_user_func_array( array( __CLASS__, $_type ), $arguments );
+			}
+		}
+
+		throw new \BadMethodCallException( 'The method "' . $name . '" does not exist, or at least, I can\'t find it.' );
 	}
 
 	//*************************************************************************
@@ -132,40 +166,20 @@ class Kisma implements \Kisma\Core\Interfaces\Publisher, \Kisma\Core\Interfaces\
 		return true;
 	}
 
-	//*************************************************************************
-	//* Properties
-	//*************************************************************************
-
 	/**
-	 * @return null|\Composer\Autoload\ClassLoader
+	 * @param Composer\Script\Event $event
 	 */
-	public static function getAutoLoader()
+	public static function postInstall( \Composer\Script\Event $event )
 	{
-		return self::get( 'app.auto_loader' );
+		//	Nada
 	}
 
 	/**
-	 * @return string
+	 * @param Composer\Script\Event $event
 	 */
-	public static function getBasePath()
+	public static function postUpdate( \Composer\Script\Event $event )
 	{
-		return self::get( 'app.base_path' );
-	}
-
-	/**
-	 * @param array $options
-	 */
-	public static function setOptions( $options )
-	{
-		self::$_options = $options;
-	}
-
-	/**
-	 * @return array
-	 */
-	public static function getOptions()
-	{
-		return self::$_options;
+		//	Nada
 	}
 
 }

@@ -2,7 +2,7 @@
 /**
  * ServiceState.php
  */
-namespace Kisma\Core\Interfaces\Services;
+namespace Kisma\Core\Interfaces;
 /**
  * ServiceState
  * Defines the various states in which a service can exist

@@ -1,13 +1,13 @@
 <?php
 /**
- * Service.php
+ * ServiceLike.php
  */
 namespace Kisma\Core\Interfaces;
 /**
- * Service
- * All Services have this
+ * ServiceLike
+ * Acts like a service
  */
-interface Service extends \Kisma\Core\Interfaces\Events\Service
+interface ServiceLike extends \Kisma\Core\Interfaces\Events\ServiceLike
 {
 	//*************************************************************************
 	//* Public Methods
@@ -20,7 +20,7 @@ interface Service extends \Kisma\Core\Interfaces\Events\Service
 	 *
 	 * @return bool
 	 */
-	public function initialize( $options = array() );
+	public function initializeService( $options = array() );
 
 	/**
 	 * Process a request for the services of this class

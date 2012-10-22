@@ -6,7 +6,7 @@ namespace Kisma\Core\Utility;
 /**
  * Convert
  */
-class Convert extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\SeedUtility
+class Convert extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\UtilityLike
 {
 	/**
 	 * Dynamically generates the object from the declared properties of the given object or array

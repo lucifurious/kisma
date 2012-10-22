@@ -7,7 +7,7 @@ namespace Kisma\Core\Utility;
  * Scalar
  * Scalar utility class
  */
-class Scalar implements \Kisma\Core\Interfaces\SeedUtility
+class Scalar implements \Kisma\Core\Interfaces\UtilityLike
 {
 	//*************************************************************************
 	//* Public Methods

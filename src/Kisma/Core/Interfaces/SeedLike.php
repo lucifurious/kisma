@@ -1,30 +1,30 @@
 <?php
 /**
- * Subscriber.php
+ * SeedLike.php
  */
 namespace Kisma\Core\Interfaces;
 /**
- * Subscriber
- * Defines an object as being able to subscribe to events
+ * SeedLike
+ * All seeds have this
  */
-interface Subscriber
+interface SeedLike extends \Kisma\Core\Interfaces\Events\SeedLike
 {
 	//*************************************************************************
 	//* Public Methods
 	//*************************************************************************
 
 	/**
-	 * Returns the unique identifier for this subscriber
-	 *
 	 * @return string
 	 */
 	public function getId();
 
 	/**
-	 * Returns a key-worthy tag for your object
-	 *
 	 * @return string
 	 */
 	public function getTag();
 
+	/**
+	 * @return string
+	 */
+	public function getName();
 }

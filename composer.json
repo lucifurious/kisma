@@ -20,6 +20,12 @@
 	"suggest":      {
 		"monolog/monolog": "1.*"
 	},
+	"autoload":     {
+		"psr-0": {
+			"Kisma": "src/"
+		},
+		"files": ["src/autoload.php"]
+	},
 	"repositories": [
 		{
 			"type":    "package",
@@ -35,15 +41,9 @@
 		}
 	],
 	"scripts":      {
-		"post-update-cmd":      "\\Kisma\\Utility\\Composer::postUpdate",
+		"post-update-cmd":      "\\Kisma::postUpdate",
 		"post-package-install": [
-			"\\Kisma\\Utility\\Composer::postPackageInstall"
+			"\\Kisma::postInstall"
 		]
-	},
-	"autoload":     {
-		"psr-0": {
-			"Kisma": "src/"
-		},
-		"files": ["src/autoload.php"]
 	}
 }
