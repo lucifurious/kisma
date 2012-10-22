@@ -42,15 +42,16 @@ abstract class SeedEnum
 	 */
 	public static function getDefinedConstants( $flipped = false )
 	{
-		static $_constants = null;
+		static $_constants = array();
+		$_class = get_called_class();
 
-		if ( null === $_constants )
+		if ( !isset( $_constants[$_class] ) )
 		{
-			$_mirror = new \ReflectionClass( get_called_class() );
-			$_constants = $_mirror->getConstants();
+			$_mirror = new \ReflectionClass( $_class );
+			$_constants[$_class] = $_mirror->getConstants();
 		}
 
-		return false === $flipped ? $_constants : array_flip( $_constants );
+		return false === $flipped ? $_constants[$_class] : array_flip( $_constants[$_class] );
 	}
 
 	/**
