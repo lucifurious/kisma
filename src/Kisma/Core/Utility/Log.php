@@ -59,7 +59,7 @@ class Log extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\UtilityLike
 	public static function log( $message, $level = self::Info, $context = array(), $extra = null, $tag = null )
 	{
 		//	If we're not debugging, don't log debug statements
-		if ( self::Debug == $level )
+		if ( static::Debug == $level )
 		{
 			$_debug = \Kisma::getDebug();
 
@@ -74,15 +74,15 @@ class Log extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\UtilityLike
 			}
 		}
 
-		self::_checkLogFile();
+		static::_checkLogFile();
 
 		$_timestamp = time();
 
 		//	Get the indent, if any
-		$_unindent = ( ( $_newIndent = self::_processMessage( $message ) ) > 0 );
+		$_unindent = ( ( $_newIndent = static::_processMessage( $message ) ) > 0 );
 
 		//	Indent...
-		$_tempIndent = self::$_currentIndent;
+		$_tempIndent = static::$_currentIndent;
 
 		if ( $_unindent )
 		{
@@ -94,25 +94,25 @@ class Log extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\UtilityLike
 			$_tempIndent = 0;
 		}
 
-		$_levelName = self::_getLogLevel( $level );
+		$_levelName = static::_getLogLevel( $level );
 
-		$_entry = self::formatLogEntry(
+		$_entry = static::formatLogEntry(
 			array(
 				'level'     => $_levelName,
-				'message'   => self::$_prefix . str_repeat( '  ', $_tempIndent ) . $message,
+				'message'   => static::$_prefix . str_repeat( '  ', $_tempIndent ) . $message,
 				'timestamp' => $_timestamp,
 				'context'   => $context,
 				'extra'     => $extra,
 			)
 		);
 
-		error_log( $_entry, 3, self::$_defaultLog );
+		error_log( $_entry, 3, static::$_defaultLog );
 
 		//	Set indent level...
-		self::$_currentIndent += $_newIndent;
+		static::$_currentIndent += $_newIndent;
 
 		//	Anything over a warning returns false so you can chain
-		return ( self::Warning > $level );
+		return ( static::Warning > $level );
 	}
 
 	/**
@@ -167,7 +167,7 @@ class Log extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\UtilityLike
 				'%%extra%%',
 			),
 			$_replacements,
-			self::$_logFormat
+			static::$_logFormat
 		) . ( $newline ? PHP_EOL : null );
 	}
 
@@ -186,7 +186,7 @@ class Log extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\UtilityLike
 	 */
 	public static function error( $message, $context = array(), $extra = null )
 	{
-		return self::log( $message, self::Error, $context, $extra, self::_getCallingMethod() );
+		return static::log( $message, static::Error, $context, $extra, static::_getCallingMethod() );
 	}
 
 	/**
@@ -200,7 +200,7 @@ class Log extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\UtilityLike
 	 */
 	public static function warning( $message, $context = array(), $extra = null )
 	{
-		return self::log( $message, self::Warning, $context, $extra, self::_getCallingMethod() );
+		return static::log( $message, static::Warning, $context, $extra, static::_getCallingMethod() );
 	}
 
 	/**
@@ -214,7 +214,7 @@ class Log extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\UtilityLike
 	 */
 	public static function notice( $message, $context = array(), $extra = null )
 	{
-		return self::log( $message, self::Notice, $context, $extra, self::_getCallingMethod() );
+		return static::log( $message, static::Notice, $context, $extra, static::_getCallingMethod() );
 	}
 
 	/**
@@ -228,7 +228,7 @@ class Log extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\UtilityLike
 	 */
 	public static function info( $message, $context = array(), $extra = null )
 	{
-		return self::log( $message, self::Info, $context, $extra, self::_getCallingMethod() );
+		return static::log( $message, static::Info, $context, $extra, static::_getCallingMethod() );
 	}
 
 	/**
@@ -242,7 +242,7 @@ class Log extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\UtilityLike
 	 */
 	public static function debug( $message, $context = array(), $extra = null )
 	{
-		return self::log( $message, self::Debug, $context, $extra, self::_getCallingMethod() );
+		return static::log( $message, static::Debug, $context, $extra, static::_getCallingMethod() );
 	}
 
 	/**
@@ -252,11 +252,11 @@ class Log extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\UtilityLike
 	 */
 	public static function decrementIndent( $howMuch = 1 )
 	{
-		self::$_currentIndent -= $howMuch;
+		static::$_currentIndent -= $howMuch;
 
-		if ( self::$_currentIndent < 0 )
+		if ( static::$_currentIndent < 0 )
 		{
-			self::$_currentIndent = 0;
+			static::$_currentIndent = 0;
 		}
 	}
 
@@ -317,20 +317,36 @@ class Log extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\UtilityLike
 
 		for ( $_i = 0, $_size = sizeof( $_backTrace ); $_i < $_size; $_i++ )
 		{
-			if ( Option::get( $_backTrace[$_i], 'class' ) == $_thisClass )
+			if ( isset( $_backTrace[$_i]['class'] ) )
+			{
+				$_class = $_backTrace[$_i]['class'];
+			}
+
+			if ( $_class == $_thisClass )
 			{
 				continue;
 			}
 
-			$_class = Option::get( $_backTrace[$_i], 'class' );
-			$_method = Option::get( $_backTrace[$_i], 'method', Option::get( $_backTrace[$_i], 'function' ) );
-			$_type = Option::get( $_backTrace[$_i], 'type' );
+			if ( isset( $_backTrace[$_i]['method'] ) )
+			{
+				$_method = $_backTrace[$_i]['method'];
+			}
+			else if ( isset( $_backTrace[$_i]['function'] ) )
+			{
+				$_method = $_backTrace[$_i]['function'];
+			}
+			else
+			{
+				$_method = 'Unknown';
+			}
+
+			$_type = $_backTrace[$_i]['type'];
 			break;
 		}
 
 		if ( $_i >= 0 )
 		{
-			return Inflector::tag( str_ireplace( 'Kisma\\Core\\', null, $_class ), true ) . $_type . $_method;
+			return str_ireplace( 'Kisma\\Core\\', 'Core\\', $_class ) . $_type . $_method;
 		}
 
 		return 'Unknown';
@@ -347,12 +363,12 @@ class Log extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\UtilityLike
 	{
 		$_newIndent = 0;
 
-		foreach ( self::$_indentTokens as $_key => $_token )
+		foreach ( static::$_indentTokens as $_key => $_token )
 		{
 			if ( $_token == substr( $message, 0, strlen( $_token ) ) )
 			{
 				$_newIndent = ( false === $_key ? -1 : 1 );
-				$message = substr( $message, strlen( self::$_indentTokens[true] ) );
+				$message = substr( $message, strlen( static::$_indentTokens[true] ) );
 			}
 		}
 
@@ -370,7 +386,7 @@ class Log extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\UtilityLike
 	 */
 	public static function setCurrentIndent( $currentIndent = 0 )
 	{
-		self::$_currentIndent = $currentIndent;
+		static::$_currentIndent = $currentIndent;
 	}
 
 	/**
@@ -379,7 +395,7 @@ class Log extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\UtilityLike
 	 */
 	public static function getCurrentIndent()
 	{
-		return self::$_currentIndent;
+		return static::$_currentIndent;
 	}
 
 	/**
@@ -389,7 +405,7 @@ class Log extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\UtilityLike
 	 */
 	public static function setPrefix( $prefix = null )
 	{
-		self::$_prefix = $prefix;
+		static::$_prefix = $prefix;
 	}
 
 	/**
@@ -398,7 +414,7 @@ class Log extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\UtilityLike
 	 */
 	public static function getPrefix()
 	{
-		return self::$_prefix;
+		return static::$_prefix;
 	}
 
 	/**
@@ -406,7 +422,7 @@ class Log extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\UtilityLike
 	 */
 	public static function setIndentTokens( $indentTokens )
 	{
-		self::$_indentTokens = $indentTokens;
+		static::$_indentTokens = $indentTokens;
 	}
 
 	/**
@@ -414,7 +430,7 @@ class Log extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\UtilityLike
 	 */
 	public static function getIndentTokens()
 	{
-		return self::$_indentTokens;
+		return static::$_indentTokens;
 	}
 
 	/**
@@ -422,7 +438,7 @@ class Log extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\UtilityLike
 	 */
 	public static function setDefaultLog( $defaultLog )
 	{
-		self::$_defaultLog = $defaultLog;
+		static::$_defaultLog = $defaultLog;
 	}
 
 	/**
@@ -430,7 +446,7 @@ class Log extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\UtilityLike
 	 */
 	public static function getDefaultLog()
 	{
-		return self::$_defaultLog;
+		return static::$_defaultLog;
 	}
 
 	/**
@@ -438,7 +454,7 @@ class Log extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\UtilityLike
 	 */
 	public static function setLogFormat( $logFormat )
 	{
-		self::$_logFormat = $logFormat;
+		static::$_logFormat = $logFormat;
 	}
 
 	/**
@@ -446,7 +462,7 @@ class Log extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\UtilityLike
 	 */
 	public static function getLogFormat()
 	{
-		return self::$_logFormat;
+		return static::$_logFormat;
 	}
 
 	/**
@@ -455,7 +471,7 @@ class Log extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\UtilityLike
 	protected static function _checkLogFile()
 	{
 		//	Set a name for the default log
-		if ( null === self::$_defaultLog )
+		if ( null === static::$_defaultLog )
 		{
 			Log::setDefaultLog( dirname( \Kisma::getBasePath() ) . '/log/kisma.log' );
 		}

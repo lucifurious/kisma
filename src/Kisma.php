@@ -65,10 +65,10 @@ class Kisma implements \Kisma\Core\Interfaces\PublisherLike, \Kisma\Core\Interfa
 		static::$_options = \Kisma\Core\Utility\Option::merge( static::$_options, $options );
 
 		//	Register our faux-destructor
-		if ( false === ( $_conceived = Kisma::getConception() ) )
+		if ( false === ( $_conceived = static::getConception() ) )
 		{
 			\register_shutdown_function(
-				function ( $eventName = Kisma::Death )
+				function ( $eventName = self::Death )
 				{
 					\Kisma\Core\Utility\EventManager::publish( null, $eventName );
 				}

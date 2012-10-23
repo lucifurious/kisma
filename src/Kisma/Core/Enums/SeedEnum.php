@@ -13,6 +13,7 @@
  * @filesource
  */
 namespace Kisma\Core\Enums;
+use \Kisma\Core\Utility;
 
 /**
  * SeedEnum
@@ -36,22 +37,24 @@ abstract class SeedEnum
 	 * Returns a hash of the called class's constants. Caches for speed
 	 * (class cache hash, say that ten times fast!).
 	 *
-	 * @param bool $flipped If true, the array is flipped before return
+	 * @param bool   $flipped If true, the array is flipped before return
+	 * @param string $class   Used internally to cache constants
 	 *
 	 * @return array
 	 */
-	public static function getDefinedConstants( $flipped = false )
+	public static function getDefinedConstants( $flipped = false, $class = null )
 	{
 		static $_constants = array();
-		$_class = get_called_class();
 
-		if ( !isset( $_constants[$_class] ) )
+		$class = $class ? : get_called_class();
+
+		if ( !isset( $_constants[$class] ) )
 		{
-			$_mirror = new \ReflectionClass( $_class );
-			$_constants[$_class] = $_mirror->getConstants();
+			$_mirror = new \ReflectionClass( $class );
+			$_constants[$class] = $_mirror->getConstants();
 		}
 
-		return false === $flipped ? $_constants[$_class] : array_flip( $_constants[$_class] );
+		return false === $flipped ? $_constants[$class] : array_flip( $_constants[$class] );
 	}
 
 	/**
@@ -82,7 +85,7 @@ abstract class SeedEnum
 	 */
 	public static function nameOf( $constant )
 	{
-		$_constants = self::getDefinedConstants( true );
+		$_constants = self::getDefinedConstants( true /*, get_called_class()*/ );
 
 		if ( !\Kisma\Core\Utility\Option::contains( $_constants, $constant ) )
 		{
@@ -111,10 +114,9 @@ abstract class SeedEnum
 	 */
 	public static function defines( $constant, $returnValue = false )
 	{
-		$_constants = self::getDefinedConstants();
-		$_has = in_array( $constant, array_keys( $_constants ) );
+		$_constants = self::getDefinedConstants( true /*, get_called_class()*/ );
 
-		if ( false !== $returnValue && false === $_has )
+		if ( false === ( $_has = Utility\Option::contains( $_constants, $constant ) ) && false !== $returnValue )
 		{
 			throw new \InvalidArgumentException( 'The constant "' . $constant . '" is not defined.' );
 		}

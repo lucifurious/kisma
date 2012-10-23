@@ -75,12 +75,13 @@ class Dispatcher extends \Kisma\Core\Seed implements \Kisma\Strata\Interfaces\Di
 			throw new \Kisma\Core\Exceptions\UnknownRouteException( 'The route "' . $tag . '" was not found.' );
 		}
 
-		if ( false === $this->publish( self::PreProcess, $_route ) )
+		$_request = new Request( $tag, $payload );
+
+		if ( false === $this->publish( self::PreProcess, $_request ) )
 		{
 			return false;
 		}
 
-		$_request = new Request( $tag, $payload );
 		$_result = $_route->processRequest( $_request );
 
 		$this->publish( self::PostProcess, $_result );
@@ -98,14 +99,14 @@ class Dispatcher extends \Kisma\Core\Seed implements \Kisma\Strata\Interfaces\Di
 	 */
 	public function addRoute( $tag, $handler, $overwrite = true )
 	{
-		$tag = Inflector::tag( $tag, true );
+		$_key = Inflector::tag( $tag, true );
 
-		if ( isset( $this->_routes[$tag] ) && false === $overwrite )
+		if ( isset( $this->_routes[$_key] ) && false === $overwrite )
 		{
 			throw new \Kisma\Strata\Exceptions\DuplicateRouteException( 'Duplicate route "' . $tag . '" found. Adding route failed.' );
 		}
 
-		return $this->_routes[$tag] = new Route( $tag, $this, $handler );
+		return $this->_routes[$_key] = new Route( $_key, $this, $handler );
 	}
 
 	/**

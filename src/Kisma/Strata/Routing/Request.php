@@ -9,7 +9,7 @@ use Kisma\Core\Utility\Option;
  * SeedRequest
  * A base class for all service requests
  */
-class Request extends \Kisma\Core\SeedBag implements \Kisma\Core\Interfaces\RequestSource, \Kisma\Strata\Interfaces\RequestLike
+class Request extends \Kisma\Core\SeedBag implements \Kisma\Strata\Interfaces\RequestLike, \Kisma\Core\Interfaces\RequestSource
 {
 	//*************************************************************************
 	//* Members
