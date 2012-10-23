@@ -9,16 +9,38 @@ use Kisma\Core\Interfaces\InputTypes;
  * Bootstrap class
  * Provides Twitter Bootstrap form-building
  */
-class Bootstrap extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\FormTypes
+class Bootstrap extends HtmlMarkup implements \Kisma\Core\Interfaces\FormTypes
 {
+	//*************************************************************************
+	//* Constants
+	//*************************************************************************
+
+	/**
+	 * @var string The block pattern for forms
+	 */
+	const VerticalGroupPattern = <<<HTML
+	%%__LABEL__%%
+	%%__INPUT__%%
+	%%__HELP_BLOCK__%%
+HTML;
+
+	/**
+	 * @var string The block pattern for horizontal forms
+	 */
+	const HorizontalGroupPattern = <<<HTML
+<div class="control-group">
+	%%__LABEL__%%
+	<div class="controls">
+		%%__INPUT__%%
+		%%__HELP_BLOCK__%%
+	</div>
+</div>
+HTML;
+
 	//*************************************************************************
 	//* Private Members
 	//*************************************************************************
 
-	/**
-	 * @var string
-	 */
-	protected $_formType = null;
 	/**
 	 * @var string If set, pre-pended to id and name attributes (id=prefix_field,name=prefix[field])
 	 */
@@ -27,84 +49,47 @@ class Bootstrap extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\FormT
 	 * @var string The HTML of the form
 	 */
 	protected $_contents = null;
+	/**
+	 * @var string
+	 */
+	protected $_blockPattern = self::VerticalGroupPattern;
 
 	//*************************************************************************
 	//* Public Methods
 	//*************************************************************************
 
 	/**
-	 * @param array|null|object|string $formType
-	 * @param string                   $prefix
-	 * @param array                    $settings
+	 * @param array       $attributes
+	 * @param string|null $prefix
+	 *
+	 * @return \Kisma\Core\Utility\Bootstrap
 	 */
-	public function __construct( $formType = self::Vertical, $prefix = null, $settings = array() )
+	public function __construct( $attributes = array(), $prefix = null )
 	{
-		$this->_formType = $formType;
 		$this->_prefix = $prefix;
-		$this->_contents = null;
-
-		parent::__construct( $settings );
-	}
-
-	public function select( array $attributes = array() )
-	{
-		$this->cleanNames( $attributes );
-		$_id = Option::get( $attributes, 'id' );
-		$_label = Option::get( $attributes, 'label', null, true );
-		$_data = Option::get( $attributes, 'data', array(), true );
-		$_options = null;
-
-		foreach ( Option::clean( $_data ) as $_key => $_value )
-		{
-			$_options .= Markup::tag(
-				'option',
-				array(
-					'value' => $_key,
-				),
-				$_value
-			);
-		}
-
-		return Markup::wrap(
-			'select',
-			$_options,
-			$attributes
-		);
+		$this->_contents = Markup::openTag( 'form', $attributes );
 	}
 
 	/**
 	 * @param string $type
 	 * @param array  $attributes
+	 * @param string $value
+	 * @param bool   $close
+	 * @param bool   $selfClose
 	 *
 	 * @return string
 	 */
-	public function input( $type, array $attributes = array() )
+	public function field( $type, array $attributes = array(), $value = null, $close = true, $selfClose = false )
 	{
 		$_html = null;
-
-		if ( false !== strpos( $type, '</' ) )
-		{
-			$_html = $type;
-			$_type = 'html';
-		}
-		else
-		{
-			$_type = trim( strtolower( $type ) );
-		}
-
-		$_labelAttributes = Option::get( $attributes, 'labelAttributes', array(), true );
+		$_type = strtolower( trim( $type ) );
 		$_wrapInput = Scalar::in( $_type, 'checkbox', 'radio' );
-
 		$_labelEnd = null;
 
 		$this->cleanNames( $attributes );
-		$_id = Option::get( $attributes, 'id' );
-		$_label = Option::get( $attributes, 'label' );
 
-		if ( null !== $_id && !isset( $_labelAttributes['for'] ) )
-		{
-			$_labelAttributes['for'] = $_id;
-		}
+		$_id = $attributes['id'];
+		$_label = $attributes['label'];
 
 		//	Add .control-label for the class to labels
 		if ( self::Horizontal == $this->_formType )
@@ -160,7 +145,7 @@ class Bootstrap extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\FormT
 			}
 			else
 			{
-				$attributes = Markup::kvpToString( $attributes );
+				$attributes = Convert::kvpToString( $attributes );
 				$_input = <<<HTML
 <input type="{$_type}" {$attributes}>
 HTML;
@@ -192,7 +177,7 @@ HTML;
 			$attributes['class'] = $_class;
 		}
 
-		$_html = Markup::kvpToString( $attributes );
+		$_html = Convert::kvpToString( $attributes );
 
 		if ( !empty( $legend ) )
 		{
@@ -235,7 +220,7 @@ HTML;
 		$_class = Option::get( $attributes, 'class' );
 		$_text = Option::get( $attributes, 'text', 'Click Me!' );
 		$attributes['class'] = Markup::addValue( $_class, 'btn' );
-		$attributes = Markup::kvpToString( $attributes );
+		$attributes = Convert::kvpToString( $attributes );
 
 		$_html = <<<HTML
 <button type="{$_type}" {$attributes}>{$_text}</button>
@@ -266,10 +251,10 @@ HTML;
 		{
 			$_id = $this->_prefix . '_' . $_id;
 			$_name = $this->_prefix . '[' . $_name . ']';
-			$attributes['id'] = $_id;
-			$attributes['name'] = $_name;
 		}
 
+		$attributes['id'] = $_id;
+		$attributes['name'] = $_name;
 		$attributes['label'] = $_label;
 	}
 

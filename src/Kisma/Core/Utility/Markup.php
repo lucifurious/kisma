@@ -37,6 +37,10 @@ class Markup
 	 * @var int The delimiter position
 	 */
 	const SelfCloseEnd = 5;
+	/**
+	 * @var string Used internally for replacements
+	 */
+	const ValuePlaceholder = '%%__VALUE__%%';
 
 	//*************************************************************************
 	//* Private Members
@@ -74,24 +78,26 @@ class Markup
 	public static function tag( $name, $attributes = array(), $value = null, $close = true, $selfClose = false )
 	{
 		//	Nah nah...
-		if ( !$close && $selfClose )
+		if ( true !== $close )
 		{
-			$selfClose = false;
+			$close = $selfClose = false;
 		}
 
-		$_html = self::openTag( $name, $attributes, $selfClose );
+		$_html = static::openTag( $name, $attributes, $selfClose );
 
-		if ( !$selfClose )
+		if ( false !== $selfClose )
 		{
-			if ( null !== $value )
-			{
-				$_html .= trim( $value );
-			}
+			return $_html;
+		}
 
-			if ( $close )
-			{
-				$_html .= self::closeTag( $name );
-			}
+		if ( null !== $value )
+		{
+			$_html .= trim( $value );
+		}
+
+		if ( $close )
+		{
+			$_html .= static::closeTag( $name );
 		}
 
 		return trim( $_html );
@@ -106,11 +112,12 @@ class Markup
 	 */
 	public static function openTag( $tag, array $attributes = array(), $selfClose = false )
 	{
-		$_attributes = self::kvpToString( $attributes );
-
-		return self::$_delimiters[( $selfClose ? self::SelfCloseStart : self::OpenStart )] .
-			( self::$_uppercaseTags ? strtoupper( $tag ) : strtolower( $tag ) ) .
-			' ' . $_attributes . self::$_delimiters[( $selfClose ? self::SelfCloseEnd : self::OpenEnd )];
+		return
+			str_replace(
+				static::ValuePlaceholder,
+				static::_cleanTag( $tag ) . ' ' . Convert::kvpToString( $attributes, static::$_uppercaseTags ),
+				static::_tagPattern( true, $selfClose )
+			);
 	}
 
 	/**
@@ -120,118 +127,24 @@ class Markup
 	 */
 	public static function closeTag( $tag )
 	{
-		return self::$_delimiters[self::CloseStart] .
-			( self::$_uppercaseTags ? strtoupper( $tag ) : strtolower( $tag ) ) .
-			self::$_delimiters[self::CloseEnd];
+		return
+			str_replace(
+				static::ValuePlaceholder,
+				static::_cleanTag( $tag ),
+				static::_tagPattern( false )
+			);
 	}
 
 	/**
-	 * @param string $tag
+	 * Wraps value in a CDATA tag
+	 *
 	 * @param string $value
-	 * @param array  $attributes
-	 * @param bool   $selfClose
 	 *
 	 * @return string
 	 */
-	public static function wrap( $tag, $value = null, array $attributes = array(), $selfClose = false )
+	public static function cdata( $value )
 	{
-		$_html = self::openTag( $tag, $attributes, $selfClose );
-
-		if ( !$selfClose )
-		{
-			if ( null !== $value )
-			{
-				$_html .= $value;
-			}
-
-			$_html .= self::closeTag( $tag );
-		}
-
-		return trim( $_html );
-	}
-
-	/**
-	 * Adds items to a list, ensuring uniqueness
-	 *
-	 * @param string|array $original   The original value
-	 * @param string|array $value      The thing(s) to add
-	 *
-	 * @return array|string
-	 */
-	public static function addValue( $original, $value )
-	{
-		$_list = ( !is_array( $original ) ? explode( ' ', trim( $original ) ) : $original );
-
-		foreach ( Option::clean( $value ) as $_value )
-		{
-			if ( !in_array( $_value, $_list ) )
-			{
-				$_list[] = $_value;
-			}
-		}
-
-		return is_array( $original ) ? $_list : implode( ' ', $_list );
-	}
-
-	/**
-	 * Removes an item from a list of things.
-	 *
-	 * @param string|array $original The existing class(es). If a string is passed in, a string is returned. If an array is passed in, an array is returned.
-	 * @param string|array $value
-	 *
-	 * @return array|string
-	 */
-	public static function removeValue( $original, $value )
-	{
-		$_list = ( !is_array( $original ) ? explode( ' ', trim( $original ) ) : $original );
-		$_oldList = Option::clean( $value );
-
-		foreach ( $_list as $_index=> $_value )
-		{
-			if ( in_array( $_value, $_oldList ) )
-			{
-				unset( $_list[$_index] );
-			}
-		}
-
-		return is_array( $original ) ? $_list : implode( ' ', $_list );
-	}
-
-	/**
-	 * Takes a kvp traversable and converts to a ' key="value" ' string suitable for framing.
-	 *
-	 * @param array|object $array
-	 * @param int          $trueConvert  The value to substitute for boolean true
-	 * @param int          $falseConvert The value to substitute for boolean false
-	 *
-	 * @return string
-	 */
-	public static function kvpToString( $array, $trueConvert = 1, $falseConvert = 0 )
-	{
-		$_result = array();
-
-		foreach ( Option::clean( $array ) as $_key => $_value )
-		{
-			if ( null !== $_value )
-			{
-				if ( false === $_value )
-				{
-					$_value = $falseConvert;
-				}
-				else if ( true === $_value )
-				{
-					$_value = $trueConvert;
-				}
-				else if ( is_array( $_value ) )
-				{
-					$_value = trim( implode( ' ', $_value ) );
-				}
-
-				$_result[] = ( self::$_uppercaseTags ? strtoupper( $_key ) : strtolower( $_key ) ) . '="' . $_value . '"';
-			}
-		}
-
-		return trim( implode( ' ', $_result ) );
+		return '<![CDATA[' . $value . ']]>';
 	}
 
 	/**
@@ -242,7 +155,7 @@ class Markup
 	 */
 	public function setDelimiter( $which, $what )
 	{
-		Option::set( self::$_delimiters, $which, $what );
+		Option::set( static::$_delimiters, $which, $what );
 
 		return $this;
 	}
@@ -254,7 +167,7 @@ class Markup
 	 */
 	public function setDelimiters( $delimiters )
 	{
-		self::$_delimiters = $delimiters;
+		static::$_delimiters = $delimiters;
 
 		return $this;
 	}
@@ -264,7 +177,7 @@ class Markup
 	 */
 	public function getDelimiters()
 	{
-		return self::$_delimiters;
+		return static::$_delimiters;
 	}
 
 	/**
@@ -272,7 +185,7 @@ class Markup
 	 */
 	public static function setUppercaseTags( $uppercaseTags )
 	{
-		self::$_uppercaseTags = $uppercaseTags;
+		static::$_uppercaseTags = $uppercaseTags;
 	}
 
 	/**
@@ -280,7 +193,75 @@ class Markup
 	 */
 	public static function getUppercaseTags()
 	{
-		return self::$_uppercaseTags;
+		return static::$_uppercaseTags;
+	}
+
+	/**
+	 * Cleans and trims a tag
+	 *
+	 * @param string $tag
+	 *
+	 * @return string
+	 */
+	protected static function _cleanTag( $tag )
+	{
+		return trim( static::$_uppercaseTags ? strtoupper( $tag ) : strtolower( $tag ) );
+	}
+
+	/**
+	 * Cleans and trims a tag
+	 *
+	 * @param bool $open      Set to false to get the end tag
+	 * @param bool $selfClose True if this is a self-closing open tag
+	 *
+	 * @internal param string $tag
+	 *
+	 * @return string
+	 */
+	protected static function _tagPattern( $open = true, $selfClose = false )
+	{
+		if ( true === $open )
+		{
+			return static::_openStartDelimiter( $selfClose ) . self::ValuePlaceholder . static::_openEndDelimiter( $selfClose );
+		}
+
+		return static::_closeStartDelimiter() . self::ValuePlaceholder . static::_closeEndDelimiter();
+	}
+
+	/**
+	 * @param bool $selfClose
+	 *
+	 * @return string
+	 */
+	protected static function _openStartDelimiter( $selfClose = false )
+	{
+		return static::$_delimiters[( $selfClose ? static::SelfCloseStart : static::OpenStart )];
+	}
+
+	/**
+	 * @param bool $selfClose
+	 *
+	 * @return string
+	 */
+	protected static function _openEndDelimiter( $selfClose = false )
+	{
+		return static::$_delimiters[( $selfClose ? static::SelfCloseEnd : static::OpenEnd )];
+	}
+
+	/**
+	 * @return string
+	 */
+	protected static function _closeStartDelimiter()
+	{
+		return static::$_delimiters[static::CloseStart];
+	}
+
+	/**
+	 * @return string
+	 */
+	protected static function _closeEndDelimiter()
+	{
+		return static::$_delimiters[static::CloseEnd];
 	}
 
 }

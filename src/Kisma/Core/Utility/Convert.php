@@ -156,4 +156,42 @@ class Convert extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\Utility
 		return $_result;
 	}
 
+	/**
+	 * Takes a KVP traversable and converts to a ' key="value" ' string suitable for framing.
+	 *
+	 * @param array|object $array
+	 * @param bool         $uppercaseKeys If TRUE, the "key" portion will be uppercased
+	 * @param int          $trueConvert   The value to substitute for boolean true
+	 * @param int          $falseConvert  The value to substitute for boolean false
+	 *
+	 * @return string
+	 */
+	public static function kvpToString( $array, $uppercaseKeys = false, $trueConvert = 1, $falseConvert = 0 )
+	{
+		$_result = array();
+
+		foreach ( Option::clean( $array ) as $_key => $_value )
+		{
+			if ( null !== $_value )
+			{
+				if ( false === $_value )
+				{
+					$_value = $falseConvert;
+				}
+				else if ( true === $_value )
+				{
+					$_value = $trueConvert;
+				}
+				else if ( is_array( $_value ) )
+				{
+					$_value = trim( implode( ' ', $_value ) );
+				}
+
+				$_result[] = ( false !== $uppercaseKeys ? strtoupper( $_key ) : strtolower( $_key ) ) . '="' . $_value . '"';
+			}
+		}
+
+		return trim( implode( ' ', $_result ) );
+	}
+
 }
