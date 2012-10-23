@@ -3,8 +3,9 @@
  * FileSystem.php
  */
 namespace Kisma\Core\Utility;
-use \Kisma\Core\Seed;
+use Kisma\Core\Seed;
 use Kisma\Core\Exceptions\UtilityException;
+use Kisma\Core\Enums\GlobFlags;
 
 /**
  * FileSystem
@@ -13,7 +14,7 @@ use Kisma\Core\Exceptions\UtilityException;
  * @property-read $fileHandle The handle of the current file
  * @property-read $fileName   The name of the current file
  */
-class FileSystem extends Seed implements \Kisma\Core\Interfaces\UtilityLike, \Kisma\Core\Interfaces\GlobFlags
+class FileSystem extends Seed implements \Kisma\Core\Interfaces\UtilityLike
 {
 	//********************************************************************************
 	//* Members
@@ -209,22 +210,14 @@ class FileSystem extends Seed implements \Kisma\Core\Interfaces\UtilityLike, \Ki
 	 * A safe empowered glob().
 	 *
 	 * Supported flags: GLOB_MARK, GLOB_NOSORT, GLOB_ONLYDIR
-	<<<<<<< HEAD
-	 * Additional flags: self::GLOB_NODIR, self::GLOB_PATH, self::GLOB_NODOTS, self::GLOB_RECURSE (not original glob() flags, defined here)
-	=======
-	 * Additional flags: GLOB_NODIR, GLOB_PATH, GLOB_NODOTS, GLOB_RECURSE (not original glob() flags, defined here)
-	>>>>>>> a94fc3007fee45238113b138ed539e06bdc22f22
+	 * Additional flags: GlobFlags::GLOB_NODIR, GlobFlags::GLOB_PATH, GlobFlags::GLOB_NODOTS, GlobFlags::GLOB_RECURSE (not original glob() flags, defined here)
 	 *
 	 * @author BigueNique AT yahoo DOT ca
 	 *
 	 * @param string $pattern
 	 * @param int    $flags
 	 *
-	<<<<<<< HEAD
-	 * @return array|false
-	=======
 	 * @return array|bool
-	>>>>>>> a94fc3007fee45238113b138ed539e06bdc22f22
 	 */
 	public static function glob( $pattern, $flags = 0 )
 	{
@@ -240,7 +233,7 @@ class FileSystem extends Seed implements \Kisma\Core\Interfaces\UtilityLike, \Ki
 			while ( false !== ( $_file = readdir( $_directory ) ) )
 			{
 				//	Recurse directories
-				if ( ( $flags & self::GLOB_RECURSE ) && is_dir( $_file ) && ( !in_array( $_file, array( '.', '..' ) ) ) )
+				if ( ( $flags & GlobFlags::GLOB_RECURSE ) && is_dir( $_file ) && ( !in_array( $_file, array( '.', '..' ) ) ) )
 				{
 					$_glob = array_merge(
 						$_glob,
@@ -249,7 +242,7 @@ class FileSystem extends Seed implements \Kisma\Core\Interfaces\UtilityLike, \Ki
 								$_path . '/' . $_file . '/' . $_mask,
 								$flags
 							),
-							( $flags & self::GLOB_PATH ? '' : $_file . '/' )
+							( $flags & GlobFlags::GLOB_PATH ? '' : $_file . '/' )
 						)
 					);
 				}
@@ -258,11 +251,11 @@ class FileSystem extends Seed implements \Kisma\Core\Interfaces\UtilityLike, \Ki
 				if ( fnmatch( $_mask, $_file ) )
 				{
 					if ( ( ( !( $flags & GLOB_ONLYDIR ) ) || is_dir( "$_path/$_file" ) )
-						&& ( ( !( $flags & self::GLOB_NODIR ) ) || ( !is_dir( $_path . '/' . $_file ) ) )
-						&& ( ( !( $flags & self::GLOB_NODOTS ) ) || ( !in_array( $_file, array( '.', '..' ) ) ) )
+						&& ( ( !( $flags & GlobFlags::GLOB_NODIR ) ) || ( !is_dir( $_path . '/' . $_file ) ) )
+						&& ( ( !( $flags & GlobFlags::GLOB_NODOTS ) ) || ( !in_array( $_file, array( '.', '..' ) ) ) )
 					)
 					{
-						$_glob[] = ( $flags & self::GLOB_PATH ? $_path . '/' : '' ) . $_file . ( $flags & GLOB_MARK ? '/' : '' );
+						$_glob[] = ( $flags & GlobFlags::GLOB_PATH ? $_path . '/' : '' ) . $_file . ( $flags & GLOB_MARK ? '/' : '' );
 					}
 				}
 			}
