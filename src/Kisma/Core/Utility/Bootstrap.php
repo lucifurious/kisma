@@ -209,27 +209,6 @@ HTML;
 	}
 
 	/**
-	 * @param string $type
-	 * @param array  $attributes
-	 *
-	 * @return string
-	 */
-	public function button( $type = 'submit', array $attributes = array() )
-	{
-		$_type = trim( strtolower( $type ) ) ? : 'button';
-		$_class = Option::get( $attributes, 'class' );
-		$_text = Option::get( $attributes, 'text', 'Click Me!' );
-		$attributes['class'] = Markup::addValue( $_class, 'btn' );
-		$attributes = Convert::kvpToString( $attributes );
-
-		$_html = <<<HTML
-<button type="{$_type}" {$attributes}>{$_text}</button>
-HTML;
-
-		return $_html;
-	}
-
-	/**
 	 * @param array $attributes
 	 */
 	public function cleanNames( array &$attributes = array() )
@@ -310,26 +289,6 @@ HTML;
 	public function getContents()
 	{
 		return $this->_contents;
-	}
-
-	/**
-	 * @param string $formType
-	 *
-	 * @return Bootstrap
-	 */
-	public function setFormType( $formType )
-	{
-		$this->_formType = $formType;
-
-		return $this;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getFormType()
-	{
-		return $this->_formType;
 	}
 
 	/**
