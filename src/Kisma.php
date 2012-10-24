@@ -68,7 +68,7 @@ class Kisma implements \Kisma\Core\Interfaces\PublisherLike, \Kisma\Core\Interfa
 		if ( false === ( $_conceived = static::getConception() ) )
 		{
 			\register_shutdown_function(
-				function ( $eventName = static::Death )
+				function ( $eventName = Kisma::Death )
 				{
 					\Kisma\Core\Utility\EventManager::publish( null, $eventName );
 				}
