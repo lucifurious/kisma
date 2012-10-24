@@ -3,7 +3,6 @@
  * SeedEvent.php
  */
 namespace Kisma\Core\Events;
-
 /**
  * SeedEvent
  * The base class for Kisma events
@@ -13,35 +12,39 @@ namespace Kisma\Core\Events;
  *
  * If an event handler calls the kill() method, propagation will halt.
  */
-class SeedEvent
+class SeedEvent extends \SplPriorityQueue
 {
 	//**************************************************************************
-	//* Private Members
+	//* Members
 	//**************************************************************************
 
 	/**
-	 * @var object The source of this event
+	 * @var int My own private Idaho.
 	 */
-	protected $_source;
+	private $_id = null;
 	/**
-	 * @var boolean Set to true to stop the bubbling of events at any point
+	 * @var string A user-defined event ID
 	 */
-	protected $_kill = false;
-	/**
-	 * @var mixed Any event data the sender wants to convey
-	 */
-	protected $_data;
+	protected $_eventId = null;
 	/**
 	 * @var string
 	 */
 	protected $_eventTag = null;
 	/**
-	 * @var string A user-defined event ID
+	 * @var object The source of this event
 	 */
-	protected $_eventId = null;
+	protected $_source;
+	/**
+	 * @var mixed Event payload
+	 */
+	protected $_payload;
+	/**
+	 * @var bool Set to TRUE to halt propagation
+	 */
+	protected $_kill = false;
 
 	//**************************************************************************
-	//* Public Methods
+	//* Methods
 	//**************************************************************************
 
 	/**
@@ -52,21 +55,67 @@ class SeedEvent
 	 */
 	public function __construct( $source = null, $data = null )
 	{
+		$this->_setId();
+
 		$this->_source = $source;
 		$this->_data = $data;
-		$this->_kill = false;
 	}
 
 	/**
-	 * Kills propagation immediately
+	 * @param callable|callable[] $listener One or more handlers
+	 * @param int                 $priority
 	 *
-	 * @return SeedEvent
+	 * @throws \InvalidArgumentException
+	 * @return \Kisma\Core\Events\SeedEvent
 	 */
-	public function kill()
+	public function subscribe( $listener, $priority = 0 )
 	{
-		$this->_kill = true;
+		if ( !is_array( $listener ) )
+		{
+			$listener = array( $listener );
+		}
+
+		foreach ( $listener as $_handler )
+		{
+			if ( !is_callable( $_handler ) )
+			{
+				throw new \InvalidArgumentException( 'Invalid listener provided.' );
+			}
+
+			$this->insert( $_handler, $priority );
+		}
 
 		return $this;
+	}
+
+	/**
+	 * @param string $eventName
+	 * @param mixed  $eventData
+	 *
+	 * @return mixed|array
+	 */
+	public function publish( $eventName, $eventData = null )
+	{
+		$this->top();
+		$this->setExtractFlags( static::EXTR_DATA );
+
+		$_results = array();
+
+		while ( $this->valid() )
+		{
+			$_handler = $this->current();
+
+			$_results[] = call_user_func( $_handler, $this );
+
+			if ( $this->wasKilled() )
+			{
+				break;
+			}
+
+			$this->next();
+		}
+
+		return $_results;
 	}
 
 	/**
@@ -77,18 +126,49 @@ class SeedEvent
 		return ( false !== $this->_kill );
 	}
 
+	/**
+	 * Handles scalar comparisons for priority
+	 *
+	 * @param mixed $first
+	 * @param mixed $second
+	 *
+	 * @return int
+	 */
+	public function compare( $first, $second )
+	{
+		return
+			$first === $second ?
+				0
+				:
+				( $first < $second ?
+					-1
+					:
+					1
+				);
+	}
+
 	//**************************************************************************
 	//* Properties
 	//**************************************************************************
 
 	/**
-	 * @param mixed $data
+	 * Sets the internal event ID
+	 */
+	private function _setId()
+	{
+		static $_serial = 0;
+
+		$this->_id = ++$_serial;
+	}
+
+	/**
+	 * @param mixed $payload
 	 *
 	 * @return SeedEvent
 	 */
-	public function setData( $data )
+	public function setPayload( $payload )
 	{
-		$this->_data = $data;
+		$this->_payload = $payload;
 
 		return $this;
 	}
@@ -96,9 +176,9 @@ class SeedEvent
 	/**
 	 * @return mixed
 	 */
-	public function getData()
+	public function getPayload()
 	{
-		return $this->_data;
+		return $this->_payload;
 	}
 
 	/**
@@ -159,6 +239,26 @@ class SeedEvent
 	public function getEventTag()
 	{
 		return $this->_eventTag;
+	}
+
+	/**
+	 * @param boolean $kill
+	 *
+	 * @return SeedEvent
+	 */
+	public function setKill( $kill )
+	{
+		$this->_kill = $kill;
+
+		return $this;
+	}
+
+	/**
+	 * @return boolean
+	 */
+	public function getKill()
+	{
+		return $this->_kill;
 	}
 
 }
