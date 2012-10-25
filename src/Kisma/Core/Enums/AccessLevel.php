@@ -14,7 +14,7 @@ namespace Kisma\Core\Enums;
  * AccessLevel
  * Various pre-defined application access levels
  */
-class AccessLevel extends SeedEnum
+class AccessLevel extends SeedEnum implements \Kisma\Core\Interfaces\AccessLevels
 {
 	//*************************************************************************
 	//* Constants
@@ -24,28 +24,4 @@ class AccessLevel extends SeedEnum
 	 * @var int The default access level
 	 */
 	const __default = self::Guest;
-	/**
-	 * @var int
-	 */
-	const None = -1;
-	/**
-	 * @var int
-	 */
-	const Guest = 0;
-	/**
-	 * @var int
-	 */
-	const UnconfirmedUser = 1;
-	/**
-	 * @var int
-	 */
-	const ConfirmedUser = 2;
-	/**
-	 * @var int
-	 */
-	const AuthorizedUser = 3;
-	/**
-	 * @var intNo access
-	 */
-	const Admin = 4;
 }
