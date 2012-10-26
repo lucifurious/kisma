@@ -10,7 +10,7 @@ use Kisma\Core\Utility\Option;
  * HttpRequest
  * Encapsulates an HTTP application request
  */
-class HttpRequest extends \Kisma\Core\Services\SeedRequest
+class HttpRequest extends \Kisma\Core\Services\SeedService
 {
 	//*************************************************************************
 	//* Private Members
@@ -21,13 +21,13 @@ class HttpRequest extends \Kisma\Core\Services\SeedRequest
 	 */
 	protected $_uri = null;
 	/**
-	 * @var \Kisma\Core\Enums\HttpMethod
+	 * @var string|\Kisma\Core\Enums\HttpMethod
 	 */
 	protected $_method = null;
 	/**
-	 * @var string
+	 * @var mixed
 	 */
-	protected $_content = null;
+	protected $_response = null;
 	/**
 	 * @var array
 	 */
@@ -162,4 +162,16 @@ class HttpRequest extends \Kisma\Core\Services\SeedRequest
 		return $this->_uri;
 	}
 
+	/**
+	 * Process a request for the services of this class
+	 * Called after the service is initialized
+	 *
+	 * @param \Kisma\Core\Interfaces\RequestLike $request
+	 *
+	 * @return bool
+	 */
+	public function process( $request )
+	{
+		// TODO: Implement process() method.
+	}
 }

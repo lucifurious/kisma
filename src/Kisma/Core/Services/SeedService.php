@@ -14,7 +14,7 @@ namespace Kisma\Core\Services;
  * @property bool|int                            $state       The current state of the service
  * @property \Kisma\Core\Interfaces\ConsumerLike $consumer    The consumer, if any, who owns this service.
  */
-abstract class SeedService extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\ServiceLike, \Kisma\Core\Interfaces\Services\ServiceState
+abstract class SeedService extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\ServiceLike, \Kisma\Core\Interfaces\ServiceState
 {
 	//*************************************************************************
 	//* Private Members

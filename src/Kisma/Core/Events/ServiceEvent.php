@@ -17,7 +17,7 @@ class ServiceEvent extends SeedEvent
 	 * @param \Kisma\Core\Interfaces\Consumer  $source
 	 * @param \Kisma\Core\Services\SeedRequest $request
 	 */
-	public function __construct( $source, \Kisma\Core\Services\SeedRequest $request )
+	public function __construct( $source,  $request )
 	{
 		parent::__construct( $source, $request );
 	}

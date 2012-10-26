@@ -13,9 +13,9 @@ interface RouteLike extends \Kisma\Strata\Interfaces\Events\RouteLike
 	//*************************************************************************
 
 	/**
-	 * @param \Kisma\Strata\Interfaces\RequestLike $request
+	 * @param \Kisma\Core\Interfaces\RequestLike $request
 	 *
 	 * @return mixed
 	 */
-	public function processRequest( \Kisma\Strata\Interfaces\RequestLike $request );
+	public function process( \Kisma\Core\Interfaces\RequestLike &$request );
 }

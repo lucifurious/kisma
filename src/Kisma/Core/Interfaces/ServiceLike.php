@@ -20,16 +20,16 @@ interface ServiceLike extends \Kisma\Core\Interfaces\Events\ServiceLike
 	 *
 	 * @return bool
 	 */
-	public function initializeService( $options = array() );
+	public function initialize( $options = array() );
 
 	/**
 	 * Process a request for the services of this class
 	 * Called after the service is initialized
 	 *
-	 * @param \Kisma\Core\Services\SeedRequest $request
+	 * @param \Kisma\Core\Interfaces\RequestLike $request
 	 *
 	 * @return bool
 	 */
-	public function processRequest( $request );
+	public function process( $request );
 
 }

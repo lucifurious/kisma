@@ -45,18 +45,18 @@ class Route extends \Kisma\Core\Seed implements \Kisma\Strata\Interfaces\RouteLi
 	}
 
 	/**
-	 * @param \Kisma\Strata\Interfaces\RequestLike $request
+	 * @param \Kisma\Core\Interfaces\RequestLike $request
 	 *
 	 * @throws \Kisma\Core\Exceptions\InvalidEventHandlerException
 	 * @return mixed
 	 */
-	public function processRequest( \Kisma\Strata\Interfaces\RequestLike &$request )
+	public function process( \Kisma\Core\Interfaces\RequestLike &$request )
 	{
 		//	Don't process if a subscriber stops/handles/augments for us
-		if ( false !== ( $_result = $this->publish( self::PreProcess, &$request ) ) )
+		if ( false !== ( $_result = $this->publish( self::PreProcess, $request ) ) )
 		{
-			$_result = call_user_func( $this->_handler, &$request );
-			$this->publish( self::PostProcess, &$_result );
+			$_result = call_user_func( $this->_handler, $request );
+			$this->publish( self::PostProcess, $_result );
 		}
 
 		return $_result;

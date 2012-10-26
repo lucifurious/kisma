@@ -58,7 +58,7 @@ class Dispatcher extends \Kisma\Core\Seed implements \Kisma\Strata\Interfaces\Di
 	 * Easy-peasy little request dispatcher
 	 *
 	 * Subclassing, overriding this method, or handling the events will let you customize it
-	 * to dispatch any thing (that implements {@see \Kisma\Strata\Interfaces\RequestLike})
+	 * to dispatch any thing (that implements {@see \Kisma\Core\Interfaces\RequestLike})
 	 * to any thing (that implements {@see \Kisma\Strata\Interfaces\RouteLike})
 	 *
 	 * @param string     $tag
