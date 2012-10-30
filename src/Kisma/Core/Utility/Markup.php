@@ -67,6 +67,20 @@ class Markup
 	//*************************************************************************
 
 	/**
+	 * Quickie wrap-per
+	 *
+	 * @param string $tag
+	 * @param string $value
+	 * @param array  $attributes
+	 *
+	 * @return string
+	 */
+	public static function wrap( $tag, $value = null, $attributes = array() )
+	{
+		return static::tag( $tag, $attributes, $value );
+	}
+
+	/**
 	 * @param string $name
 	 * @param string $value
 	 * @param array  $attributes
@@ -194,6 +208,29 @@ class Markup
 	public static function getUppercaseTags()
 	{
 		return static::$_uppercaseTags;
+	}
+
+	/**
+	 * @param string|array $source
+	 * @param string|array $value
+	 * @param string       $delimiter If you are getting back a string, this is the implosion delimiter
+	 *
+	 * @return array|string
+	 */
+	public static function addValue( $source, $value, $delimiter = ' ' )
+	{
+		$_values = ( !is_array( $source ) ) ? explode( ' ', trim( $source ) ) : $source;
+		$_newValues = Convert::createArray( $value );
+
+		foreach ( $_newValues as $_newValue )
+		{
+			if ( !in_array( $_newValue, $_values ) )
+			{
+				$_values[] = $_newValue;
+			}
+		}
+
+		return is_array( $source ) ? $_values : implode( $delimiter, $_values );
 	}
 
 	/**

@@ -97,6 +97,41 @@ class Convert extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\Utility
 	}
 
 	/**
+	 * Takes parameters and returns an array of the values.
+	 *
+	 * @param string|array $data One or more values to read and put into the return array.
+	 *
+	 * @return array
+	 */
+	public static function createArray( $data )
+	{
+		$_result = array();
+		$_count = func_num_args();
+
+		for ( $_i = 0; $_i < $_count; $_i++ )
+		{
+			//	Any other columns to touch?
+			if ( null !== ( $_arg = func_get_arg( $_i ) ) )
+			{
+				if ( !is_array( $_arg ) )
+				{
+					$_result[] = $_arg;
+				}
+				else
+				{
+					foreach ( $_arg as $_value )
+					{
+						$_result[] = $_value;
+					}
+				}
+			}
+		}
+
+		//	Return the fresh array...
+		return $_result;
+	}
+
+	/**
 	 * Down and dirty object to array function
 	 *
 	 * @static
