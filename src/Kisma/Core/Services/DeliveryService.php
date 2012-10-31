@@ -12,6 +12,7 @@ abstract class DeliveryService extends SeedService
 	//*************************************************************************
 	//* Methods
 	//*************************************************************************
+
 	/**
 	 * Process a request for the services of this class
 	 * Called after the service is initialized
@@ -20,7 +21,7 @@ abstract class DeliveryService extends SeedService
 	 *
 	 * @return bool
 	 */
-	public function process( $request )
+	public function process( \Kisma\Core\Interfaces\RequestLike $request )
 	{
 		return $this->deliver( $request, $this->getConsumer() );
 	}

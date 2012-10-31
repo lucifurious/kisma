@@ -7,7 +7,7 @@ namespace Kisma\Core\Services;
  * SeedCli
  * A base class for CLI services
  */
-abstract class SeedCli extends \Kisma\Core\SeedService implements \Kisma\Core\Interfaces\RequestSource
+abstract class SeedCli extends SeedService implements \Kisma\Core\Interfaces\RequestSource
 {
 	//********************************************************************************
 	//* Member Variables
@@ -18,7 +18,7 @@ abstract class SeedCli extends \Kisma\Core\SeedService implements \Kisma\Core\In
 	 */
 	protected $_workingDirectory = null;
 	/**
-	 * @var \Kisma\Core\Services\Request
+	 * @var \Kisma\Core\Interfaces\RequestLike
 	 */
 	protected $_request = null;
 
@@ -123,6 +123,7 @@ abstract class SeedCli extends \Kisma\Core\SeedService implements \Kisma\Core\In
 	public function setWorkingDirectory( $workingDirectory )
 	{
 		$this->_workingDirectory = $workingDirectory;
+
 		return $this;
 	}
 
@@ -142,6 +143,7 @@ abstract class SeedCli extends \Kisma\Core\SeedService implements \Kisma\Core\In
 	public function setRequest( $request )
 	{
 		$this->_request = $request;
+
 		return $this;
 	}
 

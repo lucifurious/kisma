@@ -14,7 +14,7 @@ namespace Kisma\Core\Services;
  * @property bool|int                            $state       The current state of the service
  * @property \Kisma\Core\Interfaces\ConsumerLike $consumer    The consumer, if any, who owns this service.
  */
-abstract class SeedService extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\ServiceLike, \Kisma\Core\Interfaces\ServiceState
+abstract class SeedService extends \Kisma\Core\SeedBag implements \Kisma\Core\Interfaces\ServiceLike, \Kisma\Core\Interfaces\ServiceState
 {
 	//*************************************************************************
 	//* Private Members
@@ -28,6 +28,10 @@ abstract class SeedService extends \Kisma\Core\Seed implements \Kisma\Core\Inter
 	 * @var bool|int The current state of the service
 	 */
 	protected $_state = self::Uninitialized;
+	/**
+	 * @var \Kisma\Core\Interfaces\RequestLike
+	 */
+	protected $_request = null;
 
 	//*************************************************************************
 	//* Interface Methods
@@ -36,9 +40,11 @@ abstract class SeedService extends \Kisma\Core\Seed implements \Kisma\Core\Inter
 	/**
 	 * {@InheritDoc}
 	 */
-	public function initialize( $consumer = null )
+	public function initialize( $consumer = null, $request = null )
 	{
+		$x = new SeedRequ
 		$this->_consumer = $consumer;
+		$this->_request = $request;
 
 		return true;
 	}
@@ -66,7 +72,7 @@ abstract class SeedService extends \Kisma\Core\Seed implements \Kisma\Core\Inter
 
 		$this->_state = self::Initialized;
 
-		if ( false === ( $_result = $this->processRequest( $this->_request ) ) )
+		if ( false === ( $_result = $this->process( $this->_request ) ) )
 		{
 			$this->_state = self::Completed;
 			$this->publish( self::Failure );

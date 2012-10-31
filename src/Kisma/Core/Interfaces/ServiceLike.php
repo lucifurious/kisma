@@ -20,7 +20,7 @@ interface ServiceLike extends \Kisma\Core\Interfaces\Events\ServiceLike
 	 *
 	 * @return bool
 	 */
-	public function initialize( $options = array() );
+	public function initialize( $request = null, $options = array() );
 
 	/**
 	 * Process a request for the services of this class
@@ -30,6 +30,6 @@ interface ServiceLike extends \Kisma\Core\Interfaces\Events\ServiceLike
 	 *
 	 * @return bool
 	 */
-	public function process( $request );
+	public function process( \Kisma\Core\Interfaces\RequestLike $request );
 
 }
