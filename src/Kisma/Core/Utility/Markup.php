@@ -81,11 +81,11 @@ class Markup
 	}
 
 	/**
-	 * @param string $name
-	 * @param string $value
-	 * @param array  $attributes
-	 * @param bool   $close
-	 * @param bool   $selfClose
+	 * @param string        $name
+	 * @param string        $value
+	 * @param string|array  $attributes
+	 * @param bool          $close
+	 * @param bool          $selfClose
 	 *
 	 * @return string
 	 */
