@@ -3,7 +3,6 @@
  * Bootstrap.php
  */
 namespace Kisma\Core\Utility;
-use Kisma\Core\Interfaces\InputTypes;
 
 /**
  * Bootstrap class
@@ -65,6 +64,10 @@ HTML;
 	 * @var array The form attributes
 	 */
 	protected $_attributes = array();
+	/**
+	 * @var array The default form data
+	 */
+	protected $_formData = array();
 
 	//*************************************************************************
 	//* Public Methods
@@ -86,30 +89,76 @@ HTML;
 	}
 
 	/**
+	 * @param array  $fields
+	 * @param string $prefix
+	 */
+	public function renderFields( array $fields, $prefix = null )
+	{
+		$_html = null;
+
+		if ( null !== $prefix )
+		{
+			$this->_prefix = $prefix;
+		}
+
+		foreach ( $fields as $_section => $_fields )
+		{
+			$_html .= static::wrap( 'legend', $_section );
+
+			if ( !is_array( $_fields ) )
+			{
+				$_fields = array( $_fields );
+			}
+
+			foreach ( $_fields as $_name => $_field )
+			{
+				if ( !isset( $_field['id'] ) )
+				{
+					$_field['id'] = $_name;
+				}
+
+				$_contents = Option::get( $_field, 'contents', null, true );
+
+				$_html .= $this->field(
+					Option::get( $_field, 'type', 'text', true ),
+					$_field,
+					$_contents
+				);
+			}
+		}
+
+		echo $_html;
+	}
+
+	/**
 	 * @param string $type
 	 * @param array  $attributes
-	 * @param string $value
+	 * @param string $contents
 	 *
 	 * @return string
 	 */
-	public function field( $type, array $attributes = array(), $value = null )
+	public function field( $type, array $attributes = array(), $contents = null )
 	{
 		$_html = null;
 		$_type = strtolower( trim( $type ) );
 		$_wrapInput = Scalar::in( $_type, 'checkbox', 'radio' );
 		$_labelEnd = null;
 		$_labelAttributes = array();
+		$_id = Option::get( $attributes, 'id', Option::get( $attributes, 'name' ) );
 
 		$this->cleanNames( $attributes );
 
-		$_id = $attributes['id'];
-		$_label = $attributes['label'];
+		$_label = Option::get( $attributes, 'label', null, true );
 
 		//	Add .control-label for the class to labels
 		if ( static::Horizontal == $this->_formType )
 		{
-			$_class = Option::get( $attributes, 'class', null );
-			$_labelAttributes['class'] = Markup::addValue( $_class, ( $_wrapInput ? $_type : 'control-label' ) );
+			if ( !isset( $_labelAttributes['class'] ) )
+			{
+				$_labelAttributes['class'] = null;
+			}
+
+			$_labelAttributes['class'] = Markup::addValue( $_labelAttributes['class'], ( $_wrapInput ? $_type : 'control-label' ) );
 		}
 
 		$_label = Markup::tag( 'label', $_labelAttributes, ( $_wrapInput ? null : $_label ), !$_wrapInput );
@@ -143,6 +192,11 @@ HTML;
 				break;
 		}
 
+		if ( null === $contents && !empty( $this->_formData ) )
+		{
+			$contents = Option::get( $this->_formData, $_id );
+		}
+
 		switch ( $_type )
 		{
 			case 'html':
@@ -150,26 +204,24 @@ HTML;
 				break;
 
 			case 'textarea':
-				$_input = Markup::wrap(
-					$_type,
-					Option::get( $attributes, 'value', null, true ),
-					$attributes
-				);
-				break;
-
 			case 'select':
 				$_input = Markup::wrap(
 					$_type,
-					$value,
+					$contents,
 					$attributes
 				);
 				break;
 
 			case 'button':
-				$_input = static::button( $attributes, $value );
+				$_input = static::button( $attributes, $contents );
 				break;
 
 			default:
+				if ( !isset( $attributes['value'] ) )
+				{
+					$attributes['value'] = $contents;
+				}
+
 				$attributes = Convert::kvpToString( $attributes );
 				$_input = <<<HTML
 <input type="{$_type}" {$attributes}>
@@ -244,7 +296,7 @@ HTML;
 	public function cleanNames( array &$attributes = array() )
 	{
 		$_id = Option::get( $attributes, 'id' );
-		$_name = Option::get( $attributes, 'name' );
+		$_name = Option::get( $attributes, 'name', $_id );
 
 		if ( null === $_id )
 		{
@@ -253,7 +305,13 @@ HTML;
 
 		if ( null === ( $_label = Option::get( $attributes, 'label', null, true ) ) )
 		{
-			$_label = ucwords( str_replace( '_', ' ', $_name ) );
+			$_label = ucwords(
+				str_replace(
+					array( '_text', '_nbr', '_ind', '_blob', '_' ),
+					array( null, null, null, null, ' ' ),
+					$_name
+				)
+			);
 		}
 
 		if ( null !== $this->_prefix )
@@ -421,4 +479,23 @@ HTML;
 		return $this->_formType;
 	}
 
+	/**
+	 * @param array $formData
+	 *
+	 * @return Bootstrap
+	 */
+	public function setFormData( $formData )
+	{
+		$this->_formData = $formData;
+
+		return $this;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getFormData()
+	{
+		return $this->_formData;
+	}
 }
