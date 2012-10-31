@@ -157,6 +157,14 @@ HTML;
 				);
 				break;
 
+			case 'select':
+				$_input = Markup::wrap(
+					$_type,
+					$value,
+					$attributes
+				);
+				break;
+
 			case 'button':
 				$_input = static::button( $attributes, $value );
 				break;
