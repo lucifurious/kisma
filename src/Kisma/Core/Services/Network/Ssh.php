@@ -15,7 +15,7 @@ class Ssh extends \Kisma\Core\Services\DeliveryService
 	/**
 	 * {@InheritDoc}
 	 */
-	public function deliver( $payload, $consumer )
+	public function deliver( $payload )
 	{
 		throw new \Kisma\Core\Exceptions\NotImplementedException();
 	}

@@ -168,10 +168,10 @@ class HttpRequest extends \Kisma\Core\Services\SeedService
 	 *
 	 * @param \Kisma\Core\Interfaces\RequestLike $request
 	 *
-	 * @return bool
+	 * @return \Kisma\Core\Interfaces\ResponseLike|void
 	 */
-	public function process( $request )
+	public function process( \Kisma\Core\Interfaces\RequestLike $request = null )
 	{
-		// TODO: Implement process() method.
+		return null;
 	}
 }

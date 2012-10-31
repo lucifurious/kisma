@@ -24,7 +24,7 @@ abstract class Http extends \Kisma\Core\Services\SeedService implements \Kisma\C
 	/**
 	 * {@InheritDoc}
 	 */
-	public function initialize( $consumer = null, $request = null )
+	public function initialize( \Kisma\Core\Interfaces\ConsumerLike $consumer, $request = null )
 	{
 		if ( !parent::initialize( $consumer, $request ) )
 		{

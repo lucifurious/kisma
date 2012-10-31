@@ -6,6 +6,8 @@ namespace Kisma\Core\Events;
 /**
  * ServiceEvent
  * An event that is consumed by a service. Merely enforces the $request argument
+ *
+ * @method \Kisma\Core\Interfaces\ConsumerLike getSource()
  */
 class ServiceEvent extends SeedEvent
 {
@@ -16,10 +18,10 @@ class ServiceEvent extends SeedEvent
 	/**
 	 * Enforces types...
 	 *
-	 * @param \Kisma\Core\Interfaces\ServiceLike    $source
-	 * @param \Kisma\Core\Interfaces\RequestLike    $request
+	 * @param \Kisma\Core\Interfaces\ConsumerLike    $source
+	 * @param \Kisma\Core\Interfaces\RequestLike     $request
 	 */
-	public function __construct( \Kisma\Core\Interfaces\ServiceLike $source, \Kisma\Core\Interfaces\RequestLike $request )
+	public function __construct( \Kisma\Core\Interfaces\ConsumerLike $source, \Kisma\Core\Interfaces\RequestLike $request = null )
 	{
 		parent::__construct( $source, $request );
 	}

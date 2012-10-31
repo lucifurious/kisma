@@ -20,7 +20,7 @@ class SeedEvent
 	//**************************************************************************
 
 	/**
-	 * @var object The source of this event
+	 * @var \Kisma\Core\Interfaces\SeedLike The source of this event
 	 */
 	protected $_source;
 	/**
@@ -47,8 +47,8 @@ class SeedEvent
 	/**
 	 * Constructor.
 	 *
-	 * @param object $source
-	 * @param mixed  $data
+	 * @param \Kisma\Core\Interfaces\SeedLike $source
+	 * @param mixed                           $data
 	 */
 	public function __construct( $source = null, $data = null )
 	{
@@ -102,7 +102,7 @@ class SeedEvent
 	}
 
 	/**
-	 * @param \Kisma\Core\Seed $source
+	 * @param \Kisma\Core\Interfaces\SeedLike $source
 	 *
 	 * @return SeedEvent
 	 */
@@ -114,7 +114,7 @@ class SeedEvent
 	}
 
 	/**
-	 * @return \Kisma\Core\Seed
+	 * @return \Kisma\Core\Interfaces\SeedLike
 	 */
 	public function getSource()
 	{

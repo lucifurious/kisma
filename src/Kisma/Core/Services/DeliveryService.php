@@ -14,14 +14,9 @@ abstract class DeliveryService extends SeedService
 	//*************************************************************************
 
 	/**
-	 * Process a request for the services of this class
-	 * Called after the service is initialized
-	 *
-	 * @param \Kisma\Core\Interfaces\RequestLike $request
-	 *
-	 * @return bool
+	 * {@InheritDoc}
 	 */
-	public function process( \Kisma\Core\Interfaces\RequestLike $request )
+	public function process( \Kisma\Core\Interfaces\RequestLike $request = null )
 	{
 		return $this->deliver( $request, $this->getConsumer() );
 	}
@@ -30,9 +25,8 @@ abstract class DeliveryService extends SeedService
 	 * Process the request (i.e. deliver payload)
 	 *
 	 * @param \Kisma\Core\Interfaces\RequestLike  $payload
-	 * @param \Kisma\Core\Interfaces\ConsumerLike $consumer
 	 *
 	 * @return \Kisma\Core\Interfaces\ResponseLike
 	 */
-	abstract public function deliver( $payload, $consumer );
+	abstract public function deliver( $payload );
 }

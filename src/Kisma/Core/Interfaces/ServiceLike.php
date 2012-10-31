@@ -16,11 +16,12 @@ interface ServiceLike extends \Kisma\Core\Interfaces\Events\ServiceLike
 	/**
 	 * Initialize the service. Called automatically
 	 *
-	 * @param mixed $options
+	 * @param \Kisma\Core\Interfaces\ConsumerLike $consumer
+	 * @param \Kisma\Core\Interfaces\RequestLike  $request
 	 *
 	 * @return bool
 	 */
-	public function initialize( $request = null, $options = array() );
+	public function initialize( \Kisma\Core\Interfaces\ConsumerLike $consumer, $request = null );
 
 	/**
 	 * Process a request for the services of this class
@@ -28,8 +29,8 @@ interface ServiceLike extends \Kisma\Core\Interfaces\Events\ServiceLike
 	 *
 	 * @param \Kisma\Core\Interfaces\RequestLike $request
 	 *
-	 * @return bool
+	 * @return \Kisma\Core\Interfaces\ResponseLike
 	 */
-	public function process( \Kisma\Core\Interfaces\RequestLike $request );
+	public function process( \Kisma\Core\Interfaces\RequestLike $request = null );
 
 }

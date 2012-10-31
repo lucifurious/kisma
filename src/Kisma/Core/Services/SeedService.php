@@ -38,11 +38,15 @@ abstract class SeedService extends \Kisma\Core\SeedBag implements \Kisma\Core\In
 	//*************************************************************************
 
 	/**
-	 * {@InheritDoc}
+	 * Initialize the service. Called automatically
+	 *
+	 * @param \Kisma\Core\Interfaces\ConsumerLike $consumer
+	 * @param \Kisma\Core\Interfaces\RequestLike  $request
+	 *
+	 * @return bool
 	 */
-	public function initialize( $consumer = null, $request = null )
+	public function initialize( \Kisma\Core\Interfaces\ConsumerLike $consumer, $request = null )
 	{
-		$x = new SeedRequ
 		$this->_consumer = $consumer;
 		$this->_request = $request;
 
@@ -93,7 +97,7 @@ abstract class SeedService extends \Kisma\Core\SeedBag implements \Kisma\Core\In
 	/**
 	 * @param \Kisma\Core\Interfaces\ConsumerLike $consumer
 	 *
-	 * @return SeedService
+	 * @return \Kisma\Core\Services\SeedService
 	 */
 	public function setConsumer( $consumer )
 	{
@@ -113,7 +117,7 @@ abstract class SeedService extends \Kisma\Core\SeedBag implements \Kisma\Core\In
 	/**
 	 * @param bool|int $state
 	 *
-	 * @return SeedService
+	 * @return \Kisma\Core\Services\SeedService
 	 */
 	public function setState( $state )
 	{
@@ -128,6 +132,26 @@ abstract class SeedService extends \Kisma\Core\SeedBag implements \Kisma\Core\In
 	public function getState()
 	{
 		return $this->_state;
+	}
+
+	/**
+	 * @param \Kisma\Core\Interfaces\RequestLike $request
+	 *
+	 * @return \Kisma\Core\Services\SeedService
+	 */
+	public function setRequest( $request )
+	{
+		$this->_request = $request;
+
+		return $this;
+	}
+
+	/**
+	 * @return \Kisma\Core\Interfaces\RequestLike
+	 */
+	public function getRequest()
+	{
+		return $this->_request;
 	}
 
 }
