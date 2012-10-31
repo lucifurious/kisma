@@ -230,20 +230,6 @@ class Scalar implements \Kisma\Core\Interfaces\UtilityLike
 	}
 
 	/**
-	 * Tests if a value has been serialized
-	 *
-	 * @param string $value
-	 *
-	 * @return boolean
-	 */
-	public static function serialized( $value )
-	{
-		$_result = @unserialize( $value );
-
-		return !( false === $_result && $value != serialize( false ) );
-	}
-
-	/**
 	 * Sets a value within an array only if the value is not set (SetIfNotSet=SINS).
 	 * You can pass in an array of key value pairs and do many at once.
 	 *

@@ -53,38 +53,52 @@ HTML;
 	 * @var string
 	 */
 	protected $_blockPattern = self::VerticalGroupPattern;
+	/**
+	 * @var string
+	 */
+	protected $_formType = self::Vertical;
+	/**
+	 * @var bool If true, the form is built into the $contents property and the self::renderForm method is used to output the results.
+	 */
+	protected $_builderMode = true;
+	/**
+	 * @var array The form attributes
+	 */
+	protected $_attributes = array();
 
 	//*************************************************************************
 	//* Public Methods
 	//*************************************************************************
 
 	/**
+	 * @param string      $formType
 	 * @param array       $attributes
 	 * @param string|null $prefix
 	 *
 	 * @return \Kisma\Core\Utility\Bootstrap
 	 */
-	public function __construct( $attributes = array(), $prefix = null )
+	public function __construct( $formType = self::Vertical, $attributes = array(), $prefix = null )
 	{
+		$this->_formType = $formType;
 		$this->_prefix = $prefix;
-		$this->_contents = Markup::openTag( 'form', $attributes );
+		$this->_attributes = $attributes;
+		$this->_contents = null;
 	}
 
 	/**
 	 * @param string $type
 	 * @param array  $attributes
 	 * @param string $value
-	 * @param bool   $close
-	 * @param bool   $selfClose
 	 *
 	 * @return string
 	 */
-	public function field( $type, array $attributes = array(), $value = null, $close = true, $selfClose = false )
+	public function field( $type, array $attributes = array(), $value = null )
 	{
 		$_html = null;
 		$_type = strtolower( trim( $type ) );
 		$_wrapInput = Scalar::in( $_type, 'checkbox', 'radio' );
 		$_labelEnd = null;
+		$_labelAttributes = array();
 
 		$this->cleanNames( $attributes );
 
@@ -92,7 +106,7 @@ HTML;
 		$_label = $attributes['label'];
 
 		//	Add .control-label for the class to labels
-		if ( self::Horizontal == $this->_formType )
+		if ( static::Horizontal == $this->_formType )
 		{
 			$_class = Option::get( $attributes, 'class', null );
 			$_labelAttributes['class'] = Markup::addValue( $_class, ( $_wrapInput ? $_type : 'control-label' ) );
@@ -111,7 +125,7 @@ HTML;
 
 		switch ( $this->_formType )
 		{
-			case self::Horizontal:
+			case static::Horizontal:
 				$_blockStart = Markup::tag( 'div', array( 'class' => 'control-group' ), null, false );
 				$_inputStart = Markup::tag( 'div', array( 'class' => 'controls' ), null, false );
 				$_inputEnd = $_blockEnd = '</div>';
@@ -123,40 +137,46 @@ HTML;
 				}
 				break;
 
-			case self::Search:
+			case static::Search:
 				$_class = Option::get( $attributes, 'class' );
 				$attributes['class'] = Markup::addValue( $_class, 'search-query' );
 				break;
 		}
 
-		if ( 'html' == $_type )
+		switch ( $_type )
 		{
-			$_input = $_html;
-		}
-		else
-		{
-			if ( 'textarea' == $_type )
-			{
+			case 'html':
+				$_input = $_html;
+				break;
+
+			case 'textarea':
 				$_input = Markup::wrap(
 					$_type,
 					Option::get( $attributes, 'value', null, true ),
 					$attributes
 				);
-			}
-			else
-			{
+				break;
+
+			case 'button':
+				$_input = static::button( $attributes, $value );
+				break;
+
+			default:
 				$attributes = Convert::kvpToString( $attributes );
 				$_input = <<<HTML
 <input type="{$_type}" {$attributes}>
 HTML;
-			}
+				break;
 		}
 
 		$_html = <<<HTML
 {$_blockStart}{$_inputStart}{$_label}{$_input}{$_labelEnd}{$_hint}{$_inputEnd}{$_blockEnd}
 HTML;
 
-		$this->_contents .= $_html;
+		if ( false !== $this->_builderMode )
+		{
+			$this->_contents .= $_html;
+		}
 
 		return $_html;
 	}
@@ -171,10 +191,9 @@ HTML;
 	 */
 	public function renderForm( $legend = null, $submitButton = 'Submit', array $attributes = array() )
 	{
-		if ( self::Vertical !== $this->_formType )
+		if ( static::VerticalGroupPattern !== $this->_blockPattern )
 		{
-			$_class = Markup::addValue( Option::get( $attributes, 'class', array() ), 'form' . $this->_formType );
-			$attributes['class'] = $_class;
+			$attributes['class'] = Markup::addValue( Option::get( $attributes, 'class', array() ), 'form' . $this->_formType );
 		}
 
 		$_html = Convert::kvpToString( $attributes );
@@ -185,6 +204,7 @@ HTML;
 		}
 
 		$_submit = null;
+
 		if ( !empty( $submitButton ) )
 		{
 			$_submit = $this->button(
@@ -199,7 +219,9 @@ HTML;
 <form {$_html}>
 	{$legend}
 	{$this->_contents}
+	<div class="form-actions">
 	{$_submit}
+	</div>
 </form>
 HTML;
 
@@ -309,6 +331,86 @@ HTML;
 	public function getPrefix()
 	{
 		return $this->_prefix;
+	}
+
+	/**
+	 * @param array $attributes
+	 *
+	 * @return Bootstrap
+	 */
+	public function setAttributes( $attributes )
+	{
+		$this->_attributes = $attributes;
+
+		return $this;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getAttributes()
+	{
+		return $this->_attributes;
+	}
+
+	/**
+	 * @param string $blockPattern
+	 *
+	 * @return Bootstrap
+	 */
+	public function setBlockPattern( $blockPattern )
+	{
+		$this->_blockPattern = $blockPattern;
+
+		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getBlockPattern()
+	{
+		return $this->_blockPattern;
+	}
+
+	/**
+	 * @param boolean $builderMode
+	 *
+	 * @return Bootstrap
+	 */
+	public function setBuilderMode( $builderMode )
+	{
+		$this->_builderMode = $builderMode;
+
+		return $this;
+	}
+
+	/**
+	 * @return boolean
+	 */
+	public function getBuilderMode()
+	{
+		return $this->_builderMode;
+	}
+
+	/**
+	 * @param string $formType
+	 *
+	 * @return Bootstrap
+	 */
+	public function setFormType( $formType )
+	{
+		$this->_formType = $formType;
+
+		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getFormType()
+	{
+		return $this->_formType;
 	}
 
 }
