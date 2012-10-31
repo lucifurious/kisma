@@ -118,18 +118,23 @@ class Markup
 	}
 
 	/**
-	 * @param       $tag
-	 * @param array $attributes
-	 * @param bool  $selfClose
+	 * @param string       $tag
+	 * @param string|array $attributes
+	 * @param bool         $selfClose
 	 *
 	 * @return string
 	 */
-	public static function openTag( $tag, array $attributes = array(), $selfClose = false )
+	public static function openTag( $tag, $attributes = array(), $selfClose = false )
 	{
+		if ( is_array( $attributes ) )
+		{
+			$attributes = Convert::kvpToString( $attributes, static::$_uppercaseTags );
+		}
+
 		return
 			str_replace(
 				static::ValuePlaceholder,
-				static::_cleanTag( $tag ) . ' ' . Convert::kvpToString( $attributes, static::$_uppercaseTags ),
+				static::_cleanTag( $tag ) . ' ' . $attributes,
 				static::_tagPattern( true, $selfClose )
 			);
 	}
