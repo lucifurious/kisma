@@ -11,7 +11,7 @@
  * @method static bool setConception( bool $how ) Sets the conception flag
  * @method static mixed getDebug() Gets the debug setting( s )
  * @method static mixed setDebug( mixed $how ) Sets the debug setting( s )
- * @method static mixed getAutoLoader()
+ * @method static \Composer\Autoload\ClassLoader getAutoLoader()
  * @method static mixed setAutoLoader( mixed $autoLoader )
  */
 class Kisma implements \Kisma\Core\Interfaces\PublisherLike, \Kisma\Core\Interfaces\Events\Kisma, \Kisma\Core\Interfaces\KismaSettings
