@@ -85,25 +85,45 @@ class FilterInput implements \Kisma\Core\Interfaces\UtilityLike
 			return trim( filter_var( Option::get( $type, $key, $defaultValue ), $filter, $filterOptions ) );
 		}
 
+		$_haystack = null;
+
 		//	Based on the type, pull the right value
 		switch ( $type )
 		{
 			case INPUT_REQUEST:
-				return trim( filter_var( Option::get( $_REQUEST, $key, $defaultValue ), $filter, $filterOptions ) );
-
+				$_haystack = $_REQUEST;
+				break;
 			case INPUT_SESSION:
-				return trim( filter_var( Option::get( $_SESSION, $key, $defaultValue ), $filter, $filterOptions ) );
-
+				$_haystack = $_SESSION;
+				break;
 			case INPUT_GET:
+				$_haystack = $_GET;
+				break;
 			case INPUT_POST:
+				$_haystack = $_POST;
+				break;
 			case INPUT_COOKIE:
+				$_haystack = $_COOKIE;
+				break;
 			case INPUT_SERVER:
+				$_haystack = $_SERVER;
+				break;
 			case INPUT_ENV:
-				return trim( filter_input( $type, $key, $filter, $filterOptions ) );
+				$_haystack = $_ENV;
+				break;
+			default:
+				//	No clue what you want man...
+				throw new \InvalidArgumentException( 'The filter type of "' . $type . '" is unknown or not supported.' );
 		}
 
-		//	No clue what you want man...
-		throw new \InvalidArgumentException( 'The filter type of "' . $type . '" is unknown or not supported.' );
+		if ( empty( $_haystack ) )
+		{
+			return $defaultValue;
+		}
+
+		$_value = trim( filter_var( Option::get( $_haystack, $key, $defaultValue ), $filter, $filterOptions ) );
+
+		return $_value;
 	}
 
 	/**
