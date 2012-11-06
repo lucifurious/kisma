@@ -20,6 +20,10 @@ class Log extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\UtilityLike
 	 * @var string The default log line format
 	 */
 	const DefaultLogFormat = '%%date%% %%time%% %%level%% %%message%% %%extra%%';
+	/**
+	 * @var string The relative path (from the Kisma base path) for the default log
+	 */
+	const DefaultLogFile = '/log/kisma.log';
 
 	//********************************************************************************
 	//* Private Members
@@ -276,36 +280,15 @@ class Log extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\UtilityLike
 
 		if ( empty( $_logLevels ) )
 		{
-			$_logLevels = array();
-			\Kisma\Core\Enums\SeedEnum::seedConstants(
-				array(
-
-				)
-			)
-			$_mirror = new \ReflectionClass( get_called_class() );
-			$_constants = $_mirror->getConstants();
-
-			foreach ( $_constants as $_name => $_value )
-			{
-				$_logLevels[$_name] = $_value;
-			}
+			$_logLevels = \Kisma\Core\Enums\Levels::getDefinedConstants();
 		}
 
-		$_levels = is_string( $level ) ? $_logLevels : array_flip( $_logLevels );
-
-		if ( null === ( $_tag = Option::get( $_levels, $level ) ) )
+		if ( null === ( $_tag = Option::get( is_string( $level ) ? $_logLevels : array_flip( $_logLevels ), $level ) ) )
 		{
-			$_tag = 'Info';
+			$_tag = 'INFO';
 		}
 
-		if ( false === $fullName )
-		{
-			$_tag = substr( strtoupper( $_tag ), 0, 4 );
-		}
-
-		unset( $_levels );
-
-		return $_tag;
+		return ( false === $fullName ? substr( strtoupper( $_tag ), 0, 4 ) : $_tag );
 	}
 
 	/**
@@ -478,7 +461,7 @@ class Log extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\UtilityLike
 		//	Set a name for the default log
 		if ( null === static::$_defaultLog )
 		{
-			Log::setDefaultLog( dirname( \Kisma::getBasePath() ) . '/log/kisma.log' );
+			Log::setDefaultLog( \Kisma::get( 'app.log_path', \Kisma::get( 'app.base_path' ) . static::DefaultLogFile ) );
 		}
 	}
 
