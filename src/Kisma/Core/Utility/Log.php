@@ -277,6 +277,11 @@ class Log extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\UtilityLike
 		if ( empty( $_logLevels ) )
 		{
 			$_logLevels = array();
+			\Kisma\Core\Enums\SeedEnum::seedConstants(
+				array(
+
+				)
+			)
 			$_mirror = new \ReflectionClass( get_called_class() );
 			$_constants = $_mirror->getConstants();
 

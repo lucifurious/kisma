@@ -22,7 +22,16 @@ use \Kisma\Core\Utility;
 abstract class SeedEnum
 {
 	//*************************************************************************
-	//* Public Methods
+	//* Members
+	//*************************************************************************
+
+	/**
+	 * @var array The cache for quick lookups
+	 */
+	protected static $_constants = null;
+
+	//*************************************************************************
+	//* Methods
 	//*************************************************************************
 
 	/**
@@ -31,6 +40,59 @@ abstract class SeedEnum
 	public function __invoke()
 	{
 		return self::defines( '__default', true );
+	}
+
+	/**
+	 * @param string $class
+	 * @param array  $seedConstants Seeds the cache with these optional KVPs
+	 * @param bool   $overwrite
+	 *
+	 * @return string
+	 */
+	public static function introspect( $class = null, array $seedConstants = array(), $overwrite = true )
+	{
+		$_key = static::_cacheKey( $class );
+
+		if ( true === $overwrite || !isset( static::$_constants[$_key] ) )
+		{
+			$_mirror = new \ReflectionClass( $_key );
+
+			static::$_constants[$_key] = array_merge(
+				$seedConstants,
+				$_mirror->getConstants()
+			);
+
+			unset( $_mirror );
+		}
+
+		return $_key;
+	}
+
+	/**
+	 * Gets a guaranteed cache key
+	 *
+	 * @param string $class
+	 *
+	 * @return string
+	 */
+	protected static function _cacheKey( $class = null )
+	{
+		static $_key = null;
+
+		return $_key ? : \Kisma\Core\Utility\Inflector::tag( $class ? : \get_called_class(), true );
+	}
+
+	/**
+	 * Adds constants to the cache for a particular class. Roll-your-own ENUM
+	 *
+	 * @param array  $constants
+	 * @param string $class
+	 *
+	 * @return void
+	 */
+	public static function seedConstants( array $constants, $class = null )
+	{
+		static::introspect( $class, $constants );
 	}
 
 	/**
@@ -44,17 +106,9 @@ abstract class SeedEnum
 	 */
 	public static function getDefinedConstants( $flipped = false, $class = null )
 	{
-		static $_constants = array();
+		$_key = static::introspect( $class, array(), false );
 
-		$class = $class ? : get_called_class();
-
-		if ( !isset( $_constants[$class] ) )
-		{
-			$_mirror = new \ReflectionClass( $class );
-			$_constants[$class] = $_mirror->getConstants();
-		}
-
-		return false === $flipped ? $_constants[$class] : array_flip( $_constants[$class] );
+		return false === $flipped ? static::$_constants[$_key] : array_flip( static::$_constants[$_key] );
 	}
 
 	/**
@@ -85,14 +139,12 @@ abstract class SeedEnum
 	 */
 	public static function nameOf( $constant )
 	{
-		$_constants = self::getDefinedConstants( true /*, get_called_class()*/ );
-
-		if ( !\Kisma\Core\Utility\Option::contains( $_constants, $constant ) )
+		if ( in_array( $constant, array_values( $_constants = self::getDefinedConstants( true ) ) ) )
 		{
-			throw new \InvalidArgumentException( 'The constant "' . $constant . '" is not defined.' );
+			return $_constants[$constant];
 		}
 
-		return \Kisma\Core\Utility\Option::get( $_constants, $constant );
+		throw new \InvalidArgumentException( 'The constant "' . $constant . '" is not defined.' );
 	}
 
 	/**
@@ -114,9 +166,10 @@ abstract class SeedEnum
 	 */
 	public static function defines( $constant, $returnValue = false )
 	{
-		$_constants = self::getDefinedConstants( true /*, get_called_class()*/ );
+		$_constants = self::getDefinedConstants( true );
+		$_has = isset( $_constants, $constant );
 
-		if ( false === ( $_has = Utility\Option::contains( $_constants, $constant ) ) && false !== $returnValue )
+		if ( false === $_has && false !== $returnValue )
 		{
 			throw new \InvalidArgumentException( 'The constant "' . $constant . '" is not defined.' );
 		}
