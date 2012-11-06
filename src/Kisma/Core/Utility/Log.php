@@ -283,7 +283,9 @@ class Log extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\UtilityLike
 			$_logLevels = \Kisma\Core\Enums\Levels::getDefinedConstants();
 		}
 
-		if ( null === ( $_tag = Option::get( is_string( $level ) ? $_logLevels : array_flip( $_logLevels ), $level ) ) )
+		$_levels = ( is_string( $level ) ? $_logLevels : array_flip( $_logLevels ) );
+
+		if ( null === ( $_tag = Option::get( $_levels, $level ) ) )
 		{
 			$_tag = 'INFO';
 		}
