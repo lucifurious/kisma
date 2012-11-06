@@ -55,7 +55,7 @@ abstract class SeedEnum
 
 		if ( true === $overwrite || !isset( static::$_constants[$_key] ) )
 		{
-			$_mirror = new \ReflectionClass( $class );
+			$_mirror = new \ReflectionClass( $class ? : \get_called_class() );
 
 			static::$_constants[$_key] = array_merge(
 				$seedConstants,
