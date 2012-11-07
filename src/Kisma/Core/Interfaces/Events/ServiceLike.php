@@ -16,7 +16,7 @@ interface ServiceLike
 	/**
 	 * @var string Fired before service call
 	 */
-	const BeforePerform = 'kisma.core.service_like.before_perform';
+	const BeforeServiceCall = 'kisma.core.service_like.before_service_call';
 	/**
 	 * @var string Fired when the service call succeeded
 	 */
@@ -28,7 +28,7 @@ interface ServiceLike
 	/**
 	 * @var string Fired after service call
 	 */
-	const AfterPerform = 'kisma.core.service_like.after_perform';
+	const AfterServiceCall = 'kisma.core.service_like.after_service_call';
 	/**
 	 * @var string Fired when processing is complete
 	 */
