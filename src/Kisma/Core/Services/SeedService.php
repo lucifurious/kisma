@@ -9,10 +9,9 @@ namespace Kisma\Core\Services;
  *
  * Provides three event handlers:
  *
- * onSuccess, onFailure, and onComplete
- *
- * @property bool|int                            $state       The current state of the service
- * @property \Kisma\Core\Interfaces\ConsumerLike $consumer    The consumer, if any, who owns this service.
+ * @event onSuccess Raised after a success
+ * @event onFailure Raised after a failure
+ * @event onComplete Raised upon completion of a service call
  */
 abstract class SeedService extends \Kisma\Core\SeedBag implements \Kisma\Core\Interfaces\ServiceLike, \Kisma\Core\Interfaces\ServiceState
 {
@@ -38,55 +37,25 @@ abstract class SeedService extends \Kisma\Core\SeedBag implements \Kisma\Core\In
 	//*************************************************************************
 
 	/**
-	 * Initialize the service. Called automatically
+	 * Create the service
 	 *
 	 * @param \Kisma\Core\Interfaces\ConsumerLike $consumer
-	 * @param \Kisma\Core\Interfaces\RequestLike  $request
-	 *
-	 * @return bool
+	 * @param array                               $settings
 	 */
-	public function initialize( \Kisma\Core\Interfaces\ConsumerLike $consumer, $request = null )
+	public function __construct( \Kisma\Core\Interfaces\ConsumerLike $consumer, $settings = array() )
 	{
-		$this->_consumer = $consumer;
-		$this->_request = $request;
+		parent::__construct( $settings );
 
-		return true;
+		$this->_consumer = $consumer;
+		$this->_state = self::Initialized;
 	}
 
-	//*************************************************************************
-	//* Default Event Handlers
-	//*************************************************************************
-
 	/**
-	 * Drives the service forward!
-	 *
-	 * After the base object is constructed, call the service's initialize method,
-	 * then process the request
-	 *
-	 * @param \Kisma\Core\Events\ServiceEvent $event
-	 *
-	 * @return bool
+	 * Default implementation
 	 */
-	public function onAfterConstruct( $event = null )
+	public function perform()
 	{
-		if ( false === $this->initialize( $event->getSource(), $event->getData() ) )
-		{
-			return false;
-		}
-
-		$this->_state = self::Initialized;
-
-		if ( false === ( $_result = $this->process( $this->_request ) ) )
-		{
-			$this->_state = self::Completed;
-			$this->publish( self::Failure );
-		}
-		else
-		{
-			$this->_state = self::Completed;
-			$this->publish( self::Success );
-		}
-
+		//	Service complete
 		$this->publish( self::Complete );
 	}
 

@@ -14,19 +14,20 @@ abstract class DeliveryService extends SeedService
 	//*************************************************************************
 
 	/**
-	 * {@InheritDoc}
+	 * @return mixed|void
 	 */
-	public function process( \Kisma\Core\Interfaces\RequestLike $request = null )
+	public function perform()
 	{
-		return $this->deliver( $request, $this->getConsumer() );
+		$_result = $this->deliver();
+
+		$this->publish( ( $_result->success() ? static::Success : static::Failure ), $_result );
+
+		//	Call parent implementation to raise complete event
+		parent::perform();
 	}
 
 	/**
-	 * Process the request (i.e. deliver payload)
-	 *
-	 * @param \Kisma\Core\Interfaces\RequestLike  $payload
-	 *
 	 * @return \Kisma\Core\Interfaces\ResponseLike
 	 */
-	abstract public function deliver( $payload );
+	abstract public function deliver();
 }

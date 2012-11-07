@@ -1,25 +1,22 @@
 <?php
 /**
- * ResponseLike.php
+ * SeedResponse.php
  */
-namespace Kisma\Core\Interfaces;
+namespace Kisma\Core\Services;
 /**
- * ResponseLike
+ * SeedResponse
+ * A response for a service request
  */
-interface ResponseLike extends BagLike
+class SeedResponse extends \Kisma\Core\SeedBag implements \Kisma\Core\Interfaces\ResponseLike
 {
 	//*************************************************************************
-	//* Constants
+	//* Members
 	//*************************************************************************
 
 	/**
-	 * @var int
+	 * @var int The service status
 	 */
-	const Failure = 0;
-	/**
-	 * @var int
-	 */
-	const Success = 1;
+	protected $_status = null;
 
 	//*************************************************************************
 	//* Methods
@@ -30,5 +27,8 @@ interface ResponseLike extends BagLike
 	 *
 	 * @return bool
 	 */
-	public function success();
+	public function success()
+	{
+		return $this->_status == static::Success;
+	}
 }
