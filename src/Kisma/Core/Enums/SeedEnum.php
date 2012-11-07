@@ -108,7 +108,11 @@ abstract class SeedEnum
 	{
 		$_key = static::introspect( $class, array(), false );
 
-		return false === $flipped ? static::$_constants[$_key] : array_flip( static::$_constants[$_key] );
+		return
+			false === $flipped ?
+				static::$_constants[$_key]
+				:
+				array_flip( static::$_constants[$_key] );
 	}
 
 	/**
