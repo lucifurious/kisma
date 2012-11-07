@@ -228,7 +228,7 @@ class Option
 	{
 		$_result = ( empty( $array ) ? array() : ( !is_array( $array ) ? array( $array ) : $array ) );
 
-		if ( null === $callback || is_callable( $callback ) )
+		if ( null === $callback || !is_callable( $callback ) )
 		{
 			return $_result;
 		}
@@ -317,5 +317,30 @@ class Option
 	public static function request( $key, $defaultValue = null, $unsetValue = false )
 	{
 		return self::get( $_REQUEST, $key, $defaultValue, $unsetValue );
+	}
+
+	/**
+	 * Sets a value within an array only if the value is not set (SetIfNotSet=SINS).
+	 * You can pass in an array of key value pairs and do many at once.
+	 *
+	 * @param \stdClass|array $options
+	 * @param string          $key
+	 * @param mixed           $value
+	 */
+	public static function sins( &$options = array(), $key, $value = null )
+	{
+		//	Accept an array as input or single KVP
+		if ( !is_array( $key ) )
+		{
+			$key = array( $key => $value );
+		}
+
+		foreach ( $key as $_key => $_value )
+		{
+			if ( !static::contains( $options, $_key ) )
+			{
+				static::set( $options, $_key, $_value );
+			}
+		}
 	}
 }
