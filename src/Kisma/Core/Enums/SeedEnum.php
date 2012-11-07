@@ -139,7 +139,7 @@ abstract class SeedEnum
 	 */
 	public static function nameOf( $constant )
 	{
-		if ( in_array( $constant, array_values( $_constants = self::getDefinedConstants( true ) ) ) )
+		if ( in_array( $constant, ( $_constants = self::getDefinedConstants() ) ) )
 		{
 			return $_constants[$constant];
 		}
