@@ -1,4 +1,4 @@
-![Kisma](https://github.com/lucifurious/kisma/raw/master/assets/kisma-logo-64x64.png)
+![Kisma](https://github.com/lucifurious/kisma/raw/master/assets/logo-kisma.png)
 
 NOTE: I'm in the process of restructuring the library. Please wait until I release a beta before you try to use it.
 
