@@ -1,8 +1,6 @@
 ![Kisma](https://github.com/lucifurious/kisma/raw/master/assets/logo-kisma.png)
 
-NOTE: I'm in the process of restructuring the library. Please wait until I release a beta before you try to use it.
-
-Kisma! A Fun-Sized PHP Framework
+Kisma: PHP Utility Belt
 ==================================
 Thanks for checking out *Kisma*!
 
