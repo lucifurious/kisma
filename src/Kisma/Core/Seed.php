@@ -121,7 +121,7 @@ class Seed implements \Kisma\Core\Interfaces\SeedLike, \Kisma\Core\Interfaces\Pu
 	{
 		//	This is my hash. There are many like it, but this one is mine.
 		$this->_id = hash( 'sha512', spl_object_hash( $this ) . getmypid() . microtime( true ) );
-		Utility\Log::debug( 'New seed spawned: ' . $this->_id );
+		//Utility\Log::debug( 'New seed spawned: ' . $this->_id );
 
 		//	Auto-set tag and name if they're empty
 		if ( null === $this->_tag )
