@@ -79,7 +79,11 @@ class Kisma implements \Kisma\Core\Interfaces\PublisherLike, \Kisma\Core\Interfa
 
 			//	We done baby!
 			static::setConception( true );
-			static::setAutoLoader( ComposerAutoloaderInit::getLoader() );
+
+			if ( class_exists( '\\ComposerAutoloaderInit', false ) )
+			{
+				static::setAutoLoader( \ComposerAutoloaderInit::getLoader() );
+			}
 
 			//	And let the world know we're alive
 			\Kisma\Core\Utility\EventManager::publish( null, Kisma::Birth );
