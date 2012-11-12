@@ -103,10 +103,18 @@ class Seed implements \Kisma\Core\Interfaces\SeedLike, \Kisma\Core\Interfaces\Pu
 		//	Otherwise, set the rest
 		foreach ( $settings as $_key => $_value )
 		{
-			if ( property_exists( $this, $_key ) || property_exists( $this, '_' . $_key ) )
+			if ( property_exists( $this, $_key ) )
 			{
 				Utility\Option::set( $this, $_key, $_value );
 				unset( $settings, $_key );
+			}
+			else
+			{
+				if ( method_exists( $this, 'set' . Ucwords( $_key ) ) )
+				{
+					call_user_func( array( $this, 'set' . ucwords( $_key ) ), $_value );
+					unset( $settings, $_key );
+				}
 			}
 		}
 
