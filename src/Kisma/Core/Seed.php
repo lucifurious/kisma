@@ -117,10 +117,12 @@ class Seed implements \Kisma\Core\Interfaces\SeedLike, \Kisma\Core\Interfaces\Pu
 				}
 			}
 
-			if ( method_exists( $this, 'set' . Ucwords( $_key ) ) )
+			$_setter = \Kisma\Core\Utility\Inflector::tag( 'set_' . $_key );
+
+			if ( method_exists( $this, $_setter ) )
 			{
-				call_user_func( array( $this, 'set' . ucwords( $_key ) ), $_value );
-				unset( $settings, $_key );
+				call_user_func( array( $this, $_setter ), $_value );
+				unset( $settings, $_key, $_setter );
 			}
 		}
 

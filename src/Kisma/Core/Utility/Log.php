@@ -121,6 +121,7 @@ class Log extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\UtilityLike
 
 	/**
 	 * Formats the log entry. You can override this method to provide you own formatting.
+	 * It will strip out any console escape sequences as well
 	 *
 	 * @param array $entry Read the code, data in the array
 	 * @param bool  $newline
@@ -131,7 +132,7 @@ class Log extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\UtilityLike
 	{
 		$_level = Option::get( $entry, 'level' );
 		$_timestamp = Option::get( $entry, 'timestamp' );
-		$_message = Option::get( $entry, 'message' );
+		$_message = preg_replace( '/\033\[[\d;]+m/', null, Option::get( $entry, 'message' ) );
 		$_context = Option::get( $entry, 'context' );
 		$_extra = Option::get( $entry, 'extra' );
 
