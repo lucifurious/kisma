@@ -169,18 +169,31 @@ class SeedBag extends Seed implements \ArrayAccess, \Countable, \IteratorAggrega
 
 	/**
 	 * @param array|\Traversable $source
+	 * @param bool               $noNullOverwrite If true (default), inbound NULL values will not replace NON-NULL values in the bag
 	 *
-	 * @return SeedBag
 	 * @throws \InvalidArgumentException
+	 * @return SeedBag
 	 */
-	public function merge( $source )
+	public function merge( $source, $noNullOverwrite = true )
 	{
 		if ( !is_array( $source ) && !( $source instanceof \Traversable ) )
 		{
 			throw new \InvalidArgumentException( 'The source must be an array or an object.' );
 		}
 
-		Utility\Option::merge( $this->_bag, $source );
+		foreach ( $source as $_key => $_value )
+		{
+			if ( null === $_value && true === $noNullOverwrite && Utility\Option::contains( $this->_bag, $_key ) )
+			{
+				//	If there is a value in the bag, and inbound value is null, skip...
+				if ( null !== Utility\Option::get( $this->_bag, $_key ) )
+				{
+					continue;
+				}
+			}
+
+			Utility\Option::set( $this->_bag, $_key, $_value );
+		}
 
 		return $this;
 	}
