@@ -3,7 +3,6 @@
  * Client.php
  */
 namespace Kisma\Core\Services\DataStore\CouchDb;
-
 use Kisma\Core\Utility\Curl;
 use Kisma\Core\Utility\Option;
 use Kisma\Core\Exceptions\CouchDbException;
