@@ -2,7 +2,7 @@
 /**
  * Document.php
  */
-namespace Kisma\Containers;
+namespace Kisma\Core\Containers;
 /**
  * Document
  * A base container for key => value store documents (i.e. CouchDB, Mongo, etc.)
@@ -21,45 +21,36 @@ abstract class Document extends \Kisma\Core\SeedBag
 	protected $_documentName = null;
 
 	//*************************************************************************
-	//* Public Methods
+	//* Members
 	//*************************************************************************
 
 	/**
-	 * @param string $name
-	 * @param array  $settings
-	 *
-	 * @return \Kisma\Containers\Document
+	 * @var array The default fields in this document
 	 */
-	public function __construct( $name, $settings = array() )
-	{
-		if ( is_array( $name ) )
-		{
-			$settings = $name;
-			$name = get_class( $this );
-		}
+	protected $_defaultFields = array(
+		'_id',
+		'_rev',
+		'.document_name',
+	);
 
-		$this->_documentName = $name;
-
-		parent::__construct( $settings );
-	}
+	//*************************************************************************
+	//* Methods
+	//*************************************************************************
 
 	/**
 	 * @param string $documentName
-	 *
-	 * @return Document
+	 * @param array  $contents
 	 */
-	public function setDocumentName( $documentName )
+	public function __construct( $documentName = null, $contents = array() )
 	{
-		$this->_documentName = $documentName;
+		//	Set the document name
+		$this->_defaultFields['.document_name'] = $documentName ? : get_class( $this );
 
-		return $this;
-	}
+		foreach ( $this->_defaultFields as $_field )
+		{
+			$this->set( $_field, null );
+		}
 
-	/**
-	 * @return string
-	 */
-	public function getDocumentName()
-	{
-		return $this->_documentName;
+		parent::__construct();
 	}
 }

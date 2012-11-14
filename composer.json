@@ -13,19 +13,6 @@
 			"email": "jerryablan@gmail.com"
 		}
 	],
-	"require":      {
-		"twig/twig":       "1.*",
-		"twig/extensions": "dev-master"
-	},
-	"suggest":      {
-		"monolog/monolog": "1.*"
-	},
-	"autoload":     {
-		"psr-0": {
-			"Kisma": "src/"
-		},
-		"files": ["src/autoload.php"]
-	},
 	"repositories": [
 		{
 			"type":    "package",
@@ -38,8 +25,33 @@
 					"type": "zip"
 				}
 			}
+		},
+		{
+			"type":    "package",
+			"package": {
+				"name":        "doctrine/couchdb-client",
+				"version":     "dev-master",
+				"dist":        {
+					"url":  "https://github.com/doctrine/couchdb-client/archive/master.zip",
+					"type": "zip"
+				}
+			}
 		}
 	],
+	"require":      {
+		"doctrine/couchdb-client": "dev-master"
+	},
+	"suggest":      {
+		"twig/twig":       "*",
+		"twig/extensions": "dev-master",
+		"monolog/monolog": "*"
+	},
+	"autoload":     {
+		"psr-0": {
+			"Kisma": "src/"
+		},
+		"files": ["src/autoload.php"]
+	},
 	"scripts":      {
 		"post-update-cmd":      "\\Kisma::postUpdate",
 		"post-package-install": [

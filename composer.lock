@@ -1,101 +1,17 @@
 {
-    "hash": "2992280bdb75bdc6d8c3063e1fd8e444",
+    "hash": "ed948226c17b98bd1bf7a67e094f011d",
     "packages": [
         {
-            "name": "twig/extensions",
+            "name": "doctrine/couchdb-client",
             "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/fabpot/Twig-extensions",
-                "reference": "dcdff02fbac1282e6b8f4d0558cc7e9580105688"
-            },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/fabpot/Twig-extensions/zipball/dcdff02fbac1282e6b8f4d0558cc7e9580105688",
-                "reference": "dcdff02fbac1282e6b8f4d0558cc7e9580105688",
-                "shasum": ""
+                "url": "https://github.com/doctrine/couchdb-client/archive/master.zip",
+                "reference": null,
+                "shasum": null
             },
-            "require": {
-                "twig/twig": "1.*"
-            },
-            "time": "1349889206",
             "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "1.0.x-dev"
-                }
-            },
-            "installation-source": "source",
-            "autoload": {
-                "psr-0": {
-                    "Twig_Extensions_": "lib/"
-                }
-            },
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Fabien Potencier",
-                    "email": "fabien@symfony.com"
-                }
-            ],
-            "description": "Common additional features for Twig that do not directly belong in core",
-            "homepage": "https://github.com/fabpot/Twig-extensions",
-            "keywords": [
-                "debug",
-                "i18n",
-                "text"
-            ]
-        },
-        {
-            "name": "twig/twig",
-            "version": "v1.10.3",
-            "source": {
-                "type": "git",
-                "url": "git://github.com/fabpot/Twig.git",
-                "reference": "v1.10.3"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://github.com/fabpot/Twig/zipball/v1.10.3",
-                "reference": "v1.10.3",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.2.4"
-            },
-            "time": "2012-10-19 03:45:49",
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "1.10-dev"
-                }
-            },
-            "installation-source": "dist",
-            "autoload": {
-                "psr-0": {
-                    "Twig_": "lib/"
-                }
-            },
-            "license": [
-                "BSD-3"
-            ],
-            "authors": [
-                {
-                    "name": "Fabien Potencier",
-                    "email": "fabien@symfony.com"
-                },
-                {
-                    "name": "Armin Ronacher",
-                    "email": "armin.ronacher@active-4.com"
-                }
-            ],
-            "description": "Twig, the flexible, fast, and secure template language for PHP",
-            "homepage": "http://twig.sensiolabs.org",
-            "keywords": [
-                "templating"
-            ]
+            "installation-source": "dist"
         }
     ],
     "packages-dev": null,
@@ -104,6 +20,6 @@
     ],
     "minimum-stability": "stable",
     "stability-flags": {
-        "twig/extensions": 20
+        "doctrine/couchdb-client": 20
     }
 }
