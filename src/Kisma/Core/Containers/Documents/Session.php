@@ -2,7 +2,7 @@
 /**
  * Session.php
  */
-namespace Kisma\Core\Containers;
+namespace Kisma\Core\Containers\Documents;
 /**
  * Session
  * A simple session document

@@ -2,7 +2,7 @@
 /**
  * SeedDocument.php
  */
-namespace Kisma\Core\Containers;
+namespace Kisma\Core\Containers\Documents;
 /**
  * SeedDocument
  * A base container for key => value store documents (i.e. CouchDB, Mongo, etc.). Does nothing, like the goggles.

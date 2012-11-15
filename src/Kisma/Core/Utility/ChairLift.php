@@ -84,9 +84,25 @@ class ChairLift
 
 		if ( !isset( self::$_dms[$_key] ) )
 		{
+			$_client = static::couchDbClient( $options );
+			$_httpClient = $_client->getHttpClient();
+			$_database = $_client->getDatabase();
+
+			$_reader = new \Doctrine\Common\Annotations\SimpleAnnotationReader();
+			$_reader->addNamespace( 'Doctrine\ODM\CouchDB\Mapping\Annotations' );
+			$_paths = __DIR__;
+			$_metaDriver = new \Doctrine\ODM\CouchDB\Mapping\Driver\AnnotationDriver( $_reader, $_paths );
+
+			$_config = new \Doctrine\ODM\CouchDB\Configuration();
+			$_config->setProxyDir( \sys_get_temp_dir() );
+			$_config->setAutoGenerateProxyClasses( true );
+			$_config->setMetadataDriverImpl( $_metaDriver );
+			$_config->setMetadataCacheImpl( new \Doctrine\Common\Cache\ArrayCache() );
+			$_config->setLuceneHandlerName( '_fti' );
+
 			self::$_dms[$_key] = \Doctrine\ODM\CouchDB\DocumentManager::create(
-				$options,
-				Option::get( $options, 'config', new \Doctrine\ODM\CouchDB\Configuration(), true ),
+				$_client,
+				$_config,
 				Option::get( $options, 'manager', new \Doctrine\Common\EventManager(), true )
 			);
 		}

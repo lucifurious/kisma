@@ -266,4 +266,24 @@ class WorkQueue extends \Kisma\Core\Services\SeedService
 		return $this->_queue;
 	}
 
+	/**
+	 * @param \Doctrine\ODM\CouchDB\DocumentManager $dm
+	 *
+	 * @return WorkQueue
+	 */
+	public function setDm( $dm )
+	{
+		$this->_dm = $dm;
+
+		return $this;
+	}
+
+	/**
+	 * @return \Doctrine\ODM\CouchDB\DocumentManager
+	 */
+	public function getDm()
+	{
+		return $this->_dm;
+	}
+
 }

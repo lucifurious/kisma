@@ -2,7 +2,7 @@
 /**
  * WorkItem.php
  */
-namespace Kisma\Core\Containers;
+namespace Kisma\Core\Containers\Documents;
 /**
  * WorkItem
  * An item to be picked up and worked on
