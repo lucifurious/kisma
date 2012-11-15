@@ -200,10 +200,12 @@ class WorkQueue extends \Kisma\Core\Services\SeedService
 	 * Creates a key for a document.
 	 *
 	 * @param string $id Set to FALSE to generate a manager key
+	 * @param string $delimiter
+	 * @param string $innerDelimiter
 	 *
 	 * @return string
 	 */
-	protected function _key( $id = null )
+	protected function _key( $id = null, $delimiter = ':', $innerDelimiter = '.' )
 	{
 		$_parts = array(
 			$this->_namespace,
@@ -216,10 +218,15 @@ class WorkQueue extends \Kisma\Core\Services\SeedService
 		}
 		else if ( null !== $id )
 		{
+			if ( is_array( $id ) )
+			{
+				$id = implode( $innerDelimiter, $id );
+			}
+
 			$_parts[] = $id;
 		}
 
-		return implode( ':', $_parts );
+		return implode( $delimiter, $_parts );
 	}
 
 	//*************************************************************************

@@ -55,11 +55,6 @@ abstract class SeedDocument
 	 */
 	public function setId( $id )
 	{
-		if ( is_array( $id ) )
-		{
-			$id = implode( ':', $id );
-		}
-
 		$this->_id = $id;
 
 		return $this;
