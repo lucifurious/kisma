@@ -5,52 +5,63 @@
 namespace Kisma\Core\Containers;
 /**
  * Document
- * A base container for key => value store documents (i.e. CouchDB, Mongo, etc.)
+ * A base container for key => value store documents (i.e. CouchDB, Mongo, etc.). Does nothing, like the goggles.
  *
- * @property string $documentName
+ * @Document
  */
-abstract class Document extends \Kisma\Core\SeedBag
+abstract class Document
 {
 	//*************************************************************************
-	//* Private Members
+	//* Fields
 	//*************************************************************************
 
-	/**
-	 * @var string The name of this document
-	 */
-	protected $_documentName = null;
-
-	//*************************************************************************
-	//* Members
-	//*************************************************************************
-
-	/**
-	 * @var array The default fields in this document
-	 */
-	protected $_defaultFields = array(
-		'_id',
-		'_rev',
-		'.document_name',
-	);
+	/** @Id */
+	private $_id;
+	/** @Attachments */
+	private $_attachments;
 
 	//*************************************************************************
 	//* Methods
 	//*************************************************************************
 
 	/**
-	 * @param string $documentName
-	 * @param array  $contents
+	 * @param mixed $attachments
+	 *
+	 * @return Document
 	 */
-	public function __construct( $documentName = null, $contents = array() )
+	public function setAttachments( $attachments )
 	{
-		//	Set the document name
-		$this->_defaultFields['.document_name'] = $documentName ? : get_class( $this );
+		$this->_attachments = $attachments;
 
-		foreach ( $this->_defaultFields as $_field )
-		{
-			$this->set( $_field, null );
-		}
-
-		parent::__construct();
+		return $this;
 	}
+
+	/**
+	 * @return mixed
+	 */
+	public function getAttachments()
+	{
+		return $this->_attachments;
+	}
+
+	/**
+	 * @param string $id
+	 *
+	 * @return Document
+	 */
+	public function setId( $id )
+	{
+		$this->_id = $id;
+
+		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getId()
+	{
+		return $this->_id;
+	}
+
 }

@@ -1,61 +1,26 @@
 {
-	"name":         "kisma/kisma",
-	"description":  "A Fun-Sized PHP Framework",
-	"keywords":     [
+	"name":        "kisma/kisma",
+	"description": "A Fun-Sized PHP Framework",
+	"keywords":    [
 		"php", "php5", "rest", "mvc", "framework"
 	],
-	"homepage":     "https://github.com/lucifurious/kisma",
-	"type":         "library",
-	"license":      "MIT",
-	"authors":      [
+	"homepage":    "https://github.com/lucifurious/kisma",
+	"type":        "library",
+	"license":     "MIT",
+	"authors":     [
 		{
 			"name":  "Jerry Ablan",
 			"email": "jerryablan@gmail.com"
 		}
 	],
-	"repositories": [
-		{
-			"type":    "package",
-			"package": {
-				"name":        "twitter/bootstrap",
-				"description": "twitter bootstrap",
-				"version":     "dev-master",
-				"dist":        {
-					"url":  "http://twitter.github.com/bootstrap/assets/bootstrap.zip",
-					"type": "zip"
-				}
-			}
-		},
-		{
-			"type":    "package",
-			"package": {
-				"name":        "doctrine/couchdb-client",
-				"version":     "dev-master",
-				"dist":        {
-					"url":  "https://github.com/doctrine/couchdb-client/archive/master.zip",
-					"type": "zip"
-				}
-			}
-		}
-	],
-	"require":      {
-		"doctrine/couchdb-client": "dev-master"
+	"require":     {
+		"doctrine/couchdb":     "dev-master",
+		"doctrine/couchdb-odm": "dev-master"
 	},
-	"suggest":      {
-		"twig/twig":       "*",
-		"twig/extensions": "dev-master",
-		"monolog/monolog": "*"
-	},
-	"autoload":     {
+	"autoload":    {
 		"psr-0": {
 			"Kisma": "src/"
 		},
 		"files": ["src/autoload.php"]
-	},
-	"scripts":      {
-		"post-update-cmd":      "\\Kisma::postUpdate",
-		"post-package-install": [
-			"\\Kisma::postInstall"
-		]
 	}
 }
