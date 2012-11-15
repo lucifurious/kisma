@@ -1,23 +1,29 @@
 <?php
 /**
- * Document.php
+ * SeedDocument.php
  */
 namespace Kisma\Core\Containers;
 /**
- * Document
+ * SeedDocument
  * A base container for key => value store documents (i.e. CouchDB, Mongo, etc.). Does nothing, like the goggles.
  *
  * @Document
  */
-abstract class Document
+abstract class SeedDocument
 {
 	//*************************************************************************
 	//* Fields
 	//*************************************************************************
 
-	/** @Id */
+	/**
+	 * @Id
+	 * @var string
+	 */
 	private $_id;
-	/** @Attachments */
+	/**
+	 * @Attachments
+	 * @var mixed
+	 */
 	private $_attachments;
 
 	//*************************************************************************
@@ -27,7 +33,7 @@ abstract class Document
 	/**
 	 * @param mixed $attachments
 	 *
-	 * @return Document
+	 * @return \Kisma\Core\Containers\SeedDocument
 	 */
 	public function setAttachments( $attachments )
 	{
@@ -47,7 +53,7 @@ abstract class Document
 	/**
 	 * @param string $id
 	 *
-	 * @return Document
+	 * @return \Kisma\Core\Containers\SeedDocument
 	 */
 	public function setId( $id )
 	{

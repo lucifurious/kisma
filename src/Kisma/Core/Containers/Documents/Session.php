@@ -7,6 +7,6 @@ namespace Kisma\Core\Containers;
  * Session
  * A simple session document
  */
-class Session extends Document
+class Session extends SeedDocument
 {
 }

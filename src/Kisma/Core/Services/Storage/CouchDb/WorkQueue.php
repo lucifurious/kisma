@@ -1,50 +1,41 @@
 <?php
 /**
- * Queue.php
+ * WorkQueue.php
  */
-namespace Kisma\Core\Services\DataStore\CouchDb;
+namespace Kisma\Core\Services\Storage\CouchDb;
 use Kisma\Core\Utility\Log;
 use Kisma\Core\Utility\Inflector;
 
 /**
- * Queue
+ * WorkQueue
  * A queuing service using CouchDb
+ *
+ * Keys in the document store are in this format:
+ *
+ *     namespace:queue:<_id>
+ *
+ * The queue control document's key is:
+ *
+ *     namespace:queue:manager
  */
-class Queue extends \Kisma\Core\Services\SeedService
+class WorkQueue extends \Kisma\Core\Services\SeedService
 {
-	//*************************************************************************
-	//* Constants
-	//*************************************************************************
-
-	/**
-	 * @var string
-	 */
-	const PendingViewName = 'pending_items';
-	/**
-	 * @var int
-	 */
-	const DefaultMaxItems = 1;
-	/**
-	 * @var string The key prefix for each queue
-	 */
-	const QueueServiceKeyPrefix = 'chairlift.';
-
 	//*************************************************************************
 	//* Private Members
 	//*************************************************************************
 
 	/**
-	 * @var \Doctrine\ODM\CouchDB\DocumentManager
-	 */
-	protected $_dm;
-	/**
 	 * @var string
 	 */
-	protected $_queue;
+	protected $_queue = 'default';
 	/**
-	 * @var string A string which will be prepended along, with a colon separator, to all new _id values
+	 * @var string Used to construct keys in the queue
 	 */
-	protected $_prefix = null;
+	protected $_namespace = 'work';
+	/**
+	 * @var \Doctrine\ODM\CouchDB\DocumentManager
+	 */
+	protected $_dm = null;
 
 	//*************************************************************************
 	//* Public Methods
@@ -53,23 +44,28 @@ class Queue extends \Kisma\Core\Services\SeedService
 	/**
 	 * @param \Kisma\Core\Interfaces\ConsumerLike $consumer
 	 * @param array                               $settings
+	 *
+	 * @return \Kisma\Core\Services\Storage\CouchDb\WorkQueue
 	 */
 	public function __construct( \Kisma\Core\Interfaces\ConsumerLike $consumer, $settings = array() )
 	{
 		parent::__construct( $consumer, $settings );
+
+		if ( null === $this->_namespace )
+		{
+			$this->_namespace = 'work';
+		}
 
 		if ( null === $this->_queue )
 		{
 			$this->_queue = 'default';
 		}
 
-		if ( null === $this->_dm )
-		{
-			$this->_dm = \Kisma\Core\Utility\ChairLift::createDocumentManager( $settings );
-		}
+		//	Set our document manager up...
+		$this->_dm = \Kisma\Core\Utility\ChairLift::documentManager( $settings );
 
 		//	Add a reference to the queue to the kisma global space
-		\Kisma::set( static::QueueServiceKeyPrefix . $this->_queue, $this );
+		\Kisma::set( $this->_key( false ), $this );
 	}
 
 	/**
@@ -81,7 +77,7 @@ class Queue extends \Kisma\Core\Services\SeedService
 	 * @param array|string $queryParams
 	 * @param string       $filter
 	 *
-	 * @return array|false
+	 * @return array|bool
 	 */
 	public function dequeue( $ownerId, $since = 0, $queryParams = array(), $filter = '/queue' )
 	{
@@ -103,24 +99,21 @@ class Queue extends \Kisma\Core\Services\SeedService
 	/**
 	 * Adds a work item to the queue
 	 *
-	 * @param string $queue      The name of the queue for this item
-	 * @param string $ownerId    The owner of this queue item
-	 * @param mixed  $payload    Any kind of info you want to pass the dequeuer process
+	 * @param string|callable $handler    The name of the handler class or closure
+	 * @param string          $ownerId    The owner of this queue item
+	 * @param mixed           $payload    Any kind of info you want to pass the worker process
 	 *
-	 * @return mixed|bool The _rev of the saved message, false if unchanged
+	 * @return mixed|bool The _id of the saved message, false if unchanged
 	 */
-	public function enqueue( $queue, $ownerId, $payload = null )
+	public function enqueue( $handler, $ownerId = null, $payload = null )
 	{
-		if ( is_object( $payload ) && !( $payload instanceof \stdClass ) )
-		{
-			$_queueType = Inflector::tag( get_class( $payload ), true, true );
-		}
-
 		//	New item
-		$_item = new \Kisma\Core\Containers\QueueItem();
-		$_item->setQueue( $queue );
+		$_item = new \Kisma\Core\Containers\WorkItem();
+		$_item->setQueue( $this->_queue );
+		$_item->setHandler( $handler );
 		$_item->setOwnerId( $ownerId );
 		$_item->setPayload( $payload );
+		$_item->setId( $this->_key( $this->_dm->getCouchDBClient()->getUuids() ) );
 		$this->_dm->persist( $_item );
 		$this->_dm->flush();
 
@@ -143,7 +136,7 @@ class Queue extends \Kisma\Core\Services\SeedService
 	 */
 	protected function _hashKey( $id )
 	{
-		return \Kisma\Core\Utility\Hasher::hash( $id, \Kisma\Core\Enums\HashType::SHA1, 40 );
+		return \Kisma\Core\Utility\Hasher::hash( $this->_key( $id ), \Kisma\Core\Enums\HashType::SHA1, 40 );
 	}
 
 	/**
@@ -158,13 +151,8 @@ class Queue extends \Kisma\Core\Services\SeedService
 	 */
 	protected function _encryptKey( $salt, $id = null )
 	{
-		if ( null === $id )
-		{
-			$id = '|<|' . $id . '|>|';
-		}
-
 		//	Return encrypted string
-		return \Kisma\Core\Utility\Hasher::encryptString( $id, $salt );
+		return \Kisma\Core\Utility\Hasher::encryptString( $this->_key( $id ), $salt );
 	}
 
 	/**
@@ -192,11 +180,12 @@ class Queue extends \Kisma\Core\Services\SeedService
 		}
 
 		$query['queue'] = $queue;
-		$query['ownerId'] = $ownerId;
+		$query['owner_id'] = $ownerId;
 		$query['since'] = $since;
 
 		$_path .= http_build_query( $query ) . '&filter=' . $_client->getDatabase() . $filter;
 
+		/** @noinspection PhpUndefinedMethodInspection */
 		$_response = $_client->getHttpClient()->request( 'GET', $_path, $params );
 
 		if ( 200 != $_response->status )
@@ -207,38 +196,44 @@ class Queue extends \Kisma\Core\Services\SeedService
 		return $_response->body;
 	}
 
+	/**
+	 * Creates a key for a document.
+	 *
+	 * @param string $id Set to FALSE to generate a manager key
+	 *
+	 * @return string
+	 */
+	protected function _key( $id = null )
+	{
+		$_parts = array(
+			$this->_namespace,
+			$this->_queue,
+		);
+
+		if ( false === $id )
+		{
+			$_parts[] = 'manager';
+		}
+		else if ( null !== $id )
+		{
+			$_parts[] = $id;
+		}
+
+		return implode( ':', $_parts );
+	}
+
 	//*************************************************************************
 	//* Properties
 	//*************************************************************************
 
 	/**
-	 * @param \Doctrine\ODM\CouchDB\DocumentManager $dm
+	 * @param string $namespace
 	 *
-	 * @return Queue
+	 * @return WorkQueue
 	 */
-	public function setDm( $dm )
+	public function setNamespace( $namespace )
 	{
-		$this->_dm = $dm;
-
-		return $this;
-	}
-
-	/**
-	 * @return \Doctrine\ODM\CouchDB\DocumentManager
-	 */
-	public function getDm()
-	{
-		return $this->_dm;
-	}
-
-	/**
-	 * @param string $prefix
-	 *
-	 * @return Queue
-	 */
-	public function setPrefix( $prefix )
-	{
-		$this->_prefix = $prefix;
+		$this->_namespace = $namespace;
 
 		return $this;
 	}
@@ -246,15 +241,15 @@ class Queue extends \Kisma\Core\Services\SeedService
 	/**
 	 * @return string
 	 */
-	public function getPrefix()
+	public function getNamespace()
 	{
-		return $this->_prefix;
+		return $this->_namespace;
 	}
 
 	/**
 	 * @param string $queue
 	 *
-	 * @return Queue
+	 * @return WorkQueue
 	 */
 	public function setQueue( $queue )
 	{
