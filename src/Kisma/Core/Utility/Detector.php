@@ -29,7 +29,7 @@ class Detector implements \Kisma\Core\Interfaces\PhpFrameworks
 			if ( method_exists( $_thisClass, $_method ) && call_user_func( array( $_thisClass, $_method ) ) )
 			{
 				\Kisma::set( 'app.framework', $_value );
-				Log::debug( 'PHP framework detected: ' . $_constant . ' (' . $_value . ')' );
+//				Log::debug( 'PHP framework detected: ' . $_constant . ' (' . $_value . ')' );
 
 				switch ( $_constant )
 				{

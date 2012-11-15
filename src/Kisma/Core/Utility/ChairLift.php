@@ -11,6 +11,23 @@ use Kisma\Core\Utility\Option;
  */
 class ChairLift
 {
+	//*************************************************************************
+	//* Members
+	//*************************************************************************
+
+	/**
+	 * @var \Doctrine\ODM\CouchDB\DocumentManager[]
+	 */
+	protected static $_dms = null;
+	/**
+	 * @var \Doctrine\CouchDB\CouchDBClient[]
+	 */
+	protected static $_clients = array();
+
+	//*************************************************************************
+	//* Methods
+	//*************************************************************************
+
 	/**
 	 * Construct and returns a CouchDBClient
 	 *
@@ -29,9 +46,16 @@ class ChairLift
 	 *
 	 * @return \Doctrine\CouchDB\CouchDBClient
 	 */
-	public static function createCouchDBClient( $options = array() )
+	public static function couchDbClient( $options = array() )
 	{
-		return \Doctrine\CouchDB\CouchDBClient::create( $options );
+		$_key = Option::get( $options, 'host', 'localhost' ) . ':' . Option::get( $options, 'port', 5984 );
+
+		if ( !isset( self::$_clients[$_key] ) )
+		{
+			self::$_clients[$_key] = \Doctrine\CouchDB\CouchDBClient::create( $options );
+		}
+
+		return self::$_clients[$_key];
 	}
 
 	/**
@@ -54,12 +78,19 @@ class ChairLift
 	 *
 	 * @return \Doctrine\ODM\CouchDB\DocumentManager
 	 */
-	public static function createDocumentManager( $options = array() )
+	public static function documentManager( $options = array() )
 	{
-		return \Doctrine\ODM\CouchDB\DocumentManager::create(
-			$options,
-			Option::get( $options, 'config', new \Doctrine\ODM\CouchDB\Configuration(), true ),
-			Option::get( $options, 'manager', new \Doctrine\Common\EventManager(), true )
-		);
+		$_key = Option::get( $options, 'host', 'localhost' ) . ':' . Option::get( $options, 'port', 5984 );
+
+		if ( !isset( self::$_dms[$_key] ) )
+		{
+			self::$_dms[$_key] = \Doctrine\ODM\CouchDB\DocumentManager::create(
+				$options,
+				Option::get( $options, 'config', new \Doctrine\ODM\CouchDB\Configuration(), true ),
+				Option::get( $options, 'manager', new \Doctrine\Common\EventManager(), true )
+			);
+		}
+
+		return self::$_dms[$_key];
 	}
 }
