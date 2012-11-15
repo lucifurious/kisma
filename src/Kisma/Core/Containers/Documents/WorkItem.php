@@ -4,6 +4,8 @@
  */
 namespace Kisma\Core\Containers\Documents;
 /**
+ * @Document
+ *
  * WorkItem
  * An item to be picked up and worked on
  *
@@ -14,8 +16,6 @@ namespace Kisma\Core\Containers\Documents;
  * @property string      $updated
  * @property bool        $processed
  * @property mixed       $response
- *
- * @Document
  */
 class WorkItem extends SeedDocument
 {

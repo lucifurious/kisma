@@ -1,12 +1,10 @@
 <?php
 /**
  * SeedDocument.php
+ * A base container for key => value store documents (i.e. CouchDB, Mongo, etc.). Does nothing, like the goggles.
  */
 namespace Kisma\Core\Containers\Documents;
 /**
- * SeedDocument
- * A base container for key => value store documents (i.e. CouchDB, Mongo, etc.). Does nothing, like the goggles.
- *
  * @Document
  */
 abstract class SeedDocument
@@ -33,7 +31,7 @@ abstract class SeedDocument
 	/**
 	 * @param mixed $attachments
 	 *
-	 * @return \Kisma\Core\Containers\SeedDocument
+	 * @return \Kisma\Core\Containers\Documents\SeedDocument
 	 */
 	public function setAttachments( $attachments )
 	{
@@ -53,7 +51,7 @@ abstract class SeedDocument
 	/**
 	 * @param string $id
 	 *
-	 * @return \Kisma\Core\Containers\SeedDocument
+	 * @return \Kisma\Core\Containers\Documents\SeedDocument
 	 */
 	public function setId( $id )
 	{

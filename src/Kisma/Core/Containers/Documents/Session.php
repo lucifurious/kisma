@@ -4,6 +4,8 @@
  */
 namespace Kisma\Core\Containers\Documents;
 /**
+ * @Document
+ *
  * Session
  * A simple session document
  */

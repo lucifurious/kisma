@@ -108,7 +108,7 @@ class WorkQueue extends \Kisma\Core\Services\SeedService
 	public function enqueue( $handler, $ownerId = null, $payload = null )
 	{
 		//	New item
-		$_item = new \Kisma\Core\Containers\WorkItem();
+		$_item = new \Kisma\Core\Containers\Documents\WorkItem();
 		$_item->setQueue( $this->_queue );
 		$_item->setHandler( $handler );
 		$_item->setOwnerId( $ownerId );
