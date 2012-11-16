@@ -91,7 +91,7 @@ class ChairLift
 
 			$_paths = array_merge(
 				array(
-					\Kisma::get( \Kisma\Core\Enums\KismaSettings::BasePath ) . '/src/Kisma/Core/Containers/Documents'
+					\Kisma::get( \Kisma\Core\Enums\KismaSettings::BasePath ) . '\\Kisma\\Core\\Containers\\Documents',
 				),
 				$_paths
 			);
