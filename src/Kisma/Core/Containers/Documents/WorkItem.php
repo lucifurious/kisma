@@ -2,20 +2,12 @@
 /**
  * WorkItem.php
  * An item to be picked up and worked on
- *
- * @property string      $queue    The name of this queue in which this entry resides
- * @property string      $ownerId  An owner of this entry
- * @property mixed       $payload
- * @property string      $created
- * @property string      $updated
- * @property bool        $processed
- * @property mixed       $response
  */
 namespace Kisma\Core\Containers\Documents;
 use \Doctrine\ODM\CouchDB\Mapping\Annotations;
 
 /**
- * @Document
+ * @Document @Index
  */
 class WorkItem extends SeedDocument
 {
@@ -29,10 +21,10 @@ class WorkItem extends SeedDocument
 	 */
 	private $_queue = 'default';
 	/**
-	 * @Index @Field(type="integer", jsonName="owner_id")
+	 * @Index @Field(type="integer")
 	 * @var int
 	 */
-	private $_ownerId;
+	private $_owner_id;
 	/**
 	 * @Field(type="string")
 	 * @var string|callable
@@ -49,30 +41,20 @@ class WorkItem extends SeedDocument
 	 */
 	private $_processed = false;
 	/**
-	 * @Field(type="boolean", jsonName="in_flight")
+	 * @Field(type="boolean")
 	 * @var bool
 	 */
-	private $_inFlight = false;
+	private $_in_flight = false;
 	/**
 	 * @Field(type="mixed")
 	 * @var mixed
 	 */
 	private $_response;
 	/**
-	 * @Field(type="integer", jsonName="created_at")
-	 * @var int
+	 * @Field(type="string")
+	 * @var string
 	 */
-	private $_createdAt;
-	/**
-	 * @Field(type="integer", jsonName="updated_at")
-	 * @var int
-	 */
-	private $_updatedAt;
-	/**
-	 * @Field(type="integer", jsonName="processed_at")
-	 * @var int
-	 */
-	private $_processedAt;
+	private $_processed_at;
 
 	//*************************************************************************
 	//* Methods
@@ -84,26 +66,6 @@ class WorkItem extends SeedDocument
 	public function __construct()
 	{
 		$this->_createdAt = time();
-	}
-
-	/**
-	 * @param int $createdAt
-	 *
-	 * @return WorkItem
-	 */
-	public function setCreatedAt( $createdAt )
-	{
-		$this->_createdAt = $createdAt;
-
-		return $this;
-	}
-
-	/**
-	 * @return int
-	 */
-	public function getCreatedAt()
-	{
-		return $this->_createdAt;
 	}
 
 	/**
@@ -133,7 +95,7 @@ class WorkItem extends SeedDocument
 	 */
 	public function setInFlight( $inFlight )
 	{
-		$this->_inFlight = $inFlight;
+		$this->_in_flight = $inFlight;
 
 		return $this;
 	}
@@ -143,7 +105,7 @@ class WorkItem extends SeedDocument
 	 */
 	public function getInFlight()
 	{
-		return $this->_inFlight;
+		return $this->_in_flight;
 	}
 
 	/**
@@ -153,7 +115,7 @@ class WorkItem extends SeedDocument
 	 */
 	public function setOwnerId( $ownerId )
 	{
-		$this->_ownerId = $ownerId;
+		$this->_owner_id = $ownerId;
 
 		return $this;
 	}
@@ -163,7 +125,7 @@ class WorkItem extends SeedDocument
 	 */
 	public function getOwnerId()
 	{
-		return $this->_ownerId;
+		return $this->_owner_id;
 	}
 
 	/**
@@ -213,7 +175,7 @@ class WorkItem extends SeedDocument
 	 */
 	public function setProcessedAt( $processedAt )
 	{
-		$this->_processedAt = $processedAt;
+		$this->_processed_at = $processedAt;
 
 		return $this;
 	}
@@ -223,7 +185,7 @@ class WorkItem extends SeedDocument
 	 */
 	public function getProcessedAt()
 	{
-		return $this->_processedAt;
+		return $this->_processed_at;
 	}
 
 	/**
@@ -264,26 +226,6 @@ class WorkItem extends SeedDocument
 	public function getResponse()
 	{
 		return $this->_response;
-	}
-
-	/**
-	 * @param int $updatedAt
-	 *
-	 * @return WorkItem
-	 */
-	public function setUpdatedAt( $updatedAt )
-	{
-		$this->_updatedAt = $updatedAt;
-
-		return $this;
-	}
-
-	/**
-	 * @return int
-	 */
-	public function getUpdatedAt()
-	{
-		return $this->_updatedAt;
 	}
 
 }
