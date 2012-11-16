@@ -75,6 +75,7 @@ class ChairLift
 	 * @option bool               $logging
 	 * @option Configuration      $config
 	 * @option EventManager       $manager
+	 * @option array               $namespaces Array of additional document namespaces
 	 *
 	 * @return \Doctrine\ODM\CouchDB\DocumentManager
 	 */
@@ -91,7 +92,7 @@ class ChairLift
 
 			$_paths = array_merge(
 				array(
-					\Kisma::get( \Kisma\Core\Enums\KismaSettings::BasePath ) . '\\Kisma\\Core\\Containers\\Documents',
+					\Kisma::get( \Kisma\Core\Enums\KismaSettings::BasePath ) . '//Kisma/Core/Containers/Documents',
 				),
 				$_paths
 			);
