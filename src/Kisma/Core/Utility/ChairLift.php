@@ -84,10 +84,23 @@ class ChairLift
 
 		if ( !isset( self::$_dms[$_key] ) )
 		{
+			if ( null === ( $_config = Option::get( $options, 'config' ) ) )
+			{
+				$_config = new \Doctrine\ODM\CouchDB\Configuration();
+
+				$_config->setMetadataCacheImpl(
+					new \Doctrine\Common\Cache\ArrayCache
+				);
+
+				$_config->setMetadataDriverImpl(
+					$_config->newDefaultAnnotationDriver( $GLOBALS["BASE_PATH"] . '\\Kisma\\Core\\Containers\\Documents' )
+				);
+			}
+
 			self::$_dms[$_key] = \Doctrine\ODM\CouchDB\DocumentManager::create(
 				static::couchDbClient( $options ),
-				Option::get( $options, 'config', new \Doctrine\ODM\CouchDB\Configuration(), true ),
-				Option::get( $options, 'manager', new \Doctrine\Common\EventManager(), true )
+				$_config,
+				Option::get( $options, 'manager' )
 			);
 		}
 
