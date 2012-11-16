@@ -11,11 +11,19 @@ use \Doctrine\ODM\CouchDB\Mapping\Annotations;
  */
 class Session extends SeedDocument
 {
+	//*************************************************************************
+	//* Fields
+	//*************************************************************************
+
 	/**
-	 * @Field(type="mixed",jsonName="session_data")
+	 * @Field(type="mixed")
 	 * @var mixed
 	 */
-	protected $_sessionData;
+	protected $_session_data;
+
+	//*************************************************************************
+	//* Methods
+	//*************************************************************************
 
 	/**
 	 * @param mixed $sessionData
@@ -24,7 +32,7 @@ class Session extends SeedDocument
 	 */
 	public function setSessionData( $sessionData )
 	{
-		$this->_sessionData = $sessionData;
+		$this->_session_data = $sessionData;
 
 		return $this;
 	}
@@ -34,7 +42,7 @@ class Session extends SeedDocument
 	 */
 	public function getSessionData()
 	{
-		return $this->_sessionData;
+		return $this->_session_data;
 	}
 
 }

@@ -85,9 +85,14 @@ class ChairLift
 
 		if ( !isset( self::$_dms[$_key] ) )
 		{
+			\Kisma::getAutoLoader()->add(
+				'Documents',
+				\Kisma::get( 'app.base_path' ) . '/Kisma/Core/Containers/Documents'
+			);
+
 			\Doctrine\Common\Annotations\AnnotationRegistry::registerAutoloadNamespaces(
 				array(
-					'\\Kisma\\Core\\Containers\\Documents',
+					'\\Kisma\\Core\\Containers\\Documents' => \Kisma::get( 'app.base_path' ) . '/Kisma/Core/Containers/Documents',
 				)
 			);
 

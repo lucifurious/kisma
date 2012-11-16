@@ -4,11 +4,11 @@
  * A base container for key => value store documents (i.e. CouchDB, Mongo, etc.). Does nothing, like the goggles.
  */
 namespace Kisma\Core\Containers\Documents;
-use \Doctrine\ODM\CouchDB\Mapping\Annotations;
+use Doctrine\ODM\CouchDB\Mapping\Annotations;
 
 /**
  * @Document
- * @MappedSuperClass
+ * @MappedSuperclass
  */
 abstract class SeedDocument
 {
@@ -40,6 +40,14 @@ abstract class SeedDocument
 	//*************************************************************************
 	//* Methods
 	//*************************************************************************
+
+	/**
+	 * Set defaults
+	 */
+	public function __construct()
+	{
+		$this->_created_at = time();
+	}
 
 	/**
 	 * @param mixed $attachments
@@ -106,7 +114,7 @@ abstract class SeedDocument
 	 *
 	 * @return SeedDocument
 	 */
-	public function setCreatedAt( $created_at )
+	protected function setCreatedAt( $created_at )
 	{
 		$this->_created_at = $created_at;
 
@@ -126,7 +134,7 @@ abstract class SeedDocument
 	 *
 	 * @return SeedDocument
 	 */
-	public function setUpdatedAt( $updated_at )
+	protected function setUpdatedAt( $updated_at )
 	{
 		$this->_updated_at = $updated_at;
 

@@ -4,10 +4,11 @@
  * An item to be picked up and worked on
  */
 namespace Kisma\Core\Containers\Documents;
-use \Doctrine\ODM\CouchDB\Mapping\Annotations;
+use Doctrine\ODM\CouchDB\Mapping\Annotations;
 
 /**
- * @Document @Index
+ * @Document
+ * @Index
  */
 class WorkItem extends SeedDocument
 {
@@ -16,20 +17,26 @@ class WorkItem extends SeedDocument
 	//*************************************************************************
 
 	/**
-	 * @Index @Field(type="string")
+	 * @Index
+	 * @Field(type="string")
 	 * @var string
 	 */
 	private $_queue = 'default';
 	/**
-	 * @Index @Field(type="integer")
-	 * @var int
+	 * @ReferenceOne(targetDocument="Session")
+	 * @var Session
 	 */
-	private $_owner_id;
+	private $_owner;
 	/**
-	 * @Field(type="string")
-	 * @var string|callable
+	 * @Field(type="mixed")
+	 * @var mixed
 	 */
 	private $_handler;
+	/**
+	 * @Field(type="integer")
+	 * @var int How to interpret the $handler (i.e. PHP Class, bash script, etc.)
+	 */
+	private $_handle_via = 0;
 	/**
 	 * @Field(type="mixed")
 	 * @var mixed
@@ -61,15 +68,27 @@ class WorkItem extends SeedDocument
 	//*************************************************************************
 
 	/**
-	 * Set defaults
+	 * @param int $handle_via
+	 *
+	 * @return WorkItem
 	 */
-	public function __construct()
+	public function setHandleVia( $handle_via )
 	{
-		$this->_createdAt = time();
+		$this->_handle_via = $handle_via;
+
+		return $this;
 	}
 
 	/**
-	 * @param callable|string $handler
+	 * @return int
+	 */
+	public function getHandleVia()
+	{
+		return $this->_handle_via;
+	}
+
+	/**
+	 * @param mixed $handler
 	 *
 	 * @return WorkItem
 	 */
@@ -81,7 +100,7 @@ class WorkItem extends SeedDocument
 	}
 
 	/**
-	 * @return callable|string
+	 * @return mixed
 	 */
 	public function getHandler()
 	{
@@ -89,13 +108,13 @@ class WorkItem extends SeedDocument
 	}
 
 	/**
-	 * @param boolean $inFlight
+	 * @param boolean $in_flight
 	 *
 	 * @return WorkItem
 	 */
-	public function setInFlight( $inFlight )
+	public function setInFlight( $in_flight )
 	{
-		$this->_in_flight = $inFlight;
+		$this->_in_flight = $in_flight;
 
 		return $this;
 	}
@@ -109,23 +128,23 @@ class WorkItem extends SeedDocument
 	}
 
 	/**
-	 * @param int $ownerId
+	 * @param \Kisma\Core\Containers\Documents\Session $owner
 	 *
 	 * @return WorkItem
 	 */
-	public function setOwnerId( $ownerId )
+	public function setOwner( $owner )
 	{
-		$this->_owner_id = $ownerId;
+		$this->_owner = $owner;
 
 		return $this;
 	}
 
 	/**
-	 * @return int
+	 * @return \Kisma\Core\Containers\Documents\Session
 	 */
-	public function getOwnerId()
+	public function getOwner()
 	{
-		return $this->_owner_id;
+		return $this->_owner;
 	}
 
 	/**
@@ -169,19 +188,19 @@ class WorkItem extends SeedDocument
 	}
 
 	/**
-	 * @param int $processedAt
+	 * @param string $processed_at
 	 *
 	 * @return WorkItem
 	 */
-	public function setProcessedAt( $processedAt )
+	public function setProcessedAt( $processed_at )
 	{
-		$this->_processed_at = $processedAt;
+		$this->_processed_at = $processed_at;
 
 		return $this;
 	}
 
 	/**
-	 * @return int
+	 * @return string
 	 */
 	public function getProcessedAt()
 	{
