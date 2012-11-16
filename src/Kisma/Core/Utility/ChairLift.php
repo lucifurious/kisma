@@ -84,6 +84,18 @@ class ChairLift
 
 		if ( !isset( self::$_dms[$_key] ) )
 		{
+			if ( null === ( $_paths = Option::get( $options, 'paths' ) ) )
+			{
+				$_paths = array();
+			}
+
+			$_paths = array_merge(
+				array(
+					\Kisma::get( \Kisma\Core\Enums\KismaSettings::BasePath ) . '/src/Kisma/Core/Containers/Documents'
+				),
+				$_paths
+			);
+
 			if ( null === ( $_config = Option::get( $options, 'config' ) ) )
 			{
 				$_config = new \Doctrine\ODM\CouchDB\Configuration();
@@ -93,7 +105,7 @@ class ChairLift
 				);
 
 				$_config->setMetadataDriverImpl(
-					$_config->newDefaultAnnotationDriver( $GLOBALS["BASE_PATH"] . '\\Kisma\\Core\\Containers\\Documents' )
+					$_config->newDefaultAnnotationDriver( $_paths )
 				);
 			}
 
