@@ -1,0 +1,5 @@
+assets export_ignore
+Original export_ignore
+vendor export_ignore
+atlassian-ide-plugin.xml export_ignore
+.idea export_ignore

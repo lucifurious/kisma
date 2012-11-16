@@ -80,8 +80,9 @@ class Kisma implements \Kisma\Core\Interfaces\PublisherLike, \Kisma\Core\Interfa
 			//	We done baby!
 			static::setConception( true );
 
-			if ( class_exists( '\\ComposerAutoloaderInit', false ) )
+			if ( null === static::getAutoLoader() && class_exists( '\\ComposerAutoloaderInit', false ) )
 			{
+				ComposerAutoloaderInit::getLoader();
 				static::setAutoLoader( \ComposerAutoloaderInit::getLoader() );
 			}
 
