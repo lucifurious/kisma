@@ -3,6 +3,8 @@
  * WorkItem.php
  */
 namespace Kisma\Core\Containers\Documents;
+use \Doctrine\ODM\CouchDB\Mapping\Annotations;
+
 /**
  * @Document
  *
