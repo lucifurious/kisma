@@ -85,39 +85,15 @@ class ChairLift
 
 		if ( !isset( self::$_dms[$_key] ) )
 		{
-			$_paths = null;
-
-			if ( null === ( $_config = Option::get( $options, 'config' ) ) )
-			{
-				$_reader = new \Doctrine\Common\Annotations\SimpleAnnotationReader();
-				$_reader->addNamespace( 'Doctrine\\ODM\\CouchDB\\Mapping\\Annotations' );
-				$_reader->addNamespace( '\\Kisma\\Core\\Containers\\Documents' );
-
-				if ( \Kisma\Core\Enums\PhpFrameworks::Yii == \Kisma::get( 'app.framework' ) &&
-					null !== ( $_appPath = \Kisma::get( 'app.app_path' ) )
+			\Doctrine\Common\Annotations\AnnotationRegistry::registerAutoloadNamespaces(
+				array(
+					'\\Kisma\\Core\\Containers\\Documents',
 				)
-				{
-					$_paths = $_appPath . '/protected/models';
-				}
-
-				/** @noinspection PhpParamsInspection */
-				$_driver = new \Doctrine\ODM\CouchDB\Mapping\Driver\AnnotationDriver( $_reader, $_paths );
-
-				$_config = new \Doctrine\ODM\CouchDB\Configuration();
-
-				$_config->setMetadataCacheImpl(
-					new \Doctrine\Common\Cache\ArrayCache
-				);
-
-				$_config->setProxyDir( \sys_get_temp_dir() );
-				$_config->setAutoGenerateProxyClasses( true );
-				$_config->setMetadataDriverImpl( $_driver );
-				$_config->setMetadataCacheImpl( new \Doctrine\Common\Cache\ArrayCache() );
- 			}
+			);
 
 			self::$_dms[$_key] = \Doctrine\ODM\CouchDB\DocumentManager::create(
 				static::couchDbClient( $options ),
-				$_config,
+				Option::get( $options, 'config' ),
 				Option::get( $options, 'manager' )
 			);
 		}
