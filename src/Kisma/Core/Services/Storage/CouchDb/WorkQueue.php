@@ -72,18 +72,18 @@ class WorkQueue extends \Kisma\Core\Services\SeedService
 	 * Get work items from the queue
 	 * The descending param is used to get LIFO (if true) or FIFO (if false) behavior.
 	 *
-	 * @param string       $ownerId
-	 * @param int          $since
-	 * @param array|string $queryParams
-	 * @param string       $filter
+	 * @param \Kisma\Core\Containers\Documents\Session $owner
+	 * @param int                                      $since
+	 * @param array|string                             $queryParams
+	 * @param string                                   $filter
 	 *
 	 * @return array|bool
 	 */
-	public function dequeue( $ownerId, $since = 0, $queryParams = array(), $filter = '/queue' )
+	public function dequeue( $owner, $since = 0, $queryParams = array(), $filter = '/queue' )
 	{
 		Log::debug( 'Requesting changes...' );
 
-		$_changes = $this->_getFeedChanges( $ownerId, $since, $queryParams, null, $filter );
+		$_changes = $this->_getFeedChanges( $owner, $since, $queryParams, null, $filter );
 
 		if ( empty( $_changes ) || !isset( $_changes['results'] ) )
 		{
@@ -99,27 +99,35 @@ class WorkQueue extends \Kisma\Core\Services\SeedService
 	/**
 	 * Adds a work item to the queue
 	 *
-	 * @param string|callable $handler    The name of the handler class or closure
-	 * @param string          $ownerId    The owner of this queue item
-	 * @param mixed           $payload    Any kind of info you want to pass the worker process
+	 * @param string|callable                           $handler    The name of the handler class or closure
+	 * @param \Kisma\Core\Containers\Documents\Session  $owner      The owner of this queue item
+	 * @param mixed                                     $payload    Any kind of info you want to pass the worker process
 	 *
-	 * @return mixed|bool The _id of the saved message, false if unchanged
+	 * @return string|bool The _rev of the saved message, false if unchanged
 	 */
-	public function enqueue( $handler, $ownerId = null, $payload = null )
+	public function enqueue( $handler, $owner = null, $payload = null )
 	{
 		//	New item
 		$_item = new \Kisma\Core\Containers\Documents\WorkItem();
 		$_item->setQueue( $this->_queue );
 		$_item->setHandler( $handler );
-		$_item->setOwnerId( $ownerId );
+		$_item->setOwner( $owner );
 		$_item->setPayload( $payload );
-		$_item->setId( $this->_key( $this->_dm->getCouchDBClient()->getUuids() ) );
+		$_item->setId( $_key = $this->_key( $this->_dm->getCouchDBClient()->getUuids() ) );
 		$this->_dm->persist( $_item );
 		$this->_dm->flush();
 
-		Log::debug( 'Enqueue:' . $this->_queue . ':' . $_item->getId() );
+		Log::debug(
+			'Enqueue',
+			array(
+				'key'   => $_key,
+				'queue' => $this->_queue,
+				'id'    => $_item->getId(),
+				'rev'   => $_item->getVersion(),
+			)
+		);
 
-		return $_item->getId();
+		return $_item->getVersion();
 	}
 
 	//*************************************************************************
@@ -159,7 +167,7 @@ class WorkQueue extends \Kisma\Core\Services\SeedService
 	 * Pulls a changes feed for this queue
 	 *
 	 * @param string     $queue
-	 * @param string     $ownerId
+	 * @param mixed      $owner
 	 * @param int        $since
 	 * @param array      $query
 	 * @param string     $params
@@ -168,7 +176,7 @@ class WorkQueue extends \Kisma\Core\Services\SeedService
 	 * @throws \Doctrine\CouchDB\HTTP\HTTPException
 	 * @return array
 	 */
-	protected function _getFeedChanges( $queue, $ownerId, $since = 0, $query = array(), $params = null, $filter = '/queue' )
+	protected function _getFeedChanges( $queue, $owner, $since = 0, $query = array(), $params = null, $filter = '/queue' )
 	{
 		$_client = $this->_dm->getCouchDBClient();
 
@@ -180,7 +188,7 @@ class WorkQueue extends \Kisma\Core\Services\SeedService
 		}
 
 		$query['queue'] = $queue;
-		$query['owner_id'] = $ownerId;
+		$query['owner'] = $owner;
 		$query['since'] = $since;
 
 		$_path .= http_build_query( $query ) . '&filter=' . $_client->getDatabase() . $filter;
