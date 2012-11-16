@@ -1,14 +1,6 @@
 <?php
 /**
  * WorkItem.php
- */
-namespace Kisma\Core\Containers\Documents;
-use \Doctrine\ODM\CouchDB\Mapping\Annotations;
-
-/**
- * @Document
- *
- * WorkItem
  * An item to be picked up and worked on
  *
  * @property string      $queue    The name of this queue in which this entry resides
@@ -18,6 +10,12 @@ use \Doctrine\ODM\CouchDB\Mapping\Annotations;
  * @property string      $updated
  * @property bool        $processed
  * @property mixed       $response
+ */
+namespace Kisma\Core\Containers\Documents;
+use \Doctrine\ODM\CouchDB\Mapping\Annotations;
+
+/**
+ * @Document
  */
 class WorkItem extends SeedDocument
 {

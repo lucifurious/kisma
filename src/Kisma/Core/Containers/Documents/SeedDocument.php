@@ -4,6 +4,8 @@
  * A base container for key => value store documents (i.e. CouchDB, Mongo, etc.). Does nothing, like the goggles.
  */
 namespace Kisma\Core\Containers\Documents;
+use \Doctrine\ODM\CouchDB\Mapping\Annotations;
+
 /**
  * @Document
  */
