@@ -102,14 +102,15 @@ class WorkQueue extends \Kisma\Core\Services\SeedService
 	 * @param string|callable                           $handler    The name of the handler class or closure
 	 * @param \Kisma\Core\Containers\Documents\Session  $owner      The owner of this queue item
 	 * @param mixed                                     $payload    Any kind of info you want to pass the worker process
+	 * @param string                                    $queue
 	 *
 	 * @return string|bool The _rev of the saved message, false if unchanged
 	 */
-	public function enqueue( $handler, $owner = null, $payload = null )
+	public function enqueue( $handler, $owner = null, $payload = null, $queue = null )
 	{
 		//	New item
 		$_item = new \Kisma\Core\Containers\Documents\WorkItem();
-		$_item->setQueue( $this->_queue );
+		$_item->setQueue( $queue ? : $this->_queue );
 		$_item->setHandler( $handler );
 		$_item->setOwner( $owner );
 		$_item->setPayload( $payload );
