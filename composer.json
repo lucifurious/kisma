@@ -14,9 +14,7 @@
 		}
 	],
 	"require":     {
-		"php":                  ">=5.3.8",
-		"doctrine/couchdb":     "dev-master",
-		"doctrine/couchdb-odm": "dev-master"
+		"php":                  ">=5.3.8"
 	},
 	"autoload":    {
 		"psr-0": {
