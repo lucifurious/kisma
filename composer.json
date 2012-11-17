@@ -13,6 +13,11 @@
 			"email": "jerryablan@gmail.com"
 		}
 	],
+	"require":     {
+		"php":                  ">=5.3.8",
+		"doctrine/couchdb":     "dev-master",
+		"doctrine/couchdb-odm": "dev-master"
+	},
 	"autoload":    {
 		"psr-0": {
 			"Kisma": "src/"
