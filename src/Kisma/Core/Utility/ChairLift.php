@@ -9,7 +9,7 @@ use Kisma\Core\Utility\Option;
  * ChairLift
  * Lifts you up off the couch! It's a "couch" helper, get it?
  */
-class ChairLift
+class ChairLift implements \Kisma\Core\Interfaces\HttpResponse
 {
 	//*************************************************************************
 	//* Members
@@ -100,27 +100,25 @@ class ChairLift
 	 * @param string                          $database
 	 * @param bool                            $createIfNotFound
 	 *
-	 * @return bool
+	 * @return bool Returns TRUE ONLY when the database existed before the call.
 	 * @throws \Doctrine\CouchDB\HTTP\HTTPException
 	 */
-	public static function databaseExists( $client, $database, $createIfNotFound = true )
+	public static function databaseExists( $client, $database = null, $createIfNotFound = true )
 	{
 		try
 		{
-			$client->getDatabaseInfo( $database );
+			return $client->getDatabaseInfo( $database ? : $client->getDatabase() );
 		}
 		catch ( \Doctrine\CouchDB\HTTP\HTTPException $_ex )
 		{
-			if ( $_ex->getCode() != 404 )
+			if ( static::NotFound != $_ex->getCode() )
 			{
 				throw $_ex;
 			}
 
-			if ( true !== $createIfNotFound )
+			if ( true === $createIfNotFound )
 			{
-				$client->createDatabase( $database );
-
-				return true;
+				$client->createDatabase( $database ? : $client->getDatabase() );
 			}
 		}
 
