@@ -86,12 +86,44 @@ class ChairLift
 		if ( !isset( self::$_dms[$_key] ) )
 		{
 			self::$_dms[$_key] = \Doctrine\ODM\CouchDB\DocumentManager::create(
-				static::couchDbClient( $options ),
+				Option::get( $options, 'client', static::couchDbClient( $options ) ),
 				Option::get( $options, 'config' ),
 				Option::get( $options, 'manager' )
 			);
 		}
 
 		return self::$_dms[$_key];
+	}
+
+	/**
+	 * @param \Doctrine\CouchDB\CouchDBClient $client
+	 * @param string                          $database
+	 * @param bool                            $createIfNotFound
+	 *
+	 * @return bool
+	 * @throws \Doctrine\CouchDB\HTTP\HTTPException
+	 */
+	public static function databaseExists( $client, $database, $createIfNotFound = true )
+	{
+		try
+		{
+			$client->getDatabaseInfo( $database );
+		}
+		catch ( \Doctrine\CouchDB\HTTP\HTTPException $_ex )
+		{
+			if ( $_ex->getCode() != 404 )
+			{
+				throw $_ex;
+			}
+
+			if ( true !== $createIfNotFound )
+			{
+				$client->createDatabase( $database );
+
+				return true;
+			}
+		}
+
+		return false;
 	}
 }
