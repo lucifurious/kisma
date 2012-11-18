@@ -3,6 +3,7 @@
  * Kisma.php
  * Bootstrap loader
  */
+/** @noinspection PhpUndefinedNamespaceInspection */
 /**
  * Kisma
  * Contains a few core functions implemented statically to be lightweight and single instance.
@@ -102,6 +103,29 @@ class Kisma implements \Kisma\Core\Interfaces\PublisherLike, \Kisma\Core\Interfa
 	public static function set( $key, $value = null )
 	{
 		\Kisma\Core\Utility\Option::set( static::$_options, $key, $value );
+	}
+
+	/**
+	 * @param string $key
+	 * @param string $subKey
+	 * @param mixed  $value
+	 *
+	 * @return mixed
+	 */
+	public static function addTo( $key, $subKey, $value = null )
+	{
+		\Kisma\Core\Utility\Option::addTo( static::$_options, $key, $subKey, $value );
+	}
+
+	/**
+	 * @param string $key
+	 * @param string $subKey
+	 *
+	 * @return mixed
+	 */
+	public static function removeFrom( $key, $subKey )
+	{
+		\Kisma\Core\Utility\Option::removeFrom( static::$_options, $key, $subKey );
 	}
 
 	/**

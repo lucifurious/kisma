@@ -5,7 +5,7 @@
 namespace Kisma\Core\Utility;
 /**
  * Option
- * Provides methods to manipulate array and object properties
+ * Provides methods to manipulate array and object properties in a uniform manner
  */
 class Option
 {
@@ -40,11 +40,11 @@ class Option
 	public static function getMany( &$options = array(), $keys, $defaultValue = null )
 	{
 		$_results = array();
-		$_keys = self::collapse( $keys, $defaultValue );
+		$_keys = static::collapse( $keys, $defaultValue );
 
 		foreach ( $_keys as $_key )
 		{
-			$_results[$_key] = self::get( $options, $_key, $defaultValue );
+			$_results[$_key] = static::get( $options, $_key, $defaultValue );
 		}
 
 		return $_results;
@@ -65,7 +65,7 @@ class Option
 	{
 		if ( is_array( $key ) )
 		{
-			return self::getMany( $options, $key, $defaultValue, $unsetValue );
+			return static::getMany( $options, $key, $defaultValue, $unsetValue );
 		}
 
 		$_originalKey = $key;
@@ -133,7 +133,44 @@ class Option
 	 */
 	public static function getDeep( &$options = array(), $key, $subKey, $defaultValue = null, $unsetValue = false )
 	{
-		return self::get( self::get( $options, $key, array() ), $subKey, $defaultValue, $unsetValue );
+		return static::get( static::get( $options, $key, array() ), $subKey, $defaultValue, $unsetValue );
+	}
+
+	/**
+	 * Adds a value to a property array
+	 *
+	 * @param array  $source
+	 * @param string $key
+	 * @param string $subKey
+	 * @param mixed  $value
+	 *
+	 * @return array The new array
+	 */
+	public static function addTo( &$source, $key, $subKey, $value = null )
+	{
+		$_target = static::clean( static::get( $source, $key, array() ) );
+		static::set( $_target, $subKey, $value );
+		static::set( $source, $key, $_target );
+
+		return $_target;
+	}
+
+	/**
+	 * Removes a value from a property array
+	 *
+	 * @param array  $source
+	 * @param string $key
+	 * @param string $subKey
+	 *
+	 * @return mixed The original value of the removed key
+	 */
+	public static function removeFrom( &$source, $key, $subKey )
+	{
+		$_target = static::clean( static::get( $source, $key, array() ) );
+		$_result = static::remove( $_target, $subKey );
+		static::set( $source, $key, $_target );
+
+		return $_result;
 	}
 
 	/**
@@ -143,11 +180,11 @@ class Option
 	 * @param string|array $key Pass a single key or an array of KVPs
 	 * @param mixed|null   $value
 	 *
-	 * @return void
+	 * @return array|string
 	 */
 	public static function set( &$options = array(), $key, $value = null )
 	{
-		$_options = self::collapse( $key, $value );
+		$_options = static::collapse( $key, $value );
 
 		foreach ( $_options as $_key => $_value )
 		{
@@ -182,12 +219,14 @@ class Option
 	 *
 	 * @param array  $options
 	 * @param string $key
+	 *
+	 * @return mixed The original value
 	 */
 	public static function remove( &$options = array(), $key )
 	{
 		$_originalValue = null;
 
-		if ( self::contains( $options, $key ) )
+		if ( static::contains( $options, $key ) )
 		{
 			if ( is_array( $options ) )
 			{
@@ -273,14 +312,14 @@ class Option
 	 */
 	public static function merge( $target )
 	{
-		$_arrays = self::clean( func_get_args() );
-		$_target = self::clean( array_shift( $_arrays ) );
+		$_arrays = static::clean( func_get_args() );
+		$_target = static::clean( array_shift( $_arrays ) );
 
 		foreach ( $_arrays as $_array )
 		{
 			$_target = array_merge(
 				$_target,
-				self::clean( $_array )
+				static::clean( $_array )
 			);
 
 			unset( $_array );
@@ -292,7 +331,7 @@ class Option
 	}
 
 	/**
-	 * Wrapper for a self::get on $_SERVER
+	 * Wrapper for a static::get on $_SERVER
 	 *
 	 * @param string $key
 	 * @param string $defaultValue
@@ -302,11 +341,11 @@ class Option
 	 */
 	public static function server( $key, $defaultValue = null, $unsetValue = false )
 	{
-		return self::get( $_SERVER, $key, $defaultValue, $unsetValue );
+		return static::get( $_SERVER, $key, $defaultValue, $unsetValue );
 	}
 
 	/**
-	 * Wrapper for a self::get on $_REQUEST
+	 * Wrapper for a static::get on $_REQUEST
 	 *
 	 * @param string $key
 	 * @param string $defaultValue
@@ -316,7 +355,7 @@ class Option
 	 */
 	public static function request( $key, $defaultValue = null, $unsetValue = false )
 	{
-		return self::get( $_REQUEST, $key, $defaultValue, $unsetValue );
+		return static::get( $_REQUEST, $key, $defaultValue, $unsetValue );
 	}
 
 	/**
