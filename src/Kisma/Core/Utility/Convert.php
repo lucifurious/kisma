@@ -71,7 +71,13 @@ class Convert extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\Utility
 
 				try
 				{
-					$_propertyName = ltrim( $_property->name, '_ ' );
+					$_realPropertyName = $_propertyName = ltrim( $_property->name, '_ ' );
+
+					if ( false !== strpos( $_propertyName, '_' ) )
+					{
+						$_propertyName = Inflector::tag( $_propertyName );
+					}
+
 					$_getter = 'get' . $_propertyName;
 
 					if ( method_exists( $object, $_getter ) )
@@ -83,7 +89,7 @@ class Convert extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\Utility
 							$_propertyValue = self::toObject( $_propertyValue );
 						}
 
-						$_obj->{$_propertyName} = $_propertyValue;
+						$_obj->{$_realPropertyName} = $_propertyValue;
 					}
 				}
 				catch ( \Exception $_ex )
