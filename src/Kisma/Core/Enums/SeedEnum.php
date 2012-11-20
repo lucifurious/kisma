@@ -39,7 +39,7 @@ abstract class SeedEnum
 	 */
 	public function __invoke()
 	{
-		return self::defines( '__default', true );
+		return static::defines( '__default', true );
 	}
 
 	/**
@@ -130,25 +130,26 @@ abstract class SeedEnum
 	 */
 	public static function contains( $value )
 	{
-		return in_array( $value, array_values( self::getDefinedConstants() ) );
+		return in_array( $value, array_values( static::getDefinedConstants() ) );
 	}
 
 	/**
 	 * Returns the constant name as a string
 	 *
 	 * @param string $constant
+	 * @param bool   $flipped If false, the $constantValue should contain the constant name and the value will be returned
 	 *
 	 * @throws \InvalidArgumentException
 	 * @return string
 	 */
-	public static function nameOf( $constant )
+	public static function nameOf( $constant, $flipped = true )
 	{
-		if ( in_array( $constant, array_keys( $_constants = self::getDefinedConstants( true ) ) ) )
+		if ( in_array( $constant, array_keys( $_constants = static::getDefinedConstants( $flipped ) ) ) )
 		{
 			return $_constants[$constant];
 		}
 
-		throw new \InvalidArgumentException( 'The constant "' . $constant . '" is not defined.' );
+		throw new \InvalidArgumentException( 'A constant with the value of "' . $constant . '" does not exist.' );
 	}
 
 	/**
@@ -170,8 +171,8 @@ abstract class SeedEnum
 	 */
 	public static function defines( $constant, $returnValue = false )
 	{
-		$_constants = self::getDefinedConstants( true );
-		$_has = isset( $_constants, $constant );
+		$_constants = static::getDefinedConstants( true );
+		$_has = isset( $_constants[$constant] );
 
 		if ( false === $_has && false !== $returnValue )
 		{
