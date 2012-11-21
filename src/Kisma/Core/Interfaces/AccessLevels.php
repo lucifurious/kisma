@@ -5,7 +5,7 @@
 namespace Kisma\Core\Interfaces;
 /**
  * AccessLevels
- * Generic access levels
+ * Generic access levels, matching with Yii
  */
 interface AccessLevels
 {
@@ -14,28 +14,16 @@ interface AccessLevels
 	//*************************************************************************
 
 	/**
-	 * @var int
+	 * @var string
 	 */
-	const None = -1;
+	const Any = '*';
 	/**
-	 * @var int
+	 * @var string
 	 */
-	const Guest = 0;
+	const Guest = '?';
 	/**
-	 * @var int
+	 * @var string
 	 */
-	const UnconfirmedUser = 1;
-	/**
-	 * @var int
-	 */
-	const ConfirmedUser = 2;
-	/**
-	 * @var int
-	 */
-	const AuthorizedUser = 3;
-	/**
-	 * @var intNo access
-	 */
-	const Admin = 4;
+	const Authenticated = '@';
 
 }

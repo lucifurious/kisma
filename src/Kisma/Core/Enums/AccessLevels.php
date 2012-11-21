@@ -1,9 +1,9 @@
 <?php
 /**
- * AccessLevel.php
+ * AccessLevels.php
  *
- * Kisma(tm) : PHP Nanoframework (http://github.com/Pogostick/kisma/)
- * Copyright 2009-2011, Jerry Ablan/Pogostick, LLC., All Rights Reserved
+ * Kisma(tm) : PHP Utility Belt (http://github.com/kisma/kisma/)
+ * Copyright 2009-2012, Jerry Ablan/Pogostick, LLC., All Rights Reserved
  *
  * @copyright Copyright (c) 2009-2011 Jerry Ablan/Pogostick, LLC.
  * @license   http://github.com/Pogostick/Kisma/blob/master/LICENSE
@@ -11,10 +11,10 @@
  */
 namespace Kisma\Core\Enums;
 /**
- * AccessLevel
+ * AccessLevels
  * Various pre-defined application access levels
  */
-class AccessLevel extends SeedEnum implements \Kisma\Core\Interfaces\AccessLevels
+class AccessLevels extends SeedEnum implements \Kisma\Core\Interfaces\AccessLevels
 {
 	//*************************************************************************
 	//* Constants
