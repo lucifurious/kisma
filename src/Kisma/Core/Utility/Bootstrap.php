@@ -68,6 +68,10 @@ HTML;
 	 * @var array The default form data
 	 */
 	protected $_formData = array();
+	/**
+	 * @var string CSRF token junk
+	 */
+	protected $_csrf = null;
 
 	//*************************************************************************
 	//* Public Methods
@@ -86,6 +90,17 @@ HTML;
 		$this->_prefix = $prefix;
 		$this->_attributes = $attributes;
 		$this->_contents = null;
+
+		if ( class_exists( '\\Yii', false ) && \Yii::app()->getRequest()->enableCsrfValidation )
+		{
+			$_tokenName = \Yii::app()->getRequest()->csrfTokenName;
+			$_tokenValue = \Yii::app()->getRequest()->csrfToken;
+
+			$this->_csrf = <<<HTML
+<input type="hidden" name="{$_tokenName}" value="{$_tokenValue}" />
+HTML;
+		}
+
 	}
 
 	/**
@@ -282,6 +297,7 @@ HTML;
 	<div class="form-actions">
 	{$_submit}
 	</div>
+	{$this->_csrf}
 </form>
 HTML;
 
@@ -346,8 +362,15 @@ HTML;
 
 		if ( false !== $logout )
 		{
+			$_token =
+				( class_exists( '\\Yii', false ) && false !== \Yii::app()->getRequest()->enableCsrfValidation )
+					?
+					'?token=' . \Yii::app()->getRequest()->getCsrfToken()
+					:
+					null;
+
 			$_liTags .= <<<HTML
-<li class="pull-right"><a href="/app/logout/">Logout</a></li>
+<li class="pull-right"><a href="/app/logout/{$_token}">Logout</a></li>
 HTML;
 
 		}
