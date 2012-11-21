@@ -157,7 +157,7 @@ class Scalar implements \Kisma\Core\Interfaces\UtilityLike
 
 		for ( $_i = 0; $_i < $_args; $_i++ )
 		{
-			if ( null !== ( $_default = self::o( $_haystack, $_i ) ) )
+			if ( null !== ( $_default = Option::get( $_haystack, $_i ) ) )
 			{
 				break;
 			}
