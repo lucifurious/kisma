@@ -353,11 +353,18 @@ HTML;
 
 		foreach ( $items as $_linkName => $_menuItem )
 		{
-			$_class = $_menuItem['active'] ? 'active' : 'inactive';
+			if ( !is_array( $_menuItem ) )
+			{
+				$_liTags .= $_menuItem;
+			}
+			else
+			{
+				$_class = $_menuItem['active'] ? 'active' : 'inactive';
 
-			$_liTags .= <<<HTML
+				$_liTags .= <<<HTML
 <li class="{$_class}"><a href="{$_menuItem['href']}">{$_linkName}</a></li>
 HTML;
+			}
 		}
 
 		if ( false !== $logout )
