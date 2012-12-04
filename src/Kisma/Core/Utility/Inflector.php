@@ -166,4 +166,44 @@ class Inflector implements \Kisma\Core\Interfaces\UtilityLike
 		return strtolower( preg_replace( "/([a-z])([A-Z])/", "\\1_\\2", $string ) );
 	}
 
+	/**
+	 * Converts a word to its plural form. Totally swiped from Yii
+	 *
+	 * @param string $name the word to be pluralized
+	 *
+	 * @return string the pluralized word
+	 */
+	public static function pluralize( $name )
+	{
+		static $_rules = array(
+			'/move$/i'                       => 'moves',
+			'/foot$/i'                       => 'feet',
+			'/child$/i'                      => 'children',
+			'/human$/i'                      => 'humans',
+			'/man$/i'                        => 'men',
+			'/tooth$/i'                      => 'teeth',
+			'/person$/i'                     => 'people',
+			'/([m|l])ouse$/i'                => '\1ice',
+			'/(x|ch|ss|sh|us|as|is|os)$/i'   => '\1es',
+			'/([^aeiouy]|qu)y$/i'            => '\1ies',
+			'/(?:([^f])fe|([lr])f)$/i'       => '\1\2ves',
+			'/(shea|lea|loa|thie)f$/i'       => '\1ves',
+			'/([ti])um$/i'                   => '\1a',
+			'/(tomat|potat|ech|her|vet)o$/i' => '\1oes',
+			'/(bu)s$/i'                      => '\1ses',
+			'/(ax|test)is$/i'                => '\1es',
+			'/s$/'                           => 's',
+		);
+
+		foreach ( $_rules as $_rule => $_replacement )
+		{
+			if ( preg_match( $_rule, $name ) )
+			{
+				return preg_replace( $_rule, $_replacement, $name );
+			}
+		}
+
+		return $name . 's';
+	}
+
 }
