@@ -215,7 +215,7 @@ HTML;
 		switch ( $_type )
 		{
 			case 'html':
-				$_input = $_html;
+				$_input = $contents;
 				break;
 
 			case 'textarea':
