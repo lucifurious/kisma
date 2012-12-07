@@ -353,16 +353,23 @@ HTML;
 
 		foreach ( $items as $_linkName => $_menuItem )
 		{
+			$_icon = null;
+
 			if ( !is_array( $_menuItem ) )
 			{
 				$_liTags .= $_menuItem;
 			}
 			else
 			{
+				if ( null !== ( $_icon = Option::get( $_menuItem, 'icon' ) ) )
+				{
+					$_icon = static::wrap( 'i', null, array( 'class' => 'icon-' . $_icon ) );
+				}
+
 				$_class = $_menuItem['active'] ? 'active' : 'inactive';
 
 				$_liTags .= <<<HTML
-<li class="{$_class}"><a href="{$_menuItem['href']}">{$_linkName}</a></li>
+<li class="{$_class}"><a href="{$_menuItem['href']}">{$_icon}{$_linkName}</a></li>
 HTML;
 			}
 		}
