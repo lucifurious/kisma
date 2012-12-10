@@ -160,6 +160,8 @@ HTML;
 		$_labelEnd = null;
 		$_labelAttributes = array();
 		$_id = Option::get( $attributes, 'id', Option::get( $attributes, 'name' ) );
+		$_inputAppend = Option::get( $attributes, 'append', null, true );
+		$_inputPrepend = Option::get( $attributes, 'prepend', null, true );
 
 		$this->cleanNames( $attributes );
 
@@ -186,10 +188,12 @@ HTML;
 
 		$_blockStart = $_blockEnd = null;
 		$_inputStart = $_inputEnd = null;
+		$_inputWrap = trim( ( $_inputAppend ? 'input-append' : null ) . ' ' . ( $_inputPrepend ? 'input-prepend' : null ) );
 
 		switch ( $this->_formType )
 		{
 			case static::Horizontal:
+
 				$_blockStart = Markup::tag( 'div', array( 'class' => 'control-group' ), null, false );
 				$_inputStart = Markup::tag( 'div', array( 'class' => 'controls' ), null, false );
 				$_inputEnd = $_blockEnd = '</div>';
@@ -242,6 +246,11 @@ HTML;
 <input type="{$_type}" {$attributes}>
 HTML;
 				break;
+		}
+
+		if ( !empty( $_inputWrap ) )
+		{
+			$_input = '<div class="' . $_inputWrap . '">' . $_inputPrepend . $_input . $_inputAppend . '</div>';
 		}
 
 		$_html = <<<HTML
