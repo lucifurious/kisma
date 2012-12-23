@@ -13,7 +13,12 @@ namespace Kisma\Core\Services;
  * @event onFailure Raised after a failure
  * @event onComplete Raised upon completion of a service call
  */
-abstract class SeedService extends \Kisma\Core\SeedBag implements \Kisma\Core\Interfaces\ServiceLike, \Kisma\Core\Interfaces\ServiceState
+use Kisma\Core\SeedBag;
+use Kisma\Core\Interfaces\ServiceLike;
+use Kisma\Core\Interfaces\ServiceState;
+use Kisma\Core\Interfaces\ConsumerLike;
+
+abstract class SeedService extends SeedBag implements ServiceLike, ServiceState
 {
 	//*************************************************************************
 	//* Private Members
@@ -42,7 +47,7 @@ abstract class SeedService extends \Kisma\Core\SeedBag implements \Kisma\Core\In
 	 * @param \Kisma\Core\Interfaces\ConsumerLike $consumer
 	 * @param array                               $settings
 	 */
-	public function __construct( \Kisma\Core\Interfaces\ConsumerLike $consumer, $settings = array() )
+	public function __construct( ConsumerLike $consumer, $settings = array() )
 	{
 		parent::__construct( $settings );
 

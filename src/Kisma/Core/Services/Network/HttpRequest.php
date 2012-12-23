@@ -1,177 +1,100 @@
 <?php
-/**
- * HttpRequest.php
- */
 namespace Kisma\Core\Services\Network;
 
-use Kisma\Core\Utility\Option;
+use Kisma\Core\Services\SeedRequest;
+use Kisma\Core\Enums\HttpMethod;
+use Kisma\Core\Utility\FilterInput;
+use Kisma\Core\Utility\Inflector;
+use Kisma\Core\Interfaces\RequestSource;
 
 /**
  * HttpRequest
  * Encapsulates an HTTP application request
  */
-class HttpRequest extends \Kisma\Core\Services\SeedService
+class HttpRequest extends SeedRequest
 {
 	//*************************************************************************
-	//* Private Members
+	//* Methods
 	//*************************************************************************
 
 	/**
-	 * @var string
+	 * @param array           $contents
+	 * @param RequestSource   $source
 	 */
-	protected $_uri = null;
-	/**
-	 * @var string|\Kisma\Core\Enums\HttpMethod
-	 */
-	protected $_method = null;
-	/**
-	 * @var mixed
-	 */
-	protected $_response = null;
-	/**
-	 * @var array
-	 */
-	protected $_headers = null;
-
-	//*************************************************************************
-	//* Private Methods
-	//*************************************************************************
-
-	/**
-	 * Load the inbound $_REQUEST object
-	 */
-	protected function _loadRequest()
+	public function __construct( $contents = array(), $source = null )
 	{
-		//	Initialize the request stuff
-		parent::_loadRequest();
-
-		//	Parse the rest
-		$this->_content = array(
-			'server'  => $_SERVER,
-			'request' => isset( $_REQUEST ) ? $_REQUEST : null,
-		);
-
-		$this->_uri = Option::get( $_SERVER, 'REQUEST_URI' );
-		$this->_method = Option::get( $_SERVER, 'REQUEST_METHOD' );
-
-		//	Pull out the headers
-		$this->_headers = array();
-
-		foreach ( $_SERVER as $_key => $_value )
-		{
-			if ( false === stripos( $_key, 'HTTP_', 0 ) )
-			{
-				continue;
-			}
-
-			$_clean = str_replace(
-				'HTTP_',
-				null,
-				strtoupper( $_key )
-			);
-
-			$_key = \Kisma\Core\Utility\Inflector::tag( strtolower( $_clean ), true );
-
-			$this->_headers[$_key] = $_value;
-		}
-
-		return true;
-	}
-
-	//*************************************************************************
-	//* Properties
-	//*************************************************************************
-
-	/**
-	 * @param string $content
-	 *
-	 * @return HttpRequest
-	 */
-	public function setContent( $content )
-	{
-		$this->_content = $content;
-
-		return $this;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getContent()
-	{
-		return $this->_content;
-	}
-
-	/**
-	 * @param array $headers
-	 *
-	 * @return HttpRequest
-	 */
-	public function setHeaders( $headers )
-	{
-		$this->_headers = $headers;
-
-		return $this;
+		parent::__construct( $contents, $source );
+		$this->_loadRequest();
 	}
 
 	/**
 	 * @return array
 	 */
-	public function getHeaders()
+	public function headers()
 	{
-		return $this->_headers;
-	}
-
-	/**
-	 * @param \Kisma\Core\Enums\HttpMethod $method
-	 *
-	 * @return HttpRequest
-	 */
-	public function setMethod( $method )
-	{
-		$this->_method = $method;
-
-		return $this;
+		return $this->get( 'server.headers', array() );
 	}
 
 	/**
 	 * @return \Kisma\Core\Enums\HttpMethod
 	 */
-	public function getMethod()
+	public function requestMethod()
 	{
-		return $this->_method;
+		return $this->get( 'request.method', false );
 	}
 
 	/**
-	 * @param string $uri
+	 * @param bool $defaultValue
 	 *
-	 * @return HttpRequest
+	 * @return HttpMethod
 	 */
-	public function setUri( $uri )
+	public function requestUri( $defaultValue = false )
 	{
-		$this->_uri = $uri;
-
-		return $this;
+		return $this->get( 'request.uri', $defaultValue );
 	}
 
 	/**
-	 * @return string
+	 * Load up with presents
 	 */
-	public function getUri()
+	protected function _loadRequest()
 	{
-		return $this->_uri;
+		$_goodies = array();
+
+		//	Fill up the bag
+		if ( isset( $_SERVER ) && empty( $_SERVER ) )
+		{
+			foreach ( $_SERVER as $_key => $_value )
+			{
+				if ( false !== stripos( $_key, 'HTTP_', 0 ) )
+				{
+					$_tag = str_ireplace( 'HTTP_', null, $_key );
+					if ( !is_array( $_goodies['server.headers'] ) )
+					{
+						$_goodies['server.headers'] = array();
+					}
+
+					$_goodies['server.headers'][$_tag] = $_value;
+				}
+				else
+				{
+					$_tag = 'server.' . Inflector::tag( $_key, true, false, 'SERVER_' );
+					$_goodies[$_tag] = $_value;
+				}
+			}
+		}
+
+		if ( isset( $_REQUEST ) && empty( $_REQUEST ) )
+		{
+			foreach ( $_REQUEST as $_key => $_value )
+			{
+				$_tag = 'request.' . Inflector::tag( $_key, true, false, 'REQUEST_' );
+				$_goodies[$_tag] = $_value;
+			}
+		}
+
+		$this->merge( $_goodies );
+
+		return true;
 	}
 
-	/**
-	 * Process a request for the services of this class
-	 * Called after the service is initialized
-	 *
-	 * @param \Kisma\Core\Interfaces\RequestLike $request
-	 *
-	 * @return \Kisma\Core\Interfaces\ResponseLike|void
-	 */
-	public function process( \Kisma\Core\Interfaces\RequestLike $request = null )
-	{
-		return null;
-	}
 }

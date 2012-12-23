@@ -35,6 +35,11 @@ class FilterInput implements \Kisma\Core\Interfaces\UtilityLike
 	 */
 	public static function smart( $value )
 	{
+		if ( is_array( $value ) )
+		{
+			filter_var_array( $value, FILTER_SANITIZE_STRING );
+		}
+
 		switch ( getType( $value ) )
 		{
 			case 'double':

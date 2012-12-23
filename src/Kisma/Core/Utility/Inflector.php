@@ -102,20 +102,27 @@ class Inflector implements \Kisma\Core\Interfaces\UtilityLike
 	 *       Class Name:            kisma.aspects.event_handling => \Kisma\Aspects\EventHandling
 	 *       Array Key:            my_event => MyEvent
 	 *
-	 * @param string $tag
-	 * @param bool   $isKey        If true, the $tag will be converted to a format suitable for use as an array key
-	 * @param bool   $baseNameOnly If true, only the final, base of the tag will be returned.
-	 * @param array  $keyParts
+	 * @param string      $tag
+	 * @param bool        $isKey           If true, the $tag will be converted to a format suitable for use as an array key
+	 * @param bool        $baseNameOnly    If true, only the final, base of the tag will be returned.
+	 * @param string      $strip           If $isKey == TRUE and $strip is provided, it's value is removed from the tag before it's returned. (i.e. REQUEST_URI would be URI with $strip = "REQUEST_"
+	 * @param null|array  $keyParts        If set, will contain the split of the key upon return
 	 *
 	 * @return string
 	 */
-	public static function tag( $tag, $isKey = false, $baseNameOnly = false, &$keyParts = array() )
+	public static function tag( $tag, $isKey = false, $baseNameOnly = false, $strip = null, &$keyParts = null )
 	{
 		//	If we're dotted, clean up
 		if ( false !== strpos( $tag, '.' ) )
 		{
 			//	Now spaces to slashes
 			$tag = str_replace( ' ', '\\', self::ucWordsBetter( $tag, '.' ) );
+		}
+
+		//	Strip off extraneous material
+		if ( false !== $isKey && null !== $strip )
+		{
+			$tag = str_ireplace( $strip, null, $tag );
 		}
 
 		//	Convert underscores to spaces, then remove spaces
