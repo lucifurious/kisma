@@ -29,30 +29,28 @@ class Inflector implements \Kisma\Core\Interfaces\UtilityLike
 	//*************************************************************************
 
 	/**
-	 * Given a Kisma identifier, return it to neutral format (lowercase, period and underscores)
+	 * Given a string, return it to neutral format (lowercase, period and underscores)
 	 *
-	 * Examples:
-	 *       Class Name:            \Kisma\Core\Events\SeedEvent becomes "kisma.components.component_event"
-	 *
-	 * @param string $tag
+	 * @param string $item  The string to neutralize
+	 * @param string $strip If provided, it's value is removed from item before it's neutralized.
+	 *                      Example: "REQUEST_URI" would be "URI" with $strip = "REQUEST_"
 	 *
 	 * @return string
 	 */
-	public static function untag( $tag )
+	public static function neutralize( $item, $strip = null )
 	{
-		$_parts = explode( '\\', $tag );
+		if ( null !== $strip )
+		{
+			$item = str_ireplace( $strip, null, $item );
+		}
+
+		$_parts = preg_split( "/(\w\\\.\/)+/", $item );
 
 		array_walk( $_parts,
 			function ( &$part )
 			{
-				//      Replace
-				$part = strtolower(
-					$part == strtoupper( $part )
-						?
-						$part
-						:
-						preg_replace( '/(?<=\\w)([A-Z])/', '_\\1', $part )
-				);
+				//      Clean
+				$part = static::decamelize( $part );
 			}
 		);
 
@@ -60,36 +58,62 @@ class Inflector implements \Kisma\Core\Interfaces\UtilityLike
 	}
 
 	/**
-	 * Smarter ucwords()
+	 * Given a Kisma identifier, return it to neutral format (lowercase, period and underscores)
 	 *
-	 * @param string $words
-	 * @param string $convertDelimiter Set to the delimiter you'd like replaced with spaces before conversion
+	 * Examples:
+	 *       Class Name:            \Kisma\Core\Events\SeedEvent becomes "kisma.components.component_event"
 	 *
-	 * @internal param bool $dotted If true, dots will be replaced with spaces before the UCing
+	 * @param string      $tag
+	 *
+	 * @return string
+	 * @deprecated Please use neutralize()
+	 */
+	public static function untag( $tag )
+	{
+		return static::neutralize( $tag );
+//
+//		$_parts = explode( '\\', $tag );
+//
+//		array_walk( $_parts,
+//			function ( &$part )
+//			{
+//				//      Replace
+//				$part = strtolower(
+//					$part == strtoupper( $part )
+//						?
+//						$part
+//						:
+//						preg_replace( '/(?<=\\w)([A-Z])/', '_\\1', $part )
+//				);
+//			}
+//		);
+//
+//		return implode( '.', $_parts );
+	}
+
+	/**
+	 * Given a string, return it to non-neutral format (delimited camel-case)
+	 *
+	 * @param string $item      The string to deneutralize
+	 * @param string $delimiter Will be used to reconstruct the string
 	 *
 	 * @return string
 	 */
-	public static function ucWordsBetter( $words, $convertDelimiter = null )
+	public static function deneutralize( $item, $delimiter = '\\' )
 	{
-		$_cleaned = null;
+		$_result = static::camelize(
+			str_replace(
+				' ',
+				null,
+				str_replace(
+					array( '_', '.' ),
+					array( ' ', $delimiter ),
+					$item
+				)
+			)
+		);
 
-		if ( null !== $convertDelimiter )
-		{
-			//	Convert dots to spaces, then spaces to namespace separators.
-			$words = trim( str_replace( $convertDelimiter, ' ', $words ) );
-		}
-
-		$_parts = explode( ' ', $words );
-
-		if ( !empty( $_parts ) )
-		{
-			foreach ( $_parts as $_part )
-			{
-				$_cleaned .= ' ' . ( $_part != strtoupper( $_part ) ? ucwords( $_part ) : $_part );
-			}
-		}
-
-		return trim( $_cleaned );
+		return $_result;
 	}
 
 	/**
@@ -103,46 +127,33 @@ class Inflector implements \Kisma\Core\Interfaces\UtilityLike
 	 *       Array Key:            my_event => MyEvent
 	 *
 	 * @param string      $tag
-	 * @param bool        $isKey           If true, the $tag will be converted to a format suitable for use as an array key
-	 * @param bool        $baseNameOnly    If true, only the final, base of the tag will be returned.
-	 * @param string      $strip           If $isKey == TRUE and $strip is provided, it's value is removed from the tag before it's returned. (i.e. REQUEST_URI would be URI with $strip = "REQUEST_"
-	 * @param null|array  $keyParts        If set, will contain the split of the key upon return
+	 * @param bool        $isKey           If true, the $tag will be neutralized
+	 * @param string      $strip           If provided, it's value is removed from item before it's neutralized.
+	 *                                     Example: "REQUEST_URI" would be "URI" with $strip = "REQUEST_"
 	 *
 	 * @return string
 	 */
-	public static function tag( $tag, $isKey = false, $baseNameOnly = false, $strip = null, &$keyParts = null )
+	public static function tag( $tag, $isKey = false, $strip = null )
 	{
-		//	If we're dotted, clean up
-		if ( false !== strpos( $tag, '.' ) )
+		if ( false !== $isKey )
 		{
-			//	Now spaces to slashes
-			$tag = str_replace( ' ', '\\', self::ucWordsBetter( $tag, '.' ) );
+			return static::neutralize( $tag, $strip );
 		}
 
-		//	Strip off extraneous material
-		if ( false !== $isKey && null !== $strip )
-		{
-			$tag = str_ireplace( $strip, null, $tag );
-		}
-
-		//	Convert underscores to spaces, then remove spaces
-		$_tag = str_replace( ' ', null, self::ucWordsBetter( $tag, '_' ) );
-
-		//	Only the base?
-		if ( false !== $baseNameOnly )
-		{
-			//	If this is a key, just get the last part
-			$_tag = @end( @explode( '\\', $_tag ) );
-		}
-
-		//	Make it a key?
-		if ( false !== $isKey && isset( $keyParts ) )
-		{
-			//	Convert namespace separators to dots
-			$keyParts = explode( '.', $_tag = self::untag( $_tag ) );
-		}
+		$_tag = static::deneutralize( $tag );
 
 		return $_tag;
+	}
+
+	/**
+	 * @param string $tag
+	 * @param string $delimiter
+	 *
+	 * @return string
+	 */
+	public static function baseName( $tag, $delimiter = '\\' )
+	{
+		return @end( @explode( $delimiter, $tag ) );
 	}
 
 	/**
@@ -158,7 +169,7 @@ class Inflector implements \Kisma\Core\Interfaces\UtilityLike
 	{
 		$_newString = ucwords( str_replace( $separator, ' ', $string ) );
 
-		return ( false === $preserveWhiteSpace ? str_replace( ' ', '', $_newString ) : $_newString );
+		return ( false === $preserveWhiteSpace ? str_replace( ' ', null, $_newString ) : $_newString );
 	}
 
 	/**
@@ -211,6 +222,39 @@ class Inflector implements \Kisma\Core\Interfaces\UtilityLike
 		}
 
 		return $name . 's';
+	}
+
+	/**
+	 * Smarter ucwords()
+	 *
+	 * @param string $words
+	 * @param string $convertDelimiter Set to the delimiter you'd like replaced with spaces before conversion
+	 *
+	 * @internal param bool $dotted If true, dots will be replaced with spaces before the UCing
+	 *
+	 * @return string
+	 */
+	public static function ucWordsBetter( $words, $convertDelimiter = null )
+	{
+		$_cleaned = null;
+
+		if ( null !== $convertDelimiter )
+		{
+			//	Convert dots to spaces, then spaces to namespace separators.
+			$words = trim( str_replace( $convertDelimiter, ' ', $words ) );
+		}
+
+		$_parts = explode( ' ', $words );
+
+		if ( !empty( $_parts ) )
+		{
+			foreach ( $_parts as $_part )
+			{
+				$_cleaned .= ' ' . ( $_part != strtoupper( $_part ) ? ucwords( $_part ) : $_part );
+			}
+		}
+
+		return trim( $_cleaned );
 	}
 
 }

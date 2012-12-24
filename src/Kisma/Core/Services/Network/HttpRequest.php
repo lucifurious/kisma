@@ -40,7 +40,7 @@ class HttpRequest extends SeedRequest
 	 */
 	public function requestMethod()
 	{
-		return $this->get( 'request.method', false );
+		return $this->get( 'request.request_method', false );
 	}
 
 	/**
@@ -50,7 +50,7 @@ class HttpRequest extends SeedRequest
 	 */
 	public function requestUri( $defaultValue = false )
 	{
-		return $this->get( 'request.uri', $defaultValue );
+		return $this->get( 'request.request_uri', $defaultValue );
 	}
 
 	/**
@@ -61,33 +61,33 @@ class HttpRequest extends SeedRequest
 		$_goodies = array();
 
 		//	Fill up the bag
-		if ( isset( $_SERVER ) && empty( $_SERVER ) )
+		if ( isset( $_SERVER ) && !empty( $_SERVER ) )
 		{
 			foreach ( $_SERVER as $_key => $_value )
 			{
 				if ( false !== stripos( $_key, 'HTTP_', 0 ) )
 				{
-					$_tag = str_ireplace( 'HTTP_', null, $_key );
-					if ( !is_array( $_goodies['server.headers'] ) )
+					if ( !isset( $_goodies['server.headers'] ) || !is_array( $_goodies['server.headers'] ) )
 					{
 						$_goodies['server.headers'] = array();
 					}
 
+					$_tag = Inflector::tag( $_key, true, 'HTTP_' );
 					$_goodies['server.headers'][$_tag] = $_value;
 				}
 				else
 				{
-					$_tag = 'server.' . Inflector::tag( $_key, true, false, 'SERVER_' );
+					$_tag = 'server.' . Inflector::tag( $_key, true );
 					$_goodies[$_tag] = $_value;
 				}
 			}
 		}
 
-		if ( isset( $_REQUEST ) && empty( $_REQUEST ) )
+		if ( isset( $_REQUEST ) && !empty( $_REQUEST ) )
 		{
 			foreach ( $_REQUEST as $_key => $_value )
 			{
-				$_tag = 'request.' . Inflector::tag( $_key, true, false, 'REQUEST_' );
+				$_tag = 'request.' . Inflector::tag( $_key, true, 'REQUEST_' );
 				$_goodies[$_tag] = $_value;
 			}
 		}
