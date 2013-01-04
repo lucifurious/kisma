@@ -61,7 +61,7 @@ class Option
 	 *
 	 * @return mixed
 	 */
-	public static function get( &$options = array(), $key, $defaultValue = null, $unsetValue = false )
+	public static function &get( &$options = array(), $key, $defaultValue = null, $unsetValue = false )
 	{
 		if ( is_array( $key ) )
 		{
