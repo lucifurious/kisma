@@ -50,7 +50,7 @@ class Inflector implements \Kisma\Core\Interfaces\UtilityLike
 			function ( &$part )
 			{
 				//      Clean
-				$part = self::decamelize( $part );
+				$part = Inflector::decamelize( $part );
 			}
 		);
 
