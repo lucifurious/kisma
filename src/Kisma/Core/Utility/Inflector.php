@@ -50,7 +50,7 @@ class Inflector implements \Kisma\Core\Interfaces\UtilityLike
 			function ( &$part )
 			{
 				//      Clean
-				$part = static::decamelize( $part );
+				$part = self::decamelize( $part );
 			}
 		);
 
@@ -70,7 +70,7 @@ class Inflector implements \Kisma\Core\Interfaces\UtilityLike
 	 */
 	public static function untag( $tag )
 	{
-		return static::neutralize( $tag );
+		return self::neutralize( $tag );
 //
 //		$_parts = explode( '\\', $tag );
 //
@@ -101,7 +101,7 @@ class Inflector implements \Kisma\Core\Interfaces\UtilityLike
 	 */
 	public static function deneutralize( $item, $delimiter = '\\' )
 	{
-		$_result = static::camelize(
+		$_result = self::camelize(
 			str_replace(
 				' ',
 				null,
@@ -137,10 +137,10 @@ class Inflector implements \Kisma\Core\Interfaces\UtilityLike
 	{
 		if ( false !== $isKey )
 		{
-			return static::neutralize( $tag, $strip );
+			return self::neutralize( $tag, $strip );
 		}
 
-		$_tag = static::deneutralize( $tag );
+		$_tag = self::deneutralize( $tag );
 
 		return $_tag;
 	}
