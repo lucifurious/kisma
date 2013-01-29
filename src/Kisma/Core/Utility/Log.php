@@ -6,11 +6,16 @@
  * @todo Class neutered at the moment
  */
 namespace Kisma\Core\Utility;
+
+use Kisma\Core\Interfaces\Levels;
+use Kisma\Core\Interfaces\UtilityLike;
+use Kisma\Core\Seed;
+
 /**
  * Log
  * A generic log helper
  */
-class Log extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\UtilityLike, \Kisma\Core\Interfaces\Levels
+class Log extends Seed implements UtilityLike, Levels
 {
 	//*************************************************************************
 	//* Constants
@@ -40,10 +45,11 @@ class Log extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\UtilityLike
 	/**
 	 * @var array The strings to watch for at the beginning of a log line to control the indenting
 	 */
-	protected static $_indentTokens = array(
-		true  => '<*',
-		false => '*>',
-	);
+	protected static $_indentTokens
+		= array(
+			true  => '<*',
+			false => '*>',
+		);
 	/**
 	 * @var string
 	 */
@@ -52,6 +58,10 @@ class Log extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\UtilityLike
 	 * @var string The format of the log entries
 	 */
 	protected static $_logFormat = self::DefaultLogFormat;
+	/**
+	 * @var bool If true, pid, uid, and hostname are added to log entry
+	 */
+	protected static $_includeProcessInfo = false;
 
 	//********************************************************************************
 	//* Public Methods
@@ -102,11 +112,11 @@ class Log extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\UtilityLike
 
 		$_entry = static::formatLogEntry(
 			array(
-				'level'     => $_levelName,
-				'message'   => static::$_prefix . str_repeat( '  ', $_tempIndent ) . $message,
-				'timestamp' => $_timestamp,
-				'context'   => $context,
-				'extra'     => $extra,
+				 'level'     => $_levelName,
+				 'message'   => static::$_prefix . str_repeat( '  ', $_tempIndent ) . $message,
+				 'timestamp' => $_timestamp,
+				 'context'   => $context,
+				 'extra'     => $extra,
 			)
 		);
 
@@ -137,9 +147,13 @@ class Log extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\UtilityLike
 		$_extra = Option::get( $entry, 'extra' );
 
 		$_blob = new \stdClass();
-		$_blob->pid = getmypid();
-		$_blob->uid = getmyuid();
-		$_blob->hostname = gethostname();
+
+		if ( static::$_includeProcessInfo )
+		{
+			$_blob->pid = getmypid();
+			$_blob->uid = getmyuid();
+			$_blob->hostname = gethostname();
+		}
 
 		if ( !empty( $_context ) || !empty( $_extra ) )
 		{
@@ -154,26 +168,26 @@ class Log extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\UtilityLike
 			}
 		}
 
-		$_replacements =
-			array(
-				0 => $_level,
-				1 => date( 'M d', $_timestamp ),
-				2 => date( 'H:i:s', $_timestamp ),
-				3 => $_message,
-				4 => json_encode( $_blob ),
-			);
+		$_replacements
+			= array(
+			0 => $_level,
+			1 => date( 'M d', $_timestamp ),
+			2 => date( 'H:i:s', $_timestamp ),
+			3 => $_message,
+			4 => json_encode( $_blob ),
+		);
 
 		return str_ireplace(
-			array(
-				'%%level%%',
-				'%%date%%',
-				'%%time%%',
-				'%%message%%',
-				'%%extra%%',
-			),
-			$_replacements,
-			static::$_logFormat
-		) . ( $newline ? PHP_EOL : null );
+				   array(
+						'%%level%%',
+						'%%date%%',
+						'%%time%%',
+						'%%message%%',
+						'%%extra%%',
+				   ),
+				   $_replacements,
+				   static::$_logFormat
+			   ) . ( $newline ? PHP_EOL : null );
 	}
 
 	//*************************************************************************
@@ -366,6 +380,18 @@ class Log extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\UtilityLike
 		return $_newIndent;
 	}
 
+	/**
+	 * Makes sure we have a log file name and path
+	 */
+	protected static function _checkLogFile()
+	{
+		//	Set a name for the default log
+		if ( null === static::$_defaultLog )
+		{
+			Log::setDefaultLog( \Kisma::get( 'app.log_path', \Kisma::get( 'app.base_path' ) . static::DefaultLogFile ) );
+		}
+	}
+
 	//*************************************************************************
 	//* Properties
 	//*************************************************************************
@@ -373,7 +399,9 @@ class Log extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\UtilityLike
 	/**
 	 * @static
 	 *
-	 * @param $currentIndent
+	 * @param int $currentIndent
+	 *
+	 * @return void
 	 */
 	public static function setCurrentIndent( $currentIndent = 0 )
 	{
@@ -392,7 +420,9 @@ class Log extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\UtilityLike
 	/**
 	 * @static
 	 *
-	 * @param $prefix
+	 * @param string $prefix
+	 *
+	 * @return void
 	 */
 	public static function setPrefix( $prefix = null )
 	{
@@ -433,7 +463,7 @@ class Log extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\UtilityLike
 	}
 
 	/**
-	 * @return string
+	 * @return null|string
 	 */
 	public static function getDefaultLog()
 	{
@@ -457,15 +487,19 @@ class Log extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\UtilityLike
 	}
 
 	/**
-	 * Makes sure we have a log file name and path
+	 * @param boolean $includeProcessInfo
 	 */
-	protected static function _checkLogFile()
+	public static function setIncludeProcessInfo( $includeProcessInfo )
 	{
-		//	Set a name for the default log
-		if ( null === static::$_defaultLog )
-		{
-			Log::setDefaultLog( \Kisma::get( 'app.log_path', \Kisma::get( 'app.base_path' ) . static::DefaultLogFile ) );
-		}
+		self::$_includeProcessInfo = $includeProcessInfo;
+	}
+
+	/**
+	 * @return boolean
+	 */
+	public static function getIncludeProcessInfo()
+	{
+		return self::$_includeProcessInfo;
 	}
 
 }
