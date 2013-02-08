@@ -72,6 +72,8 @@ class Log extends Seed implements UtilityLike, Levels
 	 */
 	public static function log( $message, $level = self::Info, $context = array(), $extra = null, $tag = null )
 	{
+		static $_firstRun = true;
+
 		//	If we're not debugging, don't log debug statements
 		if ( static::Debug == $level )
 		{
@@ -88,7 +90,11 @@ class Log extends Seed implements UtilityLike, Levels
 			}
 		}
 
-		static::_checkLogFile();
+		if ( $_firstRun )
+		{
+			static::_checkLogFile();
+			$_firstRun = false;
+		}
 
 		$_timestamp = time();
 
@@ -388,8 +394,11 @@ class Log extends Seed implements UtilityLike, Levels
 		//	Set a name for the default log
 		if ( null === static::$_defaultLog )
 		{
-			Log::setDefaultLog( \Kisma::get( 'app.log_path', \Kisma::get( 'app.base_path' ) . static::DefaultLogFile ) );
+			$_logPath = \Kisma::get( 'app.log_path', \Kisma::get( 'app.base_path' ) . static::DefaultLogFile );
+			Log::setDefaultLog( $_logPath );
 		}
+
+		@mkdir( static::$_defaultLog, 01777, true );
 	}
 
 	//*************************************************************************
