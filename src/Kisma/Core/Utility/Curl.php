@@ -43,6 +43,10 @@ class Curl extends \Kisma\Core\Enums\HttpMethod
 	 */
 	protected static $_lastHttpCode = null;
 	/**
+	 * @var array The last response headers
+	 */
+	protected static $_lastResponseHeaders = null;
+	/**
 	 * @var bool Enable/disable logging
 	 */
 	protected static $_debug = true;
@@ -189,7 +193,7 @@ class Curl extends \Kisma\Core\Enums\HttpMethod
 		}
 
 		//	Reset!
-		self::$_lastHttpCode = self::$_error = self::$_info = $_tmpFile = null;
+		self::$_lastResponseHeaders = self::$_lastHttpCode = self::$_error = self::$_info = $_tmpFile = null;
 
 		//	Build a curl request...
 		$_curl = curl_init( $url );
@@ -198,7 +202,7 @@ class Curl extends \Kisma\Core\Enums\HttpMethod
 		$_curlOptions = array(
 			CURLOPT_FOLLOWLOCATION => true,
 			CURLOPT_RETURNTRANSFER => true,
-			CURLOPT_HEADER         => false,
+			CURLOPT_HEADER         => true,
 			CURLOPT_SSL_VERIFYPEER => false,
 		);
 
@@ -295,6 +299,34 @@ class Curl extends \Kisma\Core\Enums\HttpMethod
 		{
 			//	Worked, but no data...
 			$_result = null;
+		}
+
+		//	Split up the body and headers if requested
+		if ( $_curlOptions[CURLOPT_HEADER] )
+		{
+			static::$_lastResponseHeaders = array();
+
+			list( $_headers, $_body ) = explode( "\r\n\r\n", $_result, 2 );
+
+			if ( $_headers )
+			{
+				$_raw = explode( "\r\n", $_headers );
+
+				if ( !empty( $_raw ) )
+				{
+					foreach ( $_raw as $_line )
+					{
+						$_parts = explode( ':', $_line, 1 );
+
+						if ( !empty( $_parts ) )
+						{
+							static::$_lastResponseHeaders[trim( $_parts[0] )] = trim( $_parts[1] );
+						}
+					}
+				}
+			}
+
+			$_result = $_body;
 		}
 
 		//	Attempt to auto-decode inbound JSON
@@ -511,6 +543,14 @@ class Curl extends \Kisma\Core\Enums\HttpMethod
 	public static function getDecodeToArray()
 	{
 		return self::$_decodeToArray;
+	}
+
+	/**
+	 * @return array
+	 */
+	public static function getLastResponseHeaders()
+	{
+		return self::$_lastResponseHeaders;
 	}
 
 }
