@@ -394,11 +394,11 @@ class Log extends Seed implements UtilityLike, Levels
 		//	Set a name for the default log
 		if ( null === static::$_defaultLog )
 		{
-			$_logPath = \Kisma::get( 'app.log_path', \Kisma::get( 'app.base_path' ) . static::DefaultLogFile );
-			Log::setDefaultLog( $_logPath );
+			$_logPath = \Kisma::get( 'app.log_path', \Kisma::get( 'app.base_path' ) );
+			Log::setDefaultLog( $_logPath . static::DefaultLogFile );
 		}
 
-		@mkdir( static::$_defaultLog, 01777, true );
+		@mkdir( dirname( static::$_defaultLog ), 0777, true );
 	}
 
 	//*************************************************************************
