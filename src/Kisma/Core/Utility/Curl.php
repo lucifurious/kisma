@@ -320,7 +320,7 @@ class Curl extends \Kisma\Core\Enums\HttpMethod
 
 						if ( !empty( $_parts ) )
 						{
-							static::$_lastResponseHeaders[trim( $_parts[0] )] = trim( $_parts[1] );
+							static::$_lastResponseHeaders[trim( $_parts[0] )] = count( $_parts ) > 1 ? trim( $_parts[1] ) : null;
 						}
 					}
 				}
