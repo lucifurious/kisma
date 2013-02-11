@@ -90,12 +90,6 @@ class Log extends Seed implements UtilityLike, Levels
 			}
 		}
 
-		if ( $_firstRun )
-		{
-			static::_checkLogFile();
-			$_firstRun = false;
-		}
-
 		$_timestamp = time();
 
 		//	Get the indent, if any
@@ -397,8 +391,6 @@ class Log extends Seed implements UtilityLike, Levels
 			$_logPath = \Kisma::get( 'app.log_path', \Kisma::get( 'app.base_path' ) );
 			Log::setDefaultLog( $_logPath . static::DefaultLogFile );
 		}
-
-		@mkdir( dirname( static::$_defaultLog ), 0777, true );
 	}
 
 	//*************************************************************************
@@ -469,6 +461,11 @@ class Log extends Seed implements UtilityLike, Levels
 	public static function setDefaultLog( $defaultLog )
 	{
 		static::$_defaultLog = $defaultLog;
+
+		if ( null !== $defaultLog )
+		{
+			@mkdir( dirname( static::$_defaultLog ), 0777, true );
+		}
 	}
 
 	/**
