@@ -277,7 +277,18 @@ class Log extends Seed implements UtilityLike, Levels
 		{
 			static::$_currentIndent = 0;
 		}
-	}
+    }
+
+    /**
+     * Makes the system log path if not there...
+     */
+    public static function checkSystemLogPath()
+    {
+        if ( null !== ( $_path = getenv( 'KISMA_SYSTEM_LOG_PATH' ) ) )
+        {
+            @mkdir( $_path, 0777, true );
+        }
+    }
 
 	//*************************************************************************
 	//* Protected Methods
@@ -509,3 +520,5 @@ class Log extends Seed implements UtilityLike, Levels
 	}
 
 }
+
+Log::checkSystemLogPath();
