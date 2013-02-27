@@ -314,9 +314,18 @@ class Curl extends \Kisma\Core\Enums\HttpMethod
 
 				if ( !empty( $_raw ) )
 				{
+					$_first = true;
+
 					foreach ( $_raw as $_line )
 					{
-						$_parts = explode( ':', $_line, 1 );
+						//	Skip the first line (HTTP/1.x response)
+						if ( $_first )
+						{
+							$_first = false;
+							continue;
+						}
+
+						$_parts = explode( ':', $_line, 2 );
 
 						if ( !empty( $_parts ) )
 						{
