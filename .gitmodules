@@ -1,0 +1,3 @@
+[submodule "src/Kisma/Pods/Davenport"]
+	path = src/Kisma/Pods/Davenport
+	url = git@github.com:kisma/davenport.git

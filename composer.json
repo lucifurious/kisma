@@ -4,17 +4,17 @@
 	"keywords":    [
 		"php", "php5", "rest", "mvc", "framework"
 	],
-	"homepage":    "https://github.com/lucifurious/kisma",
+	"homepage":    "https://github.com/kisma/kisma",
 	"type":        "library",
 	"license":     "MIT",
 	"authors":     [
 		{
 			"name":  "Jerry Ablan",
-			"email": "jerryablan@gmail.com"
+			"email": "getkisma@gmail.com"
 		}
 	],
 	"require":     {
-		"php":                  ">=5.3.8"
+		"php":             ">=5.3.10"
 	},
 	"autoload":    {
 		"psr-0": {
