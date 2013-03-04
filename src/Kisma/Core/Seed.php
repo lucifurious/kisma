@@ -3,6 +3,7 @@
  * Seed.php
  */
 namespace Kisma\Core;
+
 use \Kisma\Core\Utility;
 
 /**
@@ -56,7 +57,7 @@ use \Kisma\Core\Utility;
  * @property bool        $discoverEvents  Defaults to true.
  * @property string      $eventManager    Defaults to \Kisma\Core\Utility\EventManager
  */
-class Seed implements \Kisma\Core\Interfaces\SeedLike, \Kisma\Core\Interfaces\PublisherLike
+class Seed implements Interfaces\SeedLike, Interfaces\PublisherLike
 {
 	//********************************************************************************
 	//* Member Variables
@@ -101,28 +102,31 @@ class Seed implements \Kisma\Core\Interfaces\SeedLike, \Kisma\Core\Interfaces\Pu
 		}
 
 		//	Otherwise, set the rest
-		foreach ( $settings as $_key => $_value )
+		if ( is_array( $settings ) || is_object( $settings ) || $settings instanceof \Traversable )
 		{
-			if ( property_exists( $this, $_key ) )
+			foreach ( $settings as $_key => $_value )
 			{
-				try
+				if ( property_exists( $this, $_key ) )
 				{
-					Utility\Option::set( $this, $_key, $_value );
-					unset( $settings, $_key );
-					continue;
+					try
+					{
+						Utility\Option::set( $this, $_key, $_value );
+						unset( $settings, $_key );
+						continue;
+					}
+					catch ( \Exception $_ex )
+					{
+						//	Ignore...
+					}
 				}
-				catch ( \Exception $_ex )
+
+				$_setter = Utility\Inflector::tag( 'set_' . $_key );
+
+				if ( method_exists( $this, $_setter ) )
 				{
-					//	Ignore...
+					call_user_func( array( $this, $_setter ), $_value );
+					unset( $settings, $_key, $_setter );
 				}
-			}
-
-			$_setter = \Kisma\Core\Utility\Inflector::tag( 'set_' . $_key );
-
-			if ( method_exists( $this, $_setter ) )
-			{
-				call_user_func( array( $this, $_setter ), $_value );
-				unset( $settings, $_key, $_setter );
 			}
 		}
 
@@ -142,15 +146,15 @@ class Seed implements \Kisma\Core\Interfaces\SeedLike, \Kisma\Core\Interfaces\Pu
 		//	Auto-set tag and name if they're empty
 		if ( null === $this->_tag )
 		{
-			$this->_tag = \Kisma\Core\Utility\Inflector::tag( get_called_class(), true );
+			$this->_tag = Utility\Inflector::tag( get_called_class(), true );
 		}
 
 		if ( null === $this->_name )
 		{
-			$this->_name = \Kisma\Core\Utility\Inflector::tag( get_called_class() );
+			$this->_name = Utility\Inflector::tag( get_called_class() );
 		}
 
-		if ( !( $this instanceof \Kisma\Core\Interfaces\SubscriberLike ) || empty( $this->_eventManager ) )
+		if ( !( $this instanceof Interfaces\SubscriberLike ) || empty( $this->_eventManager ) )
 		{
 			//	Ignore event junk later
 			$this->_eventManager = false;
@@ -219,7 +223,7 @@ class Seed implements \Kisma\Core\Interfaces\SeedLike, \Kisma\Core\Interfaces\Pu
 	 */
 	public function on( $tag, $listener = null )
 	{
-		if ( !( $this instanceof \Kisma\Core\Interfaces\SubscriberLike ) || empty( $this->_eventManager ) )
+		if ( !( $this instanceof Interfaces\SubscriberLike ) || empty( $this->_eventManager ) )
 		{
 			return false;
 		}
@@ -324,5 +328,4 @@ class Seed implements \Kisma\Core\Interfaces\SeedLike, \Kisma\Core\Interfaces\Pu
 	{
 		return $this->_tag;
 	}
-
 }
