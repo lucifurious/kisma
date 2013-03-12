@@ -1,7 +1,4 @@
 <?php
-/**
- * Curl.php
- */
 namespace Kisma\Core\Utility;
 
 /**
