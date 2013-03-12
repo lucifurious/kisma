@@ -300,65 +300,67 @@ class Curl extends \Kisma\Core\Enums\HttpMethod
 			//	Worked, but no data...
 			$_result = null;
 		}
-
-		//      Split up the body and headers if requested
-		if ( $_curlOptions[CURLOPT_HEADER] )
+		else
 		{
-			static::$_lastResponseHeaders = array();
-
-			if ( false === strpos( $_result, "\r\n\r\n" ) )
+			//      Split up the body and headers if requested
+			if ( $_curlOptions[CURLOPT_HEADER] )
 			{
-				$_headers = $_result;
-				$_body = null;
-			}
-			else
-			{
-				list( $_headers, $_body ) = explode( "\r\n\r\n", $_result, 2 );
-			}
+				static::$_lastResponseHeaders = array();
 
-			if ( $_headers )
-			{
-				$_raw = explode( "\r\n", $_headers );
-
-				if ( !empty( $_raw ) )
+				if ( false === strpos( $_result, "\r\n\r\n" ) )
 				{
-					$_first = true;
+					$_headers = $_result;
+					$_body = null;
+				}
+				else
+				{
+					list( $_headers, $_body ) = explode( "\r\n\r\n", $_result, 2 );
+				}
 
-					foreach ( $_raw as $_line )
+				if ( $_headers )
+				{
+					$_raw = explode( "\r\n", $_headers );
+
+					if ( !empty( $_raw ) )
 					{
-						//	Skip the first line (HTTP/1.x response)
-						if ( $_first )
-						{
-							$_first = false;
-							continue;
-						}
+						$_first = true;
 
-						$_parts = explode( ':', $_line, 2 );
-
-						if ( !empty( $_parts ) )
+						foreach ( $_raw as $_line )
 						{
-							static::$_lastResponseHeaders[trim( $_parts[0] )] = count( $_parts ) > 1 ? trim( $_parts[1] ) : null;
+							//	Skip the first line (HTTP/1.x response)
+							if ( $_first )
+							{
+								$_first = false;
+								continue;
+							}
+
+							$_parts = explode( ':', $_line, 2 );
+
+							if ( !empty( $_parts ) )
+							{
+								static::$_lastResponseHeaders[trim( $_parts[0] )] = count( $_parts ) > 1 ? trim( $_parts[1] ) : null;
+							}
 						}
 					}
 				}
+
+				$_result = $_body;
 			}
 
-			$_result = $_body;
-		}
-
-		//	Attempt to auto-decode inbound JSON
-		if ( !empty( $_result ) && 'application/json' == Option::get( self::$_info, 'content_type' ) )
-		{
-			try
+			//	Attempt to auto-decode inbound JSON
+			if ( !empty( $_result ) && 'application/json' == Option::get( self::$_info, 'content_type' ) )
 			{
-				if ( false !== ( $_json = @json_decode( $_result, self::$_decodeToArray ) ) )
+				try
 				{
-					$_result = $_json;
+					if ( false !== ( $_json = @json_decode( $_result, self::$_decodeToArray ) ) )
+					{
+						$_result = $_json;
+					}
 				}
-			}
-			catch ( \Exception $_ex )
-			{
-				//	Ignored
+				catch ( \Exception $_ex )
+				{
+					//	Ignored
+				}
 			}
 		}
 
