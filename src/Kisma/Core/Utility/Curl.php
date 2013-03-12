@@ -301,12 +301,20 @@ class Curl extends \Kisma\Core\Enums\HttpMethod
 			$_result = null;
 		}
 
-		//	Split up the body and headers if requested
+		//      Split up the body and headers if requested
 		if ( $_curlOptions[CURLOPT_HEADER] )
 		{
 			static::$_lastResponseHeaders = array();
 
-			list( $_headers, $_body ) = explode( "\r\n\r\n", $_result, 2 );
+			if ( false === strpos( $_result, "\r\n\r\n" ) )
+			{
+				$_headers = $_result;
+				$_body = null;
+			}
+			else
+			{
+				list( $_headers, $_body ) = explode( "\r\n\r\n", $_result, 2 );
+			}
 
 			if ( $_headers )
 			{
