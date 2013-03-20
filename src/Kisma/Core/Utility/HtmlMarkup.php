@@ -22,7 +22,7 @@ class HtmlMarkup extends Markup
 	 *
 	 * @return string
 	 */
-	public function div( array $attributes = array(), $value = null, $close = true )
+	public static function div( array $attributes = array(), $value = null, $close = true )
 	{
 		return static::tag( 'div', $attributes, $value, $close );
 	}
@@ -36,7 +36,7 @@ class HtmlMarkup extends Markup
 	 *
 	 * @return string
 	 */
-	public function span( array $attributes = array(), $value = null, $close = true )
+	public static function span( array $attributes = array(), $value = null, $close = true )
 	{
 		return static::tag( 'span', $attributes, $value, $close );
 	}
@@ -49,7 +49,7 @@ class HtmlMarkup extends Markup
 	 *
 	 * @return string
 	 */
-	public function input( array $attributes = array(), $value = null )
+	public static function input( array $attributes = array(), $value = null )
 	{
 		return static::tag( 'input', $attributes, $value );
 	}
@@ -189,7 +189,7 @@ class HtmlMarkup extends Markup
 	/**
 	 * Makes an <IMG> tag
 	 *
-	 * @param array  $attributes
+	 * @param array $attributes
 	 *
 	 * @return string
 	 */
