@@ -1,11 +1,13 @@
 <?php
 namespace Kisma\Core\Utility;
 
+use Kisma\Core\Enums\HttpMethod;
+
 /**
  * Curl
  * A kick-ass cURL wrapper
  */
-class Curl extends \Kisma\Core\Enums\HttpMethod
+class Curl extends HttpMethod
 {
 	//*************************************************************************
 	//* Private Members
@@ -43,6 +45,14 @@ class Curl extends \Kisma\Core\Enums\HttpMethod
 	 * @var array The last response headers
 	 */
 	protected static $_lastResponseHeaders = null;
+	/**
+	 * @var string
+	 */
+	protected static $_responseHeaders = null;
+	/**
+	 * @var int
+	 */
+	protected static $_responseHeadersSize = null;
 	/**
 	 * @var bool Enable/disable logging
 	 */
@@ -151,6 +161,18 @@ class Curl extends \Kisma\Core\Enums\HttpMethod
 	 *
 	 * @return bool|mixed|\stdClass
 	 */
+	public static function merge( $url, $payload = array(), $curlOptions = array() )
+	{
+		return self::_httpRequest( static::Merge, $url, $payload, $curlOptions );
+	}
+
+	/**
+	 * @param string          $url
+	 * @param array|\stdClass $payload
+	 * @param array           $curlOptions
+	 *
+	 * @return bool|mixed|\stdClass
+	 */
 	public static function patch( $url, $payload = array(), $curlOptions = array() )
 	{
 		return self::_httpRequest( self::Patch, $url, $payload, $curlOptions );
@@ -200,6 +222,7 @@ class Curl extends \Kisma\Core\Enums\HttpMethod
 			CURLOPT_FOLLOWLOCATION => true,
 			CURLOPT_RETURNTRANSFER => true,
 			CURLOPT_HEADER         => true,
+			CURLINFO_HEADER_OUT    => true,
 			CURLOPT_SSL_VERIFYPEER => false,
 		);
 
@@ -279,6 +302,8 @@ class Curl extends \Kisma\Core\Enums\HttpMethod
 
 		self::$_info = curl_getinfo( $_curl );
 		self::$_lastHttpCode = Option::get( self::$_info, 'http_code' );
+		self::$_responseHeaders = curl_getinfo( $_curl, CURLINFO_HEADER_OUT );
+		self::$_responseHeadersSize = curl_getinfo( $_curl, CURLINFO_HEADER_SIZE );
 
 		if ( self::$_debug )
 		{
@@ -302,20 +327,20 @@ class Curl extends \Kisma\Core\Enums\HttpMethod
 			//      Split up the body and headers if requested
 			if ( $_curlOptions[CURLOPT_HEADER] )
 			{
-				static::$_lastResponseHeaders = array();
-
-				if ( false === strpos( $_result, "\r\n\r\n" ) )
+				if ( false === strpos( $_result, "\r\n\r\n" ) || empty( static::$_responseHeadersSize ) )
 				{
 					$_headers = $_result;
 					$_body = null;
 				}
 				else
 				{
-					list( $_headers, $_body ) = explode( "\r\n\r\n", $_result, 2 );
+					$_headers = substr( $_result, 0, static::$_responseHeadersSize );
+					$_body = substr( $_result, static::$_responseHeadersSize );
 				}
 
 				if ( $_headers )
 				{
+					static::$_lastResponseHeaders = array();
 					$_raw = explode( "\r\n", $_headers );
 
 					if ( !empty( $_raw ) )
@@ -325,7 +350,7 @@ class Curl extends \Kisma\Core\Enums\HttpMethod
 						foreach ( $_raw as $_line )
 						{
 							//	Skip the first line (HTTP/1.x response)
-							if ( $_first )
+							if ( $_first || preg_match( '/^HTTP\/[0-9\.]+ [0-9]+/', $_line ) )
 							{
 								$_first = false;
 								continue;

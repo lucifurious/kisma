@@ -49,6 +49,10 @@ interface HttpMethod
 	/**
 	 * @var string
 	 */
+	const Merge = 'MERGE';
+	/**
+	 * @var string
+	 */
 	const Trace = 'TRACE';
 	/**
 	 * @var string
