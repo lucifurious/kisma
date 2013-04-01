@@ -3,6 +3,7 @@
  * FilterInput.php
  */
 namespace Kisma\Core\Utility;
+
 /**
  * FilterInput
  * Helpers for working with filter_input and filter_var
@@ -96,25 +97,25 @@ class FilterInput implements \Kisma\Core\Interfaces\UtilityLike
 		switch ( $type )
 		{
 			case INPUT_REQUEST:
-				$_haystack = $_REQUEST;
+				$_haystack = isset( $_REQUEST ) ? $_REQUEST : array();
 				break;
 			case INPUT_SESSION:
-				$_haystack = $_SESSION;
+				$_haystack = isset( $_SESSION ) ? $_SESSION : array();
 				break;
 			case INPUT_GET:
-				$_haystack = $_GET;
+				$_haystack = isset( $_GET ) ? $_GET : array();
 				break;
 			case INPUT_POST:
-				$_haystack = $_POST;
+				$_haystack = isset( $_POST ) ? $_POST : array();
 				break;
 			case INPUT_COOKIE:
-				$_haystack = $_COOKIE;
+				$_haystack = isset( $_COOKIE ) ? $_COOKIE : array();
 				break;
 			case INPUT_SERVER:
-				$_haystack = $_SERVER;
+				$_haystack = isset( $_SERVER ) ? $_SERVER : array();
 				break;
 			case INPUT_ENV:
-				$_haystack = $_ENV;
+				$_haystack = isset( $_ENV ) ? $_ENV : array();
 				break;
 			default:
 				//	No clue what you want man...
