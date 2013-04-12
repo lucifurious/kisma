@@ -42,5 +42,4 @@ class OptionTest extends \PHPUnit_Framework_TestCase
 			Option::get( $this->object, 'ThisIsCamelCase' )
 		);
 	}
-
 }
