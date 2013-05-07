@@ -63,7 +63,7 @@ class Inflector implements \Kisma\Core\Interfaces\UtilityLike
 	 * Examples:
 	 *       Class Name:            \Kisma\Core\Events\SeedEvent becomes "kisma.components.component_event"
 	 *
-	 * @param string      $tag
+	 * @param string $tag
 	 *
 	 * @return string
 	 * @deprecated Please use neutralize()
@@ -71,24 +71,6 @@ class Inflector implements \Kisma\Core\Interfaces\UtilityLike
 	public static function untag( $tag )
 	{
 		return self::neutralize( $tag );
-//
-//		$_parts = explode( '\\', $tag );
-//
-//		array_walk( $_parts,
-//			function ( &$part )
-//			{
-//				//      Replace
-//				$part = strtolower(
-//					$part == strtoupper( $part )
-//						?
-//						$part
-//						:
-//						preg_replace( '/(?<=\\w)([A-Z])/', '_\\1', $part )
-//				);
-//			}
-//		);
-//
-//		return implode( '.', $_parts );
 	}
 
 	/**
@@ -126,9 +108,9 @@ class Inflector implements \Kisma\Core\Interfaces\UtilityLike
 	 *       Class Name:            kisma.aspects.event_handling => \Kisma\Aspects\EventHandling
 	 *       Array Key:            my_event => MyEvent
 	 *
-	 * @param string      $tag
-	 * @param bool        $isKey           If true, the $tag will be neutralized
-	 * @param string      $strip           If provided, it's value is removed from item before it's neutralized.
+	 * @param string $tag
+	 * @param bool   $isKey                If true, the $tag will be neutralized
+	 * @param string $strip                If provided, it's value is removed from item before it's neutralized.
 	 *                                     Example: "REQUEST_URI" would be "URI" with $strip = "REQUEST_"
 	 *
 	 * @return string
@@ -193,7 +175,26 @@ class Inflector implements \Kisma\Core\Interfaces\UtilityLike
 	 */
 	public static function pluralize( $name )
 	{
-		static $_rules = array(
+		static $_rules
+		= array(
+			'/(quiz)$/i'                     => '1zes',
+			'/^(ox)$/i'                      => '1en',
+			'/([m|l])ouse$/i'                => '1ice',
+			'/(matr|vert|ind)ix|ex$/i'       => '1ices',
+			'/(x|ch|ss|sh)$/i'               => '1es',
+			'/([^aeiouy]|qu)ies$/i'          => '1y',
+			'/([^aeiouy]|qu)y$/i'            => '1ies',
+			'/(hive)$/i'                     => '1s',
+			'/(?:([^f])fe|([lr])f)$/i'       => '12ves',
+			'/sis$/i'                        => 'ses',
+			'/([ti])um$/i'                   => '1a',
+			'/(buffal|tomat)o$/i'            => '1oes',
+			'/(bu)s$/i'                      => '1ses',
+			'/(alias|status)/i'              => '1es',
+			'/(octop|vir)us$/i'              => '1i',
+			'/(ax|test)is$/i'                => '1es',
+			'/s$/i'                          => 's',
+			'/$/'                            => 's',
 			'/move$/i'                       => 'moves',
 			'/foot$/i'                       => 'feet',
 			'/child$/i'                      => 'children',
@@ -201,15 +202,9 @@ class Inflector implements \Kisma\Core\Interfaces\UtilityLike
 			'/man$/i'                        => 'men',
 			'/tooth$/i'                      => 'teeth',
 			'/person$/i'                     => 'people',
-			'/([m|l])ouse$/i'                => '\1ice',
 			'/(x|ch|ss|sh|us|as|is|os)$/i'   => '\1es',
-			'/([^aeiouy]|qu)y$/i'            => '\1ies',
-			'/(?:([^f])fe|([lr])f)$/i'       => '\1\2ves',
 			'/(shea|lea|loa|thie)f$/i'       => '\1ves',
-			'/([ti])um$/i'                   => '\1a',
 			'/(tomat|potat|ech|her|vet)o$/i' => '\1oes',
-			'/(bu)s$/i'                      => '\1ses',
-			'/(ax|test)is$/i'                => '\1es',
 			'/s$/'                           => 's',
 		);
 

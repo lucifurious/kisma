@@ -10,6 +10,15 @@ namespace Kisma\Core\Utility;
 class Option
 {
 	//*************************************************************************
+	//	Members
+	//*************************************************************************
+
+	/**
+	 * @var bool If true, operates in a "case-insensitive" mode
+	 */
+	protected static $_caseInsensitive = true;
+
+	//*************************************************************************
 	//* Public Methods
 	//*************************************************************************
 
@@ -123,11 +132,11 @@ class Option
 	}
 
 	/**
-	 * @param array      $options
-	 * @param string     $key
-	 * @param string     $subKey
-	 * @param mixed      $defaultValue Only applies to target value
-	 * @param boolean    $unsetValue   Only applies to target value
+	 * @param array   $options
+	 * @param string  $key
+	 * @param string  $subKey
+	 * @param mixed   $defaultValue Only applies to target value
+	 * @param boolean $unsetValue   Only applies to target value
 	 *
 	 * @return mixed
 	 */
@@ -381,5 +390,21 @@ class Option
 				static::set( $options, $_key, $_value );
 			}
 		}
+	}
+
+	/**
+	 * @param boolean $caseInsensitive
+	 */
+	public static function setCaseInsensitive( $caseInsensitive )
+	{
+		self::$_caseInsensitive = $caseInsensitive;
+	}
+
+	/**
+	 * @return boolean
+	 */
+	public static function getCaseInsensitive()
+	{
+		return self::$_caseInsensitive;
 	}
 }
