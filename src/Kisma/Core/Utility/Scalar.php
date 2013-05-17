@@ -3,6 +3,7 @@
  * Scalar.php
  */
 namespace Kisma\Core\Utility;
+
 /**
  * Scalar
  * Scalar utility class
@@ -50,6 +51,21 @@ class Scalar implements \Kisma\Core\Interfaces\UtilityLike
 	public static function ltrimSingle( $search, $oneWhat = ' ' )
 	{
 		return ltrim( $oneWhat . $search, $oneWhat );
+	}
+
+	/**
+	 * @param mixed $value
+	 *
+	 * @return bool
+	 */
+	public static function boolval( $value )
+	{
+		if ( !function_exists( 'boolval' ) )
+		{
+			return (bool)$value;
+		}
+
+		return \boolval( $value );
 	}
 
 	/**
