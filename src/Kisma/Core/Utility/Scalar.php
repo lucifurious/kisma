@@ -4,14 +4,16 @@
  */
 namespace Kisma\Core\Utility;
 
+use Kisma\Core\Interfaces\UtilityLike;
+
 /**
  * Scalar
  * Scalar utility class
  */
-class Scalar implements \Kisma\Core\Interfaces\UtilityLike
+class Scalar implements UtilityLike
 {
 	//*************************************************************************
-	//* Public Methods
+	//* Methods
 	//*************************************************************************
 
 	/**
@@ -245,4 +247,81 @@ class Scalar implements \Kisma\Core\Interfaces\UtilityLike
 		return implode( $separator, func_get_args() );
 	}
 
+	/**
+	 * Generic array sorter
+	 *
+	 * To sort a column in descending order, assign 'desc' to the column's value in the defining array:
+	 *
+	 * $_columnsToSort = array(
+	 *    'date' => 'desc',
+	 *    'lastName' => 'asc',
+	 *    'firstName' => 'asc',
+	 * );
+	 *
+	 * @param array $arrayToSort
+	 * @param array $columnsToSort Array of columns in $arrayToSort to sort.
+	 *
+	 * @return boolean
+	 */
+	public static function arraySort( &$arrayToSort, $columnsToSort = array() )
+	{
+		//	Convert to an array
+		if ( !empty( $columnsToSort ) && !is_array( $columnsToSort ) )
+		{
+			$columnsToSort = array( $columnsToSort );
+		}
+
+		//	Any fields?
+		if ( !empty( $columnsToSort ) )
+		{
+			return usort(
+				$arrayToSort,
+				function ( $a, $b ) use ( $columnsToSort )
+				{
+					$_result = null;
+
+					foreach ( $columnsToSort as $_column => $_order )
+					{
+						$_order = trim( strtolower( $_order ) );
+
+						if ( is_numeric( $_column ) && !static::in( $_order, 'asc', 'desc' ) )
+						{
+							$_column = $_order;
+							$_order = null;
+						}
+
+						if ( 'desc' == strtolower( $_order ) )
+						{
+							return strnatcmp( $b[$_column], $a[$_column] );
+						}
+
+						return strnatcmp( $a[$_column], $b[$_column] );
+					}
+				}
+			);
+		}
+
+		return false;
+	}
+
+	/**
+	 * Sorts an array by a single column
+	 *
+	 * @param array  $sourceArray
+	 * @param string $column
+	 * @param int    $sortDirection
+	 *
+	 * @return bool
+	 */
+	public static function array_multisort_column( &$sourceArray, $column, $sortDirection = SORT_ASC )
+	{
+		$_sortColumn = array();
+
+		foreach ( $sourceArray as $_key => $_row )
+		{
+			$_sortColumn[$_key] = ( isset( $_row[$column] ) ? $_row[$column] : null );
+		}
+
+		return \array_multisort( $_sortColumn, $sortDirection, $sourceArray );
+	}
 }

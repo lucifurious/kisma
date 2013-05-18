@@ -37,7 +37,7 @@ HTML;
 HTML;
 
 	//*************************************************************************
-	//* Private Members
+	//* Members
 	//*************************************************************************
 
 	/**
@@ -74,7 +74,7 @@ HTML;
 	protected $_csrf = null;
 
 	//*************************************************************************
-	//* Public Methods
+	//* Methods
 	//*************************************************************************
 
 	/**
@@ -100,7 +100,6 @@ HTML;
 <input type="hidden" name="{$_tokenName}" value="{$_tokenValue}" />
 HTML;
 		}
-
 	}
 
 	/**
@@ -175,15 +174,15 @@ HTML;
 				$_labelAttributes['class'] = null;
 			}
 
-			$_labelAttributes['class'] = Markup::addValue( $_labelAttributes['class'], ( $_wrapInput ? $_type : 'control-label' ) );
+			$_labelAttributes['class'] = static::addValue( $_labelAttributes['class'], ( $_wrapInput ? $_type : 'control-label' ) );
 		}
 
-		$_label = Markup::tag( 'label', $_labelAttributes, ( $_wrapInput ? null : $_label ), !$_wrapInput );
+		$_label = static::tag( 'label', $_labelAttributes, ( $_wrapInput ? null : $_label ), !$_wrapInput );
 		$_labelEnd = ( $_wrapInput ? $_label . '</label>' : null );
 
 		if ( null !== ( $_hint = Option::get( $attributes, 'hint', null, true ) ) )
 		{
-			$_hint = Markup::tag( 'span', array( 'class' => 'help-block' ), $_hint );
+			$_hint = static::tag( 'span', array( 'class' => 'help-block' ), $_hint );
 		}
 
 		$_blockStart = $_blockEnd = null;
@@ -194,8 +193,8 @@ HTML;
 		{
 			case static::Horizontal:
 
-				$_blockStart = Markup::tag( 'div', array( 'class' => 'control-group' ), null, false );
-				$_inputStart = Markup::tag( 'div', array( 'class' => 'controls' ), null, false );
+				$_blockStart = static::tag( 'div', array( 'class' => 'control-group' ), null, false );
+				$_inputStart = static::tag( 'div', array( 'class' => 'controls' ), null, false );
 				$_inputEnd = $_blockEnd = '</div>';
 
 				if ( !$_wrapInput )
@@ -207,7 +206,7 @@ HTML;
 
 			case static::Search:
 				$_class = Option::get( $attributes, 'class' );
-				$attributes['class'] = Markup::addValue( $_class, 'search-query' );
+				$attributes['class'] = static::addValue( $_class, 'search-query' );
 				break;
 		}
 
@@ -223,10 +222,21 @@ HTML;
 				break;
 
 			case 'textarea':
-			case 'select':
-				$_input = Markup::wrap(
+				$_input = static::wrap(
 					$_type,
 					$contents,
+					$attributes
+				);
+				break;
+
+			case 'select':
+				if ( !isset( $attributes['value'] ) )
+				{
+					$attributes['value'] = $contents;
+				}
+
+				$_input = static::select(
+					Option::get( $attributes, 'data', array(), true ),
 					$attributes
 				);
 				break;
@@ -277,14 +287,14 @@ HTML;
 	{
 		if ( static::VerticalGroupPattern !== $this->_blockPattern )
 		{
-			$attributes['class'] = Markup::addValue( Option::get( $attributes, 'class', array() ), 'form' . $this->_formType );
+			$attributes['class'] = static::addValue( Option::get( $attributes, 'class', array() ), 'form' . $this->_formType );
 		}
 
 		$_html = Convert::kvpToString( $attributes );
 
 		if ( !empty( $legend ) )
 		{
-			$legend = Markup::wrap( 'legend', $legend );
+			$legend = static::wrap( 'legend', $legend );
 		}
 
 		$_submit = null;
@@ -294,7 +304,7 @@ HTML;
 			$_submit = $this->button(
 				'submit',
 				array(
-					'text' => ( true === $submitButton ? 'Submit' : $submitButton ),
+					 'text' => ( true === $submitButton ? 'Submit' : $submitButton ),
 				)
 			);
 		}
@@ -395,15 +405,10 @@ HTML;
 			$_liTags .= <<<HTML
 <li class="pull-right"><a href="/app/logout/{$_token}">Logout</a></li>
 HTML;
-
 		}
 
 		return $_liTags;
 	}
-
-	//*************************************************************************
-	//* [GS]etters
-	//*************************************************************************
 
 	/**
 	 * @param string $contents

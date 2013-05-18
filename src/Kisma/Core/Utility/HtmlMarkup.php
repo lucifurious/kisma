@@ -3,6 +3,7 @@
  * HtmlMarkup.php
  */
 namespace Kisma\Core\Utility;
+
 /**
  * HtmlMarkup class
  * Provides HTML markup functions
@@ -10,7 +11,7 @@ namespace Kisma\Core\Utility;
 class HtmlMarkup extends Markup
 {
 	//*************************************************************************
-	//* Public Methods
+	//* Methods
 	//*************************************************************************
 
 	/**
@@ -65,10 +66,19 @@ class HtmlMarkup extends Markup
 	public static function select( array $options = array(), array $attributes = array() )
 	{
 		$_html = null;
+		$_selectedValue = Option::get( $attributes, 'value', null, true );
 
 		foreach ( $options as $_key => $_value )
 		{
-			$_html .= static::tag( 'option', array( 'value' => $_key ), $_value );
+			$_attributes = array( 'value' => $_key );
+
+			if ( $_key == $_selectedValue )
+			{
+				$_attributes['selected'] = 'selected';
+			}
+
+			$_html .= static::tag( 'option', $_attributes, $_value );
+			unset( $_attributes );
 		}
 
 		return static::tag( 'select', $attributes, $_html );
@@ -261,5 +271,4 @@ class HtmlMarkup extends Markup
 	{
 		return static::tag( 'textarea', $attributes, $value );
 	}
-
 }
