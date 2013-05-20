@@ -246,15 +246,7 @@ HTML;
 				break;
 
 			default:
-				if ( !isset( $attributes['value'] ) )
-				{
-					$attributes['value'] = $contents;
-				}
-
-				$attributes = Convert::kvpToString( $attributes );
-				$_input = <<<HTML
-<input type="{$_type}" {$attributes}>
-HTML;
+				$_input = $this->_handleUnknownField( $_type, $attributes, $contents );
 				break;
 		}
 
@@ -273,6 +265,27 @@ HTML;
 		}
 
 		return $_html;
+	}
+
+	/**
+	 * @param string $type
+	 * @param array  $attributes
+	 * @param string $contents
+	 *
+	 * @return string
+	 */
+	protected function _handleUnknownField( $type, array $attributes = array(), $contents = null )
+	{
+		if ( !isset( $attributes['value'] ) )
+		{
+			$attributes['value'] = $contents;
+		}
+
+		$attributes = Convert::kvpToString( $attributes );
+
+		return <<<HTML
+<input type="{$type}" {$attributes}>
+HTML;
 	}
 
 	/**
@@ -361,12 +374,12 @@ HTML;
 	}
 
 	/**
-	 * @param array $items
-	 * @param bool  $logout If true, a "logout" item will be appended to the menu bar
+	 * @param array  $items
+	 * @param string $logoutUrl Set to the URL used for logout. Leave null to not create a logout option.
 	 *
 	 * @return null|string
 	 */
-	public static function buildMenuItems( array $items = array(), $logout = false )
+	public static function buildMenuItems( array $items = array(), $logoutUrl = null )
 	{
 		$_liTags = null;
 
@@ -393,7 +406,7 @@ HTML;
 			}
 		}
 
-		if ( false !== $logout )
+		if ( !empty( $logoutUrl ) )
 		{
 			$_token =
 				( class_exists( '\\Yii', false ) && false !== \Yii::app()->getRequest()->enableCsrfValidation )
@@ -403,7 +416,7 @@ HTML;
 					null;
 
 			$_liTags .= <<<HTML
-<li class="pull-right"><a href="/app/logout/{$_token}">Logout</a></li>
+<li class="pull-right"><a href="{$logoutUrl}{$_token}">Logout</a></li>
 HTML;
 		}
 
