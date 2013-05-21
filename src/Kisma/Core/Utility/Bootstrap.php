@@ -161,10 +161,11 @@ HTML;
 		$_id = Option::get( $attributes, 'id', Option::get( $attributes, 'name' ) );
 		$_inputAppend = Option::get( $attributes, 'append', null, true );
 		$_inputPrepend = Option::get( $attributes, 'prepend', null, true );
+		$_xEdit = Option::get( $attributes, 'x-edit', false, true );
 
 		$this->cleanNames( $attributes );
 
-		$_label = Option::get( $attributes, 'label', null, true );
+		$_labelText = $_label = Option::get( $attributes, 'label', null, true );
 
 		//	Add .control-label for the class to labels
 		if ( static::Horizontal == $this->_formType )
@@ -177,7 +178,7 @@ HTML;
 			$_labelAttributes['class'] = static::addValue( $_labelAttributes['class'], ( $_wrapInput ? $_type : 'control-label' ) );
 		}
 
-		$_label = static::tag( 'label', $_labelAttributes, ( $_wrapInput ? null : $_label ), !$_wrapInput );
+		$_label = static::tag( 'label', $_labelAttributes, ( $_wrapInput ? null : $_labelText ), !$_wrapInput );
 		$_labelEnd = ( $_wrapInput ? $_label . '</label>' : null );
 
 		if ( null !== ( $_hint = Option::get( $attributes, 'hint', null, true ) ) )
@@ -213,6 +214,19 @@ HTML;
 		if ( null === $contents && !empty( $this->_formData ) )
 		{
 			$contents = Option::get( $this->_formData, $_id );
+		}
+
+		if ( $_xEdit )
+		{
+			$_pk = Option::get( $this->_formData, 'id' );
+
+			$_link
+				= <<<HTML
+<a class="x-editable" href="#" id="{$_id}" data-type="{$_type}" data-pk="{$_pk}" data-url="" data-original-title="{$_labelText}">{$contents}</a>
+HTML;
+
+			$_type = 'html';
+			$contents = $_link;
 		}
 
 		switch ( $_type )
