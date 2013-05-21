@@ -161,7 +161,7 @@ HTML;
 		$_id = Option::get( $attributes, 'id', Option::get( $attributes, 'name' ) );
 		$_inputAppend = Option::get( $attributes, 'append', null, true );
 		$_inputPrepend = Option::get( $attributes, 'prepend', null, true );
-		$_xEdit = Option::get( $attributes, 'x-edit', false, true );
+		$_xEdit = Option::get( $attributes, 'x-editable', false, true );
 
 		$this->cleanNames( $attributes );
 
@@ -218,15 +218,24 @@ HTML;
 
 		if ( $_xEdit )
 		{
-			$_pk = Option::get( $this->_formData, 'id' );
+			//	Replace contents with the x-editable link...
+			$contents = static::tag(
+				'a',
+				array(
+					 'class'               => 'x-editable',
+					 'href'                => '#',
+					 'id'                  => $_id,
+					 'data-type'           => $_type,
+					 'data-pk'             => Option::get( $this->_attributes, 'x_editable_pk', Option::get( $this->_formData, 'id' ) ),
+					 'data-url'            => Option::get( $attributes, 'x-editable-url', Option::get( $this->_attributes, 'x_editable_url' ) ),
+					 'data-original-title' => $_labelText,
+					 'data-inputclass'     => Option::get( $attributes, 'class', 'input-xlarge' ),
+				),
+				$contents
+			);
 
-			$_link
-				= <<<HTML
-<a class="x-editable" href="#" id="{$_id}" data-type="{$_type}" data-pk="{$_pk}" data-url="" data-original-title="{$_labelText}">{$contents}</a>
-HTML;
-
+			//	New type of just HTML...
 			$_type = 'html';
-			$contents = $_link;
 		}
 
 		switch ( $_type )
