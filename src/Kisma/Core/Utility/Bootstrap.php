@@ -161,7 +161,6 @@ HTML;
 		$_id = Option::get( $attributes, 'id', Option::get( $attributes, 'name' ) );
 		$_inputAppend = Option::get( $attributes, 'append', null, true );
 		$_inputPrepend = Option::get( $attributes, 'prepend', null, true );
-		$_xEdit = Option::get( $attributes, 'x-editable', false, true );
 
 		$this->cleanNames( $attributes );
 
@@ -216,7 +215,8 @@ HTML;
 			$contents = Option::get( $this->_formData, $_id );
 		}
 
-		if ( $_xEdit )
+		//	X-editable?
+		if ( false !== stripos( Option::get( $attributes, 'class' ), 'x-editable' ) )
 		{
 			//	Replace contents with the x-editable link...
 			$contents = static::tag(
@@ -226,8 +226,8 @@ HTML;
 					 'href'                => '#',
 					 'id'                  => $_id,
 					 'data-type'           => $_type,
-					 'data-pk'             => Option::get( $this->_attributes, 'x_editable_pk', Option::get( $this->_formData, 'id' ) ),
-					 'data-url'            => Option::get( $attributes, 'x-editable-url', Option::get( $this->_attributes, 'x_editable_url' ) ),
+					 'data-pk'             => Option::get( $this->_attributes, 'x-editable-pk', Option::get( $this->_formData, 'id' ) ),
+					 'data-url'            => Option::get( $this->_attributes, 'x-editable-url', Option::get( $attributes, 'x-editable-url', null, true ) ),
 					 'data-original-title' => $_labelText,
 					 'data-inputclass'     => Option::get( $attributes, 'class', 'input-xlarge' ),
 				),
