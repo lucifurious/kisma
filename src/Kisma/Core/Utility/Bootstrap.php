@@ -4,11 +4,14 @@
  */
 namespace Kisma\Core\Utility;
 
+use Kisma\Core\Interfaces\FormTypes;
+use Kisma\Core\Interfaces\UtilityLike;
+
 /**
  * Bootstrap class
  * Provides Twitter Bootstrap form-building
  */
-class Bootstrap extends HtmlMarkup implements \Kisma\Core\Interfaces\FormTypes
+class Bootstrap extends HtmlMarkup implements FormTypes, UtilityLike
 {
 	//*************************************************************************
 	//* Constants
@@ -17,7 +20,8 @@ class Bootstrap extends HtmlMarkup implements \Kisma\Core\Interfaces\FormTypes
 	/**
 	 * @var string The block pattern for forms
 	 */
-	const VerticalGroupPattern = <<<HTML
+	const VerticalGroupPattern
+		= <<<HTML
 	%%__LABEL__%%
 	%%__INPUT__%%
 	%%__HELP_BLOCK__%%
@@ -26,7 +30,8 @@ HTML;
 	/**
 	 * @var string The block pattern for horizontal forms
 	 */
-	const HorizontalGroupPattern = <<<HTML
+	const HorizontalGroupPattern
+		= <<<HTML
 <div class="control-group">
 	%%__LABEL__%%
 	<div class="controls">
@@ -96,7 +101,8 @@ HTML;
 			$_tokenName = \Yii::app()->getRequest()->csrfTokenName;
 			$_tokenValue = \Yii::app()->getRequest()->csrfToken;
 
-			$this->_csrf = <<<HTML
+			$this->_csrf
+				= <<<HTML
 <input type="hidden" name="{$_tokenName}" value="{$_tokenValue}" />
 HTML;
 		}
@@ -278,7 +284,8 @@ HTML;
 			$_input = '<div class="' . $_inputWrap . '">' . $_inputPrepend . $_input . $_inputAppend . '</div>';
 		}
 
-		$_html = <<<HTML
+		$_html
+			= <<<HTML
 {$_blockStart}{$_inputStart}{$_label}{$_input}{$_labelEnd}{$_hint}{$_inputEnd}{$_blockEnd}
 HTML;
 
@@ -345,7 +352,8 @@ HTML;
 			);
 		}
 
-		$_html = <<<HTML
+		$_html
+			= <<<HTML
 <form {$_html}>
 	{$legend}
 	{$this->_contents}
@@ -423,7 +431,8 @@ HTML;
 
 				$_class = $_menuItem['active'] ? 'active' : 'inactive';
 
-				$_liTags .= <<<HTML
+				$_liTags
+					.= <<<HTML
 <li class="{$_class}"><a href="{$_menuItem['href']}">{$_icon}{$_linkName}</a></li>
 HTML;
 			}
@@ -431,14 +440,15 @@ HTML;
 
 		if ( !empty( $logoutUrl ) )
 		{
-			$_token =
-				( class_exists( '\\Yii', false ) && false !== \Yii::app()->getRequest()->enableCsrfValidation )
-					?
-					'?token=' . \Yii::app()->getRequest()->getCsrfToken()
-					:
-					null;
+			$_token
+				= ( class_exists( '\\Yii', false ) && false !== \Yii::app()->getRequest()->enableCsrfValidation )
+				?
+				'?token=' . \Yii::app()->getRequest()->getCsrfToken()
+				:
+				null;
 
-			$_liTags .= <<<HTML
+			$_liTags
+				.= <<<HTML
 <li class="pull-right"><a href="{$logoutUrl}{$_token}">Logout</a></li>
 HTML;
 		}

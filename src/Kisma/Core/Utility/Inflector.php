@@ -77,25 +77,23 @@ class Inflector implements \Kisma\Core\Interfaces\UtilityLike
 	 * Given a string, return it to non-neutral format (delimited camel-case)
 	 *
 	 * @param string $item      The string to deneutralize
+	 * @param bool   $isKey     True if the string is an array/object key/tag
 	 * @param string $delimiter Will be used to reconstruct the string
 	 *
 	 * @return string
 	 */
-	public static function deneutralize( $item, $delimiter = '\\' )
+	public static function deneutralize( $item, $isKey = false, $delimiter = '\\' )
 	{
-		$_result = self::camelize(
+		return self::camelize(
 			str_replace(
+				array( '_', '.', $delimiter ),
 				' ',
-				null,
-				str_replace(
-					array( '_', '.' ),
-					array( ' ', $delimiter ),
-					$item
-				)
-			)
+				$item
+			),
+			'_',
+			false,
+			true
 		);
-
-		return $_result;
 	}
 
 	/**
@@ -144,12 +142,18 @@ class Inflector implements \Kisma\Core\Interfaces\UtilityLike
 	 * @param string  $string
 	 * @param string  $separator
 	 * @param boolean $preserveWhiteSpace
+	 * @param bool    $isKey If true, first word is lower-cased
 	 *
 	 * @return string
 	 */
-	public static function camelize( $string, $separator = '_', $preserveWhiteSpace = false )
+	public static function camelize( $string, $separator = '_', $preserveWhiteSpace = false, $isKey = false )
 	{
 		$_newString = ucwords( str_replace( $separator, ' ', $string ) );
+
+		if ( false !== $isKey )
+		{
+			$_newString = lcfirst( $_newString );
+		}
 
 		return ( false === $preserveWhiteSpace ? str_replace( ' ', null, $_newString ) : $_newString );
 	}

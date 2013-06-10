@@ -1,8 +1,8 @@
 <?php
-/**
- * Option.php
- */
 namespace Kisma\Core\Utility;
+
+use Kisma\Core\Utility\Inflector;
+
 /**
  * Option
  * Provides methods to manipulate array and object properties in a uniform manner
@@ -30,7 +30,7 @@ class Option
 	 */
 	public static function contains( &$options = array(), $key )
 	{
-		$_key = Inflector::tag( $key, true );
+		$_key = static::_cleanKey( $key );
 
 		//	Check both the raw and cooked keys
 		return
@@ -80,7 +80,7 @@ class Option
 		$_originalKey = $key;
 
 		//	Inflect pain!
-		$key = Inflector::tag( $key, true );
+		$key = static::_cleanKey( $key );
 
 		//	Set the default value
 		$_newValue = $defaultValue;
@@ -198,7 +198,7 @@ class Option
 		foreach ( $_options as $_key => $_value )
 		{
 			$_originalKey = $_key;
-			$_key = Inflector::tag( $_key, true );
+			$_key = static::_cleanKey( $_key );
 
 			if ( is_array( $options ) )
 			{
@@ -228,8 +228,6 @@ class Option
 	 *
 	 * @param array  $options
 	 * @param string $key
-	 *
-	 * @return mixed The original value
 	 */
 	public static function remove( &$options = array(), $key )
 	{
@@ -237,10 +235,10 @@ class Option
 
 		if ( static::contains( $options, $key ) )
 		{
+			$key = static::_cleanKey( $key );
+
 			if ( is_array( $options ) )
 			{
-				$key = Inflector::tag( $key, true );
-
 				if ( isset( $options[$key] ) )
 				{
 					$_originalValue = $options[$key];
@@ -318,6 +316,7 @@ class Option
 	 * @param array $target The destination array
 	 *
 	 * @return array The resulting array
+	 * @return array
 	 */
 	public static function merge( $target )
 	{
@@ -401,10 +400,27 @@ class Option
 	}
 
 	/**
-	 * @return boolean
+	 * @return bool
 	 */
 	public static function getCaseInsensitive()
 	{
 		return self::$_caseInsensitive;
+	}
+
+	/**
+	 * Converts key to a neutral format if not already...
+	 *
+	 * @param string $key
+	 *
+	 * @return string
+	 */
+	protected static function _cleanKey( $key )
+	{
+		if ( $key == ( $_cleaned = Inflector::tag( $key, true ) ) )
+		{
+			return Inflector::deneutralize( $key, true );
+		}
+
+		return $_cleaned;
 	}
 }

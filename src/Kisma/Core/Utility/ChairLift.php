@@ -3,13 +3,16 @@
  * ChairLift.php
  */
 namespace Kisma\Core\Utility;
+
+use Kisma\Core\Interfaces\HttpResponse;
+use Kisma\Core\Interfaces\UtilityLike;
 use Kisma\Core\Utility\Option;
 
 /**
  * ChairLift
  * Lifts you up off the couch! It's a "couch" helper, get it?
  */
-class ChairLift implements \Kisma\Core\Interfaces\HttpResponse
+class ChairLift implements HttpResponse, UtilityLike
 {
 	//*************************************************************************
 	//* Members
