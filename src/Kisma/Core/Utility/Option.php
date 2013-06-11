@@ -86,10 +86,10 @@ class Option
 		$_newValue = $defaultValue;
 
 		//	Get array value if it exists
-		if ( is_array( $options ) )
+		if ( is_array( $options ) || $options instanceof \ArrayAccess )
 		{
 			//	Check for the original key too
-			if ( !array_key_exists( $key, $options ) && array_key_exists( $_originalKey, $options ) )
+			if ( !isset( $options[$key] ) && isset( $options[$_originalKey] ) )
 			{
 				$key = $_originalKey;
 			}
