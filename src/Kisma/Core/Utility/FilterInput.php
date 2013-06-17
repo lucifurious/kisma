@@ -88,7 +88,7 @@ class FilterInput implements \Kisma\Core\Interfaces\UtilityLike
 		//	Allow usage as filter_var()
 		if ( is_array( $type ) )
 		{
-			return trim( filter_var( Option::get( $type, $key, $defaultValue ), $filter, $filterOptions ) );
+			return filter_var( Option::get( $type, $key, $defaultValue ), $filter, $filterOptions );
 		}
 
 		$_haystack = null;
@@ -127,7 +127,7 @@ class FilterInput implements \Kisma\Core\Interfaces\UtilityLike
 			return $defaultValue;
 		}
 
-		$_value = trim( filter_var( Option::get( $_haystack, $key, $defaultValue ), $filter, $filterOptions ) );
+		$_value = filter_var( Option::get( $_haystack, $key, $defaultValue ), $filter, $filterOptions );
 
 		return $_value;
 	}
