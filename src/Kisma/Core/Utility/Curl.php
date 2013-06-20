@@ -461,11 +461,14 @@ class Curl extends HttpMethod
 	}
 
 	/**
+	 * @param string $key          Leaving this null will return the entire structure, otherwise just the value for the supplied key
+	 * @param mixed  $defaultValue The default value to return if the $key was not found
+	 *
 	 * @return array
 	 */
-	public static function getInfo()
+	public static function getInfo( $key = null, $defaultValue = null )
 	{
-		return self::$_info;
+		return null === $key ? self::$_info : Option::get( self::$_info, $key, $defaultValue );
 	}
 
 	/**
