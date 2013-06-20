@@ -18,11 +18,13 @@
  */
 namespace Kisma\Core\Utility;
 
+use Kisma\Core\Interfaces\UtilityLike;
+
 /**
  * Inflector
  * Provides Inflector manipulation routines
  */
-class Inflector implements \Kisma\Core\Interfaces\UtilityLike
+class Inflector implements UtilityLike
 {
 	//*************************************************************************
 	//* Public Methods
@@ -44,7 +46,8 @@ class Inflector implements \Kisma\Core\Interfaces\UtilityLike
 			$item = str_ireplace( $strip, null, $item );
 		}
 
-		$_parts = preg_split( "/(\w\\\.\/)+/", $item );
+		//	Split by forward slash, backslash, period, or space...
+		$_parts = preg_split( "/[. \/\\\\]+/", $item );
 
 		array_walk( $_parts,
 			function ( &$part )
