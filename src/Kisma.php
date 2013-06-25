@@ -3,6 +3,14 @@
  * Kisma.php
  * Bootstrap loader
  */
+use Kisma\Core\Interfaces\KismaSettings;
+use Kisma\Core\Interfaces\PublisherLike;
+use Kisma\Core\Utility\Detector;
+use Kisma\Core\Utility\EventManager;
+use Kisma\Core\Utility\Inflector;
+use Kisma\Core\Utility\Option;
+use Kisma\Core\Utility\Scalar;
+
 /** @noinspection PhpUndefinedNamespaceInspection */
 /**
  * Kisma
@@ -15,7 +23,7 @@
  * @method static \Composer\Autoload\ClassLoader getAutoLoader()
  * @method static mixed setAutoLoader( mixed $autoLoader )
  */
-class Kisma implements \Kisma\Core\Interfaces\PublisherLike, \Kisma\Core\Interfaces\Events\Kisma, \Kisma\Core\Interfaces\KismaSettings
+class Kisma implements PublisherLike, \Kisma\Core\Interfaces\Events\Kisma, KismaSettings
 {
 	//*************************************************************************
 	//* Constants
@@ -62,8 +70,11 @@ class Kisma implements \Kisma\Core\Interfaces\PublisherLike, \Kisma\Core\Interfa
 			$options = call_user_func( $options );
 		}
 
+		//	Load from session...
+		static::__wakeup();
+
 		//	Set any application-level options passed in
-		static::$_options = \Kisma\Core\Utility\Option::merge( static::$_options, $options );
+		static::$_options = Option::merge( static::$_options, $options );
 
 		//	Register our faux-destructor
 		if ( false === ( $_conceived = static::getConception() ) )
@@ -71,12 +82,13 @@ class Kisma implements \Kisma\Core\Interfaces\PublisherLike, \Kisma\Core\Interfa
 			\register_shutdown_function(
 				function ( $eventName = Kisma::Death )
 				{
-					\Kisma\Core\Utility\EventManager::publish( null, $eventName );
+					static::__sleep();
+					EventManager::publish( null, $eventName );
 				}
 			);
 
 			//	Try and detect the framework being used...
-			\Kisma\Core\Utility\Detector::framework();
+			Detector::framework();
 
 			//	We done baby!
 			static::setConception( true );
@@ -88,10 +100,40 @@ class Kisma implements \Kisma\Core\Interfaces\PublisherLike, \Kisma\Core\Interfa
 			}
 
 			//	And let the world know we're alive
-			\Kisma\Core\Utility\EventManager::publish( null, Kisma::Birth );
+			EventManager::publish( null, Kisma::Birth );
 		}
 
 		return $_conceived;
+	}
+
+	/**
+	 * Serialize
+	 */
+	public static function __sleep()
+	{
+		//	Save options out to session...
+		if ( !isset( $_SESSION ) )
+		{
+			session_start();
+		}
+
+		$_SESSION['kisma.options'] = static::$_options;
+	}
+
+	/**
+	 * Deserialize
+	 */
+	public static function __wakeup()
+	{
+		//	Load options from session...
+		if ( isset( $_SESSION, $_SESSION['kisma.options'] ) )
+		{
+			//	Merge them into the fold
+			static::$_options = array_merge(
+				$_SESSION['kisma.options'],
+				static::$_options
+			);
+		}
 	}
 
 	/**
@@ -102,7 +144,7 @@ class Kisma implements \Kisma\Core\Interfaces\PublisherLike, \Kisma\Core\Interfa
 	 */
 	public static function set( $key, $value = null )
 	{
-		\Kisma\Core\Utility\Option::set( static::$_options, $key, $value );
+		Option::set( static::$_options, $key, $value );
 	}
 
 	/**
@@ -114,7 +156,7 @@ class Kisma implements \Kisma\Core\Interfaces\PublisherLike, \Kisma\Core\Interfa
 	 */
 	public static function addTo( $key, $subKey, $value = null )
 	{
-		\Kisma\Core\Utility\Option::addTo( static::$_options, $key, $subKey, $value );
+		Option::addTo( static::$_options, $key, $subKey, $value );
 	}
 
 	/**
@@ -125,7 +167,7 @@ class Kisma implements \Kisma\Core\Interfaces\PublisherLike, \Kisma\Core\Interfa
 	 */
 	public static function removeFrom( $key, $subKey )
 	{
-		\Kisma\Core\Utility\Option::removeFrom( static::$_options, $key, $subKey );
+		Option::removeFrom( static::$_options, $key, $subKey );
 	}
 
 	/**
@@ -142,7 +184,7 @@ class Kisma implements \Kisma\Core\Interfaces\PublisherLike, \Kisma\Core\Interfa
 			return static::$_options;
 		}
 
-		return \Kisma\Core\Utility\Option::get( static::$_options, $key, $defaultValue, $removeIfFound );
+		return Option::get( static::$_options, $key, $defaultValue, $removeIfFound );
 	}
 
 	/**
@@ -156,9 +198,9 @@ class Kisma implements \Kisma\Core\Interfaces\PublisherLike, \Kisma\Core\Interfa
 	 */
 	public static function __callStatic( $name, $arguments )
 	{
-		if ( \Kisma\Core\Utility\Scalar::in( $_type = strtolower( substr( $name, 0, 3 ) ), 'get', 'set' ) )
+		if ( Scalar::in( $_type = strtolower( substr( $name, 0, 3 ) ), 'get', 'set' ) )
 		{
-			$_tag = 'app.' . \Kisma\Core\Utility\Inflector::tag( substr( $name, 3 ), true );
+			$_tag = 'app.' . Inflector::tag( substr( $name, 3 ), true );
 
 			if ( \Kisma\Core\Enums\KismaSettings::contains( $_tag ) )
 			{
@@ -180,8 +222,10 @@ class Kisma implements \Kisma\Core\Interfaces\PublisherLike, \Kisma\Core\Interfa
 	 *
 	 * @return bool
 	 */
-	public function onBirth( $event = null )
+	public static function onBirth( $event = null )
 	{
+		static::__wakeup();
+
 		return true;
 	}
 
@@ -190,8 +234,10 @@ class Kisma implements \Kisma\Core\Interfaces\PublisherLike, \Kisma\Core\Interfa
 	 *
 	 * @return bool
 	 */
-	public function onDeath( $event = null )
+	public static function onDeath( $event = null )
 	{
+		static::__sleep();
+
 		return true;
 	}
 
@@ -210,5 +256,4 @@ class Kisma implements \Kisma\Core\Interfaces\PublisherLike, \Kisma\Core\Interfa
 	{
 		//	Nada
 	}
-
 }
