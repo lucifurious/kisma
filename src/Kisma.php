@@ -112,12 +112,10 @@ class Kisma implements PublisherLike, \Kisma\Core\Interfaces\Events\Kisma, Kisma
 	public static function __sleep()
 	{
 		//	Save options out to session...
-		if ( !isset( $_SESSION ) )
+		if ( isset( $_SESSION ) )
 		{
-			session_start();
-		}
-
-		$_SESSION['kisma.options'] = static::$_options;
+		    $_SESSION['kisma.options'] = static::$_options;
+        }
 	}
 
 	/**
