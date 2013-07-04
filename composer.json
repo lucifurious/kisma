@@ -1,12 +1,13 @@
 {
 	"name":        "kisma/kisma",
-	"description": "A Fun-Sized PHP Framework",
+	"description": "PHP Utility Belt",
+	"version":     "0.1.1",
 	"keywords":    [
-		"php", "php5", "rest", "mvc", "framework"
+		"php", "php5", "library", "utility"
 	],
 	"homepage":    "https://github.com/kisma/kisma",
 	"type":        "library",
-	"license":     "MIT",
+	"license":     "GPL3",
 	"authors":     [
 		{
 			"name":  "Jerry Ablan",
@@ -14,7 +15,7 @@
 		}
 	],
 	"require":     {
-		"php":             ">=5.3.10"
+		"php": ">=5.3.10"
 	},
 	"autoload":    {
 		"psr-0": {
