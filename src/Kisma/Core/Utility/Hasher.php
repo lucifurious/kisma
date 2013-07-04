@@ -1,13 +1,35 @@
 <?php
 /**
- * Hasher.php
+ * This file is part of Kisma(tm).
+ *
+ * Kisma(tm) <https://github.com/kisma/kisma>
+ * Copyright 2009-2013 Jerry Ablan <jerryablan@gmail.com>
+ *
+ * Kisma(tm) is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Kisma(tm) is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Kisma(tm).  If not, see <http://www.gnu.org/licenses/>.
  */
 namespace Kisma\Core\Utility;
+
+use Kisma\Core\Interfaces\HashSeed;
+use Kisma\Core\Interfaces\HashType;
+use Kisma\Core\Interfaces\UtilityLike;
+use Kisma\Core\Seed;
+
 /**
  * Hasher
  * Hashing utility class
  */
-class Hasher extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\UtilityLike, \Kisma\Core\Interfaces\HashSeed, \Kisma\Core\Interfaces\HashType
+class Hasher extends Seed implements UtilityLike, HashSeed, HashType
 {
 	//********************************************************************************
 	//* Private Members
@@ -342,7 +364,7 @@ class Hasher extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\UtilityL
 		);
 
 	//********************************************************************************
-	//* Public Methods
+	//* Methods
 	//********************************************************************************
 
 	/**
@@ -409,15 +431,15 @@ class Hasher extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\UtilityL
 	/**
 	 * Generic hashing method. Will hash any string or generate a random hash and hash that!
 	 *
-	 * @param string  $hashTarget The value to hash..
-	 * @param int     $hashType   [optional] The type of hash to create. Can be {@see Hasher::MD5}, {@see Hash#SHA1},
-	 *                            or {@link Hash#CRC32}. Defaults to {@see Hasher::SHA1}.
-	 * @param integer $hashLength [optional] The length of the hash to return. Only applies if <b>$hashType</b>
-	 *                            is not MD5, SH1,
-	 *                            or CRC32. . Defaults to 32.
-	 * @param boolean $rawOutput  [optional] If <b>$rawOutput</b> is true, then the hash digest is returned in
-	 *                            raw binary format instead of
-	 *                            ASCII.
+	 * @param string  $hashTarget   The value to hash..
+	 * @param int     $hashType     [optional] The type of hash to create. Can be {@see Hasher::MD5}, {@see Hash#SHA1},
+	 *                              or {@link Hash#CRC32}. Defaults to {@see Hasher::SHA1}.
+	 * @param integer $hashLength   [optional] The length of the hash to return. Only applies if <b>$hashType</b>
+	 *                              is not MD5, SH1,
+	 *                              or CRC32. . Defaults to 32.
+	 * @param boolean $rawOutput    [optional] If <b>$rawOutput</b> is true, then the hash digest is returned in
+	 *                              raw binary format instead of
+	 *                              ASCII.
 	 *
 	 * @return string
 	 */
@@ -459,12 +481,20 @@ class Hasher extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\UtilityL
 	public static function encryptString( $text, $salt, $urlEncode = false )
 	{
 		$_value =
-			trim( \base64_encode( \mcrypt_encrypt( MCRYPT_RIJNDAEL_256,
-				sha1( $salt, true ),
-				$text,
-				MCRYPT_MODE_ECB,
-				\mcrypt_create_iv( \mcrypt_get_iv_size( MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB ),
-					MCRYPT_RAND ) ) ) );
+			trim(
+				\base64_encode(
+					\mcrypt_encrypt(
+						MCRYPT_RIJNDAEL_256,
+						sha1( $salt, true ),
+						$text,
+						MCRYPT_MODE_ECB,
+						\mcrypt_create_iv(
+							\mcrypt_get_iv_size( MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB ),
+							MCRYPT_RAND
+						)
+					)
+				)
+			);
 
 		return $urlEncode ? urlencode( $_value ) : $_value;
 	}
@@ -480,11 +510,14 @@ class Hasher extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\UtilityL
 	 */
 	public static function decryptString( $text, $salt, $urlDecode = false )
 	{
-		return trim( \mcrypt_decrypt( MCRYPT_RIJNDAEL_256,
-			sha1( $salt, true ),
-			\base64_decode( $urlDecode ? urldecode( $text ) : $text ),
-			MCRYPT_MODE_ECB,
-			\mcrypt_create_iv( \mcrypt_get_iv_size( MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB ), MCRYPT_RAND ) ) );
+		return trim(
+			\mcrypt_decrypt(
+				MCRYPT_RIJNDAEL_256,
+				sha1( $salt, true ),
+				\base64_decode( $urlDecode ? urldecode( $text ) : $text ),
+				MCRYPT_MODE_ECB,
+				\mcrypt_create_iv( \mcrypt_get_iv_size( MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB ), MCRYPT_RAND )
+			)
+		);
 	}
-
 }

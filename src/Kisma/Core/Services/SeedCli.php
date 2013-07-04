@@ -1,16 +1,36 @@
 <?php
 /**
- * SeedCli.php
+ * This file is part of Kisma(tm).
+ *
+ * Kisma(tm) <https://github.com/kisma/kisma>
+ * Copyright 2009-2013 Jerry Ablan <jerryablan@gmail.com>
+ *
+ * Kisma(tm) is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Kisma(tm) is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Kisma(tm).  If not, see <http://www.gnu.org/licenses/>.
  */
 namespace Kisma\Core\Services;
+
+use Kisma\Core\Interfaces\RequestLike;
+use Kisma\Core\Interfaces\RequestSource;
+
 /**
  * SeedCli
  * A base class for CLI services
  */
-abstract class SeedCli extends SeedService implements \Kisma\Core\Interfaces\RequestSource
+abstract class SeedCli extends SeedService implements RequestSource
 {
 	//********************************************************************************
-	//* Member Variables
+	//* Members
 	//********************************************************************************
 
 	/**
@@ -18,12 +38,12 @@ abstract class SeedCli extends SeedService implements \Kisma\Core\Interfaces\Req
 	 */
 	protected $_workingDirectory = null;
 	/**
-	 * @var \Kisma\Core\Interfaces\RequestLike
+	 * @var RequestLike
 	 */
 	protected $_request = null;
 
 	//*************************************************************************
-	//* Public Methods
+	//* Methods
 	//*************************************************************************
 
 	/**
@@ -31,7 +51,7 @@ abstract class SeedCli extends SeedService implements \Kisma\Core\Interfaces\Req
 	 */
 	public function __construct( $options = array() )
 	{
-		parent::__construct( $options );
+		parent::__construct( null, $options );
 
 		//	Set working directory
 		if ( null === $this->_workingDirectory )
@@ -111,10 +131,6 @@ abstract class SeedCli extends SeedService implements \Kisma\Core\Interfaces\Req
 		return $arguments;
 	}
 
-	//*************************************************************************
-	//* Properties
-	//*************************************************************************
-
 	/**
 	 * @param string $workingDirectory
 	 *
@@ -136,7 +152,7 @@ abstract class SeedCli extends SeedService implements \Kisma\Core\Interfaces\Req
 	}
 
 	/**
-	 * @param \Kisma\Core\Services\Request $request
+	 * @param RequestLike $request
 	 *
 	 * @return \Kisma\Core\Services\SeedCli
 	 */
@@ -148,11 +164,10 @@ abstract class SeedCli extends SeedService implements \Kisma\Core\Interfaces\Req
 	}
 
 	/**
-	 * @return \Kisma\Core\Services\Request
+	 * @return RequestLike
 	 */
 	public function getRequest()
 	{
 		return $this->_request;
 	}
-
 }

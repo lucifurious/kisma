@@ -1,9 +1,22 @@
 <?php
 /**
- * Log.php
- * It's better than bad! It's GOOD! All kids love Log!
+ * This file is part of Kisma(tm).
  *
- * @todo Class neutered at the moment
+ * Kisma(tm) <https://github.com/kisma/kisma>
+ * Copyright 2009-2013 Jerry Ablan <jerryablan@gmail.com>
+ *
+ * Kisma(tm) is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Kisma(tm) is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Kisma(tm).  If not, see <http://www.gnu.org/licenses/>.
  */
 namespace Kisma\Core\Utility;
 
@@ -31,7 +44,7 @@ class Log extends Seed implements UtilityLike, Levels
 	const DefaultLogFile = '/log/kisma.log';
 
 	//********************************************************************************
-	//* Private Members
+	//* Members
 	//********************************************************************************
 
 	/**
@@ -64,7 +77,7 @@ class Log extends Seed implements UtilityLike, Levels
 	protected static $_includeProcessInfo = false;
 
 	//********************************************************************************
-	//* Public Methods
+	//* Methods
 	//********************************************************************************
 
 	/**
@@ -190,10 +203,6 @@ class Log extends Seed implements UtilityLike, Levels
 			   ) . ( $newline ? PHP_EOL : null );
 	}
 
-	//*************************************************************************
-	//* Convenience Methods
-	//*************************************************************************
-
 	/**
 	 * Creates an 'error' log entry
 	 *
@@ -277,22 +286,18 @@ class Log extends Seed implements UtilityLike, Levels
 		{
 			static::$_currentIndent = 0;
 		}
-    }
+	}
 
-    /**
-     * Makes the system log path if not there...
-     */
-    public static function checkSystemLogPath()
-    {
-        if ( null !== ( $_path = getenv( 'KISMA_SYSTEM_LOG_PATH' ) ) )
-        {
-            @mkdir( $_path, 0777, true );
-        }
-    }
-
-	//*************************************************************************
-	//* Protected Methods
-	//*************************************************************************
+	/**
+	 * Makes the system log path if not there...
+	 */
+	public static function checkSystemLogPath()
+	{
+		if ( null !== ( $_path = getenv( 'KISMA_SYSTEM_LOG_PATH' ) ) )
+		{
+			@mkdir( $_path, 0777, true );
+		}
+	}
 
 	/**
 	 * @param int  $level
@@ -404,10 +409,6 @@ class Log extends Seed implements UtilityLike, Levels
 		}
 	}
 
-	//*************************************************************************
-	//* Properties
-	//*************************************************************************
-
 	/**
 	 * @static
 	 *
@@ -518,7 +519,6 @@ class Log extends Seed implements UtilityLike, Levels
 	{
 		return self::$_includeProcessInfo;
 	}
-
 }
 
 Log::checkSystemLogPath();

@@ -1,18 +1,25 @@
 <?php
 /**
- * Kisma(tm) : PHP Fun-Size Framework (http://github.com/lucifurious/kisma/)
- * Copyright 2009-2012, Jerry Ablan, All Rights Reserved
+ * This file is part of Kisma(tm).
  *
- * Dual licensed under the MIT License and the GNU General Public License (GPL) Version 2.
- * See {@link http://github.com/lucifurious/kisma/licensing/} for complete information.
+ * Kisma(tm) <https://github.com/kisma/kisma>
+ * Copyright 2009-2013 Jerry Ablan <jerryablan@gmail.com>
  *
- * @copyright          Copyright 2009-2012, Jerry Ablan, All Rights Reserved
- * @link               http://github.com/lucifurious/kisma/ Kisma(tm)
- * @license            http://github.com/lucifurious/kisma/licensing/
- * @author             Jerry Ablan <kisma@pogostick.com>
- * @filesource
+ * Kisma(tm) is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Kisma(tm) is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Kisma(tm).  If not, see <http://www.gnu.org/licenses/>.
  */
 namespace Kisma\Core\Enums;
+
 use \Kisma\Core\Utility;
 
 /**

@@ -1,14 +1,32 @@
 <?php
 /**
- * FilterInput.php
+ * This file is part of Kisma(tm).
+ *
+ * Kisma(tm) <https://github.com/kisma/kisma>
+ * Copyright 2009-2013 Jerry Ablan <jerryablan@gmail.com>
+ *
+ * Kisma(tm) is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Kisma(tm) is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Kisma(tm).  If not, see <http://www.gnu.org/licenses/>.
  */
 namespace Kisma\Core\Utility;
+
+use Kisma\Core\Interfaces\UtilityLike;
 
 /**
  * FilterInput
  * Helpers for working with filter_input and filter_var
  */
-class FilterInput implements \Kisma\Core\Interfaces\UtilityLike
+class FilterInput implements UtilityLike
 {
 	//*************************************************************************
 	//* Filter Getters
@@ -68,17 +86,17 @@ class FilterInput implements \Kisma\Core\Interfaces\UtilityLike
 	 * The master function, performs all filters and gets. Gets around lack of INPUT_SESSION and INPUT_REQUEST
 	 * support.
 	 *
-	 * @param int|array      $type          One of INPUT_GET, INPUT_POST, INPUT_COOKIE, INPUT_SERVER, INPUT_ENV,
-	 *                                      INPUT_SESSION and INPUT_REQUEST. You may also pass in an array and use this
-	 *                                      method to call filter_var with the value found in the array
-	 * @param string         $key           The name of a variable to get.
-	 * @param mixed          $defaultValue  The default value if the key is not found
-	 * @param int            $filter        The filter to use (see the manual page). Defaults to FILTER_DEFAULT.
-	 * @param int|array|null $filterOptions Associative array of options or bitwise disjunction of flags. If
-	 *                                      filter accepts options,
-	 *                                      flags can be provided in "flags" field of array. For the "callback" filter,
-	 *                                      callback type should be passed. The callback must accept one argument,
-	 *                                      the value to be filtered, and return the value after filtering/sanitizing it.
+	 * @param int|array      $type                    One of INPUT_GET, INPUT_POST, INPUT_COOKIE, INPUT_SERVER, INPUT_ENV,
+	 *                                                INPUT_SESSION and INPUT_REQUEST. You may also pass in an array and use this
+	 *                                                method to call filter_var with the value found in the array
+	 * @param string         $key                     The name of a variable to get.
+	 * @param mixed          $defaultValue            The default value if the key is not found
+	 * @param int            $filter                  The filter to use (see the manual page). Defaults to FILTER_DEFAULT.
+	 * @param int|array|null $filterOptions           Associative array of options or bitwise disjunction of flags. If
+	 *                                                filter accepts options,
+	 *                                                flags can be provided in "flags" field of array. For the "callback" filter,
+	 *                                                callback type should be passed. The callback must accept one argument,
+	 *                                                the value to be filtered, and return the value after filtering/sanitizing it.
 	 *
 	 * @throws \InvalidArgumentException
 	 * @return mixed

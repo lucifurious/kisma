@@ -1,8 +1,31 @@
 <?php
 /**
- * DataReader.php
+ * This file is part of Kisma(tm).
+ *
+ * Kisma(tm) <https://github.com/kisma/kisma>
+ * Copyright 2009-2013 Jerry Ablan <jerryablan@gmail.com>
+ *
+ * Kisma(tm) is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Kisma(tm) is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Kisma(tm).  If not, see <http://www.gnu.org/licenses/>.
  */
 namespace Kisma\Core\Tools;
+
+use Kisma\Core\Exceptions\NotImplementedException;
+use Kisma\Core\Exceptions\StorageException;
+use Kisma\Core\Seed;
+use Kisma\Core\Utility\Log;
+use Kisma\Core\Utility\Sql;
+
 /**
  * DataReader
  * Thin veneer over the PDOStatement class that implements Iterator and Countable so it's traversable via foreach!
@@ -27,10 +50,10 @@ namespace Kisma\Core\Tools;
  * @method array|bool getColumnMeta( $column )
  * @method bool setFetchMode( $mode )
  */
-class DataReader extends \Kisma\Core\Seed implements \Iterator, \Countable
+class DataReader extends Seed implements \Iterator, \Countable
 {
 	//*************************************************************************
-	//* Private Members
+	//* Members
 	//*************************************************************************
 
 	/**
@@ -59,7 +82,7 @@ class DataReader extends \Kisma\Core\Seed implements \Iterator, \Countable
 	protected $_errorInfo = null;
 
 	//*************************************************************************
-	//* Public Methods
+	//* Methods
 	//*************************************************************************
 
 	/**
@@ -88,7 +111,7 @@ class DataReader extends \Kisma\Core\Seed implements \Iterator, \Countable
 	 */
 	public static function create( $sql, $parameters = null, $connection = null, $fetchMode = \PDO::FETCH_ASSOC )
 	{
-		$_reader = new DataReader( \Kisma\Core\Utility\Sql::createStatement( $sql, $connection, $fetchMode ) );
+		$_reader = new DataReader( Sql::createStatement( $sql, $connection, $fetchMode ) );
 
 		if ( false === ( $_result = $_reader->execute( $parameters ) ) )
 		{
@@ -127,10 +150,12 @@ class DataReader extends \Kisma\Core\Seed implements \Iterator, \Countable
 			}
 			catch ( \Exception $_ex )
 			{
-				\Kisma\Core\Utility\Log::error( 'PDO exception: ' . $_ex->getMessage() );
+				Log::error( 'PDO exception: ' . $_ex->getMessage() );
 				throw $_ex;
 			}
 		}
+
+		throw new NotImplementedException();
 	}
 
 	/**
@@ -152,7 +177,7 @@ class DataReader extends \Kisma\Core\Seed implements \Iterator, \Countable
 		if ( false === $_result )
 		{
 			$this->_errorInfo = $this->_statement->errorInfo();
-			\Kisma\Core\Utility\Log::error( 'SQL error: [' . $this->_errorInfo[0] . '-' . $this->_errorInfo[1] . '] ' . $this->_errorInfo[2] );
+			Log::error( 'SQL error: [' . $this->_errorInfo[0] . '-' . $this->_errorInfo[1] . '] ' . $this->_errorInfo[2] );
 		}
 
 		return $this->_executeResult = $_result;
@@ -184,10 +209,6 @@ class DataReader extends \Kisma\Core\Seed implements \Iterator, \Countable
 		$this->_index = null;
 	}
 
-	//*************************************************************************
-	//* Interface Methods
-	//*************************************************************************
-
 	/**
 	 * Returns the number of rows in the result set.
 	 *
@@ -205,7 +226,7 @@ class DataReader extends \Kisma\Core\Seed implements \Iterator, \Countable
 	{
 		if ( null !== $this->_index )
 		{
-			throw new \Kisma\Core\Exceptions\StorageException( 'Forward-only cursor, "rewinding" not allowed.' );
+			throw new StorageException( 'Forward-only cursor, "rewinding" not allowed.' );
 		}
 
 		$this->next();
@@ -215,7 +236,7 @@ class DataReader extends \Kisma\Core\Seed implements \Iterator, \Countable
 	/**
 	 * Returns the index of the current row.
 	 *
-	 * @return \scalar
+	 * @return int|string
 	 */
 	public function key()
 	{
@@ -254,10 +275,6 @@ class DataReader extends \Kisma\Core\Seed implements \Iterator, \Countable
 	{
 		return false !== $this->_row;
 	}
-
-	//*************************************************************************
-	//* Properties
-	//*************************************************************************
 
 	/**
 	 * @param bool $closed
@@ -370,5 +387,4 @@ class DataReader extends \Kisma\Core\Seed implements \Iterator, \Countable
 	{
 		return $this->_statement->queryString;
 	}
-
 }

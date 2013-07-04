@@ -1,14 +1,25 @@
 <?php
 /**
- * ErrorHandler.php
- * Provides a base for data ErrorHandler services
+ * This file is part of Kisma(tm).
  *
- * @description Kisma(tm) : PHP Fun-Size Framework (http://github.com/lucifurious/kisma/)
- * @copyright   Copyright (c) 2009-2012 Jerry Ablan
- * @license     http://github.com/lucifurious/kisma/blob/master/LICENSE
- * @author      Jerry Ablan <get.kisma@gmail.com>
+ * Kisma(tm) <https://github.com/kisma/kisma>
+ * Copyright 2009-2013 Jerry Ablan <jerryablan@gmail.com>
+ *
+ * Kisma(tm) is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Kisma(tm) is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Kisma(tm).  If not, see <http://www.gnu.org/licenses/>.
  */
 namespace Kisma\Core\Utility;
+
 /**
  * ErrorHandler
  * A dead-simple error handler class
@@ -16,7 +27,7 @@ namespace Kisma\Core\Utility;
 class ErrorHandler
 {
 	//*************************************************************************
-	//* Private Members
+	//* Members
 	//*************************************************************************
 
 	/**
@@ -53,7 +64,7 @@ class ErrorHandler
 	protected static $_priorExceptionHandler = null;
 
 	//*************************************************************************
-	//* Public Methods
+	//* Methods
 	//*************************************************************************
 
 	/**
@@ -163,23 +174,23 @@ class ErrorHandler
 			Render::twigView(
 				$_errorTemplate,
 				array(
-					'base_path'         => \Kisma::get( 'app.base_path' ),
-					'app_root'          => \Kisma::get( 'app.root' ),
-					'page_title'        => 'Error',
-					'error'             => self::$_error,
-					'page_header'       => 'Something has gone awry...',
-					'page_header_small' => 'Not cool. :(',
-					'navbar'            => array(
-						'brand' => 'Kisma v' . \Kisma::KismaVersion,
-						'items' => array(
-							array(
-								'title'  => 'Kisma on GitHub!',
-								'href'   => 'http://github.com/kisma/kisma/',
-								'target' => '_blank',
-								'active' => 'active',
-							),
-						),
-					),
+					 'base_path'         => \Kisma::get( 'app.base_path' ),
+					 'app_root'          => \Kisma::get( 'app.root' ),
+					 'page_title'        => 'Error',
+					 'error'             => self::$_error,
+					 'page_header'       => 'Something has gone awry...',
+					 'page_header_small' => 'Not cool. :(',
+					 'navbar'            => array(
+						 'brand' => 'Kisma v' . \Kisma::KismaVersion,
+						 'items' => array(
+							 array(
+								 'title'  => 'Kisma on GitHub!',
+								 'href'   => 'http://github.com/kisma/kisma/',
+								 'target' => '_blank',
+								 'active' => 'active',
+							 ),
+						 ),
+					 ),
 				)
 			);
 
@@ -192,10 +203,6 @@ class ErrorHandler
 
 		return false;
 	}
-
-	//*************************************************************************
-	//* Private Methods
-	//*************************************************************************
 
 	/**
 	 * Cleans up a trace array
@@ -228,20 +235,20 @@ class ErrorHandler
 			$_traceItem['file_name'] = trim(
 				str_replace(
 					array(
-						$_basePath,
-						"\t",
-						"\r",
-						"\n",
-						PHP_EOL,
-						'phar://',
+						 $_basePath,
+						 "\t",
+						 "\r",
+						 "\n",
+						 PHP_EOL,
+						 'phar://',
 					),
 					array(
-						null,
-						'    ',
-						null,
-						null,
-						null,
-						null,
+						 null,
+						 '    ',
+						 null,
+						 null,
+						 null,
+						 null,
 					),
 					$trace[$_index]['file']
 				)
@@ -260,7 +267,6 @@ class ErrorHandler
 					else if ( is_array( $_arg ) )
 					{
 						$_args .= '[array], ';
-
 					}
 					else if ( is_bool( $_arg ) )
 					{
@@ -293,7 +299,7 @@ class ErrorHandler
 			if ( isset( $_code['type'] ) )
 			{
 				$_traceItem['function'] = ( isset( $_code['class'] ) ? $_code['class'] :
-					null ) . $_code['type'] . $_code['function'];
+						null ) . $_code['type'] . $_code['function'];
 			}
 			else
 			{
@@ -344,9 +350,11 @@ class ErrorHandler
 			}
 
 			$_line =
-				str_replace( array( "\r", "\n", "\t", PHP_EOL ),
+				str_replace(
+					array( "\r", "\n", "\t", PHP_EOL ),
 					array( null, null, '    ', null ),
-					$_source[$_start++] );
+					$_source[$_start++]
+				);
 
 			if ( false === $html )
 			{
@@ -360,5 +368,4 @@ class ErrorHandler
 
 		return $_result;
 	}
-
 }

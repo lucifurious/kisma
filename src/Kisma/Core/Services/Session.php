@@ -1,15 +1,36 @@
 <?php
 /**
- * Session.php
+ * This file is part of Kisma(tm).
+ *
+ * Kisma(tm) <https://github.com/kisma/kisma>
+ * Copyright 2009-2013 Jerry Ablan <jerryablan@gmail.com>
+ *
+ * Kisma(tm) is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Kisma(tm) is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Kisma(tm).  If not, see <http://www.gnu.org/licenses/>.
  */
 namespace Kisma\Core\Services;
+
+use Kisma\Core\Exceptions\NotImplementedException;
+use Kisma\Core\SeedBag;
+use Kisma\Core\Utility\FilterInput;
+
 /**
  * Session
  */
-class Session extends \Kisma\Core\SeedBag
+class Session extends SeedBag
 {
 	//*************************************************************************
-	//* Class Constants
+	//* Constants
 	//*************************************************************************
 
 	/**
@@ -30,7 +51,7 @@ class Session extends \Kisma\Core\SeedBag
 	const SessionCookieGcTimeout = 600;
 
 	//*************************************************************************
-	//* Private Members
+	//* Members
 	//*************************************************************************
 
 	/**
@@ -39,7 +60,7 @@ class Session extends \Kisma\Core\SeedBag
 	protected static $_sessionName;
 
 	//*************************************************************************
-	//* Public Methods
+	//* Methods
 	//*************************************************************************
 
 	/**
@@ -88,12 +109,12 @@ class Session extends \Kisma\Core\SeedBag
 	 *
 	 * @param string $id The session ID.
 	 *
-	 * @throws \Kisma\Core\Exceptions\NotImplementedException
+	 * @throws NotImplementedException
 	 * @return string The serialized session data
 	 */
 	public static function read( $id )
 	{
-		throw new \Kisma\Core\Exceptions\NotImplementedException();
+		throw new NotImplementedException();
 	}
 
 	/**
@@ -104,12 +125,12 @@ class Session extends \Kisma\Core\SeedBag
 	 * @param string $id   The session ID.
 	 * @param string $data The serialized data to store.
 	 *
-	 * @throws \Kisma\Core\Exceptions\NotImplementedException
+	 * @throws NotImplementedException
 	 * @return bool
 	 */
 	public static function write( $id, $data )
 	{
-		throw new \Kisma\Core\Exceptions\NotImplementedException();
+		throw new NotImplementedException();
 	}
 
 	/**
@@ -117,12 +138,12 @@ class Session extends \Kisma\Core\SeedBag
 	 *
 	 * @param string $id The session ID.
 	 *
-	 * @throws \Kisma\Core\Exceptions\NotImplementedException
+	 * @throws NotImplementedException
 	 * @return bool
 	 */
 	public static function destroy( $id )
 	{
-		throw new \Kisma\Core\Exceptions\NotImplementedException();
+		throw new NotImplementedException();
 	}
 
 	/**
@@ -161,7 +182,7 @@ class Session extends \Kisma\Core\SeedBag
 	 */
 	protected static function _checkExistingSession()
 	{
-		return \Kisma\Core\Utility\FilterInput::cookie( self::CookiePrefix . 'session_id', false );
+		return FilterInput::cookie( self::CookiePrefix . 'session_id', false );
 	}
 }
 
@@ -170,27 +191,27 @@ class Session extends \Kisma\Core\SeedBag
  */
 \session_set_save_handler(
 	array(
-		__CLASS__,
-		'open'
+		 __CLASS__,
+		 'open'
 	),
 	array(
-		__CLASS__,
-		'close'
+		 __CLASS__,
+		 'close'
 	),
 	array(
-		__CLASS__,
-		'read'
+		 __CLASS__,
+		 'read'
 	),
 	array(
-		__CLASS__,
-		'write'
+		 __CLASS__,
+		 'write'
 	),
 	array(
-		__CLASS__,
-		'destroy'
+		 __CLASS__,
+		 'destroy'
 	),
 	array(
-		__CLASS__,
-		'gc'
+		 __CLASS__,
+		 'gc'
 	)
 );

@@ -1,25 +1,35 @@
 <?php
+/**
+ * This file is part of Kisma(tm).
+ *
+ * Kisma(tm) <https://github.com/kisma/kisma>
+ * Copyright 2009-2013 Jerry Ablan <jerryablan@gmail.com>
+ *
+ * Kisma(tm) is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Kisma(tm) is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Kisma(tm).  If not, see <http://www.gnu.org/licenses/>.
+ */
 namespace Kisma\Core\Utility;
 
 use Kisma\Core\Utility\Inflector;
 
 /**
  * Option
- * Provides methods to manipulate array and object properties in a uniform manner
+ * Super kick-ass class to manipulate array and object properties in a uniform manner
  */
 class Option
 {
 	//*************************************************************************
-	//	Members
-	//*************************************************************************
-
-	/**
-	 * @var bool If true, operates in a "case-insensitive" mode
-	 */
-	protected static $_caseInsensitive = true;
-
-	//*************************************************************************
-	//* Public Methods
+	//* Methods
 	//*************************************************************************
 
 	/**
@@ -228,6 +238,8 @@ class Option
 	 *
 	 * @param array  $options
 	 * @param string $key
+	 *
+	 * @return mixed
 	 */
 	public static function remove( &$options = array(), $key )
 	{
@@ -389,22 +401,6 @@ class Option
 				static::set( $options, $_key, $_value );
 			}
 		}
-	}
-
-	/**
-	 * @param boolean $caseInsensitive
-	 */
-	public static function setCaseInsensitive( $caseInsensitive )
-	{
-		self::$_caseInsensitive = $caseInsensitive;
-	}
-
-	/**
-	 * @return bool
-	 */
-	public static function getCaseInsensitive()
-	{
-		return self::$_caseInsensitive;
 	}
 
 	/**

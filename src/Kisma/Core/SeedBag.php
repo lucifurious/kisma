@@ -1,16 +1,33 @@
 <?php
 /**
- * SeedBag.php
+ * This file is part of Kisma(tm).
+ *
+ * Kisma(tm) <https://github.com/kisma/kisma>
+ * Copyright 2009-2013 Jerry Ablan <jerryablan@gmail.com>
+ *
+ * Kisma(tm) is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Kisma(tm) is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Kisma(tm).  If not, see <http://www.gnu.org/licenses/>.
  */
 namespace Kisma\Core;
+
 /**
  * SeedBag
  * A generic collection class
  */
-class SeedBag extends Seed implements \ArrayAccess, \Countable, \IteratorAggregate, \Kisma\Core\Interfaces\BagLike
+class SeedBag extends Seed implements \ArrayAccess, \Countable, \IteratorAggregate, Interfaces\BagLike
 {
 	//*************************************************************************
-	//* Private Members
+	//* Members
 	//*************************************************************************
 
 	/**
@@ -23,7 +40,7 @@ class SeedBag extends Seed implements \ArrayAccess, \Countable, \IteratorAggrega
 	private $_fixedSize = false;
 
 	//*************************************************************************
-	//* Public Methods
+	//* Methods
 	//*************************************************************************
 
 	/**
@@ -109,12 +126,25 @@ class SeedBag extends Seed implements \ArrayAccess, \Countable, \IteratorAggrega
 	 * @throws Exceptions\BagException
 	 * @return SeedBag
 	 */
-	public function set( $key, $value, $overwrite = true )
+	public function set( $key, $value = null, $overwrite = true )
 	{
-		if ( null === $value && $key instanceof Interfaces\SeedLike )
+		//	Passed in an array or object
+		if ( null === $value )
 		{
-			$value = $key;
-			$key = $value->getId();
+			if ( $key instanceof \Traversable )
+			{
+				foreach ( $key as $_key => $_value )
+				{
+					$this->set( $_key, $_value, $overwrite );
+				}
+
+				return $this;
+			}
+			else if ( $key instanceof Interfaces\SeedLike )
+			{
+				$value = $key;
+				$key = $value->getId();
+			}
 		}
 
 		$_exists = Utility\Option::contains( $this->_bag, $key );
@@ -237,10 +267,6 @@ class SeedBag extends Seed implements \ArrayAccess, \Countable, \IteratorAggrega
 		return $this->_fixedSize;
 	}
 
-	//*************************************************************************
-	//* Interface Methods
-	//*************************************************************************
-
 	/**
 	 * {@InheritDoc}
 	 *
@@ -296,5 +322,4 @@ class SeedBag extends Seed implements \ArrayAccess, \Countable, \IteratorAggrega
 	{
 		return sizeof( $this->_bag );
 	}
-
 }

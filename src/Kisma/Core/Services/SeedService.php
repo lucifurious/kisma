@@ -1,8 +1,31 @@
 <?php
 /**
- * SeedService.php
+ * This file is part of Kisma(tm).
+ *
+ * Kisma(tm) <https://github.com/kisma/kisma>
+ * Copyright 2009-2013 Jerry Ablan <jerryablan@gmail.com>
+ *
+ * Kisma(tm) is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Kisma(tm) is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Kisma(tm).  If not, see <http://www.gnu.org/licenses/>.
  */
 namespace Kisma\Core\Services;
+
+use Kisma\Core\Interfaces\RequestLike;
+use Kisma\Core\SeedBag;
+use Kisma\Core\Interfaces\ServiceLike;
+use Kisma\Core\Interfaces\ServiceState;
+use Kisma\Core\Interfaces\ConsumerLike;
+
 /**
  * SeedService
  * The base class for services provided
@@ -13,19 +36,14 @@ namespace Kisma\Core\Services;
  * @event onFailure Raised after a failure
  * @event onComplete Raised upon completion of a service call
  */
-use Kisma\Core\SeedBag;
-use Kisma\Core\Interfaces\ServiceLike;
-use Kisma\Core\Interfaces\ServiceState;
-use Kisma\Core\Interfaces\ConsumerLike;
-
 abstract class SeedService extends SeedBag implements ServiceLike, ServiceState
 {
 	//*************************************************************************
-	//* Private Members
+	//* Members
 	//*************************************************************************
 
 	/**
-	 * @var \Kisma\Core\Interfaces\ConsumerLike
+	 * @var ConsumerLike
 	 */
 	protected $_consumer = null;
 	/**
@@ -33,19 +51,19 @@ abstract class SeedService extends SeedBag implements ServiceLike, ServiceState
 	 */
 	protected $_state = self::Uninitialized;
 	/**
-	 * @var \Kisma\Core\Interfaces\RequestLike
+	 * @var RequestLike
 	 */
 	protected $_request = null;
 
 	//*************************************************************************
-	//* Interface Methods
+	//* Methods
 	//*************************************************************************
 
 	/**
 	 * Create the service
 	 *
-	 * @param \Kisma\Core\Interfaces\ConsumerLike $consumer
-	 * @param array                               $settings
+	 * @param ConsumerLike $consumer
+	 * @param array        $settings
 	 */
 	public function __construct( ConsumerLike $consumer, $settings = array() )
 	{
@@ -64,12 +82,8 @@ abstract class SeedService extends SeedBag implements ServiceLike, ServiceState
 		$this->publish( self::Complete );
 	}
 
-	//*************************************************************************
-	//* Properties
-	//*************************************************************************
-
 	/**
-	 * @param \Kisma\Core\Interfaces\ConsumerLike $consumer
+	 * @param ConsumerLike $consumer
 	 *
 	 * @return \Kisma\Core\Services\SeedService
 	 */
@@ -81,7 +95,7 @@ abstract class SeedService extends SeedBag implements ServiceLike, ServiceState
 	}
 
 	/**
-	 * @return \Kisma\Core\Interfaces\ConsumerLike
+	 * @return ConsumerLike
 	 */
 	public function getConsumer()
 	{
@@ -109,7 +123,7 @@ abstract class SeedService extends SeedBag implements ServiceLike, ServiceState
 	}
 
 	/**
-	 * @param \Kisma\Core\Interfaces\RequestLike $request
+	 * @param RequestLike $request
 	 *
 	 * @return \Kisma\Core\Services\SeedService
 	 */
@@ -121,11 +135,10 @@ abstract class SeedService extends SeedBag implements ServiceLike, ServiceState
 	}
 
 	/**
-	 * @return \Kisma\Core\Interfaces\RequestLike
+	 * @return RequestLike
 	 */
 	public function getRequest()
 	{
 		return $this->_request;
 	}
-
 }

@@ -1,4 +1,23 @@
 <?php
+/**
+ * This file is part of Kisma(tm).
+ *
+ * Kisma(tm) <https://github.com/kisma/kisma>
+ * Copyright 2009-2013 Jerry Ablan <jerryablan@gmail.com>
+ *
+ * Kisma(tm) is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Kisma(tm) is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Kisma(tm).  If not, see <http://www.gnu.org/licenses/>.
+ */
 namespace Kisma\Core\Components;
 
 use Kisma\Core\Exceptions\FileSystemException;
@@ -90,7 +109,7 @@ class LineReader extends Seed implements ReaderLike
 		{
 			if ( false === @fclose( $this->_handle ) )
 			{
-				Log::error( 'Error closing file during destruct(): ' . $this->_fileName );
+				Log::error( 'Error whilst closing file: ' . $this->_fileName );
 			}
 		}
 	}
@@ -102,7 +121,7 @@ class LineReader extends Seed implements ReaderLike
 	{
 		if ( is_resource( $this->_handle ) && !fclose( $this->_handle ) )
 		{
-			throw new FileSystemException( 'Error closing file: ' . $this->_fileName );
+			throw new FileSystemException( 'Error whilst closing file: ' . $this->_fileName );
 		}
 
 		$this->_eof = true;
@@ -203,7 +222,7 @@ class LineReader extends Seed implements ReaderLike
 
 		if ( $index < 1 )
 		{
-			throw new \OutOfBoundsException( 'Invalid position' );
+			throw new \OutOfBoundsException( 'Bogus position' );
 		}
 
 		while ( $this->_lineNumber < $index && null !== $this->current() )
@@ -213,7 +232,7 @@ class LineReader extends Seed implements ReaderLike
 
 		if ( null === $this->current() )
 		{
-			throw new \OutOfBoundsException( 'Invalid position' );
+			throw new \OutOfBoundsException( 'Bogus position' );
 		}
 	}
 
@@ -418,13 +437,13 @@ class LineReader extends Seed implements ReaderLike
 		{
 			if ( !empty( $_buffer ) )
 			{
-				throw new FileSystemException( 'Cannot parse data at record #' . $this->_lineNumber . '.' );
+				throw new FileSystemException( 'Unable to decipher data from line #' . $this->_lineNumber . '.' );
 			}
 
 			return false;
 		}
 
-		throw new FileSystemException( 'Cannot read file: ' . $this->_fileName );
+		throw new FileSystemException( 'Unable to read file: ' . $this->_fileName );
 	}
 
 	/**

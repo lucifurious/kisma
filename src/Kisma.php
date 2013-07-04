@@ -1,7 +1,22 @@
 <?php
 /**
- * Kisma.php
- * Bootstrap loader
+ * This file is part of Kisma(tm).
+ *
+ * Kisma(tm) <https://github.com/kisma/kisma>
+ * Copyright 2009-2013 Jerry Ablan <jerryablan@gmail.com>
+ *
+ * Kisma(tm) is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Kisma(tm) is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Kisma(tm).  If not, see <http://www.gnu.org/licenses/>.
  */
 use Kisma\Core\Interfaces\KismaSettings;
 use Kisma\Core\Interfaces\PublisherLike;
@@ -11,7 +26,6 @@ use Kisma\Core\Utility\Inflector;
 use Kisma\Core\Utility\Option;
 use Kisma\Core\Utility\Scalar;
 
-/** @noinspection PhpUndefinedNamespaceInspection */
 /**
  * Kisma
  * Contains a few core functions implemented statically to be lightweight and single instance.
@@ -32,10 +46,10 @@ class Kisma implements PublisherLike, \Kisma\Core\Interfaces\Events\Kisma, Kisma
 	/**
 	 * @var string The current version
 	 */
-	const KismaVersion = '0.666';
+	const KismaVersion = '0.1.1';
 
 	//*************************************************************************
-	//* Private Members
+	//* Members
 	//*************************************************************************
 
 	/**
@@ -52,7 +66,7 @@ class Kisma implements PublisherLike, \Kisma\Core\Interfaces\Events\Kisma, Kisma
 	);
 
 	//**************************************************************************
-	//* Public Methods
+	//* Methods
 	//**************************************************************************
 
 	/**
@@ -114,8 +128,8 @@ class Kisma implements PublisherLike, \Kisma\Core\Interfaces\Events\Kisma, Kisma
 		//	Save options out to session...
 		if ( isset( $_SESSION ) )
 		{
-		    $_SESSION['kisma.options'] = static::$_options;
-        }
+			$_SESSION['kisma.options'] = static::$_options;
+		}
 	}
 
 	/**
@@ -210,10 +224,6 @@ class Kisma implements PublisherLike, \Kisma\Core\Interfaces\Events\Kisma, Kisma
 
 		throw new \BadMethodCallException( 'The method "' . $name . '" does not exist, or at least, I can\'t find it.' );
 	}
-
-	//*************************************************************************
-	//* Default Event Handlers
-	//*************************************************************************
 
 	/**
 	 * @param \Kisma\Core\Events\SeedEvent $event

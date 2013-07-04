@@ -1,8 +1,26 @@
 <?php
 /**
- * FileSystem.php
+ * This file is part of Kisma(tm).
+ *
+ * Kisma(tm) <https://github.com/kisma/kisma>
+ * Copyright 2009-2013 Jerry Ablan <jerryablan@gmail.com>
+ *
+ * Kisma(tm) is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Kisma(tm) is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Kisma(tm).  If not, see <http://www.gnu.org/licenses/>.
  */
 namespace Kisma\Core\Utility;
+
+use Kisma\Core\Interfaces\UtilityLike;
 use Kisma\Core\Seed;
 use Kisma\Core\Exceptions\UtilityException;
 use Kisma\Core\Enums\GlobFlags;
@@ -10,11 +28,8 @@ use Kisma\Core\Enums\GlobFlags;
 /**
  * FileSystem
  * A quicky-little down and dirty file reading utility object with a sprinkle of awesomeness
- *
- * @property-read $fileHandle The handle of the current file
- * @property-read $fileName   The name of the current file
  */
-class FileSystem extends Seed implements \Kisma\Core\Interfaces\UtilityLike
+class FileSystem extends Seed implements UtilityLike
 {
 	//********************************************************************************
 	//* Members
@@ -30,11 +45,13 @@ class FileSystem extends Seed implements \Kisma\Core\Interfaces\UtilityLike
 	protected $_fileHandle = false;
 
 	//*************************************************************************
-	//* Public Methods
+	//* Methods
 	//*************************************************************************
 
 	/**
 	 * @param array|object $fileName
+	 *
+	 * @return \Kisma\Core\Utility\FileSystem
 	 */
 	public function __construct( $fileName )
 	{
@@ -157,10 +174,6 @@ class FileSystem extends Seed implements \Kisma\Core\Interfaces\UtilityLike
 		return $this->_fileHandle;
 	}
 
-	//********************************************************************************
-	//* Static Utility Methods
-	//********************************************************************************
-
 	/**
 	 * Builds a path from arguments and validates existence.
 	 *
@@ -251,8 +264,8 @@ class FileSystem extends Seed implements \Kisma\Core\Interfaces\UtilityLike
 				if ( fnmatch( $_mask, $_file ) )
 				{
 					if ( ( ( !( $flags & GLOB_ONLYDIR ) ) || is_dir( "$_path/$_file" ) )
-						&& ( ( !( $flags & GlobFlags::GLOB_NODIR ) ) || ( !is_dir( $_path . '/' . $_file ) ) )
-						&& ( ( !( $flags & GlobFlags::GLOB_NODOTS ) ) || ( !in_array( $_file, array( '.', '..' ) ) ) )
+						 && ( ( !( $flags & GlobFlags::GLOB_NODIR ) ) || ( !is_dir( $_path . '/' . $_file ) ) )
+						 && ( ( !( $flags & GlobFlags::GLOB_NODOTS ) ) || ( !in_array( $_file, array( '.', '..' ) ) ) )
 					)
 					{
 						$_glob[] = ( $flags & GlobFlags::GLOB_PATH ? $_path . '/' : '' ) . $_file . ( $flags & GLOB_MARK ? '/' : '' );
@@ -269,43 +282,5 @@ class FileSystem extends Seed implements \Kisma\Core\Interfaces\UtilityLike
 		}
 
 		return $_glob;
-	}
-
-	/**
-	 * @static
-	 *
-	 * @param array  $array
-	 * @param string $string
-	 * @param bool   $deep
-	 *
-	 * @return array
-	 */
-	public static function array_prepend( $array, $string, $deep = false )
-	{
-		if ( empty( $array ) || empty( $string ) )
-		{
-			return $array;
-		}
-
-		foreach ( $array as $key => $element )
-		{
-			if ( is_array( $element ) )
-			{
-				if ( $deep )
-				{
-					$array[$key] = self::array_prepend( $element, $string, $deep );
-				}
-				else
-				{
-					trigger_error( 'array_prepend: array element', E_USER_WARNING );
-				}
-			}
-			else
-			{
-				$array[$key] = $string . $element;
-			}
-		}
-
-		return $array;
 	}
 }

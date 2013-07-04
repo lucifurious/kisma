@@ -1,20 +1,22 @@
 <?php
 /**
- * @file
- *            Provides Inflector manipulation utilities
+ * This file is part of Kisma(tm).
  *
- * Kisma(tm) : PHP Fun-Size Framework (http://github.com/lucifurious/kisma/)
- * Copyright 2009-2011, Jerry Ablan, All Rights Reserved
+ * Kisma(tm) <https://github.com/kisma/kisma>
+ * Copyright 2009-2013 Jerry Ablan <jerryablan@gmail.com>
  *
- * @copyright Copyright (c) 2009-2011 Jerry Ablan
- * @license   http://github.com/lucifurious/kisma/blob/master/LICENSE
+ * Kisma(tm) is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- * @author    Jerry Ablan <kisma@pogostick.com>
- * @category  Utilities
- * @package   kisma.utility
- * @since     1.0.0
+ * Kisma(tm) is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * @ingroup   utilities
+ * You should have received a copy of the GNU General Public License
+ * along with Kisma(tm).  If not, see <http://www.gnu.org/licenses/>.
  */
 namespace Kisma\Core\Utility;
 
@@ -27,7 +29,7 @@ use Kisma\Core\Interfaces\UtilityLike;
 class Inflector implements UtilityLike
 {
 	//*************************************************************************
-	//* Public Methods
+	//* Methods
 	//*************************************************************************
 
 	/**
@@ -49,7 +51,8 @@ class Inflector implements UtilityLike
 		//	Split by forward slash, backslash, period, or space...
 		$_parts = preg_split( "/[. \/\\\\]+/", $item );
 
-		array_walk( $_parts,
+		array_walk(
+			$_parts,
 			function ( &$part )
 			{
 				//      Clean
@@ -232,8 +235,6 @@ class Inflector implements UtilityLike
 	 * @param string $words
 	 * @param string $convertDelimiter Set to the delimiter you'd like replaced with spaces before conversion
 	 *
-	 * @internal param bool $dotted If true, dots will be replaced with spaces before the UCing
-	 *
 	 * @return string
 	 */
 	public static function ucWordsBetter( $words, $convertDelimiter = null )
@@ -258,5 +259,4 @@ class Inflector implements UtilityLike
 
 		return trim( $_cleaned );
 	}
-
 }

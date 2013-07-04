@@ -1,17 +1,34 @@
 <?php
 /**
- * EventManager.php
+ * This file is part of Kisma(tm).
+ *
+ * Kisma(tm) <https://github.com/kisma/kisma>
+ * Copyright 2009-2013 Jerry Ablan <jerryablan@gmail.com>
+ *
+ * Kisma(tm) is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Kisma(tm) is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Kisma(tm).  If not, see <http://www.gnu.org/licenses/>.
  */
 namespace Kisma\Core\Utility;
 
 use Kisma\Core\Exceptions\InvalidEventHandlerException;
+use Kisma\Core\SeedUtility;
 use Kisma\Core\Utility\Log;
 
 /**
  * EventManager class
  * Utility class that provides event management
  */
-class EventManager extends \Kisma\Core\SeedUtility
+class EventManager extends SeedUtility
 {
 	//*************************************************************************
 	//* Constants
@@ -23,7 +40,7 @@ class EventManager extends \Kisma\Core\SeedUtility
 	const DefaultEventHandlerSignature = '/^_?on(.*)$/';
 
 	//*************************************************************************
-	//* Private Members
+	//* Members
 	//*************************************************************************
 
 	/**
@@ -36,7 +53,7 @@ class EventManager extends \Kisma\Core\SeedUtility
 	protected static $_lastEventId = 0;
 
 	//*************************************************************************
-	//* Public Methods
+	//* Methods
 	//*************************************************************************
 
 	/**
@@ -159,9 +176,9 @@ class EventManager extends \Kisma\Core\SeedUtility
 	}
 
 	/**
-	 * @param \Kisma\Core\Interfaces\SubscriberLike  $object
-	 * @param string                                 $tag
-	 * @param callable|null                          $listener
+	 * @param \Kisma\Core\Interfaces\SubscriberLike $object
+	 * @param string                                $tag
+	 * @param callable|null                         $listener
 	 */
 	public static function on( $object, $tag, $listener = null )
 	{
@@ -235,7 +252,7 @@ class EventManager extends \Kisma\Core\SeedUtility
 				Log::debug(
 					'-- "' . $object->getTag() . '" unsubscribed from "' . $_eventTag . '"',
 					array(
-						'tag' => $_subscriberId,
+						 'tag' => $_subscriberId,
 					)
 				);
 			}
@@ -310,7 +327,6 @@ class EventManager extends \Kisma\Core\SeedUtility
 						{
 							//	Call the method
 							$_result = call_user_func( $_closure, $_event );
-
 //							Log::debug(
 //								'-- "' . $publisher->getTag() . '" handler for "' . $_event->getEventTag() . '" called',
 //								array(
@@ -333,12 +349,12 @@ class EventManager extends \Kisma\Core\SeedUtility
 							//	Oops!
 							throw new InvalidEventHandlerException(
 								'Event "' .
-									( is_object( $_closure[0] )
-										?
-										get_class( $_closure[0] )
-										:
-										'<unknownClass>' ) .
-									'.' . $_eventTag . ' has an invalid listener subscribed to it.'
+								( is_object( $_closure[0] )
+									?
+									get_class( $_closure[0] )
+									:
+									'<unknownClass>' ) .
+								'.' . $_eventTag . ' has an invalid listener subscribed to it.'
 							);
 						}
 
@@ -387,10 +403,6 @@ class EventManager extends \Kisma\Core\SeedUtility
 		return hash( 'sha256', $event->getSource()->getId() . getmypid() . microtime( true ) ) . '.' . self::$_lastEventId++;
 	}
 
-	//*************************************************************************
-	//* Properties
-	//*************************************************************************
-
 	/**
 	 * @return array The map of events to listeners
 	 */
@@ -398,5 +410,4 @@ class EventManager extends \Kisma\Core\SeedUtility
 	{
 		return self::$_eventMap;
 	}
-
 }

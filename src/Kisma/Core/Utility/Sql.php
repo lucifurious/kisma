@@ -1,9 +1,26 @@
 <?php
 /**
- * Sql.php
+ * This file is part of Kisma(tm).
+ *
+ * Kisma(tm) <https://github.com/kisma/kisma>
+ * Copyright 2009-2013 Jerry Ablan <jerryablan@gmail.com>
+ *
+ * Kisma(tm) is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Kisma(tm) is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Kisma(tm).  If not, see <http://www.gnu.org/licenses/>.
  */
 namespace Kisma\Core\Utility;
 
+use Kisma\Core\SeedUtility;
 use Kisma\Core\Tools\DataReader;
 use Kisma\Core\Utility\Option;
 
@@ -11,7 +28,7 @@ use Kisma\Core\Utility\Option;
  * Sql
  * A mess o' sql goodies
  */
-class Sql extends \Kisma\Core\SeedUtility
+class Sql extends SeedUtility
 {
 	//*************************************************************************
 	//* Constants
@@ -27,7 +44,7 @@ class Sql extends \Kisma\Core\SeedUtility
 	const PgSql = 'pgsql:host=%%host_name%%';
 
 	//*************************************************************************
-	//* Private Members
+	//* Members
 	//*************************************************************************
 
 	/**
@@ -44,15 +61,15 @@ class Sql extends \Kisma\Core\SeedUtility
 	protected static $_connectionString = null;
 
 	//*************************************************************************
-	//* Public Methods
+	//* Methods
 	//*************************************************************************
 
 	/**
 	 * Creates and returns an optionally parameter-bound \PDOStatement object
 	 *
-	 * @param string           $sql
-	 * @param \PDO             $connection
-	 * @param int              $fetchMode Set to false to not touch fetch mode
+	 * @param string $sql
+	 * @param \PDO   $connection
+	 * @param int    $fetchMode Set to false to not touch fetch mode
 	 *
 	 * @return \PDOStatement
 	 */
@@ -74,10 +91,10 @@ class Sql extends \Kisma\Core\SeedUtility
 	/**
 	 * Creates and returns an optionally parameter-bound \PDOStatement object suitable for iteration
 	 *
-	 * @param string           $sql
-	 * @param array            $parameters
-	 * @param \PDO             $connection
-	 * @param int              $fetchMode Set to false to not touch fetch mode
+	 * @param string $sql
+	 * @param array  $parameters
+	 * @param \PDO   $connection
+	 * @param int    $fetchMode Set to false to not touch fetch mode
 	 *
 	 * @return \Kisma\Core\Tools\DataReader
 	 */
@@ -89,10 +106,10 @@ class Sql extends \Kisma\Core\SeedUtility
 	/**
 	 * Executes a SQL statement
 	 *
-	 * @param string  $sql
-	 * @param array   $parameters
-	 * @param \PDO    $connection
-	 * @param int     $fetchMode
+	 * @param string $sql
+	 * @param array  $parameters
+	 * @param \PDO   $connection
+	 * @param int    $fetchMode
 	 *
 	 * @return int The number of affected rows
 	 */
@@ -111,10 +128,10 @@ class Sql extends \Kisma\Core\SeedUtility
 	/**
 	 * Executes a SQL query
 	 *
-	 * @param string  $sql
-	 * @param array   $parameters
-	 * @param \PDO    $connection
-	 * @param int     $fetchMode
+	 * @param string $sql
+	 * @param array  $parameters
+	 * @param \PDO   $connection
+	 * @param int    $fetchMode
 	 *
 	 * @return null|array
 	 */
@@ -131,10 +148,10 @@ class Sql extends \Kisma\Core\SeedUtility
 	/**
 	 * Executes the given sql statement and returns all results
 	 *
-	 * @param string           $sql
-	 * @param array            $parameters
-	 * @param \PDO             $connection
-	 * @param int              $fetchMode
+	 * @param string $sql
+	 * @param array  $parameters
+	 * @param \PDO   $connection
+	 * @param int    $fetchMode
 	 *
 	 * @return array|bool
 	 */
@@ -151,12 +168,12 @@ class Sql extends \Kisma\Core\SeedUtility
 	/**
 	 * Returns the first column of the first row or null
 	 *
-	 * @param string           $sql
-	 * @param int              $columnNumber
-	 * @param array            $parameters
-	 * @param \PDO             $connection
+	 * @param string $sql
+	 * @param int    $columnNumber
+	 * @param array  $parameters
+	 * @param \PDO   $connection
 	 *
-	 * @param int              $fetchMode
+	 * @param int    $fetchMode
 	 *
 	 * @return mixed
 	 */
@@ -170,15 +187,11 @@ class Sql extends \Kisma\Core\SeedUtility
 		return $_reader->fetchColumn( $columnNumber );
 	}
 
-	//*************************************************************************
-	//* Private Methods
-	//*************************************************************************
-
 	/**
 	 * @static
 	 *
-	 * @param array            $parameters
-	 * @param \PDO             $connection
+	 * @param array $parameters
+	 * @param \PDO  $connection
 	 *
 	 * @throws \Kisma\Core\Exceptions\StorageException
 	 * @return \PDO
@@ -202,10 +215,6 @@ class Sql extends \Kisma\Core\SeedUtility
 
 		return $_db;
 	}
-
-	//*************************************************************************
-	//* [GS]etters
-	//*************************************************************************
 
 	/**
 	 * @param \PDO|null $connection
@@ -251,14 +260,14 @@ class Sql extends \Kisma\Core\SeedUtility
 				$password,
 				array_merge(
 					array(
-						\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
+						 \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
 					),
 					$pdoOptions
 				)
 			);
-
-			return self::$_connection;
 		}
+
+		return self::$_connection;
 	}
 
 	/**

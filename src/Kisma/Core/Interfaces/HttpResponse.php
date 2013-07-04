@@ -1,8 +1,25 @@
 <?php
 /**
- * HttpResponse.php
+ * This file is part of Kisma(tm).
+ *
+ * Kisma(tm) <https://github.com/kisma/kisma>
+ * Copyright 2009-2013 Jerry Ablan <jerryablan@gmail.com>
+ *
+ * Kisma(tm) is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Kisma(tm) is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Kisma(tm).  If not, see <http://www.gnu.org/licenses/>.
  */
 namespace Kisma\Core\Interfaces;
+
 /**
  * HttpResponse
  * An interface defining all of the currently known HTTP v1.1 response codes
@@ -10,12 +27,13 @@ namespace Kisma\Core\Interfaces;
 interface HttpResponse
 {
 	//*************************************************************************
-	//* Class Constants
+	//* Constants
 	//*************************************************************************
 
-	/**
-	 * Success/Status (2xx)
-	 *************************************************************************/
+	//.........................................................................
+	//. Success/Status (2xx)
+	//.........................................................................
+
 	/**
 	 * @var int
 	 */
@@ -45,9 +63,10 @@ interface HttpResponse
 	 */
 	const PartialContent = 206;
 
-	/**
-	 * Redirection (3xx)
-	 *************************************************************************/
+	//.........................................................................
+	//. Redirection (3xx)
+	//.........................................................................
+
 	/**
 	 * @var int
 	 */
@@ -77,9 +96,10 @@ interface HttpResponse
 	 */
 	const TemporaryRedirect = 307;
 
-	/**
-	 * Client Errors (4xx)
-	 *************************************************************************/
+	//.........................................................................
+	//. Client Errors (4xx)
+	//.........................................................................
+
 	/**
 	 * @var int
 	 */
@@ -153,9 +173,10 @@ interface HttpResponse
 	 */
 	const ExpectationFailed = 417;
 
-	/***
-	 * Server Errors (5xx)
-	 *************************************************************************/
+	//.........................................................................
+	//. Server Errors (5xx)
+	//.........................................................................
+
 	/**
 	 * @var int
 	 */
