@@ -73,10 +73,10 @@ class Option
 	 * Retrieves an option from the given array. $defaultValue is set and returned if $_key is not 'set'.
 	 * Optionally will unset option in array.
 	 *
-	 * @param array      $options
-	 * @param string     $key
-	 * @param mixed|null $defaultValue
-	 * @param boolean    $unsetValue
+	 * @param array|\ArrayAccess|object $options
+	 * @param string                    $key
+	 * @param mixed|null                $defaultValue
+	 * @param boolean                   $unsetValue
 	 *
 	 * @return mixed
 	 */
@@ -142,11 +142,11 @@ class Option
 	}
 
 	/**
-	 * @param array   $options
-	 * @param string  $key
-	 * @param string  $subKey
-	 * @param mixed   $defaultValue Only applies to target value
-	 * @param boolean $unsetValue   Only applies to target value
+	 * @param array|\ArrayAccess|object $options
+	 * @param string                    $key
+	 * @param string                    $subKey
+	 * @param mixed                     $defaultValue Only applies to target value
+	 * @param boolean                   $unsetValue   Only applies to target value
 	 *
 	 * @return mixed
 	 */
@@ -161,14 +161,14 @@ class Option
 	 *
 	 * Returns TRUE for "1", "true", "on", "yes" and "y". Returns FALSE otherwise.
 	 *
-	 * @param array      $options
-	 * @param string     $key
-	 * @param mixed|null $defaultValue
-	 * @param boolean    $unsetValue
+	 * @param array|\ArrayAccess|object $options
+	 * @param string                    $key
+	 * @param boolean                   $defaultValue Defaults to false
+	 * @param boolean                   $unsetValue
 	 *
 	 * @return mixed
 	 */
-	public static function &getBool( &$options = array(), $key, $defaultValue = null, $unsetValue = false )
+	public static function &getBool( &$options = array(), $key, $defaultValue = false, $unsetValue = false )
 	{
 		return Scalar::boolval( static::get( $options, $key, $defaultValue, $unsetValue ) );
 	}
@@ -213,9 +213,9 @@ class Option
 	/**
 	 * Sets an value in the given array at key.
 	 *
-	 * @param array|object $options
-	 * @param string|array $key Pass a single key or an array of KVPs
-	 * @param mixed|null   $value
+	 * @param array|\ArrayAccess|object $options
+	 * @param string|array              $key Pass a single key or an array of KVPs
+	 * @param mixed|null                $value
 	 *
 	 * @return array|string
 	 */
