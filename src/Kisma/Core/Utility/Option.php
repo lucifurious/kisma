@@ -156,6 +156,24 @@ class Option
 	}
 
 	/**
+	 * Retrieves a boolean option from the given array. $defaultValue is set and returned if $_key is not 'set'.
+	 * Optionally will unset option in array.
+	 *
+	 * Returns TRUE for "1", "true", "on", "yes" and "y". Returns FALSE otherwise.
+	 *
+	 * @param array      $options
+	 * @param string     $key
+	 * @param mixed|null $defaultValue
+	 * @param boolean    $unsetValue
+	 *
+	 * @return mixed
+	 */
+	public static function &getBool( &$options = array(), $key, $defaultValue = null, $unsetValue = false )
+	{
+		return Scalar::boolval( static::get( $options, $key, $defaultValue, $unsetValue ) );
+	}
+
+	/**
 	 * Adds a value to a property array
 	 *
 	 * @param array  $source

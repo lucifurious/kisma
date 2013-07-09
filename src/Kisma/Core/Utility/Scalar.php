@@ -78,12 +78,24 @@ class Scalar implements UtilityLike
 	 */
 	public static function boolval( $value )
 	{
-		if ( !function_exists( 'boolval' ) )
+		if ( \is_bool( $value ) )
 		{
-			return (bool)$value;
+			return $value;
 		}
 
-		return \boolval( $value );
+		$_value = \strtolower( (string)$value );
+
+		//	FILTER_VALIDATE_BOOLEAN doesn't catch 'Y' or 'N', so convert to full words...
+		if ( 'y' == $_value )
+		{
+			$_value = 'yes';
+		}
+		elseif ( 'n' == $_value )
+		{
+			$_value = 'no';
+		}
+
+		return \filter_var( $_value, FILTER_VALIDATE_BOOLEAN );
 	}
 
 	/**
