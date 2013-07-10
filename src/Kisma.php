@@ -96,7 +96,7 @@ class Kisma implements PublisherLike, \Kisma\Core\Interfaces\Events\Kisma, Kisma
 			\register_shutdown_function(
 				function ( $eventName = Kisma::Death )
 				{
-					static::__sleep();
+					\Kisma::__sleep();
 					EventManager::publish( null, $eventName );
 				}
 			);
