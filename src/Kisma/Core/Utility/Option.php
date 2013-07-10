@@ -80,7 +80,7 @@ class Option
 	 *
 	 * @return mixed
 	 */
-	public static function &get( &$options = array(), $key, $defaultValue = null, $unsetValue = false )
+	public static function get( &$options = array(), $key, $defaultValue = null, $unsetValue = false )
 	{
 		if ( is_array( $key ) )
 		{
@@ -168,7 +168,7 @@ class Option
 	 *
 	 * @return mixed
 	 */
-	public static function &getBool( &$options = array(), $key, $defaultValue = false, $unsetValue = false )
+	public static function getBool( &$options = array(), $key, $defaultValue = false, $unsetValue = false )
 	{
 		return Scalar::boolval( static::get( $options, $key, $defaultValue, $unsetValue ) );
 	}
