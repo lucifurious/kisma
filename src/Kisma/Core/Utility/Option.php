@@ -152,7 +152,9 @@ class Option
 	 */
 	public static function getDeep( &$options = array(), $key, $subKey, $defaultValue = null, $unsetValue = false )
 	{
-		return static::get( static::get( $options, $key, array() ), $subKey, $defaultValue, $unsetValue );
+		$_deep = static::get( $options, $key, array() );
+
+		return static::get( $_deep, $subKey, $defaultValue, $unsetValue );
 	}
 
 	/**
