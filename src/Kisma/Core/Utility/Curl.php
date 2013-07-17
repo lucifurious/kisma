@@ -98,7 +98,7 @@ class Curl extends HttpMethod
 	 */
 	public static function get( $url, $payload = array(), $curlOptions = array() )
 	{
-		return self::_httpRequest( self::Get, $url, $payload, $curlOptions );
+		return static::_httpRequest( static::Get, $url, $payload, $curlOptions );
 	}
 
 	/**
@@ -110,7 +110,7 @@ class Curl extends HttpMethod
 	 */
 	public static function put( $url, $payload = array(), $curlOptions = array() )
 	{
-		return self::_httpRequest( self::Put, $url, $payload, $curlOptions );
+		return static::_httpRequest( static::Put, $url, $payload, $curlOptions );
 	}
 
 	/**
@@ -122,7 +122,7 @@ class Curl extends HttpMethod
 	 */
 	public static function post( $url, $payload = array(), $curlOptions = array() )
 	{
-		return self::_httpRequest( self::Post, $url, $payload, $curlOptions );
+		return static::_httpRequest( static::Post, $url, $payload, $curlOptions );
 	}
 
 	/**
@@ -134,7 +134,7 @@ class Curl extends HttpMethod
 	 */
 	public static function delete( $url, $payload = array(), $curlOptions = array() )
 	{
-		return self::_httpRequest( self::Delete, $url, $payload, $curlOptions );
+		return static::_httpRequest( static::Delete, $url, $payload, $curlOptions );
 	}
 
 	/**
@@ -146,7 +146,7 @@ class Curl extends HttpMethod
 	 */
 	public static function head( $url, $payload = array(), $curlOptions = array() )
 	{
-		return self::_httpRequest( self::Head, $url, $payload, $curlOptions );
+		return static::_httpRequest( static::Head, $url, $payload, $curlOptions );
 	}
 
 	/**
@@ -158,7 +158,7 @@ class Curl extends HttpMethod
 	 */
 	public static function options( $url, $payload = array(), $curlOptions = array() )
 	{
-		return self::_httpRequest( self::Options, $url, $payload, $curlOptions );
+		return static::_httpRequest( static::Options, $url, $payload, $curlOptions );
 	}
 
 	/**
@@ -170,7 +170,7 @@ class Curl extends HttpMethod
 	 */
 	public static function copy( $url, $payload = array(), $curlOptions = array() )
 	{
-		return self::_httpRequest( self::Copy, $url, $payload, $curlOptions );
+		return static::_httpRequest( static::Copy, $url, $payload, $curlOptions );
 	}
 
 	/**
@@ -182,7 +182,7 @@ class Curl extends HttpMethod
 	 */
 	public static function merge( $url, $payload = array(), $curlOptions = array() )
 	{
-		return self::_httpRequest( static::Merge, $url, $payload, $curlOptions );
+		return static::_httpRequest( static::Merge, $url, $payload, $curlOptions );
 	}
 
 	/**
@@ -194,7 +194,7 @@ class Curl extends HttpMethod
 	 */
 	public static function patch( $url, $payload = array(), $curlOptions = array() )
 	{
-		return self::_httpRequest( self::Patch, $url, $payload, $curlOptions );
+		return static::_httpRequest( static::Patch, $url, $payload, $curlOptions );
 	}
 
 	/**
@@ -207,7 +207,7 @@ class Curl extends HttpMethod
 	 */
 	public static function request( $method, $url, $payload = array(), $curlOptions = array() )
 	{
-		return self::_httpRequest( $method, $url, $payload, $curlOptions );
+		return static::_httpRequest( $method, $url, $payload, $curlOptions );
 	}
 
 	/**
@@ -221,13 +221,13 @@ class Curl extends HttpMethod
 	 */
 	protected static function _httpRequest( $method = self::Get, $url, $payload = array(), $curlOptions = array() )
 	{
-		if ( !self::contains( $method ) )
+		if ( !static::contains( $method ) )
 		{
 			throw new \InvalidArgumentException( 'Invalid method "' . $method . '" specified.' );
 		}
 
 		//	Reset!
-		self::$_lastResponseHeaders = self::$_lastHttpCode = self::$_error = self::$_info = $_tmpFile = null;
+		static::$_lastResponseHeaders = static::$_lastHttpCode = static::$_error = static::$_info = $_tmpFile = null;
 
 		//	Build a curl request...
 		$_curl = curl_init( $url );
@@ -242,11 +242,11 @@ class Curl extends HttpMethod
 		);
 
 		//	Merge in the global options if any
-		if ( !empty( self::$_curlOptions ) )
+		if ( !empty( static::$_curlOptions ) )
 		{
 			$curlOptions = array_merge(
 				$curlOptions,
-				self::$_curlOptions
+				static::$_curlOptions
 			);
 		}
 
@@ -259,19 +259,19 @@ class Curl extends HttpMethod
 			}
 		}
 
-		if ( null !== self::$_userName || null !== self::$_password )
+		if ( null !== static::$_userName || null !== static::$_password )
 		{
 			$_curlOptions[CURLOPT_HTTPAUTH] = CURLAUTH_BASIC;
-			$_curlOptions[CURLOPT_USERPWD] = self::$_userName . ':' . self::$_password;
+			$_curlOptions[CURLOPT_USERPWD] = static::$_userName . ':' . static::$_password;
 		}
 
 		switch ( $method )
 		{
-			case self::Get:
+			case static::Get:
 				//	Do nothing, like the goggles...
 				break;
 
-			case self::Put:
+			case static::Put:
 				$_payload = json_encode( !empty( $payload ) ? $payload : array() );
 
 				$_tmpFile = tmpfile();
@@ -283,30 +283,34 @@ class Curl extends HttpMethod
 				$_curlOptions[CURLOPT_INFILESIZE] = mb_strlen( $_payload );
 				break;
 
-			case self::Post:
+			case static::Post:
 				$_curlOptions[CURLOPT_POST] = true;
 				$_curlOptions[CURLOPT_POSTFIELDS] = $payload;
 				break;
 
-			case self::Head:
+			case static::Head:
 				$_curlOptions[CURLOPT_NOBODY] = true;
 				break;
 
-			case self::Patch:
-				$_curlOptions[CURLOPT_CUSTOMREQUEST] = self::Patch;
+			case static::Patch:
+				$_curlOptions[CURLOPT_CUSTOMREQUEST] = static::Patch;
 				$_curlOptions[CURLOPT_POSTFIELDS] = $payload;
 				break;
 
-			case self::Delete:
-			case self::Options:
-			case self::Copy:
+			case static::Delete:
+				$_curlOptions[CURLOPT_CUSTOMREQUEST] = static::Merge;
+				$_curlOptions[CURLOPT_POSTFIELDS] = $payload;
+				break;
+
+			case static::Options:
+			case static::Copy:
 				$_curlOptions[CURLOPT_CUSTOMREQUEST] = $method;
 				break;
 		}
 
-		if ( null !== self::$_hostPort && !isset( $_curlOptions[CURLOPT_PORT] ) )
+		if ( null !== static::$_hostPort && !isset( $_curlOptions[CURLOPT_PORT] ) )
 		{
-			$_curlOptions[CURLOPT_PORT] = self::$_hostPort;
+			$_curlOptions[CURLOPT_PORT] = static::$_hostPort;
 		}
 
 		//	Set our collected options
@@ -315,19 +319,19 @@ class Curl extends HttpMethod
 		//	Make the call!
 		$_result = curl_exec( $_curl );
 
-		self::$_info = curl_getinfo( $_curl );
-		self::$_lastHttpCode = Option::get( self::$_info, 'http_code' );
-		self::$_responseHeaders = curl_getinfo( $_curl, CURLINFO_HEADER_OUT );
-		self::$_responseHeadersSize = curl_getinfo( $_curl, CURLINFO_HEADER_SIZE );
+		static::$_info = curl_getinfo( $_curl );
+		static::$_lastHttpCode = Option::get( static::$_info, 'http_code' );
+		static::$_responseHeaders = curl_getinfo( $_curl, CURLINFO_HEADER_OUT );
+		static::$_responseHeadersSize = curl_getinfo( $_curl, CURLINFO_HEADER_SIZE );
 
-		if ( self::$_debug )
+		if ( static::$_debug )
 		{
 			//	@todo Add debug output
 		}
 
 		if ( false === $_result )
 		{
-			self::$_error = array(
+			static::$_error = array(
 				'code'    => curl_errno( $_curl ),
 				'message' => curl_error( $_curl ),
 			);
@@ -385,11 +389,11 @@ class Curl extends HttpMethod
 			}
 
 			//	Attempt to auto-decode inbound JSON
-			if ( !empty( $_result ) && 'application/json' == Option::get( self::$_info, 'content_type' ) )
+			if ( !empty( $_result ) && 'application/json' == Option::get( static::$_info, 'content_type' ) )
 			{
 				try
 				{
-					if ( false !== ( $_json = @json_decode( $_result, self::$_decodeToArray ) ) )
+					if ( false !== ( $_json = @json_decode( $_result, static::$_decodeToArray ) ) )
 					{
 						$_result = $_json;
 					}
@@ -417,9 +421,9 @@ class Curl extends HttpMethod
 	 */
 	public static function getErrorAsString()
 	{
-		if ( !empty( self::$_error ) )
+		if ( !empty( static::$_error ) )
 		{
-			return self::$_error['message'] . ' (' . self::$_error['code'] . ')';
+			return static::$_error['message'] . ' (' . static::$_error['code'] . ')';
 		}
 
 		return null;
@@ -432,7 +436,7 @@ class Curl extends HttpMethod
 	 */
 	protected static function _setError( $error )
 	{
-		self::$_error = $error;
+		static::$_error = $error;
 	}
 
 	/**
@@ -440,7 +444,7 @@ class Curl extends HttpMethod
 	 */
 	public static function getError()
 	{
-		return self::$_error;
+		return static::$_error;
 	}
 
 	/**
@@ -450,7 +454,7 @@ class Curl extends HttpMethod
 	 */
 	public static function setHostPort( $hostPort )
 	{
-		self::$_hostPort = $hostPort;
+		static::$_hostPort = $hostPort;
 	}
 
 	/**
@@ -458,7 +462,7 @@ class Curl extends HttpMethod
 	 */
 	public static function getHostPort()
 	{
-		return self::$_hostPort;
+		return static::$_hostPort;
 	}
 
 	/**
@@ -468,7 +472,7 @@ class Curl extends HttpMethod
 	 */
 	protected static function _setInfo( $info )
 	{
-		self::$_info = $info;
+		static::$_info = $info;
 	}
 
 	/**
@@ -479,7 +483,7 @@ class Curl extends HttpMethod
 	 */
 	public static function getInfo( $key = null, $defaultValue = null )
 	{
-		return null === $key ? self::$_info : Option::get( self::$_info, $key, $defaultValue );
+		return null === $key ? static::$_info : Option::get( static::$_info, $key, $defaultValue );
 	}
 
 	/**
@@ -489,7 +493,7 @@ class Curl extends HttpMethod
 	 */
 	public static function setPassword( $password )
 	{
-		self::$_password = $password;
+		static::$_password = $password;
 	}
 
 	/**
@@ -497,7 +501,7 @@ class Curl extends HttpMethod
 	 */
 	public static function getPassword()
 	{
-		return self::$_password;
+		return static::$_password;
 	}
 
 	/**
@@ -507,7 +511,7 @@ class Curl extends HttpMethod
 	 */
 	public static function setUserName( $userName )
 	{
-		self::$_userName = $userName;
+		static::$_userName = $userName;
 	}
 
 	/**
@@ -515,7 +519,7 @@ class Curl extends HttpMethod
 	 */
 	public static function getUserName()
 	{
-		return self::$_userName;
+		return static::$_userName;
 	}
 
 	/**
@@ -525,7 +529,7 @@ class Curl extends HttpMethod
 	 */
 	public static function setCurlOptions( $curlOptions )
 	{
-		self::$_curlOptions = $curlOptions;
+		static::$_curlOptions = $curlOptions;
 	}
 
 	/**
@@ -533,7 +537,7 @@ class Curl extends HttpMethod
 	 */
 	public static function getCurlOptions()
 	{
-		return self::$_curlOptions;
+		return static::$_curlOptions;
 	}
 
 	/**
@@ -541,7 +545,7 @@ class Curl extends HttpMethod
 	 */
 	protected static function _setLastHttpCode( $lastHttpCode )
 	{
-		self::$_lastHttpCode = $lastHttpCode;
+		static::$_lastHttpCode = $lastHttpCode;
 	}
 
 	/**
@@ -549,7 +553,7 @@ class Curl extends HttpMethod
 	 */
 	public static function getLastHttpCode()
 	{
-		return self::$_lastHttpCode;
+		return static::$_lastHttpCode;
 	}
 
 	/**
@@ -557,7 +561,7 @@ class Curl extends HttpMethod
 	 */
 	public static function setDebug( $debug )
 	{
-		self::$_debug = $debug;
+		static::$_debug = $debug;
 	}
 
 	/**
@@ -565,7 +569,7 @@ class Curl extends HttpMethod
 	 */
 	public static function getDebug()
 	{
-		return self::$_debug;
+		return static::$_debug;
 	}
 
 	/**
@@ -573,7 +577,7 @@ class Curl extends HttpMethod
 	 */
 	public static function setAutoDecodeJson( $autoDecodeJson )
 	{
-		self::$_autoDecodeJson = $autoDecodeJson;
+		static::$_autoDecodeJson = $autoDecodeJson;
 	}
 
 	/**
@@ -581,7 +585,7 @@ class Curl extends HttpMethod
 	 */
 	public static function getAutoDecodeJson()
 	{
-		return self::$_autoDecodeJson;
+		return static::$_autoDecodeJson;
 	}
 
 	/**
@@ -589,7 +593,7 @@ class Curl extends HttpMethod
 	 */
 	public static function setDecodeToArray( $decodeToArray )
 	{
-		self::$_decodeToArray = $decodeToArray;
+		static::$_decodeToArray = $decodeToArray;
 	}
 
 	/**
@@ -597,7 +601,7 @@ class Curl extends HttpMethod
 	 */
 	public static function getDecodeToArray()
 	{
-		return self::$_decodeToArray;
+		return static::$_decodeToArray;
 	}
 
 	/**
@@ -605,6 +609,6 @@ class Curl extends HttpMethod
 	 */
 	public static function getLastResponseHeaders()
 	{
-		return self::$_lastResponseHeaders;
+		return static::$_lastResponseHeaders;
 	}
 }
