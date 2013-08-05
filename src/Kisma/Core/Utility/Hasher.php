@@ -38,8 +38,8 @@ class Hasher extends Seed implements UtilityLike, HashSeed, HashType
 	/**
 	 * @var array The various hash seeds used by this class
 	 */
-	protected static $_hashSeeds =
-		array(
+	protected static $_hashSeeds
+		= array(
 			self::All                         => array(
 				'a',
 				'b',
@@ -373,7 +373,7 @@ class Hasher extends Seed implements UtilityLike, HashSeed, HashType
 	 * @static
 	 * @return mixed
 	 */
-	public static function __invoke()
+	public function __invoke()
 	{
 		return call_user_func_array( array( get_called_class() . '::hash' ), func_get_args() );
 	}
@@ -431,15 +431,15 @@ class Hasher extends Seed implements UtilityLike, HashSeed, HashType
 	/**
 	 * Generic hashing method. Will hash any string or generate a random hash and hash that!
 	 *
-	 * @param string  $hashTarget   The value to hash..
-	 * @param int     $hashType     [optional] The type of hash to create. Can be {@see Hasher::MD5}, {@see Hash#SHA1},
-	 *                              or {@link Hash#CRC32}. Defaults to {@see Hasher::SHA1}.
-	 * @param integer $hashLength   [optional] The length of the hash to return. Only applies if <b>$hashType</b>
-	 *                              is not MD5, SH1,
-	 *                              or CRC32. . Defaults to 32.
-	 * @param boolean $rawOutput    [optional] If <b>$rawOutput</b> is true, then the hash digest is returned in
-	 *                              raw binary format instead of
-	 *                              ASCII.
+	 * @param string  $hashTarget    The value to hash..
+	 * @param int     $hashType      [optional] The type of hash to create. Can be {@see Hasher::MD5}, {@see Hash#SHA1},
+	 *                               or {@link Hash#CRC32}. Defaults to {@see Hasher::SHA1}.
+	 * @param integer $hashLength    [optional] The length of the hash to return. Only applies if <b>$hashType</b>
+	 *                               is not MD5, SH1,
+	 *                               or CRC32. . Defaults to 32.
+	 * @param boolean $rawOutput     [optional] If <b>$rawOutput</b> is true, then the hash digest is returned in
+	 *                               raw binary format instead of
+	 *                               ASCII.
 	 *
 	 * @return string
 	 */
@@ -480,21 +480,21 @@ class Hasher extends Seed implements UtilityLike, HashSeed, HashType
 	 */
 	public static function encryptString( $text, $salt, $urlEncode = false )
 	{
-		$_value =
-			trim(
-				\base64_encode(
-					\mcrypt_encrypt(
-						MCRYPT_RIJNDAEL_256,
-						sha1( $salt, true ),
-						$text,
-						MCRYPT_MODE_ECB,
-						\mcrypt_create_iv(
-							\mcrypt_get_iv_size( MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB ),
-							MCRYPT_RAND
-						)
+		$_value
+			= trim(
+			\base64_encode(
+				\mcrypt_encrypt(
+					MCRYPT_RIJNDAEL_256,
+					sha1( $salt, true ),
+					$text,
+					MCRYPT_MODE_ECB,
+					\mcrypt_create_iv(
+						\mcrypt_get_iv_size( MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB ),
+						MCRYPT_RAND
 					)
 				)
-			);
+			)
+		);
 
 		return $urlEncode ? urlencode( $_value ) : $_value;
 	}

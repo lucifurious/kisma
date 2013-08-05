@@ -40,7 +40,7 @@ class FilterInput implements UtilityLike
 	 *
 	 * @return mixed
 	 */
-	public static function __invoke()
+	public function __invoke()
 	{
 		return call_user_func_array( array( 'FilterInput::get' ), func_get_args() );
 	}
@@ -86,17 +86,17 @@ class FilterInput implements UtilityLike
 	 * The master function, performs all filters and gets. Gets around lack of INPUT_SESSION and INPUT_REQUEST
 	 * support.
 	 *
-	 * @param int|array      $type                    One of INPUT_GET, INPUT_POST, INPUT_COOKIE, INPUT_SERVER, INPUT_ENV,
-	 *                                                INPUT_SESSION and INPUT_REQUEST. You may also pass in an array and use this
-	 *                                                method to call filter_var with the value found in the array
-	 * @param string         $key                     The name of a variable to get.
-	 * @param mixed          $defaultValue            The default value if the key is not found
-	 * @param int            $filter                  The filter to use (see the manual page). Defaults to FILTER_DEFAULT.
-	 * @param int|array|null $filterOptions           Associative array of options or bitwise disjunction of flags. If
-	 *                                                filter accepts options,
-	 *                                                flags can be provided in "flags" field of array. For the "callback" filter,
-	 *                                                callback type should be passed. The callback must accept one argument,
-	 *                                                the value to be filtered, and return the value after filtering/sanitizing it.
+	 * @param int|array      $type                         One of INPUT_GET, INPUT_POST, INPUT_COOKIE, INPUT_SERVER, INPUT_ENV,
+	 *                                                     INPUT_SESSION and INPUT_REQUEST. You may also pass in an array and use this
+	 *                                                     method to call filter_var with the value found in the array
+	 * @param string         $key                          The name of a variable to get.
+	 * @param mixed          $defaultValue                 The default value if the key is not found
+	 * @param int            $filter                       The filter to use (see the manual page). Defaults to FILTER_DEFAULT.
+	 * @param int|array|null $filterOptions                Associative array of options or bitwise disjunction of flags. If
+	 *                                                     filter accepts options,
+	 *                                                     flags can be provided in "flags" field of array. For the "callback" filter,
+	 *                                                     callback type should be passed. The callback must accept one argument,
+	 *                                                     the value to be filtered, and return the value after filtering/sanitizing it.
 	 *
 	 * @throws \InvalidArgumentException
 	 * @return mixed
