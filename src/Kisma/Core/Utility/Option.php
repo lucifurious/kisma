@@ -227,25 +227,26 @@ class Option
 
 		foreach ( $_options as $_key => $_value )
 		{
-			$_originalKey = $_key;
-			$_key = static::_cleanKey( $_key );
+			$_cleanKey = static::_cleanKey( $_key );
 
 			if ( is_array( $options ) )
 			{
 				//	Check for the original key too
-				if ( !array_key_exists( $_key, $options ) && array_key_exists( $_originalKey, $options ) )
+				if ( !array_key_exists( $_key, $options ) && array_key_exists( $_cleanKey, $options ) )
 				{
-					$_key = $_originalKey;
+					$_key = $_cleanKey;
 				}
 
 				$options[$_key] = $_value;
+
+				continue;
 			}
 
 			if ( is_object( $options ) )
 			{
-				if ( !property_exists( $options, $_key ) && property_exists( $options, $_originalKey ) )
+				if ( !property_exists( $options, $_key ) && property_exists( $options, $_cleanKey ) )
 				{
-					$_key = $_originalKey;
+					$_key = $_cleanKey;
 				}
 
 				$options->{$_key} = $_value;
@@ -427,11 +428,11 @@ class Option
 	 * Converts key to a neutral format if not already...
 	 *
 	 * @param string $key
-	 * @param bool   $opposite If true, the key is switched back to it's neutral or non-neutral format
+	 * @param bool   $opposite If true, the key is switched back to it's neutral or deneutral format
 	 *
 	 * @return string
 	 */
-	protected static function _cleanKey( $key, $opposite = false )
+	protected static function _cleanKey( $key, $opposite = true )
 	{
 		if ( $key == ( $_cleaned = Inflector::tag( $key, true ) ) )
 		{
