@@ -427,14 +427,18 @@ class Option
 	 * Converts key to a neutral format if not already...
 	 *
 	 * @param string $key
+	 * @param bool   $opposite If true, the key is switched back to it's neutral or non-neutral format
 	 *
 	 * @return string
 	 */
-	protected static function _cleanKey( $key )
+	protected static function _cleanKey( $key, $opposite = false )
 	{
 		if ( $key == ( $_cleaned = Inflector::tag( $key, true ) ) )
 		{
-			return Inflector::deneutralize( $key, true );
+			if ( false !== $opposite )
+			{
+				return Inflector::deneutralize( $key, true );
+			}
 		}
 
 		return $_cleaned;
