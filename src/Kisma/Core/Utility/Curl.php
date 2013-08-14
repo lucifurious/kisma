@@ -624,13 +624,12 @@ class Curl extends HttpMethod
 		$_proto = Option::get( $_SERVER, 'HTTP_X_FORWARDED_PROTO', 'http' . ( Option::getBool( $_SERVER, 'HTTPS' ) ? 's' : null ) ) . '://';
 		$_host = Option::get( $_SERVER, 'HTTP_X_FORWARDED_HOST', Option::get( $_SERVER, 'HTTP_HOST', gethostname() ) );
 		$_parts = parse_url( $_proto . $_host . Option::get( $_SERVER, 'REQUEST_URI' ) );
-		$_query = null;
 
-		if ( isset( $_parts, $_parts['query'] ) && !empty( $_parts['query'] ) )
+		if ( null !== ( $_query = Option::get( $_parts, 'query' ) ) )
 		{
-			$_query = '?' . http_build_query( explode( '&', $_parts['query'] ) );
+			$_query = '?' . http_build_query( explode( '&', $_query ) );
 		}
 
-		return $_proto . $_parts['host'] . ( $_port != 80 ? ':' . $_port : null ) . $_parts['path'] . $_query;
+		return $_proto . $_host . ( $_port != 80 ? ':' . $_port : null ) . Option::get( $_parts, 'path' ) . $_query;
 	}
 }
