@@ -617,7 +617,7 @@ class Curl extends HttpMethod
 	 *
 	 * @return string
 	 */
-	public static function currentUrl()
+	public static function currentUrl( $includeQuery = true )
 	{
 		//	Are we SSL? Check for load balancer protocol as well...
 		$_port = Option::get( $_SERVER, 'HTTP_X_FORWARDED_PORT', Option::get( $_SERVER, 'SERVER_PORT', 80 ) );
@@ -630,6 +630,6 @@ class Curl extends HttpMethod
 			$_query = '?' . http_build_query( explode( '&', $_query ) );
 		}
 
-		return $_proto . $_host . ( $_port != 80 ? ':' . $_port : null ) . Option::get( $_parts, 'path' ) . $_query;
+		return $_proto . $_host . ( $_port != 80 ? ':' . $_port : null ) . Option::get( $_parts, 'path' ) . ( true === $includeQuery ? $_query : null );
 	}
 }
