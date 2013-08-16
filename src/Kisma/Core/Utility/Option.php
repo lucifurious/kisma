@@ -135,6 +135,18 @@ class Option
 
 				return $_newValue;
 			}
+			else if ( method_exists( $options, 'get' . $key ) )
+			{
+				$_getter = 'get' . Inflector::deneutralize( $key );
+				$_setter = 'set' . Inflector::deneutralize( $key );
+
+				$_newValue = $options->{$_getter}();
+
+				if ( false !== $unsetValue && method_exists( $options, $_setter ) )
+				{
+					$options->{$_setter}( null );
+				}
+			}
 		}
 
 		//	Return the default...
@@ -244,12 +256,23 @@ class Option
 
 			if ( is_object( $options ) )
 			{
-				if ( !property_exists( $options, $_key ) && property_exists( $options, $_cleanKey ) )
-				{
-					$_key = $_cleanKey;
-				}
+				$_setter = 'set' . Inflector::deneutralize( $_key );
 
-				$options->{$_key} = $_value;
+				//	Prefer setter, if one...
+				if ( method_exists( $options, $_setter ) )
+				{
+					$options->{$_setter}( $_value );
+				}
+				else
+				{
+					if ( !property_exists( $options, $_key ) && property_exists( $options, $_cleanKey ) )
+					{
+						$_key = $_cleanKey;
+					}
+
+					//	Set it verbatim
+					$options->{$_key} = $_value;
+				}
 			}
 		}
 	}
