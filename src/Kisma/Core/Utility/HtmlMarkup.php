@@ -68,7 +68,7 @@ class HtmlMarkup extends Markup
 	 */
 	public static function input( array $attributes = array(), $value = null )
 	{
-		return static::tag( 'input', $attributes, $value );
+		return static::tag( 'input', $attributes, $value, true, true );
 	}
 
 	/**
