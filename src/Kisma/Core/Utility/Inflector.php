@@ -98,7 +98,7 @@ class Inflector implements UtilityLike
 			),
 			'_',
 			false,
-			true
+			$isKey
 		);
 	}
 
