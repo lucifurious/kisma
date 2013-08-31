@@ -80,6 +80,27 @@ class Inflector implements UtilityLike
 	}
 
 	/**
+	 * Given a neutralized string, return it to suitable for framing
+	 *
+	 * @param string $item The string to frame
+	 *
+	 * @return string
+	 */
+	public static function display( $item )
+	{
+		return self::camelize(
+			str_replace(
+				array( '_', '.', '\\', '/' ),
+				' ',
+				$item
+			),
+			'_',
+			true,
+			false
+		);
+	}
+
+	/**
 	 * Given a string, return it to non-neutral format (delimited camel-case)
 	 *
 	 * @param string $item      The string to deneutralize

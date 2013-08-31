@@ -31,11 +31,12 @@ class SchemaFormBuilder implements UtilityLike
 {
 	/**
 	 * @param array|string $schema
+	 * @param bool         $returnHtml If true, HTML is returned, otherwise an array of fields
 	 *
-	 * @return string
 	 * @throws \InvalidArgumentException
+	 * @return string
 	 */
-	public static function create( $schema )
+	public static function create( $schema, $returnHtml = true )
 	{
 		$_schema = $schema;
 
@@ -44,23 +45,25 @@ class SchemaFormBuilder implements UtilityLike
 			throw new \InvalidArgumentException( 'You must provide a schema in either an array or a JSON string.' );
 		}
 
-		return static::_buildFormFields( $_schema );
+		return static::_buildFormFields( $_schema, $returnHtml );
 	}
 
 	/**
 	 * @param array $schema
+	 * @param bool  $returnHtml If true, HTML is returned, otherwise an array of fields
 	 *
 	 * @return string
 	 */
-	protected static function _buildFormFields( $schema )
+	protected static function _buildFormFields( $schema, $returnHtml = true )
 	{
 		$_form = null;
+		$_fields = array();
 
 		foreach ( $schema as $_field => $_settings )
 		{
 			$_tag = null;
 			$_value = Option::get( $_settings, 'value' );
-			$_label = Option::get( $_settings, 'label', $_field );
+			$_label = Option::get( $_settings, 'label', Inflector::deneutralize( $_field, true ) );
 			$_labelAttributes = Option::get( $_settings, 'label_attributes', array( 'for' => $_field ) );
 
 			$_attributes = array_merge(
@@ -77,17 +80,20 @@ class SchemaFormBuilder implements UtilityLike
 			}
 
 			$_form .= HtmlMarkup::label( $_labelAttributes, $_label );
+			$_fields[] = array( 'label' => array( 'value' => $_label, 'attributes' => $_labelAttributes ) );
 
 			switch ( $_settings['type'] )
 			{
 				case 'text':
 					$_form .= HtmlMarkup::tag( 'textarea', $_attributes, $_value ) . PHP_EOL;
+					$_fields[] = array( 'textarea' => array( 'value' => $_value, 'attributes' => $_attributes ) );
 					break;
 
 				case 'select':
 					$_attributes['value'] = $_value ? : Option::get( $_settings, 'default' );
 					$_attributes['size'] = Option::get( $_settings, 'size', 1 );
 					$_form .= HtmlMarkup::select( Option::get( $_settings, 'options', array() ), $_attributes ) . PHP_EOL;
+					$_fields[] = array( 'select' => array( 'type' => 'text', 'options' => Option::get( $_settings, 'options', array() ), 'attributes' => $_attributes ) );
 					break;
 
 				default:
@@ -95,11 +101,12 @@ class SchemaFormBuilder implements UtilityLike
 					$_attributes['value'] = $_value ? : Option::get( $_settings, 'default' );
 					$_attributes['maxlength'] = Option::get( $_settings, 'length' );
 					$_form .= HtmlMarkup::tag( 'input', $_attributes, null, true, true ) . PHP_EOL;
+					$_fields[] = array( 'input' => array( 'attributes' => $_attributes ) );
 					break;
 			}
 		}
 
-		return $_form;
+		return $returnHtml ? $_form : $_fields;
 	}
 }
 
