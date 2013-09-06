@@ -36,8 +36,7 @@ class Bootstrap extends HtmlMarkup implements FormTypes, UtilityLike
 	/**
 	 * @var string The block pattern for forms
 	 */
-	const VerticalGroupPattern
-		= <<<HTML
+	const VerticalGroupPattern = <<<HTML
 	%%__LABEL__%%
 	%%__INPUT__%%
 	%%__HELP_BLOCK__%%
@@ -46,8 +45,7 @@ HTML;
 	/**
 	 * @var string The block pattern for horizontal forms
 	 */
-	const HorizontalGroupPattern
-		= <<<HTML
+	const HorizontalGroupPattern = <<<HTML
 <div class="control-group">
 	%%__LABEL__%%
 	<div class="controls">
@@ -117,8 +115,7 @@ HTML;
 			$_tokenName = \Yii::app()->getRequest()->csrfTokenName;
 			$_tokenValue = \Yii::app()->getRequest()->csrfToken;
 
-			$this->_csrf
-				= <<<HTML
+			$this->_csrf = <<<HTML
 <input type="hidden" name="{$_tokenName}" value="{$_tokenValue}" />
 HTML;
 		}
@@ -148,12 +145,17 @@ HTML;
 
 			foreach ( $_fields as $_name => $_field )
 			{
+				if ( false !== Option::get( $_field, 'private', false ) )
+				{
+					continue;
+				}
+
 				if ( !isset( $_field['id'] ) )
 				{
 					$_field['id'] = $_name;
 				}
 
-				$_contents = Option::get( $_field, 'contents', null, true );
+				$_contents = ( !isset( $_field['contents'] ) && isset( $_field['value'] ) ? $_field['value'] : Option::get( $_field, 'contents', null, true ) );
 
 				$_html .= $this->field(
 					Option::get( $_field, 'type', 'text', true ),
@@ -186,7 +188,17 @@ HTML;
 
 		$this->cleanNames( $attributes );
 
-		$_labelText = $_label = Option::get( $attributes, 'label', null, true );
+		$_label = Option::get( $attributes, 'label', null, true );
+
+		if ( is_array( $_label ) )
+		{
+			$_labelAttributes = Option::get( $_label, 'attributes', array() );
+			$_labelText = Option::get( $_label, 'value', array() );
+		}
+		else
+		{
+			$_labelText = $_label;
+		}
 
 		//	Add .control-label for the class to labels
 		if ( static::Horizontal == $this->_formType )
@@ -267,6 +279,8 @@ HTML;
 				break;
 
 			case 'textarea':
+				$attributes['class'] = static::addValue( Option::get( $attributes, 'class' ), 'input-xxlarge' );
+
 				$_input = static::wrap(
 					$_type,
 					$contents,
@@ -300,8 +314,7 @@ HTML;
 			$_input = '<div class="' . $_inputWrap . '">' . $_inputPrepend . $_input . $_inputAppend . '</div>';
 		}
 
-		$_html
-			= <<<HTML
+		$_html = <<<HTML
 {$_blockStart}{$_inputStart}{$_label}{$_input}{$_labelEnd}{$_hint}{$_inputEnd}{$_blockEnd}
 HTML;
 
@@ -325,6 +338,24 @@ HTML;
 		if ( !isset( $attributes['value'] ) )
 		{
 			$attributes['value'] = $contents;
+		}
+
+		if ( null !== ( $_length = Option::get( $attributes, 'maxlength' ) ) )
+		{
+			$_class = Option::get( $attributes, 'class' );
+
+			if ( $_length <= 64 )
+			{
+				$attributes['class'] = static::addValue( $_class, 'input-large' );
+			}
+			else if ( $_length < 128 )
+			{
+				$attributes['class'] = static::addValue( $_class, 'input-xlarge' );
+			}
+			else if ( $_length >= 128 )
+			{
+				$attributes['class'] = static::addValue( $_class, 'input-xxlarge' );
+			}
 		}
 
 		$attributes = Convert::kvpToString( $attributes );
@@ -368,8 +399,7 @@ HTML;
 			);
 		}
 
-		$_html
-			= <<<HTML
+		$_html = <<<HTML
 <form {$_html}>
 	{$legend}
 	{$this->_contents}
@@ -447,8 +477,7 @@ HTML;
 
 				$_class = $_menuItem['active'] ? 'active' : 'inactive';
 
-				$_liTags
-					.= <<<HTML
+				$_liTags .= <<<HTML
 <li class="{$_class}"><a href="{$_menuItem['href']}">{$_icon}{$_linkName}</a></li>
 HTML;
 			}
@@ -456,15 +485,10 @@ HTML;
 
 		if ( !empty( $logoutUrl ) )
 		{
-			$_token
-				= ( class_exists( '\\Yii', false ) && false !== \Yii::app()->getRequest()->enableCsrfValidation )
-				?
-				'?token=' . \Yii::app()->getRequest()->getCsrfToken()
-				:
-				null;
+			$_token =
+				( class_exists( '\\Yii', false ) && false !== \Yii::app()->getRequest()->enableCsrfValidation ) ? '?token=' . \Yii::app()->getRequest()->getCsrfToken() : null;
 
-			$_liTags
-				.= <<<HTML
+			$_liTags .= <<<HTML
 <li class="pull-right"><a href="{$logoutUrl}{$_token}">Logout</a></li>
 HTML;
 		}

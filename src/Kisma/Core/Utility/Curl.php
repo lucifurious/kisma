@@ -615,9 +615,12 @@ class Curl extends HttpMethod
 	/**
 	 * Returns the validated URL that has been called to get here
 	 *
+	 * @param bool $includeQuery If true, query string is included
+	 * @param bool $includePath  If true, the uri path is included
+	 *
 	 * @return string
 	 */
-	public static function currentUrl( $includeQuery = true )
+	public static function currentUrl( $includeQuery = true, $includePath = true )
 	{
 		//	Are we SSL? Check for load balancer protocol as well...
 		$_port = Option::get( $_SERVER, 'HTTP_X_FORWARDED_PORT', Option::get( $_SERVER, 'SERVER_PORT', 80 ) );
@@ -630,6 +633,15 @@ class Curl extends HttpMethod
 			$_query = '?' . http_build_query( explode( '&', $_query ) );
 		}
 
-		return $_proto . $_host . ( $_port != 80 ? ':' . $_port : null ) . Option::get( $_parts, 'path' ) . ( true === $includeQuery ? $_query : null );
+		if ( ( $_proto == 'https://' && $_port == 443 ) || ( $_proto == 'http://' && $_port == 80 ) )
+		{
+			$_port = null;
+		}
+		else
+		{
+			$_port .= ':';
+		}
+
+		return $_proto . $_host . $_port . ( true === $includePath ? Option::get( $_parts, 'path' ) : null ) . ( true === $includeQuery ? $_query : null );
 	}
 }

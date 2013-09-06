@@ -198,6 +198,36 @@ class Inflector implements UtilityLike
 	}
 
 	/**
+	 * This function is NOT smart. It only looks for an 's' at the end of a word. You have been warned.
+	 *
+	 * @param string $word
+	 * @param bool   $returnSingular If true, the word without the "s" is returned.
+	 *
+	 * @return bool|string
+	 */
+	public static function isPlural( $word, $returnSingular = false )
+	{
+		if ( empty( $word ) || !is_string( $word ) || strlen( $word ) < 3 )
+		{
+			return false;
+		}
+
+		$_temp = $word[strlen( $word ) - 1];
+
+		if ( 's' == $_temp && $word == static::pluralize( substr( $word, 0, -1 ) ) )
+		{
+			if ( false !== $returnSingular )
+			{
+				return substr( $word, 0, -1 );
+			}
+
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
 	 * Converts a word to its plural form. Totally swiped from Yii
 	 *
 	 * @param string $name the word to be pluralized
@@ -206,8 +236,7 @@ class Inflector implements UtilityLike
 	 */
 	public static function pluralize( $name )
 	{
-		static $_rules
-		= array(
+		static $_rules = array(
 			'/(quiz)$/i'                     => '1zes',
 			'/^(ox)$/i'                      => '1en',
 			'/([m|l])ouse$/i'                => '1ice',

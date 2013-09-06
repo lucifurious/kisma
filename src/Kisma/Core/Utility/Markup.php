@@ -252,7 +252,7 @@ class Markup
 			}
 		}
 
-		return is_array( $source ) ? $_values : implode( $delimiter, $_values );
+		return is_array( $source ) ? $_values : ltrim( implode( $delimiter, $_values ), $delimiter );
 	}
 
 	/**

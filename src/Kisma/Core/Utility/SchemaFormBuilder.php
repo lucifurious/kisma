@@ -61,9 +61,14 @@ class SchemaFormBuilder implements UtilityLike
 
 		foreach ( $schema as $_field => $_settings )
 		{
-			$_tag = null;
-			$_value = Option::get( $_settings, 'value' );
-			$_label = Option::get( $_settings, 'label', Inflector::deneutralize( $_field, true ) );
+			//	No private fields are ever rendered
+			if ( false !== Option::get( $_settings, 'private', false ) )
+			{
+				continue;
+			}
+
+			$_value = Option::get( $_settings, 'value', Option::get( $_settings, 'default' ) );
+			$_label = Option::get( $_settings, 'label', Inflector::display( $_field ) );
 			$_labelAttributes = Option::get( $_settings, 'label_attributes', array( 'for' => $_field ) );
 
 			$_attributes = array_merge(
@@ -80,28 +85,45 @@ class SchemaFormBuilder implements UtilityLike
 			}
 
 			$_form .= HtmlMarkup::label( $_labelAttributes, $_label );
-			$_fields[] = array( 'label' => array( 'value' => $_label, 'attributes' => $_labelAttributes ) );
+			$_fields[$_field]['label'] = array( 'value' => $_label, 'attributes' => $_labelAttributes );
 
 			switch ( $_settings['type'] )
 			{
 				case 'text':
 					$_form .= HtmlMarkup::tag( 'textarea', $_attributes, $_value ) . PHP_EOL;
-					$_fields[] = array( 'textarea' => array( 'value' => $_value, 'attributes' => $_attributes ) );
+
+					$_fields[$_field] = array_merge(
+						$_fields[$_field],
+						array( 'type' => 'textarea', 'contents' => $_value ),
+						$_attributes
+					);
 					break;
 
 				case 'select':
-					$_attributes['value'] = $_value ? : Option::get( $_settings, 'default' );
 					$_attributes['size'] = Option::get( $_settings, 'size', 1 );
-					$_form .= HtmlMarkup::select( Option::get( $_settings, 'options', array() ), $_attributes ) . PHP_EOL;
-					$_fields[] = array( 'select' => array( 'type' => 'text', 'options' => Option::get( $_settings, 'options', array() ), 'attributes' => $_attributes ) );
+					$_attributes['value'] = $_value;
+
+					$_fields[$_field] = array_merge(
+						$_fields[$_field],
+						array( 'type' => 'select', 'data' => Option::get( $_settings, 'options', array() ) ),
+						$_attributes
+					);
+
+					$_form .= HtmlMarkup::select( $_fields[$_field]['data'], $_attributes ) . PHP_EOL;
 					break;
 
 				default:
-					$_attributes['type'] = 'text';
-					$_attributes['value'] = $_value ? : Option::get( $_settings, 'default' );
 					$_attributes['maxlength'] = Option::get( $_settings, 'length' );
+					$_attributes['value'] = $_value;
+					$_attributes['type'] = 'text';
+
+					$_fields[$_field] = array_merge(
+						$_fields[$_field],
+						array( 'type' => 'input', 'value' => $_value ),
+						$_attributes
+					);
+
 					$_form .= HtmlMarkup::tag( 'input', $_attributes, null, true, true ) . PHP_EOL;
-					$_fields[] = array( 'input' => array( 'attributes' => $_attributes ) );
 					break;
 			}
 		}

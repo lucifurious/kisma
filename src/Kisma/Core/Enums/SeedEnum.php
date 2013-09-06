@@ -86,7 +86,7 @@ abstract class SeedEnum
 	{
 		static $_key = null;
 
-		return $_key ? : \Kisma\Core\Utility\Inflector::tag( $class ? : \get_called_class(), true );
+		return $_key ? : Utility\Inflector::tag( $class ? : \get_called_class(), true );
 	}
 
 	/**
@@ -106,20 +106,32 @@ abstract class SeedEnum
 	 * Returns a hash of the called class's constants. Caches for speed
 	 * (class cache hash, say that ten times fast!).
 	 *
-	 * @param bool   $flipped If true, the array is flipped before return
-	 * @param string $class   Used internally to cache constants
+	 * @param bool   $flipped  If true, the array is flipped before return
+	 * @param string $class    Used internally to cache constants
+	 * @param bool   $listData If true, the constant names themselves are cleaned up for display purposes.
 	 *
 	 * @return array
 	 */
-	public static function getDefinedConstants( $flipped = false, $class = null )
+	public static function getDefinedConstants( $flipped = false, $class = null, $listData = false )
 	{
 		$_key = static::introspect( $class, array(), false );
 
-		return
-			false === $flipped ?
-				static::$_constants[$_key]
-				:
-				array_flip( static::$_constants[$_key] );
+		$_constants = false === $flipped ? static::$_constants[$_key] : array_flip( static::$_constants[$_key] );
+
+		if ( false === $listData )
+		{
+			return $_constants;
+		}
+
+		$_temp = array();
+
+		foreach ( static::$_constants[$_key] as $_constant => $_value )
+		{
+			$_temp[$_value] = Utility\Inflector::display( Utility\Inflector::neutralize( $_constant ) );
+			unset( $_value, $_option );
+		}
+
+		return $_temp;
 	}
 
 	/**
@@ -186,7 +198,6 @@ abstract class SeedEnum
 			throw new \InvalidArgumentException( 'The constant "' . $constant . '" is not defined.' );
 		}
 
-		return
-			false === $returnValue ? $_has : $_constants[$constant];
+		return false === $returnValue ? $_has : $_constants[$constant];
 	}
 }
