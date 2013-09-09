@@ -91,6 +91,10 @@ HTML;
 	 * @var string CSRF token junk
 	 */
 	protected $_csrf = null;
+	/**
+	 * @var string
+	 */
+	protected $_removePrefix = null;
 
 	//*************************************************************************
 	//* Methods
@@ -136,7 +140,7 @@ HTML;
 
 		foreach ( $fields as $_section => $_fields )
 		{
-			$_html .= static::wrap( 'legend', $_section );
+			$_inner = static::wrap( 'legend', $_section );
 
 			if ( !is_array( $_fields ) )
 			{
@@ -157,12 +161,14 @@ HTML;
 
 				$_contents = ( !isset( $_field['contents'] ) && isset( $_field['value'] ) ? $_field['value'] : Option::get( $_field, 'contents', null, true ) );
 
-				$_html .= $this->field(
+				$_inner .= $this->field(
 					Option::get( $_field, 'type', 'text', true ),
 					$_field,
 					$_contents
 				);
 			}
+
+			$_html .= static::wrap( 'fieldset', $_inner );
 		}
 
 		echo $_html;
@@ -421,11 +427,16 @@ HTML;
 	public function cleanNames( array &$attributes = array() )
 	{
 		$_id = Option::get( $attributes, 'id' );
-		$_name = Option::get( $attributes, 'name', $_id );
+		$_name = $_savedName = Option::get( $attributes, 'name', $_id );
 
 		if ( null === $_id )
 		{
 			$_id = $_name;
+		}
+
+		if ( !empty( $this->_removePrefix ) )
+		{
+			$_savedName = str_replace( $this->_removePrefix, null, $_id );
 		}
 
 		if ( null === ( $_label = Option::get( $attributes, 'label', null, true ) ) )
@@ -434,7 +445,7 @@ HTML;
 				str_replace(
 					array( '_text', '_nbr', '_ind', '_blob', '_' ),
 					array( null, null, null, null, ' ' ),
-					$_name
+					$_savedName
 				)
 			);
 		}
@@ -634,5 +645,25 @@ HTML;
 	public function getFormData()
 	{
 		return $this->_formData;
+	}
+
+	/**
+	 * @param string $removePrefix
+	 *
+	 * @return Bootstrap
+	 */
+	public function setRemovePrefix( $removePrefix )
+	{
+		$this->_removePrefix = $removePrefix;
+
+		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getRemovePrefix()
+	{
+		return $this->_removePrefix;
 	}
 }
