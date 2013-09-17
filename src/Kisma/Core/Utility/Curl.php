@@ -389,7 +389,7 @@ class Curl extends HttpMethod
 			}
 
 			//	Attempt to auto-decode inbound JSON
-			if ( !empty( $_result ) && 'application/json' == Option::get( static::$_info, 'content_type' ) )
+			if ( !empty( $_result ) && false !== stripos( Option::get( static::$_info, 'content_type' ), 'application/json', 0 ) )
 			{
 				try
 				{
