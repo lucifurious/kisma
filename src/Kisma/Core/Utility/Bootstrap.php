@@ -126,6 +126,22 @@ HTML;
 	}
 
 	/**
+	 * @param string $label
+	 * @param array  $labelAttributes
+	 * @param array  $inputAttributes
+	 * @param string $wrapper
+	 *
+	 * @return string
+	 */
+	public static function textFormGroup( $label = null, $labelAttributes = array(), $inputAttributes = array(), $wrapper = null )
+	{
+		$_label = static::label( array_merge( $labelAttributes, array( 'class' => 'form-label' ) ), $label );
+		$_input = static::text( array_merge( $inputAttributes, array( 'class' => 'form-control' ) ), null, $wrapper );
+
+		return static::div( array( 'class' => 'form-group' ), $_label . $_input );
+	}
+
+	/**
 	 * @param array  $fields
 	 * @param string $prefix
 	 */
@@ -162,9 +178,9 @@ HTML;
 				$_contents = ( !isset( $_field['contents'] ) && isset( $_field['value'] ) ? $_field['value'] : Option::get( $_field, 'contents', null, true ) );
 
 				$_inner .= $this->field(
-					Option::get( $_field, 'type', 'text', true ),
-					$_field,
-					$_contents
+								Option::get( $_field, 'type', 'text', true ),
+								$_field,
+								$_contents
 				);
 			}
 
@@ -260,18 +276,18 @@ HTML;
 		{
 			//	Replace contents with the x-editable link...
 			$contents = static::tag(
-				'a',
-				array(
-					 'class'               => 'x-editable',
-					 'href'                => '#',
-					 'id'                  => $_id,
-					 'data-type'           => $_type,
-					 'data-pk'             => Option::get( $this->_attributes, 'x-editable-pk', Option::get( $this->_formData, 'id' ) ),
-					 'data-url'            => Option::get( $this->_attributes, 'x-editable-url', Option::get( $attributes, 'x-editable-url', null, true ) ),
-					 'data-original-title' => $_labelText,
-					 'data-inputclass'     => Option::get( $attributes, 'class', 'input-xlarge' ),
-				),
-				$contents
+							  'a',
+							  array(
+								   'class'               => 'x-editable',
+								   'href'                => '#',
+								   'id'                  => $_id,
+								   'data-type'           => $_type,
+								   'data-pk'             => Option::get( $this->_attributes, 'x-editable-pk', Option::get( $this->_formData, 'id' ) ),
+								   'data-url'            => Option::get( $this->_attributes, 'x-editable-url', Option::get( $attributes, 'x-editable-url', null, true ) ),
+								   'data-original-title' => $_labelText,
+								   'data-inputclass'     => Option::get( $attributes, 'class', 'input-xlarge' ),
+							  ),
+							  $contents
 			);
 
 			//	New type of just HTML...
@@ -288,9 +304,9 @@ HTML;
 				$attributes['class'] = static::addValue( Option::get( $attributes, 'class' ), 'input-xxlarge' );
 
 				$_input = static::wrap(
-					$_type,
-					$contents,
-					$attributes
+								$_type,
+								$contents,
+								$attributes
 				);
 				break;
 
@@ -301,8 +317,8 @@ HTML;
 				}
 
 				$_input = static::select(
-					Option::get( $attributes, 'data', array(), true ),
-					$attributes
+								Option::get( $attributes, 'data', array(), true ),
+								$attributes
 				);
 				break;
 
@@ -398,10 +414,10 @@ HTML;
 		if ( !empty( $submitButton ) )
 		{
 			$_submit = $this->button(
-				'submit',
-				array(
-					 'text' => ( true === $submitButton ? 'Submit' : $submitButton ),
-				)
+							'submit',
+							array(
+								 'text' => ( true === $submitButton ? 'Submit' : $submitButton ),
+							)
 			);
 		}
 
