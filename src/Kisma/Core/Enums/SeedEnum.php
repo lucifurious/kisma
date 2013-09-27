@@ -103,10 +103,10 @@ abstract class SeedEnum
 	}
 
 	/**
-	 * Returns a hash of the called class's constants. Caches for speed
+	 * Returns a hash of the called class's constants ( CONSTANT_NAME => value ). Caches for speed
 	 * (class cache hash, say that ten times fast!).
 	 *
-	 * @param bool   $flipped  If true, the array is flipped before return
+	 * @param bool   $flipped  If true, the array is flipped before return ( value => CONSTANT_NAME )
 	 * @param string $class    Used internally to cache constants
 	 * @param bool   $listData If true, the constant names themselves are cleaned up for display purposes.
 	 *
@@ -190,7 +190,7 @@ abstract class SeedEnum
 	 */
 	public static function defines( $constant, $returnValue = false )
 	{
-		$_constants = static::getDefinedConstants( true );
+		$_constants = static::getDefinedConstants();
 		$_has = isset( $_constants[$constant] );
 
 		if ( false === $_has && false !== $returnValue )
