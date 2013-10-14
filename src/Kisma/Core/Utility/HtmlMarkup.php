@@ -64,11 +64,20 @@ class HtmlMarkup extends Markup
 	 * @param array  $attributes
 	 * @param string $value
 	 *
+	 * @param null   $wrapper
+	 *
 	 * @return string
 	 */
-	public static function input( array $attributes = array(), $value = null )
+	public static function input( array $attributes = array(), $value = null, $wrapper = null )
 	{
-		return static::tag( 'input', $attributes, $value, true, true );
+		$_html = static::tag( 'input', $attributes, $value, true, true );
+
+		if ( null !== $wrapper )
+		{
+			$_html = static::div( array( 'class' => $wrapper ), $_html );
+		}
+
+		return $_html;
 	}
 
 	/**
@@ -79,7 +88,7 @@ class HtmlMarkup extends Markup
 	 *
 	 * @return string
 	 */
-	public static function select( array $options = array(), array $attributes = array() )
+	public static function select( array $options = array(), array $attributes = array(), $wrapper = null )
 	{
 		$_html = null;
 		$_selectedValue = Option::get( $attributes, 'value', null, true );
@@ -97,7 +106,7 @@ class HtmlMarkup extends Markup
 			unset( $_attributes );
 		}
 
-		return static::tag( 'select', $attributes, $_html );
+		return static::tag( 'select', $attributes, $_html, $wrapper );
 	}
 
 	/**
@@ -205,6 +214,8 @@ class HtmlMarkup extends Markup
 	 * @param array  $attributes
 	 * @param string $value
 	 *
+	 * @param null   $wrapper
+	 *
 	 * @return string
 	 */
 	public static function legend( array $attributes = array(), $value = null )
@@ -216,6 +227,8 @@ class HtmlMarkup extends Markup
 	 * Makes an <IMG> tag
 	 *
 	 * @param array $attributes
+	 *
+	 * @param null  $wrapper
 	 *
 	 * @return string
 	 */
@@ -242,49 +255,57 @@ class HtmlMarkup extends Markup
 
 	/**
 	 * Makes a <INPUT type="TEXT"> tag
+	 * @return string
 	 */
-	public static function text( array $attributes = array(), $value = null )
+	public static function text( array $attributes = array(), $value = null, $wrapper = null )
 	{
 		$attributes['type'] = 'text';
 
-		return static::input( $attributes, $value );
+		return static::input( $attributes, $value, $wrapper );
 	}
 
 	/**
 	 * Makes a <INPUT type="HIDDEN"> tag
 	 */
-	public static function hidden( array $attributes = array(), $value = null )
+	public static function hidden( array $attributes = array(), $value = null, $wrapper = null )
 	{
 		$attributes['type'] = 'hidden';
 
-		return static::input( $attributes, $value );
+		return static::input( $attributes, $value, $wrapper );
 	}
 
 	/**
 	 * Makes a <INPUT type="PASSWORD"> tag
 	 */
-	public static function password( array $attributes = array(), $value = null )
+	public static function password( array $attributes = array(), $value = null, $wrapper = null )
 	{
 		$attributes['type'] = 'password';
 
-		return static::input( $attributes, $value );
+		return static::input( $attributes, $value, $wrapper );
 	}
 
 	/**
 	 * Makes a <INPUT type="FILE"> tag
 	 */
-	public static function file( array $attributes = array(), $value = null )
+	public static function file( array $attributes = array(), $value = null, $wrapper = null )
 	{
 		$attributes['type'] = 'file';
 
-		return static::input( $attributes, $value );
+		return static::input( $attributes, $value, $wrapper );
 	}
 
 	/**
 	 * Makes a <TEXTAREA> tag
 	 */
-	public static function textarea( array $attributes = array(), $value = null )
+	public static function textarea( array $attributes = array(), $value = null, $wrapper = null )
 	{
-		return static::tag( 'textarea', $attributes, $value );
+		$_html = static::tag( 'textarea', $attributes, $value );
+
+		if ( null !== $wrapper )
+		{
+			$_html = static::div( array( 'class' => $wrapper ), $_html );
+		}
+
+		return $_html;
 	}
 }
