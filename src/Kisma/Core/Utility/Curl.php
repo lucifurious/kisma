@@ -297,10 +297,10 @@ class Curl extends HttpMethod
 				$_curlOptions[CURLOPT_POSTFIELDS] = $payload;
 				break;
 
+			case static::Merge:
 			case static::Delete:
-				$_curlOptions[CURLOPT_CUSTOMREQUEST] = static::Merge;
 				$_curlOptions[CURLOPT_POSTFIELDS] = $payload;
-				break;
+			//	Fall through...
 
 			case static::Options:
 			case static::Copy:
@@ -401,7 +401,14 @@ class Curl extends HttpMethod
 				catch ( \Exception $_ex )
 				{
 					//	Ignored
+					Log::debug( 'Exception decoding result: ' . $_ex->getMessage() );
 				}
+			}
+
+			//	Don't confuse error with empty data...
+			if ( false === $_result )
+			{
+				$_result = null;
 			}
 		}
 
