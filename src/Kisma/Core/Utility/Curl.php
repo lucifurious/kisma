@@ -654,6 +654,11 @@ class Curl extends HttpMethod
 			$_port .= ':';
 		}
 
+		if ( false !== strpos( $_host, ':' ) )
+		{	
+			$_port = null;
+		}
+
 		return $_proto . $_host . $_port . ( true === $includePath ? Option::get( $_parts, 'path' ) : null ) . ( true === $includeQuery ? $_query : null );
 	}
 }
