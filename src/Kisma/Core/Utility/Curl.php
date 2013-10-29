@@ -299,8 +299,8 @@ class Curl extends HttpMethod
 
 			case static::Merge:
 			case static::Delete:
+				/** Merge && Delete have payloads, but they and Options/Copy need CURLOPT_CUSTOMREQUEST set so just fall through... */
 				$_curlOptions[CURLOPT_POSTFIELDS] = $payload;
-			//	Fall through...
 
 			case static::Options:
 			case static::Copy:
@@ -635,7 +635,7 @@ class Curl extends HttpMethod
 		$_host = Option::get( $_SERVER, 'HTTP_X_FORWARDED_HOST', Option::get( $_SERVER, 'HTTP_HOST', gethostname() ) );
 		$_parts = parse_url( $_proto . $_host . Option::get( $_SERVER, 'REQUEST_URI' ) );
 
-		if ( empty( $_port ) || null !== ( $_parsePort = Option::get( $_parts, 'port' ) ) )
+		if ( ( empty( $_port ) || !is_numeric( $_port ) ) && null !== ( $_parsePort = Option::get( $_parts, 'port' ) ) )
 		{
 			$_port = @intval( $_parsePort );
 		}
@@ -655,10 +655,19 @@ class Curl extends HttpMethod
 		}
 
 		if ( false !== strpos( $_host, ':' ) )
-		{	
+		{
 			$_port = null;
 		}
 
-		return $_proto . $_host . $_port . ( true === $includePath ? Option::get( $_parts, 'path' ) : null ) . ( true === $includeQuery ? $_query : null );
+		$_currentUrl = $_proto . $_host . $_port .
+					   ( true === $includePath ? Option::get( $_parts, 'path' ) : null ) .
+					   ( true === $includeQuery ? $_query : null );
+
+		if ( \Kisma::get( 'debug.curl.current_url' ) )
+		{
+			Log::debug( 'Parsed current URL to be: ' . $_currentUrl, $_parts );
+		}
+
+		return $_currentUrl;
 	}
 }
