@@ -630,7 +630,7 @@ class Curl extends HttpMethod
 	public static function currentUrl( $includeQuery = true, $includePath = true )
 	{
 		//	Are we SSL? Check for load balancer protocol as well...
-		$_port = Option::get( $_SERVER, 'HTTP_X_FORWARDED_PORT', Option::get( $_SERVER, 'SERVER_PORT', 80 ) );
+		$_port = intval( Option::get( $_SERVER, 'HTTP_X_FORWARDED_PORT', Option::get( $_SERVER, 'SERVER_PORT', 80 ) ) );
 		$_proto = Option::get( $_SERVER, 'HTTP_X_FORWARDED_PROTO', 'http' . ( Option::getBool( $_SERVER, 'HTTPS' ) ? 's' : null ) ) . '://';
 		$_host = Option::get( $_SERVER, 'HTTP_X_FORWARDED_HOST', Option::get( $_SERVER, 'HTTP_HOST', gethostname() ) );
 		$_parts = parse_url( $_proto . $_host . Option::get( $_SERVER, 'REQUEST_URI' ) );
@@ -645,13 +645,13 @@ class Curl extends HttpMethod
 			$_query = '?' . http_build_query( explode( '&', $_query ) );
 		}
 
-		if ( ( $_proto == 'https://' && $_port == 443 ) || ( $_proto == 'http://' && $_port == 80 ) )
+		if ( false !== strpos( $_host, ':' ) || ( $_proto == 'https://' && $_port == 443 ) || ( $_proto == 'http://' && $_port == 80 ) )
 		{
 			$_port = null;
 		}
 		else
 		{
-			$_port .= ':';
+			$_port = ':' . $_port;
 		}
 
 		if ( false !== strpos( $_host, ':' ) )

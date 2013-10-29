@@ -414,7 +414,11 @@ class Hasher extends Seed implements UtilityLike, HashSeed, HashType
 	 */
 	public static function generateUnique( $seed = null, $length = 32, $algorithm = 'sha512' )
 	{
-		if ( file_exists( '/dev/urandom' ) )
+		if ( !empty( $seed ) )
+		{
+			$_entropy = $seed;
+		}
+		elseif ( file_exists( '/dev/urandom' ) )
 		{
 			$_fp = @fopen( '/dev/urandom', 'rb' );
 			$_entropy = fread( $_fp, $length * 10 );
