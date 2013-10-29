@@ -635,6 +635,11 @@ class Curl extends HttpMethod
 		$_host = Option::get( $_SERVER, 'HTTP_X_FORWARDED_HOST', Option::get( $_SERVER, 'HTTP_HOST', gethostname() ) );
 		$_parts = parse_url( $_proto . $_host . Option::get( $_SERVER, 'REQUEST_URI' ) );
 
+		if ( empty( $_port ) || null !== ( $_parsePort = Option::get( $_parts, 'port' ) ) )
+		{
+			$_port = @intval( $_parsePort );
+		}
+
 		if ( null !== ( $_query = Option::get( $_parts, 'query' ) ) )
 		{
 			$_query = '?' . http_build_query( explode( '&', $_query ) );
