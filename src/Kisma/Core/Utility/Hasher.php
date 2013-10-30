@@ -31,6 +31,15 @@ use Kisma\Core\Seed;
  */
 class Hasher extends Seed implements UtilityLike, HashSeed, HashType
 {
+	//*************************************************************************
+	//	Constants
+	//*************************************************************************
+
+	/**
+	 * @var int The maximum default length for unique hash generations
+	 */
+	const MAX_UNIQUE_HASH_LENGTH = 256;
+
 	//********************************************************************************
 	//* Private Members
 	//********************************************************************************
@@ -375,7 +384,7 @@ class Hasher extends Seed implements UtilityLike, HashSeed, HashType
 	 */
 	public function __invoke()
 	{
-		return call_user_func_array( array( get_called_class() . '::hash' ), func_get_args() );
+		return call_user_func_array( array(get_called_class() . '::hash'), func_get_args() );
 	}
 
 	/**
@@ -404,7 +413,7 @@ class Hasher extends Seed implements UtilityLike, HashSeed, HashType
 	}
 
 	/**
-	 * Generates a unique hash code
+	 * Generates a pseudo-random/mostly-unique hash code. If you need guaranteed uniqueness, write yourself a GUID method
 	 *
 	 * @param string $seed
 	 * @param int    $length
@@ -412,24 +421,73 @@ class Hasher extends Seed implements UtilityLike, HashSeed, HashType
 	 *
 	 * @return string
 	 */
-	public static function generateUnique( $seed = null, $length = 32, $algorithm = 'sha512' )
+	public static function generateUnique( $seed = null, $length = null, $algorithm = 'sha512' )
 	{
+		static $_debug = null;
+
+		$length = $length ? : static::MAX_UNIQUE_HASH_LENGTH;
+
+		if ( null === $_debug )
+		{
+			$_tag = Inflector::neutralize( __METHOD__ );
+			$_debug = \Kisma::get( 'debug.' . $_tag, false );
+			Log::debug( 'Debug flag in "' . 'debug.' . $_tag . '": ' . ( $_debug ? 'ON' : 'OFF' ) );
+		}
+
+		if ( $_debug )
+		{
+			Log::debug(
+				' >> Hasher::generateUnique() called',
+				array(
+					 'seed'      => ( null === $seed ? 'NULL' : $seed ),
+					 'length'    => $length,
+					 'algorithm' => $algorithm
+				)
+			);
+		}
+
+		$_entropy = @( microtime( true ) * mt_rand() ) ? : microtime( true ) . mt_rand();
+
+		//	If a seed is passed, use that as our base....
 		if ( !empty( $seed ) )
 		{
 			$_entropy = $seed;
-		}
-		elseif ( file_exists( '/dev/urandom' ) )
-		{
-			$_fp = @fopen( '/dev/urandom', 'rb' );
-			$_entropy = fread( $_fp, $length * 10 );
-			@fclose( $_fp );
-		}
-		else
-		{
-			$_entropy = md5( time() . mt_rand() . time() );
+
+			if ( $_debug )
+			{
+				Log::debug( '  Using passed - in $seed value of "' . $_entropy . '"' );
+			}
+			//	Otherwise generate a random string of data 10 times the size of $length
+			elseif ( file_exists( '/dev/urandom' ) )
+			{
+				$_fp = @fopen( '/dev/urandom', 'rb' );
+				$_entropy = fread( $_fp, $length * 10 ? : 1024 );
+				@fclose( $_fp );
+				Log::debug( '  Generated seed using "/dev/urandom": ' . $_entropy );
+			}
 		}
 
-		return substr( hash( $algorithm, $_entropy ), 0, $length );
+		$_seed = hash( $algorithm, $_entropy . microtime( true ) );
+
+		if ( $_debug )
+		{
+			Log::debug(
+				'  Random-ish seed created: ' . $_seed,
+				array('seed' => ( null === $seed ? 'NULL' : $seed ), 'length' => ( $length ? : 1024 ), 'algorithm' => $algorithm)
+			);
+		}
+
+		$_hash = substr( hash( $algorithm, $_seed ), 0, $length );
+
+		if ( $_debug )
+		{
+			Log::debug(
+				'<< Hash generated: ' . $_hash
+			);
+		}
+
+		return $_hash;
+
 	}
 
 	/**
@@ -447,7 +505,8 @@ class Hasher extends Seed implements UtilityLike, HashSeed, HashType
 	 *
 	 * @return string
 	 */
-	public static function hash( $hashTarget = null, $hashType = self::SHA1, $hashLength = 32, $rawOutput = false )
+	public
+	static function hash( $hashTarget = null, $hashType = self::SHA1, $hashLength = 32, $rawOutput = false )
 	{
 		$_value = ( null === $hashTarget ) ? self::generate( $hashLength ) : $hashTarget;
 
