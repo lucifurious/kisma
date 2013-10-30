@@ -299,8 +299,8 @@ class Curl extends HttpMethod
 
 			case static::Merge:
 			case static::Delete:
+				/** Merge && Delete have payloads, but they and Options/Copy need CURLOPT_CUSTOMREQUEST set so just fall through... */
 				$_curlOptions[CURLOPT_POSTFIELDS] = $payload;
-			//	Fall through...
 
 			case static::Options:
 			case static::Copy:
@@ -630,25 +630,44 @@ class Curl extends HttpMethod
 	public static function currentUrl( $includeQuery = true, $includePath = true )
 	{
 		//	Are we SSL? Check for load balancer protocol as well...
-		$_port = Option::get( $_SERVER, 'HTTP_X_FORWARDED_PORT', Option::get( $_SERVER, 'SERVER_PORT', 80 ) );
+		$_port = intval( Option::get( $_SERVER, 'HTTP_X_FORWARDED_PORT', Option::get( $_SERVER, 'SERVER_PORT', 80 ) ) );
 		$_proto = Option::get( $_SERVER, 'HTTP_X_FORWARDED_PROTO', 'http' . ( Option::getBool( $_SERVER, 'HTTPS' ) ? 's' : null ) ) . '://';
 		$_host = Option::get( $_SERVER, 'HTTP_X_FORWARDED_HOST', Option::get( $_SERVER, 'HTTP_HOST', gethostname() ) );
 		$_parts = parse_url( $_proto . $_host . Option::get( $_SERVER, 'REQUEST_URI' ) );
+
+		if ( ( empty( $_port ) || !is_numeric( $_port ) ) && null !== ( $_parsePort = Option::get( $_parts, 'port' ) ) )
+		{
+			$_port = @intval( $_parsePort );
+		}
 
 		if ( null !== ( $_query = Option::get( $_parts, 'query' ) ) )
 		{
 			$_query = '?' . http_build_query( explode( '&', $_query ) );
 		}
 
-		if ( ( $_proto == 'https://' && $_port == 443 ) || ( $_proto == 'http://' && $_port == 80 ) )
+		if ( false !== strpos( $_host, ':' ) || ( $_proto == 'https://' && $_port == 443 ) || ( $_proto == 'http://' && $_port == 80 ) )
 		{
 			$_port = null;
 		}
 		else
 		{
-			$_port .= ':';
+			$_port = ':' . $_port;
 		}
 
-		return $_proto . $_host . $_port . ( true === $includePath ? Option::get( $_parts, 'path' ) : null ) . ( true === $includeQuery ? $_query : null );
+		if ( false !== strpos( $_host, ':' ) )
+		{
+			$_port = null;
+		}
+
+		$_currentUrl = $_proto . $_host . $_port .
+					   ( true === $includePath ? Option::get( $_parts, 'path' ) : null ) .
+					   ( true === $includeQuery ? $_query : null );
+
+		if ( \Kisma::get( 'debug.curl.current_url' ) )
+		{
+			Log::debug( 'Parsed current URL to be: ' . $_currentUrl, $_parts );
+		}
+
+		return $_currentUrl;
 	}
 }
