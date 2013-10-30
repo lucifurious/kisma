@@ -38,7 +38,7 @@ class Hasher extends Seed implements UtilityLike, HashSeed, HashType
 	/**
 	 * @var int The maximum default length for unique hash generations
 	 */
-	const MAX_UNIQUE_HASH_LENGTH = 256;
+	const MAX_HASH_LENGTH = 128;
 
 	//********************************************************************************
 	//* Private Members
@@ -395,7 +395,7 @@ class Hasher extends Seed implements UtilityLike, HashSeed, HashType
 	 *
 	 * @return string
 	 */
-	public static function generate( $hashLength = 20, $hashSeed = self::All )
+	public static function generate( $hashLength = self::MAX_HASH_LENGTH, $hashSeed = self::All )
 	{
 		//	If we ain't got what you're looking for, return simple md5 hash...
 		if ( !isset( self::$_hashSeeds, self::$_hashSeeds[$hashSeed] ) || !is_array( self::$_hashSeeds[$hashSeed] ) )
@@ -421,11 +421,9 @@ class Hasher extends Seed implements UtilityLike, HashSeed, HashType
 	 *
 	 * @return string
 	 */
-	public static function generateUnique( $seed = null, $length = null, $algorithm = 'sha512' )
+	public static function generateUnique( $seed = null, $length = self::MAX_HASH_LENGTH, $algorithm = 'sha512' )
 	{
 		static $_debug = null;
-
-		$length = $length ? : static::MAX_UNIQUE_HASH_LENGTH;
 
 		if ( null === $_debug )
 		{
@@ -461,7 +459,7 @@ class Hasher extends Seed implements UtilityLike, HashSeed, HashType
 			elseif ( file_exists( '/dev/urandom' ) )
 			{
 				$_fp = @fopen( '/dev/urandom', 'rb' );
-				$_entropy = fread( $_fp, $length * 10 ? : 1024 );
+				$_entropy = fread( $_fp, $length * 10 );
 				@fclose( $_fp );
 				Log::debug( '  Generated seed using "/dev/urandom": ' . $_entropy );
 			}
@@ -473,7 +471,7 @@ class Hasher extends Seed implements UtilityLike, HashSeed, HashType
 		{
 			Log::debug(
 				'  Random-ish seed created: ' . $_seed,
-				array('seed' => ( null === $seed ? 'NULL' : $seed ), 'length' => ( $length ? : 1024 ), 'algorithm' => $algorithm)
+				array('seed' => ( null === $seed ? 'NULL' : $seed ), 'length' => $length, 'algorithm' => $algorithm)
 			);
 		}
 
@@ -498,15 +496,14 @@ class Hasher extends Seed implements UtilityLike, HashSeed, HashType
 	 *                               or {@link Hash#CRC32}. Defaults to {@see Hasher::SHA1}.
 	 * @param integer $hashLength    [optional] The length of the hash to return. Only applies if <b>$hashType</b>
 	 *                               is not MD5, SH1,
-	 *                               or CRC32. . Defaults to 32.
+	 *                               or CRC32. . Defaults to static::MAX_HASH_LENGTH.
 	 * @param boolean $rawOutput     [optional] If <b>$rawOutput</b> is true, then the hash digest is returned in
 	 *                               raw binary format instead of
 	 *                               ASCII.
 	 *
 	 * @return string
 	 */
-	public
-	static function hash( $hashTarget = null, $hashType = self::SHA1, $hashLength = 32, $rawOutput = false )
+	public static function hash( $hashTarget = null, $hashType = self::SHA1, $hashLength = self::MAX_HASH_LENGTH, $rawOutput = false )
 	{
 		$_value = ( null === $hashTarget ) ? self::generate( $hashLength ) : $hashTarget;
 
@@ -562,8 +559,7 @@ class Hasher extends Seed implements UtilityLike, HashSeed, HashType
 		return $urlEncode ? urlencode( $_value ) : $_value;
 	}
 
-	/**
-	 * Simple string decryption using the $salt as a key
+	/**     * Simple string decryption using the $salt as a key
 	 *
 	 * @param string  $text
 	 * @param string  $salt
