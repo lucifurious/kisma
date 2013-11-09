@@ -670,4 +670,25 @@ class Curl extends HttpMethod
 
 		return $_currentUrl;
 	}
+
+	/**
+	 * Builds an URL, properly appending the payload as the query string.
+	 *
+	 * @param string $url           The target URL
+	 * @param array  $payload       The query string data. May be an array or object containing properties. The array form may be a simple one-dimensional
+	 *                              structure, or an array of arrays (who in turn may contain other arrays).
+	 * @param string $numericPrefix If numeric indices are used in the base array and this parameter is provided, it will be prepended to the numeric index for
+	 *                              elements in the base array only.
+	 *                              This is meant to allow for legal variable names when the data is decoded by PHP or another CGI application later on.
+	 * @param string $argSeparator  Character to use to separate arguments. Defaults to '&'
+	 * @param int    $encodingType  If encodingType is PHP_QUERY_RFC1738 (the default), then encoding is as application/x-www-form-urlencoded, spaces will be
+	 *                              encoded with plus (+) signs
+	 *                              If encodingType is PHP_QUERY_RFC3986, spaces will be encoded with %20
+	 *
+	 * @return string an URL-encoded string
+	 */
+	public static function buildUrl( $url, $payload = array(), $numericPrefix = null, $argSeparator = null, $encodingType = PHP_QUERY_RFC1738 )
+	{
+		return $url . ( false === strpos( $url, '?' ) ? '?' : '&' ) . \http_build_query( $payload, $numericPrefix, $argSeparator, $encodingType );
+	}
 }
