@@ -631,9 +631,9 @@ class Curl extends HttpMethod
 	{
 		//	Are we SSL? Check for load balancer protocol as well...
 		$_port = intval( Option::get( $_SERVER, 'HTTP_X_FORWARDED_PORT', Option::get( $_SERVER, 'SERVER_PORT', 80 ) ) );
-		$_proto = Option::get( $_SERVER, 'HTTP_X_FORWARDED_PROTO', 'http' . ( Option::getBool( $_SERVER, 'HTTPS' ) ? 's' : null ) ) . '://';
+		$_protocol = Option::get( $_SERVER, 'HTTP_X_FORWARDED_PROTO', 'http' . ( Option::getBool( $_SERVER, 'HTTPS' ) ? 's' : null ) ) . '://';
 		$_host = Option::get( $_SERVER, 'HTTP_X_FORWARDED_HOST', Option::get( $_SERVER, 'HTTP_HOST', gethostname() ) );
-		$_parts = parse_url( $_proto . $_host . Option::get( $_SERVER, 'REQUEST_URI' ) );
+		$_parts = parse_url( $_protocol . $_host . Option::get( $_SERVER, 'REQUEST_URI' ) );
 
 		if ( ( empty( $_port ) || !is_numeric( $_port ) ) && null !== ( $_parsePort = Option::get( $_parts, 'port' ) ) )
 		{
@@ -645,7 +645,7 @@ class Curl extends HttpMethod
 			$_query = '?' . http_build_query( explode( '&', $_query ) );
 		}
 
-		if ( false !== strpos( $_host, ':' ) || ( $_proto == 'https://' && $_port == 443 ) || ( $_proto == 'http://' && $_port == 80 ) )
+		if ( false !== strpos( $_host, ':' ) || ( $_protocol == 'https://' && $_port == 443 ) || ( $_protocol == 'http://' && $_port == 80 ) )
 		{
 			$_port = null;
 		}
@@ -659,7 +659,7 @@ class Curl extends HttpMethod
 			$_port = null;
 		}
 
-		$_currentUrl = $_proto . $_host . $_port .
+		$_currentUrl = $_protocol . $_host . $_port .
 					   ( true === $includePath ? Option::get( $_parts, 'path' ) : null ) .
 					   ( true === $includeQuery ? $_query : null );
 
@@ -687,8 +687,10 @@ class Curl extends HttpMethod
 	 *
 	 * @return string an URL-encoded string
 	 */
-	public static function buildUrl( $url, $payload = array(), $numericPrefix = null, $argSeparator = null, $encodingType = PHP_QUERY_RFC1738 )
+	public static function buildUrl( $url, $payload = array(), $numericPrefix = null, $argSeparator = '&', $encodingType = PHP_QUERY_RFC1738 )
 	{
-		return $url . ( false === strpos( $url, '?' ) ? '?' : '&' ) . \http_build_query( $payload, $numericPrefix, $argSeparator, $encodingType );
+		$_query = \http_build_query( $payload, $numericPrefix, $argSeparator, $encodingType );
+
+		return $url . ( false === strpos( $url, '?' ) ? '?' : '&' ) . $_query;
 	}
 }
