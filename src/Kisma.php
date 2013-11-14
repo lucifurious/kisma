@@ -46,7 +46,7 @@ class Kisma implements PublisherLike, \Kisma\Core\Interfaces\Events\Kisma, Kisma
 	/**
 	 * @var string The current version
 	 */
-	const KismaVersion = '0.1.1';
+	const KismaVersion = '0.2.4';
 
 	//*************************************************************************
 	//* Members
