@@ -1,11 +1,11 @@
 <?php
-require_once  dirname( __DIR__ ) . '/vendor/autoload.php';
+require_once dirname( __DIR__ ) . '/vendor/autoload.php';
 
 class KismaTest extends \Kisma\Core\TestCase
 {
 	public function testCallStatic()
 	{
-		$this->assertEquals( 'App', \Kisma::getName() );
+		$this->assertEquals( 'App', \Kisma::get( 'app.name' ) );
 	}
 
 	/**
@@ -31,7 +31,7 @@ class KismaTest extends \Kisma\Core\TestCase
 	 */
 	public function testGetBasePath()
 	{
-		$this->assertTrue( dirname( __DIR__ ) . '/src' == \Kisma::getBasePath() );
+		$this->assertTrue( dirname( __DIR__ ) . '/src' == \Kisma::get( 'app.base_path' ) );
 	}
 
 	/**
