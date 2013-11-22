@@ -123,6 +123,27 @@ class ParsingLineReader extends LineReader
 	}
 
 	/**
+	 * @param string $line
+	 *
+	 * @throws \Kisma\Core\Exceptions\FileSystemException
+	 * @return array|bool
+	 */
+	protected function _parseLine( $line )
+	{
+		$_result = str_getcsv(
+			$line,
+			$this->_separator,
+			$this->_enclosure,
+			EscapeStyle::SLASHED == $this->_escapeStyle
+				? '\\'
+				:
+				EscapeStyle::DOUBLED == $this->_escapeStyle ? '"' : ''
+		);
+
+		return $_result;
+	}
+
+	/**
 	 * @param array $keys
 	 */
 	public function setKeys( $keys )
@@ -244,153 +265,4 @@ class ParsingLineReader extends LineReader
 		return $this->_separator;
 	}
 
-	/**
-	 * @param string $line
-	 *
-	 * @throws \Kisma\Core\Exceptions\FileSystemException
-	 * @return array|bool
-	 */
-	protected function _parseLine( $line )
-	{
-		if ( empty( $this->_enclosure ) )
-		{
-			$_result = $this->_parseNone( $line );
-		}
-		else
-		{
-			switch ( $this->_escapeStyle )
-			{
-				case EscapeStyle::DOUBLED:
-					$_result = $this->_parseDoubled( $line );
-					break;
-
-				case EscapeStyle::SLASHED:
-					$_result = $this->_parseSlashed( $line );
-					break;
-
-				case EscapeStyle::NONE:
-					$_result = $this->_parseNonEscaped( $line );
-					break;
-				default:
-					$_result = $this->_parseNone( $line );
-					break;
-			}
-		}
-
-		return $_result;
-	}
-
-	/**
-	 * @param string $line
-	 * @param string $regex
-	 *
-	 * @throws \Kisma\Core\Exceptions\FileSystemException
-	 * @return array|bool
-	 */
-	protected function _parsePattern( $line, $regex )
-	{
-		$regex = str_replace( '#', '\\#', $regex );
-		$_wrap = preg_quote( $this->_enclosure, '#' );
-		$_sep = preg_quote( $this->_separator, '#' );
-		$_regexp = '#^(?:' . $regex . ',)*' . $regex . '(?:\\r\\n|\\n)$#s';
-		$_regexp = str_replace( array( '"', ',' ), array( $_wrap, $_sep ), $_regexp );
-
-		if ( false === ( $_result = preg_match( $_regexp, $line ) ) )
-		{
-			throw new FileSystemException( 'Pattern matching error while processing line' );
-		}
-
-		if ( !$_result )
-		{
-			return false;
-		}
-
-		$regex = '#' . $regex . '(?:,|\\r\\n|\\n)#s';
-		$regex = str_replace( array( '"', ',' ), array( $_wrap, $_sep ), $regex );
-
-		if ( false === ( $_count = preg_match_all( $regex, $line, $matches, PREG_SET_ORDER ) ) )
-		{
-			throw new FileSystemException( 'Pattern matching error while processing line' );
-		}
-
-		$_response = array();
-
-		for ( $_i = 0; $_i < $_count; $_i++ )
-		{
-			unset( $matches[$_i][0] );
-			$_response[] = implode( '', $matches[$_i] );
-		}
-
-		return $_response;
-	}
-
-	/**
-	 * @param string $line
-	 *
-	 * @return array|bool
-	 */
-	protected function _parseDoubled( $line )
-	{
-		$_result = $this->_parsePattern( $line, '(?:"((?:""|[^"])*)"|((?U)[^,"]*))' );
-
-		if ( $_result )
-		{
-			array_walk(
-				$_result,
-				function ( &$value, $enclosure )
-				{
-					$value = str_replace( $enclosure . $enclosure, $enclosure, $value );
-				},
-				$this->_enclosure
-			);
-		}
-
-		return $_result;
-	}
-
-	/**
-	 * @param string $line
-	 *
-	 * @return mixed
-	 */
-	protected function _parseSlashed( $line )
-	{
-		$_result = $this->_parsePattern( $line, '(?:"((?:\\\\"|[^"])*)"|((?U)[^,"]*))' );
-
-		if ( $_result )
-		{
-			array_walk(
-				$_result,
-				function ( &$value, $enclosure )
-				{
-					$value = str_replace( '\\' . $enclosure, $enclosure, $value );
-				},
-				$this->_enclosure
-			);
-		}
-
-		return $_result;
-	}
-
-	/**
-	 * @param string $line
-	 *
-	 * @return array|bool
-	 */
-	protected function _parseNonEscaped( $line )
-	{
-		return $this->_parsePattern( $line, '(?:"((?U).*)")' );
-	}
-
-	/**
-	 * @param string $line
-	 *
-	 * @return array
-	 */
-	protected function _parseNone( $line )
-	{
-		$_line = preg_replace( '#\\r?\\n$#', '', $line );
-
-		return empty( $this->_separator ) ? $_line : explode( $this->_separator, $_line );
-	}
 }
