@@ -45,5 +45,17 @@ interface OutputFormat
 	/**
 	 * @var int
 	 */
-	const HTTP = 3;
+    const HTTP = 3;
+    /**
+     * @var int Comma-separated values
+     */
+    const CSV = 4;
+    /**
+     * @var int Pipe-separated values
+     */
+    const PSV = 5;
+    /**
+     * @var int Tab-separated values 
+     */
+    const TSV = 6;
 }
