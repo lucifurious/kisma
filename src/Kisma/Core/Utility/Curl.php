@@ -701,7 +701,7 @@ class Curl extends HttpMethod
 	 *
 	 * @return string
 	 */
-	public function urlSeparator( $url, $argSeparator = '&' )
+	public static function urlSeparator( $url, $argSeparator = '&' )
 	{
 		return ( false === strpos( $url, '?', 0 ) ? '?' : $argSeparator );
 	}
