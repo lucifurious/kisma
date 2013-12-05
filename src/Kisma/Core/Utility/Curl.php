@@ -642,7 +642,7 @@ class Curl extends HttpMethod
 
 		if ( null !== ( $_query = Option::get( $_parts, 'query' ) ) )
 		{
-			$_query = '?' . http_build_query( explode( '&', $_query ) );
+			$_query = static::urlSeparator( $_query ) . http_build_query( explode( '&', $_query ) );
 		}
 
 		if ( false !== strpos( $_host, ':' ) || ( $_protocol == 'https://' && $_port == 443 ) || ( $_protocol == 'http://' && $_port == 80 ) )
@@ -659,9 +659,8 @@ class Curl extends HttpMethod
 			$_port = null;
 		}
 
-		$_currentUrl = $_protocol . $_host . $_port .
-					   ( true === $includePath ? Option::get( $_parts, 'path' ) : null ) .
-					   ( true === $includeQuery ? $_query : null );
+		$_currentUrl =
+			$_protocol . $_host . $_port . ( true === $includePath ? Option::get( $_parts, 'path' ) : null ) . ( true === $includeQuery ? $_query : null );
 
 		if ( \Kisma::get( 'debug.curl.current_url' ) )
 		{
@@ -691,6 +690,20 @@ class Curl extends HttpMethod
 	{
 		$_query = \http_build_query( $payload, $numericPrefix, $argSeparator, $encodingType );
 
-		return $url . ( false === strpos( $url, '?' ) ? '?' : '&' ) . $_query;
+		return $url . static::urlSeparator( $url, $argSeparator ) . $_query;
 	}
+
+	/**
+	 * Returns the proper separator for an addition to the URL (? or &)
+	 *
+	 * @param string $url          The URL to test
+	 * @param string $argSeparator Defaults to '&' but you can override
+	 *
+	 * @return string
+	 */
+	public static function urlSeparator( $url, $argSeparator = '&' )
+	{
+		return ( false === strpos( $url, '?', 0 ) ? '?' : $argSeparator );
+	}
+
 }
