@@ -65,13 +65,9 @@ class Curl extends HttpMethod
 	 */
 	protected static $_lastResponseHeaders = null;
 	/**
-	 * @var string
+	 * @var array
 	 */
-	protected static $_responseHeaders = null;
-	/**
-	 * @var int
-	 */
-	protected static $_responseHeadersSize = null;
+	protected static $_lastRequestHeaders = null;
 	/**
 	 * @var bool Enable/disable logging
 	 */
@@ -211,6 +207,118 @@ class Curl extends HttpMethod
 	}
 
 	/**
+	 * @param mixed $payload
+	 * @param array $headers
+	 *
+	 * @return array
+	 */
+	protected static function _formatPayload( $payload, $headers = array() )
+	{
+		if ( !empty( $headers ) )
+		{
+			foreach ( $headers as $_header )
+			{
+				if ( false !== stripos( $_header, 'content-type:', 0 ) )
+				{
+					$_type = strtolower( trim( str_ireplace( 'content-type:', null, $_header ) ) );
+
+					switch ( $_type )
+					{
+						case 'application/json':
+							if ( !is_string( $payload ) )
+							{
+								return json_encode( empty( $payload ) ? array() : $payload );
+							}
+							break;
+					}
+				}
+			}
+		}
+
+		return $payload;
+	}
+
+	/**
+	 * Based on the response content type, the result is formatted
+	 *
+	 * @param mixed $response
+	 *
+	 * @return mixed
+	 */
+	protected static function _formatResponse( $response )
+	{
+		if ( !empty( $response ) && false !== stripos( Option::get( static::$_info, 'content_type' ), 'application/json', 0 ) )
+		{
+			try
+			{
+				if ( false !== ( $_json = @json_decode( $response, static::$_decodeToArray ) ) )
+				{
+					return $_json;
+				}
+			}
+			catch ( \Exception $_ex )
+			{
+				//	Ignored
+				Log::debug( 'Exception decoding result: ' . $_ex->getMessage() );
+			}
+		}
+
+		return $response;
+	}
+
+	/**
+	 * Separate the headers from the body of a response
+	 *
+	 * @param string $headers
+	 * @param int    $size
+	 *
+	 * @return array
+	 */
+	protected static function _parseHeaders( $headers, $size )
+	{
+		if ( false === strpos( $headers, "\r\n\r\n" ) || empty( $size ) )
+		{
+			$_headers = $headers;
+			$_body = null;
+		}
+		else
+		{
+			$_headers = substr( $headers, 0, $size );
+			$_body = substr( $headers, $size );
+		}
+
+		if ( $_headers )
+		{
+			static::$_lastResponseHeaders = array();
+			$_raw = explode( "\r\n", $_headers );
+
+			if ( !empty( $_raw ) )
+			{
+				$_first = true;
+
+				foreach ( $_raw as $_line )
+				{
+					//	Skip the first line (HTTP/1.x response)
+					if ( $_first || preg_match( '/^HTTP\/[0-9\.]+ [0-9]+/', $_line ) )
+					{
+						$_first = false;
+						continue;
+					}
+
+					$_parts = explode( ':', $_line, 2 );
+
+					if ( !empty( $_parts ) )
+					{
+						static::$_lastResponseHeaders[trim( $_parts[0] )] = count( $_parts ) > 1 ? trim( $_parts[1] ) : null;
+					}
+				}
+			}
+		}
+
+		return array( static::$_lastResponseHeaders = $_headers, $_body );
+	}
+
+	/**
 	 * @param string $method
 	 * @param string $url
 	 * @param array  $payload
@@ -227,7 +335,7 @@ class Curl extends HttpMethod
 		}
 
 		//	Reset!
-		static::$_lastResponseHeaders = static::$_lastHttpCode = static::$_error = static::$_info = $_tmpFile = null;
+		static::$_lastResponseHeaders = static::$_lastRequestHeaders = static::$_lastHttpCode = static::$_error = static::$_info = $_tmpFile = null;
 
 		//	Build a curl request...
 		$_curl = curl_init( $url );
@@ -250,20 +358,23 @@ class Curl extends HttpMethod
 			);
 		}
 
-		//	Add/override user options
-		if ( !empty( $curlOptions ) )
-		{
-			foreach ( $curlOptions as $_key => $_value )
-			{
-				$_curlOptions[$_key] = $_value;
-			}
-		}
-
+		//	Global auth?
 		if ( null !== static::$_userName || null !== static::$_password )
 		{
 			$_curlOptions[CURLOPT_HTTPAUTH] = CURLAUTH_BASIC;
 			$_curlOptions[CURLOPT_USERPWD] = static::$_userName . ':' . static::$_password;
 		}
+
+		//	Add/override user options
+		if ( !empty( $curlOptions ) )
+		{
+			array_merge(
+				$_curlOptions,
+				$curlOptions
+			);
+		}
+
+		$payload = static::_formatPayload( $payload, Option::get( $_curlOptions, CURLOPT_HTTPHEADER ) );
 
 		switch ( $method )
 		{
@@ -272,15 +383,12 @@ class Curl extends HttpMethod
 				break;
 
 			case static::Put:
-				$_payload = json_encode( !empty( $payload ) ? $payload : array() );
-
-				$_tmpFile = tmpfile();
-				fwrite( $_tmpFile, $_payload );
+				fwrite( $_tmpFile = tmpfile(), $payload );
 				rewind( $_tmpFile );
 
 				$_curlOptions[CURLOPT_PUT] = true;
 				$_curlOptions[CURLOPT_INFILE] = $_tmpFile;
-				$_curlOptions[CURLOPT_INFILESIZE] = mb_strlen( $_payload );
+				$_curlOptions[CURLOPT_INFILESIZE] = function_exists( 'mb_strlen' ) ? mb_strlen( $payload ) : strlen( $payload );
 				break;
 
 			case static::Post:
@@ -292,14 +400,10 @@ class Curl extends HttpMethod
 				$_curlOptions[CURLOPT_NOBODY] = true;
 				break;
 
-			case static::Patch:
-				$_curlOptions[CURLOPT_CUSTOMREQUEST] = static::Patch;
-				$_curlOptions[CURLOPT_POSTFIELDS] = $payload;
-				break;
-
-			case static::Merge:
+			/** Merge, Patch, and Delete can have payloads, but they and Options/Copy need CURLOPT_CUSTOMREQUEST set so just fall through... */
 			case static::Delete:
-				/** Merge && Delete have payloads, but they and Options/Copy need CURLOPT_CUSTOMREQUEST set so just fall through... */
+			case static::Merge:
+			case static::Patch:
 				$_curlOptions[CURLOPT_POSTFIELDS] = $payload;
 
 			case static::Options:
@@ -321,13 +425,7 @@ class Curl extends HttpMethod
 
 		static::$_info = curl_getinfo( $_curl );
 		static::$_lastHttpCode = Option::get( static::$_info, 'http_code' );
-		static::$_responseHeaders = curl_getinfo( $_curl, CURLINFO_HEADER_OUT );
-		static::$_responseHeadersSize = curl_getinfo( $_curl, CURLINFO_HEADER_SIZE );
-
-		if ( static::$_debug )
-		{
-			//	@todo Add debug output
-		}
+		static::$_lastRequestHeaders = curl_getinfo( $_curl, CURLINFO_HEADER_OUT );
 
 		if ( false === $_result )
 		{
@@ -344,66 +442,13 @@ class Curl extends HttpMethod
 		else
 		{
 			//      Split up the body and headers if requested
-			if ( $_curlOptions[CURLOPT_HEADER] )
+			if ( null !== Option::get( $_curlOptions, CURLOPT_HEADER ) )
 			{
-				if ( false === strpos( $_result, "\r\n\r\n" ) || empty( static::$_responseHeadersSize ) )
-				{
-					$_headers = $_result;
-					$_body = null;
-				}
-				else
-				{
-					$_headers = substr( $_result, 0, static::$_responseHeadersSize );
-					$_body = substr( $_result, static::$_responseHeadersSize );
-				}
-
-				if ( $_headers )
-				{
-					static::$_lastResponseHeaders = array();
-					$_raw = explode( "\r\n", $_headers );
-
-					if ( !empty( $_raw ) )
-					{
-						$_first = true;
-
-						foreach ( $_raw as $_line )
-						{
-							//	Skip the first line (HTTP/1.x response)
-							if ( $_first || preg_match( '/^HTTP\/[0-9\.]+ [0-9]+/', $_line ) )
-							{
-								$_first = false;
-								continue;
-							}
-
-							$_parts = explode( ':', $_line, 2 );
-
-							if ( !empty( $_parts ) )
-							{
-								static::$_lastResponseHeaders[trim( $_parts[0] )] = count( $_parts ) > 1 ? trim( $_parts[1] ) : null;
-							}
-						}
-					}
-				}
-
-				$_result = $_body;
+				list( $_headers, $_result ) = static::_parseHeaders( $_result, curl_getinfo( $_curl, CURLINFO_HEADER_SIZE ) );
 			}
 
-			//	Attempt to auto-decode inbound JSON
-			if ( !empty( $_result ) && false !== stripos( Option::get( static::$_info, 'content_type' ), 'application/json', 0 ) )
-			{
-				try
-				{
-					if ( false !== ( $_json = @json_decode( $_result, static::$_decodeToArray ) ) )
-					{
-						$_result = $_json;
-					}
-				}
-				catch ( \Exception $_ex )
-				{
-					//	Ignored
-					Log::debug( 'Exception decoding result: ' . $_ex->getMessage() );
-				}
-			}
+			//	Reformat the response if necessary
+			$_result = static::_formatResponse( $_result );
 
 			//	Don't confuse error with empty data...
 			if ( false === $_result )
@@ -434,6 +479,93 @@ class Curl extends HttpMethod
 		}
 
 		return null;
+	}
+
+	/**
+	 * Returns the validated URL that has been called to get here
+	 *
+	 * @param bool $includeQuery If true, query string is included
+	 * @param bool $includePath  If true, the uri path is included
+	 *
+	 * @return string
+	 */
+	public static function currentUrl( $includeQuery = true, $includePath = true )
+	{
+		//	Are we SSL? Check for load balancer protocol as well...
+		$_port = intval( Option::get( $_SERVER, 'HTTP_X_FORWARDED_PORT', Option::get( $_SERVER, 'SERVER_PORT', 80 ) ) );
+		$_protocol = Option::get( $_SERVER, 'HTTP_X_FORWARDED_PROTO', 'http' . ( Option::getBool( $_SERVER, 'HTTPS' ) ? 's' : null ) ) . '://';
+		$_host = Option::get( $_SERVER, 'HTTP_X_FORWARDED_HOST', Option::get( $_SERVER, 'HTTP_HOST', gethostname() ) );
+		$_parts = parse_url( $_protocol . $_host . Option::get( $_SERVER, 'REQUEST_URI' ) );
+
+		if ( ( empty( $_port ) || !is_numeric( $_port ) ) && null !== ( $_parsePort = Option::get( $_parts, 'port' ) ) )
+		{
+			$_port = @intval( $_parsePort );
+		}
+
+		if ( null !== ( $_query = Option::get( $_parts, 'query' ) ) )
+		{
+			$_query = static::urlSeparator( $_query ) . http_build_query( explode( '&', $_query ) );
+		}
+
+		if ( false !== strpos( $_host, ':' ) || ( $_protocol == 'https://' && $_port == 443 ) || ( $_protocol == 'http://' && $_port == 80 ) )
+		{
+			$_port = null;
+		}
+		else
+		{
+			$_port = ':' . $_port;
+		}
+
+		if ( false !== strpos( $_host, ':' ) )
+		{
+			$_port = null;
+		}
+
+		$_currentUrl =
+			$_protocol . $_host . $_port . ( true === $includePath ? Option::get( $_parts, 'path' ) : null ) . ( true === $includeQuery ? $_query : null );
+
+		if ( \Kisma::get( 'debug.curl.current_url' ) )
+		{
+			Log::debug( 'Parsed current URL to be: ' . $_currentUrl, $_parts );
+		}
+
+		return $_currentUrl;
+	}
+
+	/**
+	 * Builds an URL, properly appending the payload as the query string.
+	 *
+	 * @param string $url           The target URL
+	 * @param array  $payload       The query string data. May be an array or object containing properties. The array form may be a simple one-dimensional
+	 *                              structure, or an array of arrays (who in turn may contain other arrays).
+	 * @param string $numericPrefix If numeric indices are used in the base array and this parameter is provided, it will be prepended to the numeric index for
+	 *                              elements in the base array only.
+	 *                              This is meant to allow for legal variable names when the data is decoded by PHP or another CGI application later on.
+	 * @param string $argSeparator  Character to use to separate arguments. Defaults to '&'
+	 * @param int    $encodingType  If encodingType is PHP_QUERY_RFC1738 (the default), then encoding is as application/x-www-form-urlencoded, spaces will be
+	 *                              encoded with plus (+) signs
+	 *                              If encodingType is PHP_QUERY_RFC3986, spaces will be encoded with %20
+	 *
+	 * @return string an URL-encoded string
+	 */
+	public static function buildUrl( $url, $payload = array(), $numericPrefix = null, $argSeparator = '&', $encodingType = PHP_QUERY_RFC1738 )
+	{
+		$_query = \http_build_query( $payload, $numericPrefix, $argSeparator, $encodingType );
+
+		return $url . static::urlSeparator( $url, $argSeparator ) . $_query;
+	}
+
+	/**
+	 * Returns the proper separator for an addition to the URL (? or &)
+	 *
+	 * @param string $url          The URL to test
+	 * @param string $argSeparator Defaults to '&' but you can override
+	 *
+	 * @return string
+	 */
+	public static function urlSeparator( $url, $argSeparator = '&' )
+	{
+		return ( false === strpos( $url, '?', 0 ) ? '?' : $argSeparator );
 	}
 
 	/**
@@ -620,90 +752,11 @@ class Curl extends HttpMethod
 	}
 
 	/**
-	 * Returns the validated URL that has been called to get here
-	 *
-	 * @param bool $includeQuery If true, query string is included
-	 * @param bool $includePath  If true, the uri path is included
-	 *
-	 * @return string
+	 * @return array
 	 */
-	public static function currentUrl( $includeQuery = true, $includePath = true )
+	public static function getLastRequestHeaders()
 	{
-		//	Are we SSL? Check for load balancer protocol as well...
-		$_port = intval( Option::get( $_SERVER, 'HTTP_X_FORWARDED_PORT', Option::get( $_SERVER, 'SERVER_PORT', 80 ) ) );
-		$_protocol = Option::get( $_SERVER, 'HTTP_X_FORWARDED_PROTO', 'http' . ( Option::getBool( $_SERVER, 'HTTPS' ) ? 's' : null ) ) . '://';
-		$_host = Option::get( $_SERVER, 'HTTP_X_FORWARDED_HOST', Option::get( $_SERVER, 'HTTP_HOST', gethostname() ) );
-		$_parts = parse_url( $_protocol . $_host . Option::get( $_SERVER, 'REQUEST_URI' ) );
-
-		if ( ( empty( $_port ) || !is_numeric( $_port ) ) && null !== ( $_parsePort = Option::get( $_parts, 'port' ) ) )
-		{
-			$_port = @intval( $_parsePort );
-		}
-
-		if ( null !== ( $_query = Option::get( $_parts, 'query' ) ) )
-		{
-			$_query = static::urlSeparator( $_query ) . http_build_query( explode( '&', $_query ) );
-		}
-
-		if ( false !== strpos( $_host, ':' ) || ( $_protocol == 'https://' && $_port == 443 ) || ( $_protocol == 'http://' && $_port == 80 ) )
-		{
-			$_port = null;
-		}
-		else
-		{
-			$_port = ':' . $_port;
-		}
-
-		if ( false !== strpos( $_host, ':' ) )
-		{
-			$_port = null;
-		}
-
-		$_currentUrl =
-			$_protocol . $_host . $_port . ( true === $includePath ? Option::get( $_parts, 'path' ) : null ) . ( true === $includeQuery ? $_query : null );
-
-		if ( \Kisma::get( 'debug.curl.current_url' ) )
-		{
-			Log::debug( 'Parsed current URL to be: ' . $_currentUrl, $_parts );
-		}
-
-		return $_currentUrl;
-	}
-
-	/**
-	 * Builds an URL, properly appending the payload as the query string.
-	 *
-	 * @param string $url           The target URL
-	 * @param array  $payload       The query string data. May be an array or object containing properties. The array form may be a simple one-dimensional
-	 *                              structure, or an array of arrays (who in turn may contain other arrays).
-	 * @param string $numericPrefix If numeric indices are used in the base array and this parameter is provided, it will be prepended to the numeric index for
-	 *                              elements in the base array only.
-	 *                              This is meant to allow for legal variable names when the data is decoded by PHP or another CGI application later on.
-	 * @param string $argSeparator  Character to use to separate arguments. Defaults to '&'
-	 * @param int    $encodingType  If encodingType is PHP_QUERY_RFC1738 (the default), then encoding is as application/x-www-form-urlencoded, spaces will be
-	 *                              encoded with plus (+) signs
-	 *                              If encodingType is PHP_QUERY_RFC3986, spaces will be encoded with %20
-	 *
-	 * @return string an URL-encoded string
-	 */
-	public static function buildUrl( $url, $payload = array(), $numericPrefix = null, $argSeparator = '&', $encodingType = PHP_QUERY_RFC1738 )
-	{
-		$_query = \http_build_query( $payload, $numericPrefix, $argSeparator, $encodingType );
-
-		return $url . static::urlSeparator( $url, $argSeparator ) . $_query;
-	}
-
-	/**
-	 * Returns the proper separator for an addition to the URL (? or &)
-	 *
-	 * @param string $url          The URL to test
-	 * @param string $argSeparator Defaults to '&' but you can override
-	 *
-	 * @return string
-	 */
-	public static function urlSeparator( $url, $argSeparator = '&' )
-	{
-		return ( false === strpos( $url, '?', 0 ) ? '?' : $argSeparator );
+		return self::$_lastRequestHeaders;
 	}
 
 }

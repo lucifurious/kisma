@@ -109,7 +109,6 @@ class Kisma implements PublisherLike, \Kisma\Core\Interfaces\Events\Kisma, Kisma
 
 			if ( null === static::getAutoLoader() && class_exists( '\\ComposerAutoloaderInit', false ) )
 			{
-				ComposerAutoloaderInit::getLoader();
 				static::setAutoLoader( \ComposerAutoloaderInit::getLoader() );
 			}
 
