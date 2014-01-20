@@ -3,7 +3,7 @@
  * This file is part of Kisma(tm).
  *
  * Kisma(tm) <https://github.com/kisma/kisma>
- * Copyright 2009-2013 Jerry Ablan <jerryablan@gmail.com>
+ * Copyright 2009-2014 Jerry Ablan <jerryablan@gmail.com>
  *
  * Kisma(tm) is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -175,12 +175,19 @@ HTML;
 					$_field['id'] = $_name;
 				}
 
-				$_contents = ( !isset( $_field['contents'] ) && isset( $_field['value'] ) ? $_field['value'] : Option::get( $_field, 'contents', null, true ) );
+				$_contents = ( !isset( $_field['contents'] ) && isset( $_field['value'] )
+					? $_field['value']
+					: Option::get(
+						$_field,
+						'contents',
+						null,
+						true
+					) );
 
 				$_inner .= $this->field(
-								Option::get( $_field, 'type', 'text', true ),
-								$_field,
-								$_contents
+					Option::get( $_field, 'type', 'text', true ),
+					$_field,
+					$_contents
 				);
 			}
 
@@ -216,8 +223,7 @@ HTML;
 		{
 			$_labelAttributes = Option::get( $_label, 'attributes', array() );
 			$_labelText = Option::get( $_label, 'value', array() );
-		}
-		else
+		} else
 		{
 			$_labelText = $_label;
 		}
@@ -276,18 +282,22 @@ HTML;
 		{
 			//	Replace contents with the x-editable link...
 			$contents = static::tag(
-							  'a',
-							  array(
-								   'class'               => 'x-editable',
-								   'href'                => '#',
-								   'id'                  => $_id,
-								   'data-type'           => $_type,
-								   'data-pk'             => Option::get( $this->_attributes, 'x-editable-pk', Option::get( $this->_formData, 'id' ) ),
-								   'data-url'            => Option::get( $this->_attributes, 'x-editable-url', Option::get( $attributes, 'x-editable-url', null, true ) ),
-								   'data-original-title' => $_labelText,
-								   'data-inputclass'     => Option::get( $attributes, 'class', 'input-xlarge' ),
-							  ),
-							  $contents
+				'a',
+				array(
+					'class'               => 'x-editable',
+					'href'                => '#',
+					'id'                  => $_id,
+					'data-type'           => $_type,
+					'data-pk'             => Option::get( $this->_attributes, 'x-editable-pk', Option::get( $this->_formData, 'id' ) ),
+					'data-url'            => Option::get(
+							$this->_attributes,
+							'x-editable-url',
+							Option::get( $attributes, 'x-editable-url', null, true )
+						),
+					'data-original-title' => $_labelText,
+					'data-inputclass'     => Option::get( $attributes, 'class', 'input-xlarge' ),
+				),
+				$contents
 			);
 
 			//	New type of just HTML...
@@ -304,9 +314,9 @@ HTML;
 				$attributes['class'] = static::addValue( Option::get( $attributes, 'class' ), 'input-xxlarge' );
 
 				$_input = static::wrap(
-								$_type,
-								$contents,
-								$attributes
+					$_type,
+					$contents,
+					$attributes
 				);
 				break;
 
@@ -317,8 +327,8 @@ HTML;
 				}
 
 				$_input = static::select(
-								Option::get( $attributes, 'data', array(), true ),
-								$attributes
+					Option::get( $attributes, 'data', array(), true ),
+					$attributes
 				);
 				break;
 
@@ -369,12 +379,10 @@ HTML;
 			if ( $_length <= 64 )
 			{
 				$attributes['class'] = static::addValue( $_class, 'input-large' );
-			}
-			else if ( $_length < 128 )
+			} else if ( $_length < 128 )
 			{
 				$attributes['class'] = static::addValue( $_class, 'input-xlarge' );
-			}
-			else if ( $_length >= 128 )
+			} else if ( $_length >= 128 )
 			{
 				$attributes['class'] = static::addValue( $_class, 'input-xxlarge' );
 			}
@@ -414,10 +422,10 @@ HTML;
 		if ( !empty( $submitButton ) )
 		{
 			$_submit = $this->button(
-							'submit',
-							array(
-								 'text' => ( true === $submitButton ? 'Submit' : $submitButton ),
-							)
+				'submit',
+				array(
+					'text' => ( true === $submitButton ? 'Submit' : $submitButton ),
+				)
 			);
 		}
 
@@ -494,8 +502,7 @@ HTML;
 			if ( !is_array( $_menuItem ) )
 			{
 				$_liTags .= $_menuItem;
-			}
-			else
+			} else
 			{
 				if ( null !== ( $_icon = Option::get( $_menuItem, 'icon' ) ) )
 				{
@@ -513,7 +520,8 @@ HTML;
 		if ( !empty( $logoutUrl ) )
 		{
 			$_token =
-				( class_exists( '\\Yii', false ) && false !== \Yii::app()->getRequest()->enableCsrfValidation ) ? '?token=' . \Yii::app()->getRequest()->getCsrfToken() : null;
+				( class_exists( '\\Yii', false ) && false !== \Yii::app()->getRequest()->enableCsrfValidation ) ?
+					'?token=' . \Yii::app()->getRequest()->getCsrfToken() : null;
 
 			$_liTags .= <<<HTML
 <li class="pull-right"><a href="{$logoutUrl}{$_token}">Logout</a></li>

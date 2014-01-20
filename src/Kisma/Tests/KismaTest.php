@@ -1,10 +1,14 @@
 <?php
-require_once dirname( __DIR__ ) . '/vendor/autoload.php';
+namespace Kisma\Tests;
+
+use Kisma\Core\TestCase;
+
+require_once __DIR__ . '/bootstrap.php';
 
 /**
  * KismaTest
  */
-class KismaTest extends \Kisma\Core\TestCase
+class KismaTest extends TestCase
 {
 	public function testCallStatic()
 	{

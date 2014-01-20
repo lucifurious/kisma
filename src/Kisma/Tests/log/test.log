@@ -1,0 +1,45 @@
+Oct 30 13:21:31 DEBU Looking for debug flag in: debug.kisma.core.utility.hasher::kisma.core.utility.hasher::generate_unique {}
+Oct 30 13:23:04 DEBU Looking for debug flag in: debug.kisma.core.utility.hasher::generate_unique {}
+Oct 30 13:23:46 DEBU Debug flag in "debug.ON {}
+Oct 30 13:24:31 DEBU Debug flag in "debug.kisma.core.utility.hasher::kisma.core.utility.hasher::generate_unique": OFF {}
+Oct 30 13:24:40 DEBU Debug flag in "debug.kisma.core.utility.hasher::generate_unique": ON {}
+Oct 30 13:24:40 DEBU  >> Hasher::generateUnique() called {"context":{"seed":"NULL","length":1024,"algorithm":"sha512"}}
+Oct 30 13:24:40 DEBU   Random - ish seed created: debe4c82f23dccf9e0e7fea634d85f40ad08234ed8fb2d1960e8794ca7f54711c8df54afaaec579b8fb846637c8d641c1e3aa7317e0bbd889b932a53ba2155f0 {"context":{"seed":"NULL","length":1024,"algorithm":"sha512"}}
+Oct 30 13:24:40 DEBU  >> Hasher::generateUnique() called {"context":{"seed":"someemailaddress@somewhere.com","length":1024,"algorithm":"sha512"}}
+Oct 30 13:24:40 DEBU   Using passed - in $seed value of "someemailaddress@somewhere.com" {}
+Oct 30 13:24:40 DEBU   Random - ish seed created: eb58f38077bb6a16781895ea95150c94e4064788334a56c65549f455889a99674694c1f0547daf54c3a852582e2a944b5a09302baad3116e02d430f1c2411b84 {"context":{"seed":"someemailaddress@somewhere.com","length":1024,"algorithm":"sha512"}}
+Oct 30 13:24:40 DEBU  >> Hasher::generateUnique() called {"context":{"seed":"NULL","length":1024,"algorithm":"sha512"}}
+Oct 30 13:24:40 DEBU   Random - ish seed created: ca2fb770555022deedc3cf57f81b9e53490bb5c6176c3a4c6174c3a79841f9298f8413064dae0ca6ce647b4f9aa42c116b6b9f86e0a8e632ed2e3b9967bba177 {"context":{"seed":"NULL","length":1024,"algorithm":"sha512"}}
+Oct 30 13:24:40 DEBU  >> Hasher::generateUnique() called {"context":{"seed":"someemailaddress@somewhere.com","length":1024,"algorithm":"sha512"}}
+Oct 30 13:24:40 DEBU   Using passed - in $seed value of "someemailaddress@somewhere.com" {}
+Oct 30 13:24:40 DEBU   Random - ish seed created: 5eb0a04987e9717822363777e4a5167b22fd5c99ba32a4a4c9c831f5f04a27414562ac32779388459a837ae7cacb2db6b9d073f5ba9bf60b0d7ca17289dd4b48 {"context":{"seed":"someemailaddress@somewhere.com","length":1024,"algorithm":"sha512"}}
+Oct 30 13:25:38 DEBU Debug flag in "debug.kisma.core.utility.hasher::generate_unique": ON {}
+Oct 30 13:25:38 DEBU  >> Hasher::generateUnique() called {"context":{"seed":"NULL","length":1024,"algorithm":"sha512"}}
+Oct 30 13:25:38 DEBU   Random-ish seed created: a14647287690bb7f23731df29ac21625c6b92479694ded4334d22421942c48b1103a31e19761b3df0ddd73cda3fefc3ab492b05e4f03ba4cbd42b35794ec9ef2 {"context":{"seed":"NULL","length":1024,"algorithm":"sha512"}}
+Oct 30 13:25:38 DEBU << Hash generated:  {}
+Oct 30 13:25:38 DEBU  >> Hasher::generateUnique() called {"context":{"seed":"someemailaddress@somewhere.com","length":1024,"algorithm":"sha512"}}
+Oct 30 13:25:38 DEBU   Using passed - in $seed value of "someemailaddress@somewhere.com" {}
+Oct 30 13:25:38 DEBU   Random-ish seed created: 363f6909699da78cd7a0409b227c0d19b1e679e31904eb37715ac16c5799a37f05373d617f0653c1da22e19fa10fc4bcc2ff7d2fe0f6dfb612890ee89ec1358a {"context":{"seed":"someemailaddress@somewhere.com","length":1024,"algorithm":"sha512"}}
+Oct 30 13:25:38 DEBU << Hash generated:  {}
+Oct 30 13:25:38 DEBU  >> Hasher::generateUnique() called {"context":{"seed":"NULL","length":1024,"algorithm":"sha512"}}
+Oct 30 13:25:38 DEBU   Random-ish seed created: cdc962849c66db987586942aebd5adb4ef66335c926f3e82dd3be0602aaf240605f1ae1d19e3faa6680889f35861c286837faf79bd5a01fe087499f830ae2b90 {"context":{"seed":"NULL","length":1024,"algorithm":"sha512"}}
+Oct 30 13:25:38 DEBU << Hash generated:  {}
+Oct 30 13:25:38 DEBU  >> Hasher::generateUnique() called {"context":{"seed":"someemailaddress@somewhere.com","length":1024,"algorithm":"sha512"}}
+Oct 30 13:25:38 DEBU   Using passed - in $seed value of "someemailaddress@somewhere.com" {}
+Oct 30 13:25:38 DEBU   Random-ish seed created: 5946d59b9956bb95f4e9458d1f0deb475c17542e54515c017debfd6d1bdedcd6616dca5fa6a5820c44008ce3fd9d912478420c7b099c46079fdd61d3c843a4ea {"context":{"seed":"someemailaddress@somewhere.com","length":1024,"algorithm":"sha512"}}
+Oct 30 13:25:38 DEBU << Hash generated:  {}
+Oct 30 13:28:12 DEBU Debug flag in "debug.kisma.core.utility.hasher::generate_unique": ON {}
+Oct 30 13:28:12 DEBU  >> Hasher::generateUnique() called {"context":{"seed":"NULL","length":256,"algorithm":"sha512"}}
+Oct 30 13:28:12 DEBU   Random-ish seed created: 8d0f5569dc9f385d9a29b56f5e4fc8985d33175eb2bb5c5937b14c2facf7ba5a2687b12089ac6b8e4ae8932edf1be204af591022411e8247b5d3904d9acae3eb {"context":{"seed":"NULL","length":256,"algorithm":"sha512"}}
+Oct 30 13:28:12 DEBU << Hash generated: 1d8c3a7f889b25ed8ed198c334129f8cbc369895f7cb4a915061d1cb7f670b1e9030d3d363c9744fcd177729c6f8570b1963146cceab9552113193085d82045c {}
+Oct 30 13:28:12 DEBU  >> Hasher::generateUnique() called {"context":{"seed":"someemailaddress@somewhere.com","length":256,"algorithm":"sha512"}}
+Oct 30 13:28:12 DEBU   Using passed - in $seed value of "someemailaddress@somewhere.com" {}
+Oct 30 13:28:12 DEBU   Random-ish seed created: 0c40ff11d844155c135bd3ea7d58eb3c03147e596cca0d6eefd1774d30ee613ba29012a19aa5f7a06294a0eb013625cd39e53f88b08c887224fbccbe06b18487 {"context":{"seed":"someemailaddress@somewhere.com","length":256,"algorithm":"sha512"}}
+Oct 30 13:28:12 DEBU << Hash generated: 6b151608dca094228201ac932cebc9f79662ae44bef8e9e49b32e4e69182df4c86228f1e7519053985252ae3999c2f91517a1583c879c17a836952b39629bf67 {}
+Oct 30 13:28:12 DEBU  >> Hasher::generateUnique() called {"context":{"seed":"NULL","length":256,"algorithm":"sha512"}}
+Oct 30 13:28:12 DEBU   Random-ish seed created: 4fc0602745d35a8ce6dba6362685769fa6023cec8dc618f87119e7fa49648f40f1fbce7a7b715df2f34b639ba5369817322614767aeaa28fe89c4232e40b4bb5 {"context":{"seed":"NULL","length":256,"algorithm":"sha512"}}
+Oct 30 13:28:12 DEBU << Hash generated: 00c8cea49960e53718975017a6163393803153d75c4ab3cef7cd1f4e111ffbdecadf4228f59b7fa2d0abc6c0644e42a454daae3597b8bc61f5aeb9d906f9d26c {}
+Oct 30 13:28:12 DEBU  >> Hasher::generateUnique() called {"context":{"seed":"someemailaddress@somewhere.com","length":256,"algorithm":"sha512"}}
+Oct 30 13:28:12 DEBU   Using passed - in $seed value of "someemailaddress@somewhere.com" {}
+Oct 30 13:28:12 DEBU   Random-ish seed created: bcd1e555a99adc01a114c74da8ee6b5eb858dad810d2f73a3ff6a539cd671b238a432989f6c1380ba3579bfe2186c1e45defae80f434c78e24b13e41ae10496e {"context":{"seed":"someemailaddress@somewhere.com","length":256,"algorithm":"sha512"}}
+Oct 30 13:28:12 DEBU << Hash generated: fa437bc2bc09c7eadb0a870f5045a06f88c50732310c6d2ede61572585a21bf5c259d67aa4cec5d308cad09469ddf9bebce78a5b1802d013a20ab8ba59ca92a3 {}

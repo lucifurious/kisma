@@ -3,7 +3,7 @@
  * This file is part of Kisma(tm).
  *
  * Kisma(tm) <https://github.com/kisma/kisma>
- * Copyright 2009-2013 Jerry Ablan <jerryablan@gmail.com>
+ * Copyright 2009-2014 Jerry Ablan <jerryablan@gmail.com>
  *
  * Kisma(tm) is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -191,27 +191,27 @@ class Session extends SeedBag
  */
 \session_set_save_handler(
 	array(
-		 __CLASS__,
-		 'open'
+		__CLASS__,
+		'open'
 	),
 	array(
-		 __CLASS__,
-		 'close'
+		__CLASS__,
+		'close'
 	),
 	array(
-		 __CLASS__,
-		 'read'
+		__CLASS__,
+		'read'
 	),
 	array(
-		 __CLASS__,
-		 'write'
+		__CLASS__,
+		'write'
 	),
 	array(
-		 __CLASS__,
-		 'destroy'
+		__CLASS__,
+		'destroy'
 	),
 	array(
-		 __CLASS__,
-		 'gc'
+		__CLASS__,
+		'gc'
 	)
 );

@@ -1,5 +1,5 @@
 <?php
-namespace Kisma\Core\Utility;
+namespace Kisma\Tests\Core\Utility;
 
 class SchemaFormBuilderTest extends \PHPUnit_Framework_TestCase
 {
@@ -30,8 +30,18 @@ class SchemaFormBuilderTest extends \PHPUnit_Framework_TestCase
 				'default'  => 0,
 				'options'  => array( 0 => 'Option 0', 1 => 'Option 1', 2 => 'Option 2' ),
 			),
-			'access_type'             => array( 'type' => 'select', 'required' => false, 'default' => 0, 'options' => array( 0 => 'Option 0', 1 => 'Option 1', 2 => 'Option 2' ), ),
-			'flow_type'               => array( 'type' => 'select', 'required' => false, 'default' => 0, 'options' => array( 0 => 'Option 0', 1 => 'Option 1', 2 => 'Option 2' ), ),
+			'access_type'             => array(
+				'type'     => 'select',
+				'required' => false,
+				'default'  => 0,
+				'options'  => array( 0 => 'Option 0', 1 => 'Option 1', 2 => 'Option 2' ),
+			),
+			'flow_type'               => array(
+				'type'     => 'select',
+				'required' => false,
+				'default'  => 0,
+				'options'  => array( 0 => 'Option 0', 1 => 'Option 1', 2 => 'Option 2' ),
+			),
 			'access_token_param_name' => array( 'type' => 'string', 'length' => 64, 'required' => false ),
 			'auth_header_name'        => array( 'type' => 'string', 'length' => 64, 'required' => false ),
 			'access_token'            => array( 'type' => 'string', 'length' => 128, 'required' => false ),

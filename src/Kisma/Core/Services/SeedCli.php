@@ -3,7 +3,7 @@
  * This file is part of Kisma(tm).
  *
  * Kisma(tm) <https://github.com/kisma/kisma>
- * Copyright 2009-2013 Jerry Ablan <jerryablan@gmail.com>
+ * Copyright 2009-2014 Jerry Ablan <jerryablan@gmail.com>
  *
  * Kisma(tm) is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -94,12 +94,10 @@ abstract class SeedCli extends SeedService implements RequestSource
 			if ( $_value && $_value[0] == '-' && $_value[1] == '-' )
 			{
 				$_options[substr( $_value, 2 )] = str_replace( $_value . '=', '', $_argument );
-			}
-			elseif ( $_value && $_value[0] == '-' )
+			} elseif ( $_value && $_value[0] == '-' )
 			{
 				$_options[substr( $_value, 1 )] = str_replace( $_value . '=', '', $_argument );
-			}
-			else
+			} else
 			{
 				$_results['rebuilt'][] = $arguments[$_i];
 			}

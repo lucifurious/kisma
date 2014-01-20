@@ -3,7 +3,7 @@
  * This file is part of Kisma(tm).
  *
  * Kisma(tm) <https://github.com/kisma/kisma>
- * Copyright 2009-2013 Jerry Ablan <jerryablan@gmail.com>
+ * Copyright 2009-2014 Jerry Ablan <jerryablan@gmail.com>
  *
  * Kisma(tm) is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,8 +19,6 @@
  * along with Kisma(tm).  If not, see <http://www.gnu.org/licenses/>.
  */
 namespace Kisma\Core\Utility;
-
-use Kisma\Core\Utility\Inflector;
 
 /**
  * Option
@@ -44,8 +42,7 @@ class Option
 
 		//	Check both the raw and cooked keys
 		return
-			( is_array( $options ) && ( isset( $options[$key] ) || isset( $options[$_key] ) ) )
-			||
+			( is_array( $options ) && ( isset( $options[$key] ) || isset( $options[$_key] ) ) ) ||
 			( is_object( $options ) && ( property_exists( $options, $key ) || property_exists( $options, $_key ) ) );
 	}
 
@@ -134,8 +131,7 @@ class Option
 				}
 
 				return $_newValue;
-			}
-			else if ( method_exists( $options, 'get' . $key ) )
+			} else if ( method_exists( $options, 'get' . $key ) )
 			{
 				$_getter = 'get' . Inflector::deneutralize( $key );
 				$_setter = 'set' . Inflector::deneutralize( $key );
@@ -262,8 +258,7 @@ class Option
 				if ( method_exists( $options, $_setter ) )
 				{
 					$options->{$_setter}( $_value );
-				}
-				else
+				} else
 				{
 					if ( !property_exists( $options, $_key ) && property_exists( $options, $_cleanKey ) )
 					{
@@ -301,8 +296,7 @@ class Option
 				}
 
 				unset( $options[$key] );
-			}
-			else
+			} else
 			{
 				if ( isset( $options->$key ) )
 				{
@@ -358,10 +352,8 @@ class Option
 	public static function collapse( $key, $value = null )
 	{
 		return ( is_array( $key ) && null === $value )
-			?
-			$key
-			:
-			array(
+			? $key
+			: array(
 				$key => $value
 			);
 	}

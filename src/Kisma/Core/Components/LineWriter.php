@@ -3,7 +3,7 @@
  * This file is part of Kisma(tm).
  *
  * Kisma(tm) <https://github.com/kisma/kisma>
- * Copyright 2009-2013 Jerry Ablan <jerryablan@gmail.com>
+ * Copyright 2009-2014 Jerry Ablan <jerryablan@gmail.com>
  *
  * Kisma(tm) is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,7 +24,6 @@ use Kisma\Core\Enums\LineBreak;
 use Kisma\Core\Exceptions\FileSystemException;
 use Kisma\Core\Interfaces\EscapeStyle;
 use Kisma\Core\Interfaces\WriterLike;
-use Kisma\Core\Seed;
 
 /**
  * LineWriter.php
@@ -112,8 +111,7 @@ class LineWriter extends ParsingLineReader implements WriterLike
 		if ( empty( $this->_keys ) )
 		{
 			$_data = $data;
-		}
-		else
+		} else
 		{
 			$_data = array();
 
@@ -175,7 +173,8 @@ class LineWriter extends ParsingLineReader implements WriterLike
 				continue;
 			}
 
-			if ( $this->_lazyWrap && false === strpos( $_value, $this->_separator ) &&
+			if ( $this->_lazyWrap &&
+				 false === strpos( $_value, $this->_separator ) &&
 				 ( empty( $this->_enclosure ) || false === strpos( $_value, $this->_enclosure ) )
 			)
 			{
@@ -202,8 +201,7 @@ class LineWriter extends ParsingLineReader implements WriterLike
 		if ( !$this->_appendEOL )
 		{
 			$_line .= $this->_lineBreak;
-		}
-		else if ( $this->_linesOut > 0 )
+		} else if ( $this->_linesOut > 0 )
 		{
 			$_line = $this->_lineBreak . $_line;
 		}

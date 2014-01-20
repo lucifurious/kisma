@@ -1,5 +1,5 @@
 <?php
-namespace Kisma\Core;
+namespace Kisma\Tests\Core;
 
 require_once __DIR__ . '/SeedTest_Object.php';
 

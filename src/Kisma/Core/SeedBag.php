@@ -3,7 +3,7 @@
  * This file is part of Kisma(tm).
  *
  * Kisma(tm) <https://github.com/kisma/kisma>
- * Copyright 2009-2013 Jerry Ablan <jerryablan@gmail.com>
+ * Copyright 2009-2014 Jerry Ablan <jerryablan@gmail.com>
  *
  * Kisma(tm) is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -139,8 +139,7 @@ class SeedBag extends Seed implements \ArrayAccess, \Countable, \IteratorAggrega
 				}
 
 				return $this;
-			}
-			else if ( $key instanceof Interfaces\SeedLike )
+			} else if ( $key instanceof Interfaces\SeedLike )
 			{
 				$value = $key;
 				$key = $value->getId();

@@ -1,5 +1,5 @@
 <?php
-namespace Kisma\Core;
+namespace Kisma\Tests\Core;
 
 require_once __DIR__ . '/SeedTest_Object.php';
 
@@ -34,11 +34,9 @@ class SeedTest extends \PHPUnit_Framework_TestCase
 			unset( $this->_object );
 		}
 
-		$this->_object = new \SeedTest_Object(
-			array(
-				'tester' => $this
-			)
-		);
+		$this->_object = new \SeedTest_Object( array(
+			'tester' => $this
+		) );
 	}
 
 	protected function tearDown()
@@ -56,8 +54,9 @@ class SeedTest extends \PHPUnit_Framework_TestCase
 				{
 					foreach ( $_closures as $_closure )
 					{
-						\Kisma\Core\Utility\Log::debug( '-- "' . $_subscriberId . '" of ' . ( is_object( $_closure ) ? get_class( $_closure ) :
-							gettype( $_closure ) ) );
+						\Kisma\Core\Utility\Log::debug(
+							'-- "' . $_subscriberId . '" of ' . ( is_object( $_closure ) ? get_class( $_closure ) : gettype( $_closure ) )
+						);
 					}
 				}
 			}

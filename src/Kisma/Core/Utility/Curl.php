@@ -3,7 +3,7 @@
  * This file is part of Kisma(tm).
  *
  * Kisma(tm) <https://github.com/kisma/kisma>
- * Copyright 2009-2013 Jerry Ablan <jerryablan@gmail.com>
+ * Copyright 2009-2014 Jerry Ablan <jerryablan@gmail.com>
  *
  * Kisma(tm) is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -280,8 +280,7 @@ class Curl extends HttpMethod
 		{
 			$_headers = $headers;
 			$_body = null;
-		}
-		else
+		} else
 		{
 			$_headers = substr( $headers, 0, $size );
 			$_body = substr( $headers, $size );
@@ -433,13 +432,11 @@ class Curl extends HttpMethod
 				'code'    => curl_errno( $_curl ),
 				'message' => curl_error( $_curl ),
 			);
-		}
-		elseif ( true === $_result )
+		} elseif ( true === $_result )
 		{
 			//	Worked, but no data...
 			$_result = null;
-		}
-		else
+		} else
 		{
 			//      Split up the body and headers if requested
 			if ( null !== Option::get( $_curlOptions, CURLOPT_HEADER ) )
@@ -510,8 +507,7 @@ class Curl extends HttpMethod
 		if ( false !== strpos( $_host, ':' ) || ( $_protocol == 'https://' && $_port == 443 ) || ( $_protocol == 'http://' && $_port == 80 ) )
 		{
 			$_port = null;
-		}
-		else
+		} else
 		{
 			$_port = ':' . $_port;
 		}
@@ -522,7 +518,11 @@ class Curl extends HttpMethod
 		}
 
 		$_currentUrl =
-			$_protocol . $_host . $_port . ( true === $includePath ? Option::get( $_parts, 'path' ) : null ) . ( true === $includeQuery ? $_query : null );
+			$_protocol .
+			$_host .
+			$_port .
+			( true === $includePath ? Option::get( $_parts, 'path' ) : null ) .
+			( true === $includeQuery ? $_query : null );
 
 		if ( \Kisma::get( 'debug.curl.current_url' ) )
 		{

@@ -1,5 +1,5 @@
 <?php
-namespace Kisma\Core\Utility;
+namespace Kisma\Tests\Core\Utility;
 
 class OptionTest extends \PHPUnit_Framework_TestCase
 {

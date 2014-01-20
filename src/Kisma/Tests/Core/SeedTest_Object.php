@@ -1,4 +1,6 @@
 <?php
+namespace Kisma\Tests\Core;
+
 /**
  * SeedTest_Object
  */
