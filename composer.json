@@ -1,7 +1,6 @@
 {
 	"name":        "kisma/kisma",
 	"description": "PHP Utility Belt",
-	"version":     "0.2.7",
 	"keywords":    [
 		"php", "php5", "library", "utility"
 	],
