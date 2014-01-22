@@ -3,7 +3,7 @@
  * This file is part of Kisma(tm).
  *
  * Kisma(tm) <https://github.com/kisma/kisma>
- * Copyright 2009-2013 Jerry Ablan <jerryablan@gmail.com>
+ * Copyright 2009-2014 Jerry Ablan <jerryablan@gmail.com>
  *
  * Kisma(tm) is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -174,23 +174,23 @@ class ErrorHandler
 			Render::twigView(
 				$_errorTemplate,
 				array(
-					 'base_path'         => \Kisma::get( 'app.base_path' ),
-					 'app_root'          => \Kisma::get( 'app.root' ),
-					 'page_title'        => 'Error',
-					 'error'             => self::$_error,
-					 'page_header'       => 'Something has gone awry...',
-					 'page_header_small' => 'Not cool. :(',
-					 'navbar'            => array(
-						 'brand' => 'Kisma v' . \Kisma::KismaVersion,
-						 'items' => array(
-							 array(
-								 'title'  => 'Kisma on GitHub!',
-								 'href'   => 'http://github.com/kisma/kisma/',
-								 'target' => '_blank',
-								 'active' => 'active',
-							 ),
-						 ),
-					 ),
+					'base_path'         => \Kisma::get( 'app.base_path' ),
+					'app_root'          => \Kisma::get( 'app.root' ),
+					'page_title'        => 'Error',
+					'error'             => self::$_error,
+					'page_header'       => 'Something has gone awry...',
+					'page_header_small' => 'Not cool. :(',
+					'navbar'            => array(
+						'brand' => 'Kisma v' . \Kisma::KismaVersion,
+						'items' => array(
+							array(
+								'title'  => 'Kisma on GitHub!',
+								'href'   => 'http://github.com/kisma/kisma/',
+								'target' => '_blank',
+								'active' => 'active',
+							),
+						),
+					),
 				)
 			);
 
@@ -235,20 +235,20 @@ class ErrorHandler
 			$_traceItem['file_name'] = trim(
 				str_replace(
 					array(
-						 $_basePath,
-						 "\t",
-						 "\r",
-						 "\n",
-						 PHP_EOL,
-						 'phar://',
+						$_basePath,
+						"\t",
+						"\r",
+						"\n",
+						PHP_EOL,
+						'phar://',
 					),
 					array(
-						 null,
-						 '    ',
-						 null,
-						 null,
-						 null,
-						 null,
+						null,
+						'    ',
+						null,
+						null,
+						null,
+						null,
 					),
 					$trace[$_index]['file']
 				)
@@ -263,31 +263,25 @@ class ErrorHandler
 					if ( is_object( $_arg ) )
 					{
 						$_args .= get_class( $_arg ) . ', ';
-					}
-					else if ( is_array( $_arg ) )
+					} else if ( is_array( $_arg ) )
 					{
 						$_args .= '[array], ';
-					}
-					else if ( is_bool( $_arg ) )
+					} else if ( is_bool( $_arg ) )
 					{
 						if ( $_arg )
 						{
 							$_args .= 'true, ';
-						}
-						else
+						} else
 						{
 							$_args .= 'false, ';
 						}
-					}
-					else if ( is_numeric( $_arg ) )
+					} else if ( is_numeric( $_arg ) )
 					{
 						$_args .= $_arg . ', ';
-					}
-					else if ( is_scalar( $_arg ) )
+					} else if ( is_scalar( $_arg ) )
 					{
 						$_args .= '"' . $_arg . '", ';
-					}
-					else
+					} else
 					{
 						$_args .= '"' . gettype( $_arg ) . '", ';
 					}
@@ -298,10 +292,8 @@ class ErrorHandler
 
 			if ( isset( $_code['type'] ) )
 			{
-				$_traceItem['function'] = ( isset( $_code['class'] ) ? $_code['class'] :
-						null ) . $_code['type'] . $_code['function'];
-			}
-			else
+				$_traceItem['function'] = ( isset( $_code['class'] ) ? $_code['class'] : null ) . $_code['type'] . $_code['function'];
+			} else
 			{
 				$_traceItem['function'] = $_code['function'];
 			}
@@ -349,18 +341,16 @@ class ErrorHandler
 				break;
 			}
 
-			$_line =
-				str_replace(
-					array( "\r", "\n", "\t", PHP_EOL ),
-					array( null, null, '    ', null ),
-					$_source[$_start++]
-				);
+			$_line = str_replace(
+				array( "\r", "\n", "\t", PHP_EOL ),
+				array( null, null, '    ', null ),
+				$_source[$_start++]
+			);
 
 			if ( false === $html )
 			{
 				$_result .= $_line . PHP_EOL;
-			}
-			else
+			} else
 			{
 				$_result .= $_line . '<br />';
 			}

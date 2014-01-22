@@ -3,7 +3,7 @@
  * This file is part of Kisma(tm).
  *
  * Kisma(tm) <https://github.com/kisma/kisma>
- * Copyright 2009-2013 Jerry Ablan <jerryablan@gmail.com>
+ * Copyright 2009-2014 Jerry Ablan <jerryablan@gmail.com>
  *
  * Kisma(tm) is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -134,10 +134,7 @@ class ParsingLineReader extends LineReader
 			$line,
 			$this->_separator,
 			$this->_enclosure,
-			EscapeStyle::SLASHED == $this->_escapeStyle
-				? '\\'
-				:
-				EscapeStyle::DOUBLED == $this->_escapeStyle ? '"' : ''
+			EscapeStyle::SLASHED == $this->_escapeStyle ? '\\' : EscapeStyle::DOUBLED == $this->_escapeStyle ? '"' : ''
 		);
 
 		return $_result;

@@ -3,7 +3,7 @@
  * This file is part of Kisma(tm).
  *
  * Kisma(tm) <https://github.com/kisma/kisma>
- * Copyright 2009-2013 Jerry Ablan <jerryablan@gmail.com>
+ * Copyright 2009-2014 Jerry Ablan <jerryablan@gmail.com>
  *
  * Kisma(tm) is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,7 +24,6 @@ use Kisma\Core\Enums\LineBreak;
 use Kisma\Core\Exceptions\FileSystemException;
 use Kisma\Core\Interfaces\EscapeStyle;
 use Kisma\Core\Interfaces\WriterLike;
-use Kisma\Core\Seed;
 
 /**
  * LineWriter.php
@@ -112,8 +111,7 @@ class LineWriter extends ParsingLineReader implements WriterLike
 		if ( empty( $this->_keys ) )
 		{
 			$_data = $data;
-		}
-		else
+		} else
 		{
 			$_data = array();
 
@@ -171,17 +169,13 @@ class LineWriter extends ParsingLineReader implements WriterLike
 					continue;
 				}
 
-				$_value = '';
-			}
-
-			if ( '' === $_value )
-			{
-				$_values[] = !$this->_wrapWhitespace ? '' : ( $this->_enclosure . $this->_enclosure );
+				$_values[] = !$this->_wrapWhitespace ? null : ( $this->_enclosure . $this->_enclosure );
 				continue;
 			}
 
-			if ( $this->_lazyWrap && false === strpos( $_value, $this->_separator ) &&
-				 ( $this->_enclosure === '' || false === strpos( $_value, $this->_enclosure ) )
+			if ( $this->_lazyWrap &&
+				 false === strpos( $_value, $this->_separator ) &&
+				 ( empty( $this->_enclosure ) || false === strpos( $_value, $this->_enclosure ) )
 			)
 			{
 				$_values[] = $_value;
@@ -193,6 +187,7 @@ class LineWriter extends ParsingLineReader implements WriterLike
 				case EscapeStyle::DOUBLED:
 					$_value = str_replace( $this->_enclosure, $this->_enclosure . $this->_enclosure, $_value );
 					break;
+
 				case EscapeStyle::SLASHED:
 					$_value = str_replace( $this->_enclosure, '\\' . $this->_enclosure, str_replace( '\\', '\\\\', $_value ) );
 					break;
@@ -206,18 +201,19 @@ class LineWriter extends ParsingLineReader implements WriterLike
 		if ( !$this->_appendEOL )
 		{
 			$_line .= $this->_lineBreak;
-		}
-		else if ( $this->_linesOut > 0 )
+		} else if ( $this->_linesOut > 0 )
 		{
 			$_line = $this->_lineBreak . $_line;
 		}
+
+		$_lineSize = function_exists( 'mb_strlen' ) ? mb_strlen( $_line ) : strlen( $_line );
 
 		if ( false === ( $_byteCount = fwrite( $this->_handle, $_line ) ) )
 		{
 			throw new FileSystemException( 'Error writing to file: ' . $this->_fileName );
 		}
 
-		if ( $_byteCount != mb_strlen( $_line ) )
+		if ( $_byteCount != $_lineSize )
 		{
 			throw new FileSystemException( 'Failed to write entire buffer to file: ' . $this->_fileName );
 		}
