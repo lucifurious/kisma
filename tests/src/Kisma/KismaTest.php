@@ -1,6 +1,8 @@
 <?php
-require_once dirname( __DIR__ ) . '/vendor/autoload.php';
 
+/**
+ * KismaTest
+ */
 class KismaTest extends \Kisma\Core\TestCase
 {
 	public function testCallStatic()

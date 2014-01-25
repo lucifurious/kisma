@@ -1,9 +1,8 @@
 {
 	"name":        "kisma/kisma",
 	"description": "PHP Utility Belt",
-	"version":     "0.2.7",
 	"keywords":    [
-		"php", "php5", "library", "utility"
+		"php", "php5", "library", "utility", "tool"
 	],
 	"homepage":    "https://github.com/kisma/kisma",
 	"type":        "library",
@@ -17,9 +16,14 @@
 	"require":     {
 		"php": ">=5.3.10"
 	},
+	"require-dev": {
+		"phpunit/phpunit":     "*",
+		"phpunit/php-invoker": "~1.1.0"
+	},
 	"autoload":    {
-		"psr-0": {
-			"Kisma": "src/"
+		"psr-4": {
+			"Kisma\\":        "src/",
+			"Kisma\\Tests\\": "tests/src/"
 		},
 		"files": ["src/autoload.php"]
 	}

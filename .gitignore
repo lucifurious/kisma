@@ -1,6 +1,7 @@
 */*.log/*
 kisma.log
 examples/blog/app/cache/
+composer.lock
 .gitignore
 vendor
 Original/
