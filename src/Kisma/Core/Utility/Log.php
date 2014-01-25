@@ -3,7 +3,7 @@
  * This file is part of Kisma(tm).
  *
  * Kisma(tm) <https://github.com/kisma/kisma>
- * Copyright 2009-2013 Jerry Ablan <jerryablan@gmail.com>
+ * Copyright 2009-2014 Jerry Ablan <jerryablan@gmail.com>
  *
  * Kisma(tm) is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -58,11 +58,10 @@ class Log extends Seed implements UtilityLike, Levels
 	/**
 	 * @var array The strings to watch for at the beginning of a log line to control the indenting
 	 */
-	protected static $_indentTokens
-		= array(
-			true  => '<*',
-			false => '*>',
-		);
+	protected static $_indentTokens = array(
+		true  => '<*',
+		false => '*>',
+	);
 	/**
 	 * @var string
 	 */
@@ -125,11 +124,11 @@ class Log extends Seed implements UtilityLike, Levels
 
 		$_entry = static::formatLogEntry(
 			array(
-				 'level'     => $_levelName,
-				 'message'   => static::$_prefix . str_repeat( '  ', $_tempIndent ) . $message,
-				 'timestamp' => $_timestamp,
-				 'context'   => $context,
-				 'extra'     => $extra,
+				'level'     => $_levelName,
+				'message'   => static::$_prefix . str_repeat( '  ', $_tempIndent ) . $message,
+				'timestamp' => $_timestamp,
+				'context'   => $context,
+				'extra'     => $extra,
 			)
 		);
 
@@ -181,8 +180,7 @@ class Log extends Seed implements UtilityLike, Levels
 			}
 		}
 
-		$_replacements
-			= array(
+		$_replacements = array(
 			0 => $_level,
 			1 => date( 'M d', $_timestamp ),
 			2 => date( 'H:i:s', $_timestamp ),
@@ -192,11 +190,11 @@ class Log extends Seed implements UtilityLike, Levels
 
 		return str_ireplace(
 				   array(
-						'%%level%%',
-						'%%date%%',
-						'%%time%%',
-						'%%message%%',
-						'%%extra%%',
+					   '%%level%%',
+					   '%%date%%',
+					   '%%time%%',
+					   '%%message%%',
+					   '%%extra%%',
 				   ),
 				   $_replacements,
 				   static::$_logFormat
@@ -351,12 +349,10 @@ class Log extends Seed implements UtilityLike, Levels
 			if ( isset( $_backTrace[$_i]['method'] ) )
 			{
 				$_method = $_backTrace[$_i]['method'];
-			}
-			else if ( isset( $_backTrace[$_i]['function'] ) )
+			} else if ( isset( $_backTrace[$_i]['function'] ) )
 			{
 				$_method = $_backTrace[$_i]['function'];
-			}
-			else
+			} else
 			{
 				$_method = 'Unknown';
 			}

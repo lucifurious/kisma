@@ -3,7 +3,7 @@
  * This file is part of Kisma(tm).
  *
  * Kisma(tm) <https://github.com/kisma/kisma>
- * Copyright 2009-2013 Jerry Ablan <jerryablan@gmail.com>
+ * Copyright 2009-2014 Jerry Ablan <jerryablan@gmail.com>
  *
  * Kisma(tm) is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,10 +20,10 @@
  */
 namespace Kisma\Core\Utility;
 
+use Kisma\Core\Enums\GlobFlags;
+use Kisma\Core\Exceptions\UtilityException;
 use Kisma\Core\Interfaces\UtilityLike;
 use Kisma\Core\Seed;
-use Kisma\Core\Exceptions\UtilityException;
-use Kisma\Core\Enums\GlobFlags;
 
 /**
  * FileSystem
@@ -263,9 +263,9 @@ class FileSystem extends Seed implements UtilityLike
 				// Match file mask
 				if ( fnmatch( $_mask, $_file ) )
 				{
-					if ( ( ( !( $flags & GLOB_ONLYDIR ) ) || is_dir( "$_path/$_file" ) )
-						 && ( ( !( $flags & GlobFlags::GLOB_NODIR ) ) || ( !is_dir( $_path . '/' . $_file ) ) )
-						 && ( ( !( $flags & GlobFlags::GLOB_NODOTS ) ) || ( !in_array( $_file, array( '.', '..' ) ) ) )
+					if ( ( ( !( $flags & GLOB_ONLYDIR ) ) || is_dir( "$_path/$_file" ) ) &&
+						 ( ( !( $flags & GlobFlags::GLOB_NODIR ) ) || ( !is_dir( $_path . '/' . $_file ) ) ) &&
+						 ( ( !( $flags & GlobFlags::GLOB_NODOTS ) ) || ( !in_array( $_file, array( '.', '..' ) ) ) )
 					)
 					{
 						$_glob[] = ( $flags & GlobFlags::GLOB_PATH ? $_path . '/' : '' ) . $_file . ( $flags & GLOB_MARK ? '/' : '' );

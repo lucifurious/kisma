@@ -3,7 +3,7 @@
  * This file is part of Kisma(tm).
  *
  * Kisma(tm) <https://github.com/kisma/kisma>
- * Copyright 2009-2013 Jerry Ablan <jerryablan@gmail.com>
+ * Copyright 2009-2014 Jerry Ablan <jerryablan@gmail.com>
  *
  * Kisma(tm) is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -148,12 +148,11 @@ class Markup
 			$attributes = Convert::kvpToString( $attributes, static::$_uppercaseTags );
 		}
 
-		return
-			str_replace(
-				static::ValuePlaceholder,
-				static::_cleanTag( $tag ) . ' ' . $attributes,
-				static::_tagPattern( true, $selfClose )
-			);
+		return str_replace(
+			static::ValuePlaceholder,
+			static::_cleanTag( $tag ) . ' ' . $attributes,
+			static::_tagPattern( true, $selfClose )
+		);
 	}
 
 	/**
@@ -163,12 +162,11 @@ class Markup
 	 */
 	public static function closeTag( $tag )
 	{
-		return
-			str_replace(
-				static::ValuePlaceholder,
-				static::_cleanTag( $tag ),
-				static::_tagPattern( false )
-			);
+		return str_replace(
+			static::ValuePlaceholder,
+			static::_cleanTag( $tag ),
+			static::_tagPattern( false )
+		);
 	}
 
 	/**

@@ -10,3 +10,4 @@ src/Kisma/Pods
 src/Kisma/Strata
 tests/log/
 composer.lock
+doc

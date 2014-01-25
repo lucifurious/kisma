@@ -3,7 +3,7 @@
  * This file is part of Kisma(tm).
  *
  * Kisma(tm) <https://github.com/kisma/kisma>
- * Copyright 2009-2013 Jerry Ablan <jerryablan@gmail.com>
+ * Copyright 2009-2014 Jerry Ablan <jerryablan@gmail.com>
  *
  * Kisma(tm) is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,7 +22,6 @@ namespace Kisma\Core\Utility;
 
 use Kisma\Core\SeedUtility;
 use Kisma\Core\Tools\DataReader;
-use Kisma\Core\Utility\Option;
 
 /**
  * Sql
@@ -254,17 +253,12 @@ class Sql extends SeedUtility
 		{
 			self::$_connectionString = $connectionString;
 
-			self::$_connection = new \PDO(
-				self::$_connectionString,
-				$userName,
-				$password,
-				array_merge(
-					array(
-						 \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
-					),
-					$pdoOptions
-				)
-			);
+			self::$_connection = new \PDO( self::$_connectionString, $userName, $password, array_merge(
+				array(
+					\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
+				),
+				$pdoOptions
+			) );
 		}
 
 		return self::$_connection;

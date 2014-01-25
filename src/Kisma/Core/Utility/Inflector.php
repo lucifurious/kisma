@@ -3,7 +3,7 @@
  * This file is part of Kisma(tm).
  *
  * Kisma(tm) <https://github.com/kisma/kisma>
- * Copyright 2009-2013 Jerry Ablan <jerryablan@gmail.com>
+ * Copyright 2009-2014 Jerry Ablan <jerryablan@gmail.com>
  *
  * Kisma(tm) is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -236,36 +236,33 @@ class Inflector implements UtilityLike
 	 */
 	public static function pluralize( $name )
 	{
+		/** @noinspection SpellCheckingInspection */
 		static $_rules = array(
-			'/(quiz)$/i'                     => '1zes',
-			'/^(ox)$/i'                      => '1en',
-			'/([m|l])ouse$/i'                => '1ice',
-			'/(matr|vert|ind)ix|ex$/i'       => '1ices',
-			'/(x|ch|ss|sh)$/i'               => '1es',
-			'/([^aeiouy]|qu)ies$/i'          => '1y',
-			'/([^aeiouy]|qu)y$/i'            => '1ies',
-			'/(hive)$/i'                     => '1s',
-			'/(?:([^f])fe|([lr])f)$/i'       => '12ves',
-			'/sis$/i'                        => 'ses',
-			'/([ti])um$/i'                   => '1a',
-			'/(buffal|tomat)o$/i'            => '1oes',
-			'/(bu)s$/i'                      => '1ses',
-			'/(alias|status)/i'              => '1es',
-			'/(octop|vir)us$/i'              => '1i',
-			'/(ax|test)is$/i'                => '1es',
-			'/s$/i'                          => 's',
-			'/$/'                            => 's',
-			'/move$/i'                       => 'moves',
-			'/foot$/i'                       => 'feet',
-			'/child$/i'                      => 'children',
-			'/human$/i'                      => 'humans',
-			'/man$/i'                        => 'men',
-			'/tooth$/i'                      => 'teeth',
-			'/person$/i'                     => 'people',
-			'/(x|ch|ss|sh|us|as|is|os)$/i'   => '\1es',
-			'/(shea|lea|loa|thie)f$/i'       => '\1ves',
-			'/(tomat|potat|ech|her|vet)o$/i' => '\1oes',
-			'/s$/'                           => 's',
+			'/(quiz)$/i'                            => '\1zes',
+			'/^(ox)$/i'                             => '\1en',
+			'/([m|l])ouse$/i'                       => '\1ice',
+			'/(matr|vert|ind)ix|ex$/i'              => '\1ices',
+			'/(x|ch|ss|sh|us|as|is|os)$/i'          => '\1es',
+			'/(shea|lea|loa|thie)f$/i'              => '\1ves',
+			'/(buffal|tomat|potat|ech|her|vet)o$/i' => '\1oes',
+			'/([^aeiouy]|qu)ies$/i'                 => '\1y',
+			'/([^aeiouy]|qu)y$/i'                   => '\1ies',
+			'/(?:([^f])fe|([lr])f)$/i'              => '\1\2ves',
+			'/([ti])um$/i'                          => '\1a',
+			'/(bu)s$/i'                             => '\1ses',
+			'/(hive)$/i'                            => '\1s',
+			'/(alias|status)/i'                     => '\1es',
+			'/(octop|vir|radi)us$/i'                => '\1i',
+			'/(ax|test)is$/i'                       => '\1es',
+			'/sis$/i'                               => 'ses',
+			'/move$/i'                              => 'moves',
+			'/foot$/i'                              => 'feet',
+			'/child$/i'                             => 'children',
+			'/human$/i'                             => 'humans',
+			'/man$/i'                               => 'men',
+			'/tooth$/i'                             => 'teeth',
+			'/person$/i'                            => 'people',
+			'/$/'                                   => 's',
 		);
 
 		foreach ( $_rules as $_rule => $_replacement )

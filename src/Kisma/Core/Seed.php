@@ -3,7 +3,7 @@
  * This file is part of Kisma(tm).
  *
  * Kisma(tm) <https://github.com/kisma/kisma>
- * Copyright 2009-2013 Jerry Ablan <jerryablan@gmail.com>
+ * Copyright 2009-2014 Jerry Ablan <jerryablan@gmail.com>
  *
  * Kisma(tm) is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
  */
 namespace Kisma\Core;
 
-use \Kisma\Core\Utility;
+use Kisma\Core\Utility;
 
 /**
  * Seed
@@ -219,12 +219,7 @@ class Seed implements Interfaces\SeedLike, Interfaces\PublisherLike
 	public function publish( $eventName, $eventData = null )
 	{
 		//	A little chicanery...
-		return
-			false !== $this->_eventManager
-				?
-				call_user_func( array( $this->_eventManager, 'publish' ), $this, $eventName, $eventData )
-				:
-				false;
+		return false !== $this->_eventManager ? call_user_func( array( $this->_eventManager, 'publish' ), $this, $eventName, $eventData ) : false;
 	}
 
 	/**
@@ -235,18 +230,18 @@ class Seed implements Interfaces\SeedLike, Interfaces\PublisherLike
 	 */
 	public function on( $tag, $listener = null )
 	{
-		if ( !( $this instanceof Interfaces\SubscriberLike ) || empty( $this->_eventManager ) )
+		//  Add our event handlers
+		if ( $this instanceof Interfaces\SubscriberLike && !empty( $this->_eventManager ) )
 		{
-			return false;
+			return call_user_func(
+				array( $this->_eventManager, 'on' ),
+				$this,
+				$tag,
+				$listener
+			);
 		}
 
-		//	Otherwise add handler
-		return call_user_func(
-			array( $this->_eventManager, 'on' ),
-			$this,
-			$tag,
-			$listener
-		);
+		return false;
 	}
 
 	/**

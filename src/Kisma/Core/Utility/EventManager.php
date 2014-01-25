@@ -3,7 +3,7 @@
  * This file is part of Kisma(tm).
  *
  * Kisma(tm) <https://github.com/kisma/kisma>
- * Copyright 2009-2013 Jerry Ablan <jerryablan@gmail.com>
+ * Copyright 2009-2014 Jerry Ablan <jerryablan@gmail.com>
  *
  * Kisma(tm) is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,7 +22,6 @@ namespace Kisma\Core\Utility;
 
 use Kisma\Core\Exceptions\InvalidEventHandlerException;
 use Kisma\Core\SeedUtility;
-use Kisma\Core\Utility\Log;
 
 /**
  * EventManager class
@@ -252,7 +251,7 @@ class EventManager extends SeedUtility
 				Log::debug(
 					'-- "' . $object->getTag() . '" unsubscribed from "' . $_eventTag . '"',
 					array(
-						 'tag' => $_subscriberId,
+						'tag' => $_subscriberId,
 					)
 				);
 			}
@@ -290,12 +289,7 @@ class EventManager extends SeedUtility
 		}
 
 		//	Make a new event if one wasn't provided
-		$_event =
-			( $eventData instanceof \Kisma\Core\Events\SeedEvent )
-				?
-				$eventData
-				:
-				new \Kisma\Core\Events\SeedEvent( $publisher, $eventData );
+		$_event = ( $eventData instanceof \Kisma\Core\Events\SeedEvent ) ? $eventData : new \Kisma\Core\Events\SeedEvent( $publisher, $eventData );
 
 		$_event->setEventTag( $_eventTag );
 
@@ -335,27 +329,21 @@ class EventManager extends SeedUtility
 //									'eventId' => $_event->getEventId(),
 //								)
 //							);
-						}
-						elseif ( is_array( $_closure ) && 1 == count( $_closure ) && $_closure[0] instanceof \Closure )
+						} elseif ( is_array( $_closure ) && 1 == count( $_closure ) && $_closure[0] instanceof \Closure )
 						{
 							//	Call the closure...
 							if ( false === $_closure[0]( $_event ) )
 							{
 								return false;
 							}
-						}
-						else
+						} else
 						{
 							//	Oops!
-							throw new InvalidEventHandlerException(
-								'Event "' .
-								( is_object( $_closure[0] )
-									?
-									get_class( $_closure[0] )
-									:
-									'<unknownClass>' ) .
-								'.' . $_eventTag . ' has an invalid listener subscribed to it.'
-							);
+							throw new InvalidEventHandlerException( 'Event "' .
+																	( is_object( $_closure[0] ) ? get_class( $_closure[0] ) : '<unknownClass>' ) .
+																	'.' .
+																	$_eventTag .
+																	' has an invalid listener subscribed to it.' );
 						}
 
 						unset( $_closure );

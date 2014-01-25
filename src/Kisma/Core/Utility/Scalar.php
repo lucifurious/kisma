@@ -3,7 +3,7 @@
  * This file is part of Kisma(tm).
  *
  * Kisma(tm) <https://github.com/kisma/kisma>
- * Copyright 2009-2013 Jerry Ablan <jerryablan@gmail.com>
+ * Copyright 2009-2014 Jerry Ablan <jerryablan@gmail.com>
  *
  * Kisma(tm) is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -89,8 +89,7 @@ class Scalar implements UtilityLike
 		if ( 'y' == $_value )
 		{
 			$_value = 'yes';
-		}
-		elseif ( 'n' == $_value )
+		} elseif ( 'n' == $_value )
 		{
 			$_value = 'no';
 		}
@@ -144,13 +143,11 @@ class Scalar implements UtilityLike
 				if ( $deep )
 				{
 					$array[$key] = self::array_prepend( $element, $string, $deep );
-				}
-				else
+				} else
 				{
 					trigger_error( 'array_prepend: array element', E_USER_WARNING );
 				}
-			}
-			else
+			} else
 			{
 				$array[$key] = $string . $element;
 			}

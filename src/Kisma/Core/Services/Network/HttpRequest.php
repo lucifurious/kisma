@@ -3,7 +3,7 @@
  * This file is part of Kisma(tm).
  *
  * Kisma(tm) <https://github.com/kisma/kisma>
- * Copyright 2009-2013 Jerry Ablan <jerryablan@gmail.com>
+ * Copyright 2009-2014 Jerry Ablan <jerryablan@gmail.com>
  *
  * Kisma(tm) is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,11 +20,10 @@
  */
 namespace Kisma\Core\Services\Network;
 
-use Kisma\Core\Services\SeedRequest;
 use Kisma\Core\Enums\HttpMethod;
-use Kisma\Core\Utility\FilterInput;
-use Kisma\Core\Utility\Inflector;
 use Kisma\Core\Interfaces\RequestSource;
+use Kisma\Core\Services\SeedRequest;
+use Kisma\Core\Utility\Inflector;
 
 /**
  * HttpRequest
@@ -93,8 +92,7 @@ class HttpRequest extends SeedRequest
 
 					$_tag = Inflector::tag( $_key, true, 'HTTP_' );
 					$_goodies['server.headers'][$_tag] = $_value;
-				}
-				else
+				} else
 				{
 					$_tag = 'server.' . Inflector::tag( $_key, true );
 					$_goodies[$_tag] = $_value;
