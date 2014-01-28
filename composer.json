@@ -4,7 +4,7 @@
 	"keywords":    [
 		"php", "php5", "library", "utility", "tool"
 	],
-	"homepage":    "https://github.com/kisma/kisma",
+	"homepage":    "https://github.com/lucifurious/kisma",
 	"type":        "library",
 	"license":     "GPL3",
 	"authors":     [
@@ -17,8 +17,12 @@
 		"php": ">=5.3.10"
 	},
 	"require-dev": {
-		"phpunit/phpunit":     "*",
-		"phpunit/php-invoker": "~1.1.0"
+		"symfony/yaml":         "~2.0",
+		"doctrine/couchdb":     "@dev",
+		"doctrine/couchdb-odm": "@dev",
+		"phpunit/phpunit":      "@stable",
+		"phpunit/php-invoker":  "@stable"
+
 	},
 	"autoload":    {
 		"psr-4": {

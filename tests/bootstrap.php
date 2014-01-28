@@ -1,6 +1,8 @@
 <?php
 use Kisma\Core\Utility\Log;
+use Kisma\Kisma;
 
-require_once dirname( __DIR__ ) . '/vendor/autoload.php';
+$_rootPath = dirname( __DIR__ );
 
-Log::setDefaultLog( __DIR__ . '/log/test.log' );
+Kisma::setAutoLoader( $_autoloader = require( $_rootPath . '/vendor/autoload.php' ) );
+Log::setDefaultLog( $_rootPath . '/log/unit-tests.log' );

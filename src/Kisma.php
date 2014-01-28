@@ -3,7 +3,7 @@
  * This file is part of Kisma(tm).
  *
  * Kisma(tm) <https://github.com/kisma/kisma>
- * Copyright 2009-2013 Jerry Ablan <jerryablan@gmail.com>
+ * Copyright 2009-2014 Jerry Ablan <jerryablan@gmail.com>
  *
  * Kisma(tm) is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,13 +18,19 @@
  * You should have received a copy of the GNU General Public License
  * along with Kisma(tm).  If not, see <http://www.gnu.org/licenses/>.
  */
-use Kisma\Core\Interfaces\KismaSettings;
+namespace Kisma;
+
+use Composer\Autoload\ClassLoader;
+use Composer\Script\Event;
+use Kisma\Core\Enums\KismaSettings;
+use Kisma\Core\Interfaces\Events as Events;
 use Kisma\Core\Interfaces\PublisherLike;
 use Kisma\Core\Utility\Detector;
 use Kisma\Core\Utility\EventManager;
 use Kisma\Core\Utility\Inflector;
 use Kisma\Core\Utility\Option;
 use Kisma\Core\Utility\Scalar;
+use Kisma\Core\Utility\Storage;
 
 /**
  * Kisma
@@ -34,10 +40,10 @@ use Kisma\Core\Utility\Scalar;
  * @method static bool setConception( bool $how ) Sets the conception flag
  * @method static mixed getDebug() Gets the debug setting( s )
  * @method static mixed setDebug( mixed $how ) Sets the debug setting( s )
- * @method static \Composer\Autoload\ClassLoader getAutoLoader()
+ * @method static ClassLoader getAutoLoader()
  * @method static mixed setAutoLoader( mixed $autoLoader )
  */
-class Kisma implements PublisherLike, \Kisma\Core\Interfaces\Events\Kisma, KismaSettings
+class Kisma implements PublisherLike, Events\Kisma, Core\Interfaces\KismaSettings
 {
 	//*************************************************************************
 	//* Constants
@@ -45,8 +51,13 @@ class Kisma implements PublisherLike, \Kisma\Core\Interfaces\Events\Kisma, Kisma
 
 	/**
 	 * @var string The current version
+	 * @deprecated Please use Kisma::KISMA_VERSION
 	 */
 	const KismaVersion = '0.2.7';
+	/**
+	 * @var string The current version
+	 */
+	const KISMA_VERSION = '0.2.7';
 
 	//*************************************************************************
 	//* Members
@@ -56,13 +67,13 @@ class Kisma implements PublisherLike, \Kisma\Core\Interfaces\Events\Kisma, Kisma
 	 * @var array The library configuration options
 	 */
 	protected static $_options = array(
-		self::BasePath   => __DIR__,
+		self::BasePath => __DIR__,
 		self::AutoLoader => null,
 		self::Conception => false,
-		self::Version    => self::KismaVersion,
-		self::Name       => 'App',
-		self::NavBar     => null,
-		self::Framework  => null,
+		self::Version => self::KISMA_VERSION,
+		self::Name => 'App',
+		self::NavBar => null,
+		self::Framework => null,
 	);
 
 	//**************************************************************************
@@ -96,7 +107,7 @@ class Kisma implements PublisherLike, \Kisma\Core\Interfaces\Events\Kisma, Kisma
 			\register_shutdown_function(
 				function ( $eventName = Kisma::Death )
 				{
-					\Kisma::__sleep();
+					Kisma::__sleep();
 					EventManager::publish( null, $eventName );
 				}
 			);
@@ -126,10 +137,8 @@ class Kisma implements PublisherLike, \Kisma\Core\Interfaces\Events\Kisma, Kisma
 	public static function __sleep()
 	{
 		//	Save options out to session...
-		if ( isset( $_SESSION ) )
-		{
-			$_SESSION['kisma.options'] = static::$_options;
-		}
+		$_data = Storage::freeze( static::$_options );
+		isset( $_SESSION ) ? $_SESSION['kisma.options'] = $_data : $GLOBALS['kisma.options'] = $_data;
 	}
 
 	/**
@@ -138,14 +147,16 @@ class Kisma implements PublisherLike, \Kisma\Core\Interfaces\Events\Kisma, Kisma
 	public static function __wakeup()
 	{
 		//	Load options from session...
-		if ( isset( $_SESSION, $_SESSION['kisma.options'] ) )
-		{
-			//	Merge them into the fold
-			static::$_options = array_merge(
-				$_SESSION['kisma.options'],
-				static::$_options
-			);
-		}
+		$_data =
+			isset( $_SESSION, $_SESSION['kisma.options'] )
+				? $_SESSION['kisma.options'] : ( isset( $GLOBALS, $GLOBALS['kisma.options'] )
+				? $GLOBALS['kisma.options'] : array() );
+
+		//	Merge them into the fold
+		static::$_options = array_merge(
+			(array)Storage::defrost( $_data ),
+			static::$_options
+		);
 	}
 
 	/**
@@ -214,7 +225,7 @@ class Kisma implements PublisherLike, \Kisma\Core\Interfaces\Events\Kisma, Kisma
 		{
 			$_tag = 'app.' . Inflector::tag( substr( $name, 3 ), true );
 
-			if ( \Kisma\Core\Enums\KismaSettings::contains( $_tag ) )
+			if ( KismaSettings::contains( $_tag ) )
 			{
 				array_unshift( $arguments, $_tag );
 
@@ -250,17 +261,17 @@ class Kisma implements PublisherLike, \Kisma\Core\Interfaces\Events\Kisma, Kisma
 	}
 
 	/**
-	 * @param Composer\Script\Event $event
+	 * @param Event $event
 	 */
-	public static function postInstall( \Composer\Script\Event $event )
+	public static function postInstall( Event $event )
 	{
 		//	Nada
 	}
 
 	/**
-	 * @param Composer\Script\Event $event
+	 * @param Event $event
 	 */
-	public static function postUpdate( \Composer\Script\Event $event )
+	public static function postUpdate( Event $event )
 	{
 		//	Nada
 	}
