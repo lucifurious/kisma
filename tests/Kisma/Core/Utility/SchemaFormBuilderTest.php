@@ -1,5 +1,5 @@
 <?php
-namespace Kisma\Tests\Core\Utility;
+namespace Kisma\Core\Utility;
 
 class SchemaFormBuilderTest extends \PHPUnit_Framework_TestCase
 {

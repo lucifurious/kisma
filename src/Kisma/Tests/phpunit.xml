@@ -1,8 +1,0 @@
-<phpunit strict="true" verbose="true">
-	<php>
-		<const name="Psr0_ProjectRootNamespaces" value="PROJECT_ROOT_NAMESPACES"/>
-		<const name="Psr0_ScannerStartDir" value="./Core"/>
-		<const name="Psr0_ScannerInclude" value="*.php"/>
-		<const name="Psr0_ScannerExclude" value="*/vendor/*:*/Test/*"/>
-	</php>
-</phpunit>

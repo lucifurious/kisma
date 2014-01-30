@@ -1,5 +1,5 @@
 <?php
-namespace Kisma\Tests\Core\Components;
+namespace Kisma\Core\Components;
 
 use Kisma\Core\Components\LineWriter;
 use Kisma\Core\Components\ParsingLineReader;
