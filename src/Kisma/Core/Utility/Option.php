@@ -131,7 +131,8 @@ class Option
 				}
 
 				return $_newValue;
-			} else if ( method_exists( $options, 'get' . $key ) )
+			}
+			else if ( method_exists( $options, 'get' . $key ) )
 			{
 				$_getter = 'get' . Inflector::deneutralize( $key );
 				$_setter = 'set' . Inflector::deneutralize( $key );
@@ -258,7 +259,8 @@ class Option
 				if ( method_exists( $options, $_setter ) )
 				{
 					$options->{$_setter}( $_value );
-				} else
+				}
+				else
 				{
 					if ( !property_exists( $options, $_key ) && property_exists( $options, $_cleanKey ) )
 					{
@@ -286,19 +288,29 @@ class Option
 
 		if ( static::contains( $options, $key ) )
 		{
-			$key = static::_cleanKey( $key );
+			$_cleanedKey = static::_cleanKey( $key );
 
 			if ( is_array( $options ) )
 			{
+				if ( !isset( $options[$key] ) && isset( $options[$_cleanedKey] ) )
+				{
+					$key = $_cleanedKey;
+				}
+
 				if ( isset( $options[$key] ) )
 				{
 					$_originalValue = $options[$key];
+					unset( $options[$key] );
+				}
+			}
+			else
+			{
+				if ( !isset( $options->{$key} ) && isset( $options->{$_cleanedKey} ) )
+				{
+					$key = $_cleanedKey;
 				}
 
-				unset( $options[$key] );
-			} else
-			{
-				if ( isset( $options->$key ) )
+				if ( isset( $options->{$key} ) )
 				{
 					$_originalValue = $options->{$key};
 				}
@@ -449,7 +461,7 @@ class Option
 	 */
 	protected static function _cleanKey( $key, $opposite = true )
 	{
-		if ( $key == ( $_cleaned = Inflector::tag( $key, true ) ) )
+		if ( $key == ( $_cleaned = Inflector::neutralize( $key ) ) )
 		{
 			if ( false !== $opposite )
 			{
