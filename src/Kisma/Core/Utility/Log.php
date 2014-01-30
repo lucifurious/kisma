@@ -74,6 +74,10 @@ class Log extends Seed implements UtilityLike, Levels
 	 * @var bool If true, pid, uid, and hostname are added to log entry
 	 */
 	protected static $_includeProcessInfo = false;
+	/**
+	 * @var bool Set when log file has been validated
+	 */
+	protected static $_logFileValid = false;
 
 	//********************************************************************************
 	//* Methods
@@ -100,6 +104,19 @@ class Log extends Seed implements UtilityLike, Levels
 			{
 				return true;
 			}
+		}
+
+		if ( $_firstRun || !static::$_logFileValid )
+		{
+			$_logFile = static::getDefaultLog();
+
+			if ( empty( $_logFile ) || !file_exists( $_logFile ) )
+			{
+				static::setDefaultLog( LOG_SYSLOG );
+				static::$_logFileValid = true;
+			}
+
+			$_firstRun = false;
 		}
 
 		$_timestamp = time();
@@ -132,7 +149,14 @@ class Log extends Seed implements UtilityLike, Levels
 			)
 		);
 
-		error_log( $_entry, 3, static::$_defaultLog );
+		if ( static::$_logFileValid || is_numeric( static::$_defaultLog ) )
+		{
+			error_log( $_entry );
+		}
+		else
+		{
+			error_log( $_entry, 3, static::$_defaultLog );
+		}
 
 		//	Set indent level...
 		static::$_currentIndent += $_newIndent;
@@ -189,16 +213,16 @@ class Log extends Seed implements UtilityLike, Levels
 		);
 
 		return str_ireplace(
-				   array(
-					   '%%level%%',
-					   '%%date%%',
-					   '%%time%%',
-					   '%%message%%',
-					   '%%extra%%',
-				   ),
-				   $_replacements,
-				   static::$_logFormat
-			   ) . ( $newline ? PHP_EOL : null );
+			array(
+				'%%level%%',
+				'%%date%%',
+				'%%time%%',
+				'%%message%%',
+				'%%extra%%',
+			),
+			$_replacements,
+			static::$_logFormat
+		) . ( $newline ? PHP_EOL : null );
 	}
 
 	/**
@@ -349,10 +373,12 @@ class Log extends Seed implements UtilityLike, Levels
 			if ( isset( $_backTrace[$_i]['method'] ) )
 			{
 				$_method = $_backTrace[$_i]['method'];
-			} else if ( isset( $_backTrace[$_i]['function'] ) )
+			}
+			else if ( isset( $_backTrace[$_i]['function'] ) )
 			{
 				$_method = $_backTrace[$_i]['function'];
-			} else
+			}
+			else
 			{
 				$_method = 'Unknown';
 			}
