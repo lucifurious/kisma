@@ -6,7 +6,10 @@
 	],
 	"homepage":    "https://github.com/kisma/kisma",
 	"type":        "library",
-	"license":     "GPL3",
+	"license":     ["MIT"],
+	"config":      {
+		"bin-dir": "bin"
+	},
 	"authors":     [
 		{
 			"name":  "Jerry Ablan",
@@ -14,7 +17,7 @@
 		}
 	],
 	"require":     {
-		"php": ">=5.3.10"
+		"php":             ">=5.3.10"
 	},
 	"autoload":    {
 		"psr-0": {
