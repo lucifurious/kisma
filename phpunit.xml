@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit bootstrap="./tests/bootstrap.php"
+		 backupGlobals="true"
+		 colors="true"
+		 convertErrorsToExceptions="true"
+		 convertNoticesToExceptions="true"
+		 convertWarningsToExceptions="true"
+		 processIsolation="false"
+		 syntaxCheck="true"
+		 verbose="true"
+		 strict="false"
+		 stopOnError="true"
+		 stopOnFailure="false"
+		 stopOnIncomplete="false"
+		 stopOnSkipped="false">
+	<php>
+		<ini name="memory_limit" value="2048M"/>
+	</php>
+	<testsuite name="Release">
+		<directory suffix="Test.php">./tests</directory>
+		<exclude>
+			<directory>./tests/log</directory>
+			<directory>./tests/metrics</directory>
+			<directory>./tests/config</directory>
+			<directory>./tests/web</directory>
+			<directory>./tests/public</directory>
+		</exclude>
+	</testsuite>
+	<logging>
+		<log type="coverage-html"
+			 target="./tests/metrics/codeCoverage"
+			 charset="UTF-8"
+			 yui="true"
+			 highlight="false"
+			 lowUpperBound="35"
+			 highLowerBound="70"/>
+		<log type="coverage-clover" target="./tests/metrics/codeCoverage/codeCoverage.xml"/>
+		<log type="metrics-xml" target="./tests/metrics/metrics.xml"/>
+		<log type="test-xml" target="./tests/metrics/logfile.xml" logIncompleteSkipped="false"/>
+	</logging>
+</phpunit>
