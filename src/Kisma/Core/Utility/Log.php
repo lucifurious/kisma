@@ -41,7 +41,7 @@ class Log extends Seed implements UtilityLike, Levels
 	/**
 	 * @var string The relative path (from the Kisma base path) for the default log
 	 */
-	const DefaultLogFile = '/log/kisma.log';
+	const DefaultLogFile = '/kisma.log';
 
 	//********************************************************************************
 	//* Members
@@ -108,9 +108,9 @@ class Log extends Seed implements UtilityLike, Levels
 
 		if ( $_firstRun || !static::$_logFileValid )
 		{
-			$_logFile = static::getDefaultLog();
+			static::$_logFileValid = static::_checkLogFile();
 
-			if ( empty( $_logFile ) || !file_exists( $_logFile ) )
+			if ( !static::$_logFileValid || empty( static::$_defaultLog ) || !file_exists( static::$_defaultLog ) )
 			{
 				static::setDefaultLog( LOG_SYSLOG );
 				static::$_logFileValid = true;
@@ -426,9 +426,32 @@ class Log extends Seed implements UtilityLike, Levels
 		//	Set a name for the default log
 		if ( null === static::$_defaultLog )
 		{
-			$_logPath = \Kisma::get( 'app.log_path', \Kisma::get( 'app.base_path' ) );
-			Log::setDefaultLog( $_logPath . static::DefaultLogFile );
+			$_logPath = \Kisma::get( 'app.log_path', \Kisma::get( 'app.base_path' ) ) ? : getcwd();
+			static::$_defaultLog = $_logPath . static::DefaultLogFile;
 		}
+		else
+		{
+			if ( !is_file( static::$_defaultLog ) && is_dir( static::$_defaultLog ) )
+			{
+				$_logPath = static::$_defaultLog;
+				static::$_defaultLog .= static::DefaultLogFile;
+			}
+			else
+			{
+				$_logPath = dirname( static::$_defaultLog );
+			}
+		}
+
+		//	Try and create the path
+		if ( !is_dir( $_logPath ) )
+		{
+			if ( false === @mkdir( $_logPath, 0777, true ) )
+			{
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	/**
