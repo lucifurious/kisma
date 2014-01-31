@@ -4,5 +4,7 @@ use Kisma\Kisma;
 
 $_rootPath = dirname( __DIR__ );
 
-Kisma::setAutoLoader( $_autoloader = require( $_rootPath . '/vendor/autoload.php' ) );
+$_autoloader = require( $_rootPath . '/vendor/autoload.php' );
+
+Kisma::setAutoLoader( $_autoloader );
 Log::setDefaultLog( $_rootPath . '/log/unit-tests.log' );

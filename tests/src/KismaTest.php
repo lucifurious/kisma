@@ -1,12 +1,10 @@
 <?php
 namespace Kisma;
 
-use Kisma\Core\TestCase;
-
 /**
  * KismaTest
  */
-class KismaTest extends TestCase
+class KismaTest extends \PHPUnit_Framework_TestCase
 {
 	/**
 	 * @covers \Kisma\Kisma::__callStatic
@@ -25,7 +23,7 @@ class KismaTest extends TestCase
 	}
 
 	/**
-	 * @covers \Kisma\Kisma::getAutoLoader
+	 * @covers \Kisma\Kisma::get
 	 */
 	public function testGetAutoLoader()
 	{
@@ -35,12 +33,14 @@ class KismaTest extends TestCase
 	}
 
 	/**
-	 * @covers \Kisma\Kisma::getBasePath
+	 * @covers \Kisma\Kisma::get
 	 */
 	public function testGetBasePath()
 	{
-		echo 'path = ' . $_path = Kisma::get( 'app.base_path' );
-		$this->assertTrue( realpath( __DIR__ . '/..' ) == realpath( $_path ) );
+		$_path = realpath( Kisma::get( 'app.base_path' ) );
+		$_testPath = realpath( dirname( dirname( __DIR__ ) ) ) . '/src';
+
+		$this->assertTrue( $_path == $_testPath );
 	}
 
 	/**
