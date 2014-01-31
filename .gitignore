@@ -5,5 +5,4 @@ vendor
 .idea/*.iml
 tests/log/
 tests/metrics/
-composer.lock
 doc
