@@ -1,0 +1,2790 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+    <meta charset="utf-8"/>
+    <title>API Documentation</title>
+    <meta name="author" content=""/>
+    <meta name="description" content=""/>
+
+    <link href="https://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.no-icons.min.css" rel="stylesheet">
+    <link href="https://netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.min.css" rel="stylesheet">
+    <link href="../css/prism.css" rel="stylesheet" media="all"/>
+    <link href="../css/template.css" rel="stylesheet" media="all"/>
+    
+    <!--[if lt IE 9]>
+    <script src="https://html5shim.googlecode.com/svn/trunk/html5.js" type="text/javascript"></script>
+    <![endif]-->
+    <script src="https://code.jquery.com/jquery-1.10.2.min.js" type="text/javascript"></script>
+    <script src="https://code.jquery.com/ui/1.10.3/jquery-ui.min.js" type="text/javascript"></script>
+    <script src="https://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
+    <script src="../js/jquery.smooth-scroll.js"></script>
+    <script src="../js/prism.min.js"></script>
+    <!-- TODO: Add http://jscrollpane.kelvinluck.com/ to style the scrollbars for browsers not using webkit-->
+    <script type="text/javascript">
+    function loadExternalCodeSnippets() {
+        Array.prototype.slice.call(document.querySelectorAll('pre[data-src]')).forEach(function (pre) {
+            var src = pre.getAttribute('data-src');
+            var extension = (src.match(/\.(\w+)$/) || [, ''])[1];
+            var language = 'php';
+
+            var code = document.createElement('code');
+            code.className = 'language-' + language;
+
+            pre.textContent = '';
+
+            code.textContent = 'Loading…';
+
+            pre.appendChild(code);
+
+            var xhr = new XMLHttpRequest();
+
+            xhr.open('GET', src, true);
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 4) {
+
+                    if (xhr.status < 400 && xhr.responseText) {
+                        code.textContent = xhr.responseText;
+
+                        Prism.highlightElement(code);
+                    }
+                    else if (xhr.status >= 400) {
+                        code.textContent = '✖ Error ' + xhr.status + ' while fetching file: ' + xhr.statusText;
+                    }
+                    else {
+                        code.textContent = '✖ Error: File does not exist or is empty';
+                    }
+                }
+            };
+
+            xhr.send(null);
+        });
+    }
+
+    $(document).ready(function(){
+        loadExternalCodeSnippets();
+    });
+    $('#source-view').on('shown', function () {
+        loadExternalCodeSnippets();
+    })
+</script>
+
+    <link rel="shortcut icon" href="../images/favicon.ico"/>
+    <link rel="apple-touch-icon" href="../images/apple-touch-icon.png"/>
+    <link rel="apple-touch-icon" sizes="72x72" href="../images/apple-touch-icon-72x72.png"/>
+    <link rel="apple-touch-icon" sizes="114x114" href="../images/apple-touch-icon-114x114.png"/>
+</head>
+<body>
+
+<div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+        <div class="container">
+            <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                <i class="icon-ellipsis-vertical"></i>
+            </a>
+            <a class="brand" href="../index.html">API Documentation</a>
+
+            <div class="nav-collapse">
+                <ul class="nav pull-right">
+                    <li class="dropdown">
+                        <a href="../index.html" class="dropdown-toggle" data-toggle="dropdown">
+                            API Documentation <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                                                        <li><a href="../namespaces/CIS.html">\CIS</a></li>
+                                                        <li><a href="../namespaces/Kisma.html">\Kisma</a></li>
+                                                    </ul>
+                    </li>
+                    <li class="dropdown" id="charts-menu">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            Charts <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="../graphs/class.html">
+                                    <i class="icon-list-alt"></i>&#160;Class hierarchy diagram
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="dropdown" id="reports-menu">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            Reports <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="../reports/errors.html">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <i class="icon-list-alt"></i>&#160;Errors <span class="label label-info pull-right">574</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="../reports/markers.html">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <i class="icon-list-alt"></i>&#160;Markers <span class="label label-info pull-right">1</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <!--<div class="go_to_top">-->
+    <!--<a href="#___" style="color: inherit">Back to top&#160;&#160;<i class="icon-upload icon-white"></i></a>-->
+    <!--</div>-->
+</div>
+
+<div id="___" class="container-fluid">
+        <section class="row-fluid">
+        <div class="span2 sidebar">
+                                <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle " data-toggle="collapse" data-target="#namespace-227101573"></a>
+                                <a href="../namespaces/default.html" style="margin-left: 30px; padding-left: 0">\</a>
+            </div>
+            <div id="namespace-227101573" class="accordion-body collapse in">
+                <div class="accordion-inner">
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-475447123"></a>
+                                <a href="../namespaces/CIS.html" style="margin-left: 30px; padding-left: 0">CIS</a>
+            </div>
+            <div id="namespace-475447123" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1726546741"></a>
+                                <a href="../namespaces/CIS.Services.html" style="margin-left: 30px; padding-left: 0">Services</a>
+            </div>
+            <div id="namespace-1726546741" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-571277190"></a>
+                                <a href="../namespaces/CIS.Services.Graylog.html" style="margin-left: 30px; padding-left: 0">Graylog</a>
+            </div>
+            <div id="namespace-571277190" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                    <li class="interface"><a href="../classes/CIS.Services.Graylog.Graylog.html">Graylog</a></li>
+                                                                                                    <li class="class"><a href="../classes/CIS.Services.Graylog.Message.html">Message</a></li>
+                                                    <li class="class"><a href="../classes/CIS.Services.Graylog.Handler.html">Handler</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-115708812"></a>
+                                <a href="../namespaces/CIS.Services.OAuth.html" style="margin-left: 30px; padding-left: 0">OAuth</a>
+            </div>
+            <div id="namespace-115708812" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/CIS.Services.OAuth.BaseClient.html">BaseClient</a></li>
+                                                    <li class="class"><a href="../classes/CIS.Services.OAuth.Client.html">Client</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-702466915"></a>
+                                <a href="../namespaces/CIS.Services.Console.html" style="margin-left: 30px; padding-left: 0">Console</a>
+            </div>
+            <div id="namespace-702466915" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/CIS.Services.Console.OutputTest.html">OutputTest</a></li>
+                                                    <li class="class"><a href="../classes/CIS.Services.Console.Output.html">Output</a></li>
+                                                    <li class="class"><a href="../classes/CIS.Services.Console.ConsoleOutput.html">ConsoleOutput</a></li>
+                                                    <li class="class"><a href="../classes/CIS.Services.Console.Styles.html">Styles</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1628265369"></a>
+                                <a href="../namespaces/CIS.Services.Storage.html" style="margin-left: 30px; padding-left: 0">Storage</a>
+            </div>
+            <div id="namespace-1628265369" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1133607087"></a>
+                                <a href="../namespaces/CIS.Services.Storage.MongoDb.html" style="margin-left: 30px; padding-left: 0">MongoDb</a>
+            </div>
+            <div id="namespace-1133607087" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/CIS.Services.Storage.MongoDb.Service.html">Service</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                    
+                    <ul>
+                                                                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1977350206"></a>
+                                <a href="../namespaces/CIS.Services.Delivery.html" style="margin-left: 30px; padding-left: 0">Delivery</a>
+            </div>
+            <div id="namespace-1977350206" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/CIS.Services.Delivery.Settings.html">Settings</a></li>
+                                                    <li class="class"><a href="../classes/CIS.Services.Delivery.Email.html">Email</a></li>
+                                                    <li class="class"><a href="../classes/CIS.Services.Delivery.Sftp.html">Sftp</a></li>
+                                                    <li class="class"><a href="../classes/CIS.Services.Delivery.Mount.html">Mount</a></li>
+                                                    <li class="class"><a href="../classes/CIS.Services.Delivery.Ftp.html">Ftp</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-144393691"></a>
+                                <a href="../namespaces/CIS.Services.Profiler.html" style="margin-left: 30px; padding-left: 0">Profiler</a>
+            </div>
+            <div id="namespace-144393691" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/CIS.Services.Profiler.Service.html">Service</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                    
+                    <ul>
+                                                                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                    
+                    <ul>
+                                                                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1319568340"></a>
+                                <a href="../namespaces/Kisma.html" style="margin-left: 30px; padding-left: 0">Kisma</a>
+            </div>
+            <div id="namespace-1319568340" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1457075485"></a>
+                                <a href="../namespaces/Kisma.Core.html" style="margin-left: 30px; padding-left: 0">Core</a>
+            </div>
+            <div id="namespace-1457075485" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-851513301"></a>
+                                <a href="../namespaces/Kisma.Core.Components.html" style="margin-left: 30px; padding-left: 0">Components</a>
+            </div>
+            <div id="namespace-851513301" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/Kisma.Core.Components.LineWriter.html">LineWriter</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Components.Map.html">Map</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Components.LineReader.html">LineReader</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Components.ParsingLineReader.html">ParsingLineReader</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-937107093"></a>
+                                <a href="../namespaces/Kisma.Core.Exceptions.html" style="margin-left: 30px; padding-left: 0">Exceptions</a>
+            </div>
+            <div id="namespace-937107093" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.UtilityException.html">UtilityException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.StorageException.html">StorageException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.InvalidSettingKeyException.html">InvalidSettingKeyException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.ServiceException.html">ServiceException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.CouchDbException.html">CouchDbException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.NotImplementedException.html">NotImplementedException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.ProcessLockException.html">ProcessLockException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.ProcessLockExistsException.html">ProcessLockExistsException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.ProcessLockAgeException.html">ProcessLockAgeException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.ProcessLockFileException.html">ProcessLockFileException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.SettingException.html">SettingException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.SeedException.html">SeedException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.EventException.html">EventException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.HaltPropagationException.html">HaltPropagationException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.InvalidEventHandlerException.html">InvalidEventHandlerException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.InvalidRequestException.html">InvalidRequestException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.HttpException.html">HttpException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.DuplicateKeyException.html">DuplicateKeyException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.BagException.html">BagException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.FileSystemException.html">FileSystemException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.EventHandlerException.html">EventHandlerException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.DataStoreException.html">DataStoreException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.InvalidSettingValueException.html">InvalidSettingValueException</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-306543335"></a>
+                                <a href="../namespaces/Kisma.Core.Events.html" style="margin-left: 30px; padding-left: 0">Events</a>
+            </div>
+            <div id="namespace-306543335" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/Kisma.Core.Events.ServiceEvent.html">ServiceEvent</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Events.SeedEvent.html">SeedEvent</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-796328627"></a>
+                                <a href="../namespaces/Kisma.Core.Services.html" style="margin-left: 30px; padding-left: 0">Services</a>
+            </div>
+            <div id="namespace-796328627" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1616385072"></a>
+                                <a href="../namespaces/Kisma.Core.Services.Network.html" style="margin-left: 30px; padding-left: 0">Network</a>
+            </div>
+            <div id="namespace-1616385072" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/Kisma.Core.Services.Network.HttpRequest.html">HttpRequest</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Services.Network.Ssh.html">Ssh</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Services.Network.Http.html">Http</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Services.Network.WebDav.html">WebDav</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Services.Network.Ftp.html">Ftp</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/Kisma.Core.Services.SeedRequest.html">SeedRequest</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Services.DeliveryService.html">DeliveryService</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Services.Session.html">Session</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Services.HttpService.html">HttpService</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Services.SeedCli.html">SeedCli</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Services.SeedService.html">SeedService</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Services.SeedResponse.html">SeedResponse</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1856200617"></a>
+                                <a href="../namespaces/Kisma.Core.Tools.html" style="margin-left: 30px; padding-left: 0">Tools</a>
+            </div>
+            <div id="namespace-1856200617" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/Kisma.Core.Tools.DataReader.html">DataReader</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-327950806"></a>
+                                <a href="../namespaces/Kisma.Core.Utility.html" style="margin-left: 30px; padding-left: 0">Utility</a>
+            </div>
+            <div id="namespace-327950806" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.Log.html">Log</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.Markup.html">Markup</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.Bootstrap.html">Bootstrap</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.ChairLift.html">ChairLift</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.Hasher.html">Hasher</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.Detector.html">Detector</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.FileSystem.html">FileSystem</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.Inflector.html">Inflector</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.Xml.html">Xml</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.FilterInput.html">FilterInput</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.Scalar.html">Scalar</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.SchemaFormBuilder.html">SchemaFormBuilder</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.DateTime.html">DateTime</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.EventManager.html">EventManager</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.ErrorHandler.html">ErrorHandler</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.Composer.html">Composer</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.Convert.html">Convert</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.Curl.html">Curl</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.Render.html">Render</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.Sql.html">Sql</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.Storage.html">Storage</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.HtmlMarkup.html">HtmlMarkup</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.Option.html">Option</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-889805835"></a>
+                                <a href="../namespaces/Kisma.Core.Enums.html" style="margin-left: 30px; padding-left: 0">Enums</a>
+            </div>
+            <div id="namespace-889805835" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/Kisma.Core.Enums.Levels.html">Levels</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Enums.PhpFrameworks.html">PhpFrameworks</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Enums.SeedEnum.html">SeedEnum</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Enums.HttpMethod.html">HttpMethod</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Enums.HttpResponse.html">HttpResponse</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Enums.TimerPrecision.html">TimerPrecision</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Enums.AnsiColor.html">AnsiColor</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Enums.KismaSettings.html">KismaSettings</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Enums.OutputFormat.html">OutputFormat</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Enums.AccessLevels.html">AccessLevels</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Enums.GlobFlags.html">GlobFlags</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Enums.DateTime.html">DateTime</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Enums.LineBreak.html">LineBreak</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Enums.HashSeed.html">HashSeed</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Enums.HashType.html">HashType</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Enums.DataSeparator.html">DataSeparator</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Enums.DataEnclosure.html">DataEnclosure</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Enums.DebugLevel.html">DebugLevel</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Enums.AnsiConsole.html">AnsiConsole</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-61800217"></a>
+                                <a href="../namespaces/Kisma.Core.Interfaces.html" style="margin-left: 30px; padding-left: 0">Interfaces</a>
+            </div>
+            <div id="namespace-61800217" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1140519650"></a>
+                                <a href="../namespaces/Kisma.Core.Interfaces.Events.html" style="margin-left: 30px; padding-left: 0">Events</a>
+            </div>
+            <div id="namespace-1140519650" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.Events.Database.html">Database</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.Events.PublisherLike.html">PublisherLike</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.Events.ServiceLike.html">ServiceLike</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.Events.Http.html">Http</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.Events.SeedLike.html">SeedLike</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.Events.Kisma.html">Kisma</a></li>
+                                                                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                    
+                    <ul>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.MapLike.html">MapLike</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.InputTypes.html">InputTypes</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.RequestLike.html">RequestLike</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.Levels.html">Levels</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.PhpFrameworks.html">PhpFrameworks</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.HttpMethod.html">HttpMethod</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.ResponseLike.html">ResponseLike</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.SubscriberLike.html">SubscriberLike</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.HttpResponse.html">HttpResponse</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.PublisherLike.html">PublisherLike</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.RequestSource.html">RequestSource</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.KismaSettings.html">KismaSettings</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.OutputFormat.html">OutputFormat</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.AccessLevels.html">AccessLevels</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.ServiceLike.html">ServiceLike</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.GlobFlags.html">GlobFlags</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.ServiceState.html">ServiceState</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.ReaderLike.html">ReaderLike</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.DateTime.html">DateTime</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.UtilityLike.html">UtilityLike</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.FormTypes.html">FormTypes</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.ProviderLike.html">ProviderLike</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.EscapeStyle.html">EscapeStyle</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.ConsumerLike.html">ConsumerLike</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.HashSeed.html">HashSeed</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.SeedLike.html">SeedLike</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.HashType.html">HashType</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.FormTemplates.html">FormTemplates</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.JobLike.html">JobLike</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.Seed.html">Seed</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.BagLike.html">BagLike</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.WriterLike.html">WriterLike</a></li>
+                                                                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/Kisma.Core.TestCase.html">TestCase</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.SeedBag.html">SeedBag</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.SeedQueue.html">SeedQueue</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Seed.html">Seed</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.SeedUtility.html">SeedUtility</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.SeedBagIterator.html">SeedBagIterator</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-368627806"></a>
+                                <a href="../namespaces/Kisma.Services.html" style="margin-left: 30px; padding-left: 0">Services</a>
+            </div>
+            <div id="namespace-368627806" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1224002646"></a>
+                                <a href="../namespaces/Kisma.Services.Network.html" style="margin-left: 30px; padding-left: 0">Network</a>
+            </div>
+            <div id="namespace-1224002646" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/Kisma.Services.Network.Email.html">Email</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                    
+                    <ul>
+                                                                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                    
+                    <ul>
+                                                                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/Kisma.html">Kisma</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+        </div>
+    </section>
+    <section class="row-fluid">
+        <div class="span10 offset2">
+            <div class="row-fluid">
+                <div class="span8 content class">
+                    <nav>
+                                                <a href="../namespaces/CIS.Services.OAuth.html">\CIS\Services\OAuth</a> <i class="icon-level-up"></i>
+                                            </nav>
+                    <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal"><i class="icon-code"></i></a>
+
+                    <h1><small>\CIS\Services\OAuth</small>Client</h1>
+                    <p><em>Client
+A generic OAuth client</em></p>
+                    
+
+                    <section id="summary">
+                        <h2>Summary</h2>
+                        <section class="row-fluid heading">
+                            <section class="span4">
+                                <a href="#methods">Methods</a>
+                            </section>
+                            <section class="span4">
+                                <a href="#properties">Properties</a>
+                            </section>
+                            <section class="span4">
+                                <a href="#constants">Constants</a>
+                            </section>
+                        </section>
+                        <section class="row-fluid public">
+                            <section class="span4">
+                                                                    <a href="../classes/CIS.Services.OAuth.Client.html#method___construct" class="">__construct()</a><br />
+                                                                    <a href="../classes/CIS.Services.OAuth.Client.html#method_getAuthorizeUrl" class="">getAuthorizeUrl()</a><br />
+                                                                    <a href="../classes/CIS.Services.OAuth.Client.html#method_storeToken" class="">storeToken()</a><br />
+                                                                    <a href="../classes/CIS.Services.OAuth.Client.html#method_loadToken" class="">loadToken()</a><br />
+                                                                    <a href="../classes/CIS.Services.OAuth.Client.html#method_buildEndpoint" class="">buildEndpoint()</a><br />
+                                                                    <a href="../classes/CIS.Services.OAuth.Client.html#method_setAccessTokenUrl" class="">setAccessTokenUrl()</a><br />
+                                                                    <a href="../classes/CIS.Services.OAuth.Client.html#method_getAccessTokenUrl" class="">getAccessTokenUrl()</a><br />
+                                                                    <a href="../classes/CIS.Services.OAuth.Client.html#method_setAuthorizationCallback" class="">setAuthorizationCallback()</a><br />
+                                                                    <a href="../classes/CIS.Services.OAuth.Client.html#method_getAuthorizationCallback" class="">getAuthorizationCallback()</a><br />
+                                                                    <a href="../classes/CIS.Services.OAuth.Client.html#method_setRedirectUri" class="">setRedirectUri()</a><br />
+                                                                    <a href="../classes/CIS.Services.OAuth.Client.html#method_getRedirectUri" class="">getRedirectUri()</a><br />
+                                                                    <a href="../classes/CIS.Services.OAuth.Client.html#method_setCurrentToken" class="">setCurrentToken()</a><br />
+                                                                    <a href="../classes/CIS.Services.OAuth.Client.html#method_getCurrentToken" class="">getCurrentToken()</a><br />
+                                                                    <a href="../classes/CIS.Services.OAuth.Client.html#method_setIsAuthorized" class="">setIsAuthorized()</a><br />
+                                                                    <a href="../classes/CIS.Services.OAuth.Client.html#method_getIsAuthorized" class="">getIsAuthorized()</a><br />
+                                                                    <a href="../classes/CIS.Services.OAuth.Client.html#method_setOauth" class="">setOauth()</a><br />
+                                                                    <a href="../classes/CIS.Services.OAuth.Client.html#method_getOauth" class="">getOauth()</a><br />
+                                                                    <a href="../classes/CIS.Services.OAuth.Client.html#method_setOauthEndpoint" class="">setOauthEndpoint()</a><br />
+                                                                    <a href="../classes/CIS.Services.OAuth.Client.html#method_getOauthEndpoint" class="">getOauthEndpoint()</a><br />
+                                                                    <a href="../classes/CIS.Services.OAuth.Client.html#method_setRequestTokenUrl" class="">setRequestTokenUrl()</a><br />
+                                                                    <a href="../classes/CIS.Services.OAuth.Client.html#method_getRequestTokenUrl" class="">getRequestTokenUrl()</a><br />
+                                                                    <a href="../classes/CIS.Services.OAuth.Client.html#method_setConsumerKey" class="">setConsumerKey()</a><br />
+                                                                    <a href="../classes/CIS.Services.OAuth.Client.html#method_getConsumerKey" class="">getConsumerKey()</a><br />
+                                                                    <a href="../classes/CIS.Services.OAuth.Client.html#method_setConsumerSecret" class="">setConsumerSecret()</a><br />
+                                                                    <a href="../classes/CIS.Services.OAuth.Client.html#method_getConsumerSecret" class="">getConsumerSecret()</a><br />
+                                                                    <a href="../classes/CIS.Services.OAuth.Client.html#method_setOauthAuthType" class="">setOauthAuthType()</a><br />
+                                                                    <a href="../classes/CIS.Services.OAuth.Client.html#method_getOauthAuthType" class="">getOauthAuthType()</a><br />
+                                                                    <a href="../classes/CIS.Services.OAuth.Client.html#method_setOauthSignatureMethod" class="">setOauthSignatureMethod()</a><br />
+                                                                    <a href="../classes/CIS.Services.OAuth.Client.html#method_getOauthSignatureMethod" class="">getOauthSignatureMethod()</a><br />
+                                                                    <a href="../classes/CIS.Services.OAuth.Client.html#method_setOauthToken" class="">setOauthToken()</a><br />
+                                                                    <a href="../classes/CIS.Services.OAuth.Client.html#method_getOauthToken" class="">getOauthToken()</a><br />
+                                                                    <a href="../classes/CIS.Services.OAuth.Client.html#method_setOauthTokenSecret" class="">setOauthTokenSecret()</a><br />
+                                                                    <a href="../classes/CIS.Services.OAuth.Client.html#method_getOauthTokenSecret" class="">getOauthTokenSecret()</a><br />
+                                                                    <a href="../classes/CIS.Services.OAuth.Client.html#method_setReturnArrays" class="">setReturnArrays()</a><br />
+                                                                    <a href="../classes/CIS.Services.OAuth.Client.html#method_getReturnArrays" class="">getReturnArrays()</a><br />
+                                                            </section>
+                            <section class="span4">
+                                                                    <em>No public properties found</em>
+                                                            </section>
+                            <section class="span4">
+                                                                    <em>No constants found</em>
+                                                            </section>
+                        </section>
+                        <section class="row-fluid protected">
+                            <section class="span4">
+                                                                    <a href="../classes/CIS.Services.OAuth.Client.html#method__initializeClient" class="">_initializeClient()</a><br />
+                                                                    <a href="../classes/CIS.Services.OAuth.Client.html#method_makeRequest" class="">makeRequest()</a><br />
+                                                            </section>
+                            <section class="span4">
+                                                                    <a href="../classes/CIS.Services.OAuth.Client.html#property__oauthSignatureMethod" class="">$_oauthSignatureMethod</a><br />
+                                                                    <a href="../classes/CIS.Services.OAuth.Client.html#property__oauthAuthType" class="">$_oauthAuthType</a><br />
+                                                                    <a href="../classes/CIS.Services.OAuth.Client.html#property__oauth" class="">$_oauth</a><br />
+                                                                    <a href="../classes/CIS.Services.OAuth.Client.html#property__currentToken" class="">$_currentToken</a><br />
+                                                                    <a href="../classes/CIS.Services.OAuth.Client.html#property__redirectUri" class="">$_redirectUri</a><br />
+                                                                    <a href="../classes/CIS.Services.OAuth.Client.html#property__isAuthorized" class="">$_isAuthorized</a><br />
+                                                                    <a href="../classes/CIS.Services.OAuth.Client.html#property__accessTokenUrl" class="">$_accessTokenUrl</a><br />
+                                                                    <a href="../classes/CIS.Services.OAuth.Client.html#property__authorizeUrl" class="">$_authorizeUrl</a><br />
+                                                                    <a href="../classes/CIS.Services.OAuth.Client.html#property__requestTokenUrl" class="">$_requestTokenUrl</a><br />
+                                                                    <a href="../classes/CIS.Services.OAuth.Client.html#property__consumerKey" class="">$_consumerKey</a><br />
+                                                                    <a href="../classes/CIS.Services.OAuth.Client.html#property__consumerSecret" class="">$_consumerSecret</a><br />
+                                                                    <a href="../classes/CIS.Services.OAuth.Client.html#property__oauthEndpoint" class="">$_oauthEndpoint</a><br />
+                                                                    <a href="../classes/CIS.Services.OAuth.Client.html#property__authorizationCallback" class="">$_authorizationCallback</a><br />
+                                                                    <a href="../classes/CIS.Services.OAuth.Client.html#property__oauthToken" class="">$_oauthToken</a><br />
+                                                                    <a href="../classes/CIS.Services.OAuth.Client.html#property__oauthTokenSecret" class="">$_oauthTokenSecret</a><br />
+                                                                    <a href="../classes/CIS.Services.OAuth.Client.html#property__returnArrays" class="">$_returnArrays</a><br />
+                                                            </section>
+                            <section class="span4">
+                                <em>N/A</em>
+                            </section>
+                        </section>
+                        <section class="row-fluid private">
+                            <section class="span4">
+                                                                    <em>No private methods found</em>
+                                                            </section>
+                            <section class="span4">
+                                                                    <em>No private properties found</em>
+                                                            </section>
+                            <section class="span4">
+                                <em>N/A</em>
+                            </section>
+                        </section>
+                    </section>
+                </div>
+                <aside class="span4 detailsbar">
+                                        
+                    
+                    <dl>
+                        <dt>File</dt>
+                            <dd><a href="../files/temp.OAuth.Client.php.html"><div class="path-wrapper">temp/OAuth/Client.php</div></a></dd>
+                                                <dt>Package</dt>
+                            <dd><div class="namespace-wrapper">\cis.oauth</div></dd>
+                                                <dt>Class hierarchy</dt>
+                            <dd class="hierarchy">
+                                                                                                                                                                                                                                                                                                
+                                        <div class="namespace-wrapper">\CIS\Services\BaseService</div>
+                                                                                                    <div class="namespace-wrapper">\CIS\Services\OAuth\Client</div>
+                            </dd>
+
+                        
+                        
+                        
+                        
+                                                                        </dl>
+                    <h2>Tags</h2>
+                    <table class="table table-condensed">
+                                            <tr>
+                            <th>
+                                todo
+                            </th>
+                            <td>
+                                                            </td>
+                        </tr>
+                                        </table>
+                </aside>
+            </div>
+
+                        
+                                    <a id="properties" name="properties"></a>
+            <div class="row-fluid">
+                <div class="span8 content class">
+                    <h2>Properties</h2>
+                </div>
+                <aside class="span4 detailsbar"></aside>
+            </div>
+
+                                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property__oauthSignatureMethod" name="property__oauthSignatureMethod" class="anchor"></a>
+            <article class="property">
+                <h3 class="protected ">$_oauthSignatureMethod</h3>
+                <pre class="signature">$_oauthSignatureMethod : string</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                string
+                                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property__oauthAuthType" name="property__oauthAuthType" class="anchor"></a>
+            <article class="property">
+                <h3 class="protected ">$_oauthAuthType</h3>
+                <pre class="signature">$_oauthAuthType : string</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                string
+                                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property__oauth" name="property__oauth" class="anchor"></a>
+            <article class="property">
+                <h3 class="protected ">$_oauth</h3>
+                <pre class="signature">$_oauth : \OAuth</pre>
+                <p><em>Our OAuth object</em></p>
+                
+
+                                <h4>Type</h4>
+                \OAuth
+                                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property__currentToken" name="property__currentToken" class="anchor"></a>
+            <article class="property">
+                <h3 class="protected ">$_currentToken</h3>
+                <pre class="signature">$_currentToken : array</pre>
+                <p><em>The current token</em></p>
+                
+
+                                <h4>Type</h4>
+                array
+                                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property__redirectUri" name="property__redirectUri" class="anchor"></a>
+            <article class="property">
+                <h3 class="protected ">$_redirectUri</h3>
+                <pre class="signature">$_redirectUri : string</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                string
+                                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property__isAuthorized" name="property__isAuthorized" class="anchor"></a>
+            <article class="property">
+                <h3 class="protected ">$_isAuthorized</h3>
+                <pre class="signature">$_isAuthorized : bool</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                bool
+                                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property__accessTokenUrl" name="property__accessTokenUrl" class="anchor"></a>
+            <article class="property">
+                <h3 class="protected ">$_accessTokenUrl</h3>
+                <pre class="signature">$_accessTokenUrl : string</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                string
+                                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property__authorizeUrl" name="property__authorizeUrl" class="anchor"></a>
+            <article class="property">
+                <h3 class="protected ">$_authorizeUrl</h3>
+                <pre class="signature">$_authorizeUrl : string</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                string
+                                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property__requestTokenUrl" name="property__requestTokenUrl" class="anchor"></a>
+            <article class="property">
+                <h3 class="protected ">$_requestTokenUrl</h3>
+                <pre class="signature">$_requestTokenUrl : string</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                string
+                                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property__consumerKey" name="property__consumerKey" class="anchor"></a>
+            <article class="property">
+                <h3 class="protected ">$_consumerKey</h3>
+                <pre class="signature">$_consumerKey : string</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                string
+                &mdash; The OAuth public key                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property__consumerSecret" name="property__consumerSecret" class="anchor"></a>
+            <article class="property">
+                <h3 class="protected ">$_consumerSecret</h3>
+                <pre class="signature">$_consumerSecret : string</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                string
+                &mdash; The OAuth secret key                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property__oauthEndpoint" name="property__oauthEndpoint" class="anchor"></a>
+            <article class="property">
+                <h3 class="protected ">$_oauthEndpoint</h3>
+                <pre class="signature">$_oauthEndpoint : string</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                string
+                &mdash; The OAuth endpoint                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property__authorizationCallback" name="property__authorizationCallback" class="anchor"></a>
+            <article class="property">
+                <h3 class="protected ">$_authorizationCallback</h3>
+                <pre class="signature">$_authorizationCallback : callback</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                callback
+                &mdash; An optional callback for when an authorization occurs                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property__oauthToken" name="property__oauthToken" class="anchor"></a>
+            <article class="property">
+                <h3 class="protected ">$_oauthToken</h3>
+                <pre class="signature">$_oauthToken : string</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                string
+                                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property__oauthTokenSecret" name="property__oauthTokenSecret" class="anchor"></a>
+            <article class="property">
+                <h3 class="protected ">$_oauthTokenSecret</h3>
+                <pre class="signature">$_oauthTokenSecret : string</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                string
+                                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property__returnArrays" name="property__returnArrays" class="anchor"></a>
+            <article class="property">
+                <h3 class="protected ">$_returnArrays</h3>
+                <pre class="signature">$_returnArrays : bool</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                bool
+                                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                            
+                                    <a id="methods" name="methods"></a>
+            <div class="row-fluid">
+                <div class="span8 content class"><h2>Methods</h2></div>
+                <aside class="span4 detailsbar"></aside>
+            </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method___construct" name="method___construct" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">__construct()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">__construct( <span class="argument">$options</span>)</pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td></td>
+                                <td>$options</td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getAuthorizeUrl" name="method_getAuthorizeUrl" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getAuthorizeUrl()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getAuthorizeUrl() : string</pre>
+                <p><em>I
+Appends the current token to the authorizeUrl option</em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    string
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_storeToken" name="method_storeToken" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">storeToken()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">storeToken(array <span class="argument">$token</span>) : void</pre>
+                <p><em>Stores the current token in a member variable and in the user state oAuthToken</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>array</td>
+                                <td>$token</td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                                    <h4>Throws</h4>
+                    <dl>
+                                                    <dt>\Exception</dt>
+                            <dd></dd>
+                                                                    </dl>
+                
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_loadToken" name="method_loadToken" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">loadToken()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">loadToken() : bool</pre>
+                <p><em>Loads a token from the user state oAuthToken</em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    bool
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_buildEndpoint" name="method_buildEndpoint" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">buildEndpoint()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">buildEndpoint(null|string <span class="argument">$path</span>) : string</pre>
+                <p><em>Given a path, build a full url</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>null|string</td>
+                                <td>$path</td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    string
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_setAccessTokenUrl" name="method_setAccessTokenUrl" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">setAccessTokenUrl()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">setAccessTokenUrl(string <span class="argument">$accessTokenUrl</span>) : \CIS\OAuth\Client</pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$accessTokenUrl</td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    \CIS\OAuth\Client
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getAccessTokenUrl" name="method_getAccessTokenUrl" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getAccessTokenUrl()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getAccessTokenUrl() : string</pre>
+                <p><em></em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    string
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_setAuthorizationCallback" name="method_setAuthorizationCallback" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">setAuthorizationCallback()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">setAuthorizationCallback(callback <span class="argument">$authorizationCallback</span>) : \CIS\OAuth\Client</pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>callback</td>
+                                <td>$authorizationCallback</td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    \CIS\OAuth\Client
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getAuthorizationCallback" name="method_getAuthorizationCallback" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getAuthorizationCallback()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getAuthorizationCallback() : callback</pre>
+                <p><em></em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    callback
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_setRedirectUri" name="method_setRedirectUri" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">setRedirectUri()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">setRedirectUri(string <span class="argument">$redirectUri</span>) : \CIS\OAuth\Client</pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$redirectUri</td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    \CIS\OAuth\Client
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getRedirectUri" name="method_getRedirectUri" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getRedirectUri()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getRedirectUri() : string</pre>
+                <p><em></em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    string
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_setCurrentToken" name="method_setCurrentToken" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">setCurrentToken()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">setCurrentToken(array <span class="argument">$currentToken</span>) : \CIS\OAuth\Client</pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>array</td>
+                                <td>$currentToken</td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    \CIS\OAuth\Client
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getCurrentToken" name="method_getCurrentToken" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getCurrentToken()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getCurrentToken() : array</pre>
+                <p><em></em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    array
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_setIsAuthorized" name="method_setIsAuthorized" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">setIsAuthorized()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">setIsAuthorized(boolean <span class="argument">$isAuthorized</span>) : \CIS\OAuth\Client</pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>boolean</td>
+                                <td>$isAuthorized</td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    \CIS\OAuth\Client
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getIsAuthorized" name="method_getIsAuthorized" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getIsAuthorized()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getIsAuthorized() : boolean</pre>
+                <p><em></em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    boolean
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_setOauth" name="method_setOauth" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">setOauth()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">setOauth(\OAuth <span class="argument">$oauth</span>) : \CIS\OAuth\Client</pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>\OAuth</td>
+                                <td>$oauth</td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    \CIS\OAuth\Client
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getOauth" name="method_getOauth" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getOauth()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getOauth() : \OAuth</pre>
+                <p><em></em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    \OAuth
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_setOauthEndpoint" name="method_setOauthEndpoint" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">setOauthEndpoint()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">setOauthEndpoint(string <span class="argument">$oauthEndpoint</span>) : \CIS\OAuth\Client</pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$oauthEndpoint</td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    \CIS\OAuth\Client
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getOauthEndpoint" name="method_getOauthEndpoint" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getOauthEndpoint()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getOauthEndpoint() : string</pre>
+                <p><em></em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    string
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_setRequestTokenUrl" name="method_setRequestTokenUrl" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">setRequestTokenUrl()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">setRequestTokenUrl(string <span class="argument">$requestTokenUrl</span>) : \CIS\OAuth\Client</pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$requestTokenUrl</td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    \CIS\OAuth\Client
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getRequestTokenUrl" name="method_getRequestTokenUrl" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getRequestTokenUrl()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getRequestTokenUrl() : string</pre>
+                <p><em></em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    string
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_setConsumerKey" name="method_setConsumerKey" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">setConsumerKey()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">setConsumerKey(string <span class="argument">$consumerKey</span>) : \CIS\OAuth\Client</pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$consumerKey</td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    \CIS\OAuth\Client
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getConsumerKey" name="method_getConsumerKey" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getConsumerKey()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getConsumerKey() : string</pre>
+                <p><em></em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    string
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_setConsumerSecret" name="method_setConsumerSecret" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">setConsumerSecret()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">setConsumerSecret(string <span class="argument">$consumerSecret</span>) : \CIS\OAuth\Client</pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$consumerSecret</td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    \CIS\OAuth\Client
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getConsumerSecret" name="method_getConsumerSecret" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getConsumerSecret()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getConsumerSecret() : string</pre>
+                <p><em></em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    string
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_setOauthAuthType" name="method_setOauthAuthType" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">setOauthAuthType()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">setOauthAuthType(string <span class="argument">$oauthAuthType</span>) : \CIS\Services\OAuth\Client</pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$oauthAuthType</td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    <a href="../classes/CIS.Services.OAuth.Client.html">\CIS\Services\OAuth\Client</a>
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getOauthAuthType" name="method_getOauthAuthType" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getOauthAuthType()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getOauthAuthType() : string</pre>
+                <p><em></em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    string
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_setOauthSignatureMethod" name="method_setOauthSignatureMethod" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">setOauthSignatureMethod()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">setOauthSignatureMethod(string <span class="argument">$oauthSignatureMethod</span>) : \CIS\Services\OAuth\Client</pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$oauthSignatureMethod</td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    <a href="../classes/CIS.Services.OAuth.Client.html">\CIS\Services\OAuth\Client</a>
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getOauthSignatureMethod" name="method_getOauthSignatureMethod" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getOauthSignatureMethod()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getOauthSignatureMethod() : string</pre>
+                <p><em></em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    string
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_setOauthToken" name="method_setOauthToken" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">setOauthToken()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">setOauthToken(string <span class="argument">$oauthToken</span>) : \CIS\Services\OAuth\Client</pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$oauthToken</td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    <a href="../classes/CIS.Services.OAuth.Client.html">\CIS\Services\OAuth\Client</a>
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getOauthToken" name="method_getOauthToken" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getOauthToken()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getOauthToken() : string</pre>
+                <p><em></em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    string
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_setOauthTokenSecret" name="method_setOauthTokenSecret" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">setOauthTokenSecret()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">setOauthTokenSecret(string <span class="argument">$oauthTokenSecret</span>) : \CIS\Services\OAuth\Client</pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$oauthTokenSecret</td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    <a href="../classes/CIS.Services.OAuth.Client.html">\CIS\Services\OAuth\Client</a>
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getOauthTokenSecret" name="method_getOauthTokenSecret" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getOauthTokenSecret()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getOauthTokenSecret() : string</pre>
+                <p><em></em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    string
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_setReturnArrays" name="method_setReturnArrays" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">setReturnArrays()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">setReturnArrays(boolean <span class="argument">$returnArrays</span>) : \CIS\Services\OAuth\Client</pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>boolean</td>
+                                <td>$returnArrays</td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    <a href="../classes/CIS.Services.OAuth.Client.html">\CIS\Services\OAuth\Client</a>
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getReturnArrays" name="method_getReturnArrays" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getReturnArrays()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getReturnArrays() : boolean</pre>
+                <p><em></em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    boolean
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method__initializeClient" name="method__initializeClient" class="anchor"></a>
+            <article class="method">
+                <h3 class="protected ">_initializeClient()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">_initializeClient(array <span class="argument">$options</span>) : void</pre>
+                <p><em>Initialize client</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>array</td>
+                                <td>$options</td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_makeRequest" name="method_makeRequest" class="anchor"></a>
+            <article class="method">
+                <h3 class="protected ">makeRequest()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">makeRequest( <span class="argument">$action</span>,  <span class="argument">$payload</span>,  <span class="argument">$method</span>,  <span class="argument">$headers</span>)</pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td></td>
+                                <td>$action</td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$payload</td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$method</td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$headers</td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                                    </div>
+    </section>
+
+    <div id="source-view" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="source-view-label" aria-hidden="true">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h3 id="source-view-label">Client.php</h3>
+        </div>
+        <div class="modal-body">
+            <pre data-src="../files/temp/OAuth/Client.php.txt" class="language-php line-numbers"></pre>
+        </div>
+    </div>
+
+    <footer class="row-fluid">
+        <section class="span10 offset2">
+            <section class="row-fluid">
+                <section class="span10 offset1">
+                    <section class="row-fluid footer-sections">
+                        <section class="span4">
+                                                        <h1><i class="icon-code"></i></h1>
+                            <div>
+                                <ul>
+                                                                            <li><a href="../namespaces/CIS.html">\CIS</a></li>
+                                                                            <li><a href="../namespaces/Kisma.html">\Kisma</a></li>
+                                                                    </ul>
+                            </div>
+                        </section>
+                        <section class="span4">
+                                                        <h1><i class="icon-bar-chart"></i></h1>
+                            <div>
+                                <ul>
+                                    <li><a href="../graphs/class.html">Class Hierarchy Diagram</a></li>
+                                </ul>
+                            </div>
+                        </section>
+                        <section class="span4">
+                                                        <h1><i class="icon-pushpin"></i></h1>
+                            <div>
+                                <ul>
+                                    <li><a href="../reports/errors.html">Errors</a></li>
+                                    <li><a href="../reports/markers.html">Markers</a></li>
+                                </ul>
+                            </div>
+                        </section>
+                    </section>
+                </section>
+            </section>
+            <section class="row-fluid">
+                <section class="span10 offset1">
+                    <hr />
+                    Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor </a> and authored
+                    on January 9th, 2014 at 12:04.
+                </section>
+            </section>
+        </section>
+    </footer>
+</div>
+
+</body>
+</html>

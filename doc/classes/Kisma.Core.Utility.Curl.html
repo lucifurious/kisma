@@ -1,0 +1,3317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+    <meta charset="utf-8"/>
+    <title>API Documentation</title>
+    <meta name="author" content=""/>
+    <meta name="description" content=""/>
+
+    <link href="https://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.no-icons.min.css" rel="stylesheet">
+    <link href="https://netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.min.css" rel="stylesheet">
+    <link href="../css/prism.css" rel="stylesheet" media="all"/>
+    <link href="../css/template.css" rel="stylesheet" media="all"/>
+    
+    <!--[if lt IE 9]>
+    <script src="https://html5shim.googlecode.com/svn/trunk/html5.js" type="text/javascript"></script>
+    <![endif]-->
+    <script src="https://code.jquery.com/jquery-1.10.2.min.js" type="text/javascript"></script>
+    <script src="https://code.jquery.com/ui/1.10.3/jquery-ui.min.js" type="text/javascript"></script>
+    <script src="https://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
+    <script src="../js/jquery.smooth-scroll.js"></script>
+    <script src="../js/prism.min.js"></script>
+    <!-- TODO: Add http://jscrollpane.kelvinluck.com/ to style the scrollbars for browsers not using webkit-->
+    <script type="text/javascript">
+    function loadExternalCodeSnippets() {
+        Array.prototype.slice.call(document.querySelectorAll('pre[data-src]')).forEach(function (pre) {
+            var src = pre.getAttribute('data-src');
+            var extension = (src.match(/\.(\w+)$/) || [, ''])[1];
+            var language = 'php';
+
+            var code = document.createElement('code');
+            code.className = 'language-' + language;
+
+            pre.textContent = '';
+
+            code.textContent = 'Loading…';
+
+            pre.appendChild(code);
+
+            var xhr = new XMLHttpRequest();
+
+            xhr.open('GET', src, true);
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 4) {
+
+                    if (xhr.status < 400 && xhr.responseText) {
+                        code.textContent = xhr.responseText;
+
+                        Prism.highlightElement(code);
+                    }
+                    else if (xhr.status >= 400) {
+                        code.textContent = '✖ Error ' + xhr.status + ' while fetching file: ' + xhr.statusText;
+                    }
+                    else {
+                        code.textContent = '✖ Error: File does not exist or is empty';
+                    }
+                }
+            };
+
+            xhr.send(null);
+        });
+    }
+
+    $(document).ready(function(){
+        loadExternalCodeSnippets();
+    });
+    $('#source-view').on('shown', function () {
+        loadExternalCodeSnippets();
+    })
+</script>
+
+    <link rel="shortcut icon" href="../images/favicon.ico"/>
+    <link rel="apple-touch-icon" href="../images/apple-touch-icon.png"/>
+    <link rel="apple-touch-icon" sizes="72x72" href="../images/apple-touch-icon-72x72.png"/>
+    <link rel="apple-touch-icon" sizes="114x114" href="../images/apple-touch-icon-114x114.png"/>
+</head>
+<body>
+
+<div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+        <div class="container">
+            <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                <i class="icon-ellipsis-vertical"></i>
+            </a>
+            <a class="brand" href="../index.html">API Documentation</a>
+
+            <div class="nav-collapse">
+                <ul class="nav pull-right">
+                    <li class="dropdown">
+                        <a href="../index.html" class="dropdown-toggle" data-toggle="dropdown">
+                            API Documentation <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                                                        <li><a href="../namespaces/Kisma.html">\Kisma</a></li>
+                                                    </ul>
+                    </li>
+                    <li class="dropdown" id="charts-menu">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            Charts <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="../graphs/class.html">
+                                    <i class="icon-list-alt"></i>&#160;Class hierarchy diagram
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="dropdown" id="reports-menu">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            Reports <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="../reports/errors.html">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <i class="icon-list-alt"></i>&#160;Errors <span class="label label-info pull-right">390</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="../reports/markers.html">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <i class="icon-list-alt"></i>&#160;Markers <span class="label label-info pull-right">0</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <!--<div class="go_to_top">-->
+    <!--<a href="#___" style="color: inherit">Back to top&#160;&#160;<i class="icon-upload icon-white"></i></a>-->
+    <!--</div>-->
+</div>
+
+<div id="___" class="container-fluid">
+        <section class="row-fluid">
+        <div class="span2 sidebar">
+                                <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle " data-toggle="collapse" data-target="#namespace-294022392"></a>
+                                <a href="../namespaces/default.html" style="margin-left: 30px; padding-left: 0">\</a>
+            </div>
+            <div id="namespace-294022392" class="accordion-body collapse in">
+                <div class="accordion-inner">
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-532280819"></a>
+                                <a href="../namespaces/Kisma.html" style="margin-left: 30px; padding-left: 0">Kisma</a>
+            </div>
+            <div id="namespace-532280819" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1009517197"></a>
+                                <a href="../namespaces/Kisma.Core.html" style="margin-left: 30px; padding-left: 0">Core</a>
+            </div>
+            <div id="namespace-1009517197" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1323512578"></a>
+                                <a href="../namespaces/Kisma.Core.Interfaces.html" style="margin-left: 30px; padding-left: 0">Interfaces</a>
+            </div>
+            <div id="namespace-1323512578" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-2037421911"></a>
+                                <a href="../namespaces/Kisma.Core.Interfaces.Events.html" style="margin-left: 30px; padding-left: 0">Events</a>
+            </div>
+            <div id="namespace-2037421911" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.Events.PublisherLike.html">PublisherLike</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.Events.ServiceLike.html">ServiceLike</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.Events.SeedLike.html">SeedLike</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.Events.Http.html">Http</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.Events.Kisma.html">Kisma</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.Events.Database.html">Database</a></li>
+                                                                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                    
+                    <ul>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.PhpFrameworks.html">PhpFrameworks</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.JobLike.html">JobLike</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.AccessLevels.html">AccessLevels</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.OutputFormat.html">OutputFormat</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.HashType.html">HashType</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.GlobFlags.html">GlobFlags</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.FormTemplates.html">FormTemplates</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.UtilityLike.html">UtilityLike</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.Levels.html">Levels</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.InputTypes.html">InputTypes</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.HttpMethod.html">HttpMethod</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.ServiceLike.html">ServiceLike</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.HttpResponse.html">HttpResponse</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.WriterLike.html">WriterLike</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.DateTime.html">DateTime</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.ReaderLike.html">ReaderLike</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.BagLike.html">BagLike</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.SeedLike.html">SeedLike</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.ProviderLike.html">ProviderLike</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.ResponseLike.html">ResponseLike</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.FormTypes.html">FormTypes</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.KismaSettings.html">KismaSettings</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.Seed.html">Seed</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.SubscriberLike.html">SubscriberLike</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.HashSeed.html">HashSeed</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.MapLike.html">MapLike</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.RequestSource.html">RequestSource</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.RequestLike.html">RequestLike</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.PublisherLike.html">PublisherLike</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.ServiceState.html">ServiceState</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.ConsumerLike.html">ConsumerLike</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.EscapeStyle.html">EscapeStyle</a></li>
+                                                                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-550034496"></a>
+                                <a href="../namespaces/Kisma.Core.Exceptions.html" style="margin-left: 30px; padding-left: 0">Exceptions</a>
+            </div>
+            <div id="namespace-550034496" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.InvalidEventHandlerException.html">InvalidEventHandlerException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.InvalidSettingValueException.html">InvalidSettingValueException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.SeedException.html">SeedException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.EventException.html">EventException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.InvalidSettingKeyException.html">InvalidSettingKeyException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.EventHandlerException.html">EventHandlerException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.ProcessLockException.html">ProcessLockException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.ProcessLockExistsException.html">ProcessLockExistsException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.ProcessLockAgeException.html">ProcessLockAgeException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.ProcessLockFileException.html">ProcessLockFileException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.HaltPropagationException.html">HaltPropagationException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.InvalidRequestException.html">InvalidRequestException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.FileSystemException.html">FileSystemException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.UtilityException.html">UtilityException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.SettingException.html">SettingException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.CouchDbException.html">CouchDbException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.DataStoreException.html">DataStoreException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.BagException.html">BagException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.ServiceException.html">ServiceException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.NotImplementedException.html">NotImplementedException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.StorageException.html">StorageException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.HttpException.html">HttpException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.DuplicateKeyException.html">DuplicateKeyException</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1459728729"></a>
+                                <a href="../namespaces/Kisma.Core.Enums.html" style="margin-left: 30px; padding-left: 0">Enums</a>
+            </div>
+            <div id="namespace-1459728729" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/Kisma.Core.Enums.LineBreak.html">LineBreak</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Enums.TimerPrecision.html">TimerPrecision</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Enums.HashSeed.html">HashSeed</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Enums.SeedEnum.html">SeedEnum</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Enums.AccessLevels.html">AccessLevels</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Enums.DateTime.html">DateTime</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Enums.KismaSettings.html">KismaSettings</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Enums.GlobFlags.html">GlobFlags</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Enums.HttpResponse.html">HttpResponse</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Enums.OutputFormat.html">OutputFormat</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Enums.HashType.html">HashType</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Enums.AnsiColor.html">AnsiColor</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Enums.HttpMethod.html">HttpMethod</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Enums.DebugLevel.html">DebugLevel</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Enums.Levels.html">Levels</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Enums.DataSeparator.html">DataSeparator</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Enums.PhpFrameworks.html">PhpFrameworks</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Enums.DataEnclosure.html">DataEnclosure</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Enums.AnsiConsole.html">AnsiConsole</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1877130224"></a>
+                                <a href="../namespaces/Kisma.Core.Utility.html" style="margin-left: 30px; padding-left: 0">Utility</a>
+            </div>
+            <div id="namespace-1877130224" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.EventManager.html">EventManager</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.Option.html">Option</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.Hasher.html">Hasher</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.ChairLift.html">ChairLift</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.FilterInput.html">FilterInput</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.Markup.html">Markup</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.HtmlMarkup.html">HtmlMarkup</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.Inflector.html">Inflector</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.Composer.html">Composer</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.DateTime.html">DateTime</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.Xml.html">Xml</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.Render.html">Render</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.Log.html">Log</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.Sql.html">Sql</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.Convert.html">Convert</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.FileSystem.html">FileSystem</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.SchemaFormBuilder.html">SchemaFormBuilder</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.ErrorHandler.html">ErrorHandler</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.Storage.html">Storage</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.Bootstrap.html">Bootstrap</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.Scalar.html">Scalar</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.Detector.html">Detector</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.Curl.html">Curl</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1993467852"></a>
+                                <a href="../namespaces/Kisma.Core.Services.html" style="margin-left: 30px; padding-left: 0">Services</a>
+            </div>
+            <div id="namespace-1993467852" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1906353446"></a>
+                                <a href="../namespaces/Kisma.Core.Services.Network.html" style="margin-left: 30px; padding-left: 0">Network</a>
+            </div>
+            <div id="namespace-1906353446" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/Kisma.Core.Services.Network.WebDav.html">WebDav</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Services.Network.HttpRequest.html">HttpRequest</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Services.Network.Http.html">Http</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Services.Network.Ssh.html">Ssh</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Services.Network.Ftp.html">Ftp</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/Kisma.Core.Services.HttpService.html">HttpService</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Services.SeedService.html">SeedService</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Services.SeedResponse.html">SeedResponse</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Services.SeedCli.html">SeedCli</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Services.Session.html">Session</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Services.SeedRequest.html">SeedRequest</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Services.DeliveryService.html">DeliveryService</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-766395751"></a>
+                                <a href="../namespaces/Kisma.Core.Events.html" style="margin-left: 30px; padding-left: 0">Events</a>
+            </div>
+            <div id="namespace-766395751" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/Kisma.Core.Events.SeedEvent.html">SeedEvent</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Events.ServiceEvent.html">ServiceEvent</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1723407416"></a>
+                                <a href="../namespaces/Kisma.Core.Components.html" style="margin-left: 30px; padding-left: 0">Components</a>
+            </div>
+            <div id="namespace-1723407416" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/Kisma.Core.Components.ParsingLineReader.html">ParsingLineReader</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Components.LineReader.html">LineReader</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Components.LineWriter.html">LineWriter</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Components.Map.html">Map</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1381802226"></a>
+                                <a href="../namespaces/Kisma.Core.Tools.html" style="margin-left: 30px; padding-left: 0">Tools</a>
+            </div>
+            <div id="namespace-1381802226" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/Kisma.Core.Tools.DataReader.html">DataReader</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/Kisma.Core.SeedUtility.html">SeedUtility</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.SeedBagIterator.html">SeedBagIterator</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.SeedBag.html">SeedBag</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Seed.html">Seed</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.TestCase.html">TestCase</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.SeedQueue.html">SeedQueue</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-2029213670"></a>
+                                <a href="../namespaces/Kisma.Services.html" style="margin-left: 30px; padding-left: 0">Services</a>
+            </div>
+            <div id="namespace-2029213670" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-618444820"></a>
+                                <a href="../namespaces/Kisma.Services.Network.html" style="margin-left: 30px; padding-left: 0">Network</a>
+            </div>
+            <div id="namespace-618444820" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/Kisma.Services.Network.Email.html">Email</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                    
+                    <ul>
+                                                                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                    
+                    <ul>
+                                                                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/Kisma.html">Kisma</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+        </div>
+    </section>
+    <section class="row-fluid">
+        <div class="span10 offset2">
+            <div class="row-fluid">
+                <div class="span8 content class">
+                    <nav>
+                                                <a href="../namespaces/Kisma.Core.Utility.html">\Kisma\Core\Utility</a> <i class="icon-level-up"></i>
+                                            </nav>
+                    <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal"><i class="icon-code"></i></a>
+
+                    <h1><small>\Kisma\Core\Utility</small>Curl</h1>
+                    <p><em>Curl
+A kick-ass cURL wrapper</em></p>
+                    
+
+                    <section id="summary">
+                        <h2>Summary</h2>
+                        <section class="row-fluid heading">
+                            <section class="span4">
+                                <a href="#methods">Methods</a>
+                            </section>
+                            <section class="span4">
+                                <a href="#properties">Properties</a>
+                            </section>
+                            <section class="span4">
+                                <a href="#constants">Constants</a>
+                            </section>
+                        </section>
+                        <section class="row-fluid public">
+                            <section class="span4">
+                                                                    <a href="../classes/Kisma.Core.Utility.Curl.html#method_get" class="">get()</a><br />
+                                                                    <a href="../classes/Kisma.Core.Utility.Curl.html#method_put" class="">put()</a><br />
+                                                                    <a href="../classes/Kisma.Core.Utility.Curl.html#method_post" class="">post()</a><br />
+                                                                    <a href="../classes/Kisma.Core.Utility.Curl.html#method_delete" class="">delete()</a><br />
+                                                                    <a href="../classes/Kisma.Core.Utility.Curl.html#method_head" class="">head()</a><br />
+                                                                    <a href="../classes/Kisma.Core.Utility.Curl.html#method_options" class="">options()</a><br />
+                                                                    <a href="../classes/Kisma.Core.Utility.Curl.html#method_copy" class="">copy()</a><br />
+                                                                    <a href="../classes/Kisma.Core.Utility.Curl.html#method_merge" class="">merge()</a><br />
+                                                                    <a href="../classes/Kisma.Core.Utility.Curl.html#method_patch" class="">patch()</a><br />
+                                                                    <a href="../classes/Kisma.Core.Utility.Curl.html#method_request" class="">request()</a><br />
+                                                                    <a href="../classes/Kisma.Core.Utility.Curl.html#method_getErrorAsString" class="">getErrorAsString()</a><br />
+                                                                    <a href="../classes/Kisma.Core.Utility.Curl.html#method_currentUrl" class="">currentUrl()</a><br />
+                                                                    <a href="../classes/Kisma.Core.Utility.Curl.html#method_buildUrl" class="">buildUrl()</a><br />
+                                                                    <a href="../classes/Kisma.Core.Utility.Curl.html#method_urlSeparator" class="">urlSeparator()</a><br />
+                                                                    <a href="../classes/Kisma.Core.Utility.Curl.html#method_getError" class="">getError()</a><br />
+                                                                    <a href="../classes/Kisma.Core.Utility.Curl.html#method_setHostPort" class="">setHostPort()</a><br />
+                                                                    <a href="../classes/Kisma.Core.Utility.Curl.html#method_getHostPort" class="">getHostPort()</a><br />
+                                                                    <a href="../classes/Kisma.Core.Utility.Curl.html#method_getInfo" class="">getInfo()</a><br />
+                                                                    <a href="../classes/Kisma.Core.Utility.Curl.html#method_setPassword" class="">setPassword()</a><br />
+                                                                    <a href="../classes/Kisma.Core.Utility.Curl.html#method_getPassword" class="">getPassword()</a><br />
+                                                                    <a href="../classes/Kisma.Core.Utility.Curl.html#method_setUserName" class="">setUserName()</a><br />
+                                                                    <a href="../classes/Kisma.Core.Utility.Curl.html#method_getUserName" class="">getUserName()</a><br />
+                                                                    <a href="../classes/Kisma.Core.Utility.Curl.html#method_setCurlOptions" class="">setCurlOptions()</a><br />
+                                                                    <a href="../classes/Kisma.Core.Utility.Curl.html#method_getCurlOptions" class="">getCurlOptions()</a><br />
+                                                                    <a href="../classes/Kisma.Core.Utility.Curl.html#method_getLastHttpCode" class="">getLastHttpCode()</a><br />
+                                                                    <a href="../classes/Kisma.Core.Utility.Curl.html#method_setDebug" class="">setDebug()</a><br />
+                                                                    <a href="../classes/Kisma.Core.Utility.Curl.html#method_getDebug" class="">getDebug()</a><br />
+                                                                    <a href="../classes/Kisma.Core.Utility.Curl.html#method_setAutoDecodeJson" class="">setAutoDecodeJson()</a><br />
+                                                                    <a href="../classes/Kisma.Core.Utility.Curl.html#method_getAutoDecodeJson" class="">getAutoDecodeJson()</a><br />
+                                                                    <a href="../classes/Kisma.Core.Utility.Curl.html#method_setDecodeToArray" class="">setDecodeToArray()</a><br />
+                                                                    <a href="../classes/Kisma.Core.Utility.Curl.html#method_getDecodeToArray" class="">getDecodeToArray()</a><br />
+                                                                    <a href="../classes/Kisma.Core.Utility.Curl.html#method_getLastResponseHeaders" class="">getLastResponseHeaders()</a><br />
+                                                                    <a href="../classes/Kisma.Core.Utility.Curl.html#method_getLastRequestHeaders" class="">getLastRequestHeaders()</a><br />
+                                                                    <a href="../classes/Kisma.Core.Enums.SeedEnum.html#method___invoke" class="">__invoke()</a><br />
+                                                                    <a href="../classes/Kisma.Core.Enums.SeedEnum.html#method_introspect" class="">introspect()</a><br />
+                                                                    <a href="../classes/Kisma.Core.Enums.SeedEnum.html#method_seedConstants" class="">seedConstants()</a><br />
+                                                                    <a href="../classes/Kisma.Core.Enums.SeedEnum.html#method_getDefinedConstants" class="">getDefinedConstants()</a><br />
+                                                                    <a href="../classes/Kisma.Core.Enums.SeedEnum.html#method_contains" class="">contains()</a><br />
+                                                                    <a href="../classes/Kisma.Core.Enums.SeedEnum.html#method_nameOf" class="">nameOf()</a><br />
+                                                                    <a href="../classes/Kisma.Core.Enums.SeedEnum.html#method_defines" class="">defines()</a><br />
+                                                            </section>
+                            <section class="span4">
+                                                                    <em>No public properties found</em>
+                                                            </section>
+                            <section class="span4">
+                                                                    <a href="../classes/Kisma.Core.Enums.HttpMethod.html#constant___default" class="">__default</a><br />
+                                                            </section>
+                        </section>
+                        <section class="row-fluid protected">
+                            <section class="span4">
+                                                                    <a href="../classes/Kisma.Core.Utility.Curl.html#method__formatPayload" class="">_formatPayload()</a><br />
+                                                                    <a href="../classes/Kisma.Core.Utility.Curl.html#method__formatResponse" class="">_formatResponse()</a><br />
+                                                                    <a href="../classes/Kisma.Core.Utility.Curl.html#method__parseHeaders" class="">_parseHeaders()</a><br />
+                                                                    <a href="../classes/Kisma.Core.Utility.Curl.html#method__httpRequest" class="">_httpRequest()</a><br />
+                                                                    <a href="../classes/Kisma.Core.Utility.Curl.html#method__setError" class="">_setError()</a><br />
+                                                                    <a href="../classes/Kisma.Core.Utility.Curl.html#method__setInfo" class="">_setInfo()</a><br />
+                                                                    <a href="../classes/Kisma.Core.Utility.Curl.html#method__setLastHttpCode" class="">_setLastHttpCode()</a><br />
+                                                                    <a href="../classes/Kisma.Core.Enums.SeedEnum.html#method__cacheKey" class="">_cacheKey()</a><br />
+                                                            </section>
+                            <section class="span4">
+                                                                    <a href="../classes/Kisma.Core.Utility.Curl.html#property__userName" class="">$_userName</a><br />
+                                                                    <a href="../classes/Kisma.Core.Utility.Curl.html#property__password" class="">$_password</a><br />
+                                                                    <a href="../classes/Kisma.Core.Utility.Curl.html#property__hostPort" class="">$_hostPort</a><br />
+                                                                    <a href="../classes/Kisma.Core.Utility.Curl.html#property__error" class="">$_error</a><br />
+                                                                    <a href="../classes/Kisma.Core.Utility.Curl.html#property__info" class="">$_info</a><br />
+                                                                    <a href="../classes/Kisma.Core.Utility.Curl.html#property__curlOptions" class="">$_curlOptions</a><br />
+                                                                    <a href="../classes/Kisma.Core.Utility.Curl.html#property__lastHttpCode" class="">$_lastHttpCode</a><br />
+                                                                    <a href="../classes/Kisma.Core.Utility.Curl.html#property__lastResponseHeaders" class="">$_lastResponseHeaders</a><br />
+                                                                    <a href="../classes/Kisma.Core.Utility.Curl.html#property__lastRequestHeaders" class="">$_lastRequestHeaders</a><br />
+                                                                    <a href="../classes/Kisma.Core.Utility.Curl.html#property__debug" class="">$_debug</a><br />
+                                                                    <a href="../classes/Kisma.Core.Utility.Curl.html#property__autoDecodeJson" class="">$_autoDecodeJson</a><br />
+                                                                    <a href="../classes/Kisma.Core.Utility.Curl.html#property__decodeToArray" class="">$_decodeToArray</a><br />
+                                                                    <a href="../classes/Kisma.Core.Enums.SeedEnum.html#property__constants" class="">$_constants</a><br />
+                                                            </section>
+                            <section class="span4">
+                                <em>N/A</em>
+                            </section>
+                        </section>
+                        <section class="row-fluid private">
+                            <section class="span4">
+                                                                    <em>No private methods found</em>
+                                                            </section>
+                            <section class="span4">
+                                                                    <em>No private properties found</em>
+                                                            </section>
+                            <section class="span4">
+                                <em>N/A</em>
+                            </section>
+                        </section>
+                    </section>
+                </div>
+                <aside class="span4 detailsbar">
+                                        
+                    
+                    <dl>
+                        <dt>File</dt>
+                            <dd><a href="../files/Kisma.Core.Utility.Curl.php.html"><div class="path-wrapper">Kisma/Core/Utility/Curl.php</div></a></dd>
+                                                <dt>Package</dt>
+                            <dd><div class="namespace-wrapper">\Default</div></dd>
+                                                <dt>Class hierarchy</dt>
+                            <dd class="hierarchy">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                            
+                                        <div class="namespace-wrapper"><a href="../classes/Kisma.Core.Enums.SeedEnum.html">\Kisma\Core\Enums\SeedEnum</a></div>
+                                                                    
+                                        <div class="namespace-wrapper"><a href="../classes/Kisma.Core.Enums.HttpMethod.html">\Kisma\Core\Enums\HttpMethod</a></div>
+                                                                                                    <div class="namespace-wrapper">\Kisma\Core\Utility\Curl</div>
+                            </dd>
+
+                        
+                        
+                        
+                        
+                                                                        </dl>
+                    <h2>Tags</h2>
+                    <table class="table table-condensed">
+                                            <tr>
+                            <th>
+                                todo
+                            </th>
+                            <td>
+                                                            </td>
+                        </tr>
+                                        </table>
+                </aside>
+            </div>
+
+                                    <a id="constants" name="constants"></a>
+            <div class="row-fluid">
+                <div class="span8 content class">
+                    <h2>Constants</h2>
+                </div>
+                <aside class="span4 detailsbar"></aside>
+            </div>
+
+                                <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant___default" name="constant___default" class="anchor"></a>
+            <article id="constant___default" class="constant">
+                <h3 class="">__default</h3>
+                <pre class="signature">__default</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/Kisma.Core.Enums.HttpMethod.html"><div class="path-wrapper">\Kisma\Core\Enums\HttpMethod</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                            
+                                    <a id="properties" name="properties"></a>
+            <div class="row-fluid">
+                <div class="span8 content class">
+                    <h2>Properties</h2>
+                </div>
+                <aside class="span4 detailsbar"></aside>
+            </div>
+
+                                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property__userName" name="property__userName" class="anchor"></a>
+            <article class="property">
+                <h3 class="protected ">$_userName</h3>
+                <pre class="signature">$_userName : string</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                string
+                                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property__password" name="property__password" class="anchor"></a>
+            <article class="property">
+                <h3 class="protected ">$_password</h3>
+                <pre class="signature">$_password : string</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                string
+                                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property__hostPort" name="property__hostPort" class="anchor"></a>
+            <article class="property">
+                <h3 class="protected ">$_hostPort</h3>
+                <pre class="signature">$_hostPort : int</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                int
+                                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property__error" name="property__error" class="anchor"></a>
+            <article class="property">
+                <h3 class="protected ">$_error</h3>
+                <pre class="signature">$_error : array</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                array
+                &mdash; The error of the last call                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property__info" name="property__info" class="anchor"></a>
+            <article class="property">
+                <h3 class="protected ">$_info</h3>
+                <pre class="signature">$_info : array</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                array
+                &mdash; The results of the last call                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property__curlOptions" name="property__curlOptions" class="anchor"></a>
+            <article class="property">
+                <h3 class="protected ">$_curlOptions</h3>
+                <pre class="signature">$_curlOptions : array</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                array
+                &mdash; Default cURL options                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property__lastHttpCode" name="property__lastHttpCode" class="anchor"></a>
+            <article class="property">
+                <h3 class="protected ">$_lastHttpCode</h3>
+                <pre class="signature">$_lastHttpCode : int</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                int
+                &mdash; The last http code                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property__lastResponseHeaders" name="property__lastResponseHeaders" class="anchor"></a>
+            <article class="property">
+                <h3 class="protected ">$_lastResponseHeaders</h3>
+                <pre class="signature">$_lastResponseHeaders : array</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                array
+                &mdash; The last response headers                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property__lastRequestHeaders" name="property__lastRequestHeaders" class="anchor"></a>
+            <article class="property">
+                <h3 class="protected ">$_lastRequestHeaders</h3>
+                <pre class="signature">$_lastRequestHeaders : array</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                array
+                                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property__debug" name="property__debug" class="anchor"></a>
+            <article class="property">
+                <h3 class="protected ">$_debug</h3>
+                <pre class="signature">$_debug : bool</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                bool
+                &mdash; Enable/disable logging                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property__autoDecodeJson" name="property__autoDecodeJson" class="anchor"></a>
+            <article class="property">
+                <h3 class="protected ">$_autoDecodeJson</h3>
+                <pre class="signature">$_autoDecodeJson : bool</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                bool
+                &mdash; If true, and response is &quot;application/json&quot; content-type, it will be returned decoded                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property__decodeToArray" name="property__decodeToArray" class="anchor"></a>
+            <article class="property">
+                <h3 class="protected ">$_decodeToArray</h3>
+                <pre class="signature">$_decodeToArray : bool</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                bool
+                &mdash; If true, auto-decoded response is returned as an array                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property__constants" name="property__constants" class="anchor"></a>
+            <article class="property">
+                <h3 class="protected ">$_constants</h3>
+                <pre class="signature">$_constants : array</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                array
+                &mdash; The cache for quick lookups                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/Kisma.Core.Enums.SeedEnum.html"><div class="path-wrapper">\Kisma\Core\Enums\SeedEnum</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                            
+                                    <a id="methods" name="methods"></a>
+            <div class="row-fluid">
+                <div class="span8 content class"><h2>Methods</h2></div>
+                <aside class="span4 detailsbar"></aside>
+            </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_get" name="method_get" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">get()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">get(string <span class="argument">$url</span>, array|\stdClass <span class="argument">$payload</span>, array <span class="argument">$curlOptions</span>) : string|\stdClass</pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$url</td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td>array|\stdClass</td>
+                                <td>$payload</td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td>array</td>
+                                <td>$curlOptions</td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    string|\stdClass
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_put" name="method_put" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">put()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">put(string <span class="argument">$url</span>, array|\stdClass <span class="argument">$payload</span>, array <span class="argument">$curlOptions</span>) : bool|mixed|\stdClass</pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$url</td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td>array|\stdClass</td>
+                                <td>$payload</td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td>array</td>
+                                <td>$curlOptions</td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    bool|mixed|\stdClass
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_post" name="method_post" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">post()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">post(string <span class="argument">$url</span>, array|\stdClass <span class="argument">$payload</span>, array <span class="argument">$curlOptions</span>) : bool|mixed|\stdClass</pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$url</td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td>array|\stdClass</td>
+                                <td>$payload</td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td>array</td>
+                                <td>$curlOptions</td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    bool|mixed|\stdClass
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_delete" name="method_delete" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">delete()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">delete(string <span class="argument">$url</span>, array|\stdClass <span class="argument">$payload</span>, array <span class="argument">$curlOptions</span>) : bool|mixed|\stdClass</pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$url</td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td>array|\stdClass</td>
+                                <td>$payload</td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td>array</td>
+                                <td>$curlOptions</td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    bool|mixed|\stdClass
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_head" name="method_head" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">head()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">head(string <span class="argument">$url</span>, array|\stdClass <span class="argument">$payload</span>, array <span class="argument">$curlOptions</span>) : bool|mixed|\stdClass</pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$url</td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td>array|\stdClass</td>
+                                <td>$payload</td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td>array</td>
+                                <td>$curlOptions</td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    bool|mixed|\stdClass
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_options" name="method_options" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">options()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">options(string <span class="argument">$url</span>, array|\stdClass <span class="argument">$payload</span>, array <span class="argument">$curlOptions</span>) : bool|mixed|\stdClass</pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$url</td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td>array|\stdClass</td>
+                                <td>$payload</td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td>array</td>
+                                <td>$curlOptions</td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    bool|mixed|\stdClass
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_copy" name="method_copy" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">copy()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">copy(string <span class="argument">$url</span>, array|\stdClass <span class="argument">$payload</span>, array <span class="argument">$curlOptions</span>) : bool|mixed|\stdClass</pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$url</td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td>array|\stdClass</td>
+                                <td>$payload</td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td>array</td>
+                                <td>$curlOptions</td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    bool|mixed|\stdClass
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_merge" name="method_merge" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">merge()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">merge(string <span class="argument">$url</span>, array|\stdClass <span class="argument">$payload</span>, array <span class="argument">$curlOptions</span>) : bool|mixed|\stdClass</pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$url</td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td>array|\stdClass</td>
+                                <td>$payload</td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td>array</td>
+                                <td>$curlOptions</td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    bool|mixed|\stdClass
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_patch" name="method_patch" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">patch()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">patch(string <span class="argument">$url</span>, array|\stdClass <span class="argument">$payload</span>, array <span class="argument">$curlOptions</span>) : bool|mixed|\stdClass</pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$url</td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td>array|\stdClass</td>
+                                <td>$payload</td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td>array</td>
+                                <td>$curlOptions</td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    bool|mixed|\stdClass
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_request" name="method_request" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">request()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">request(string <span class="argument">$method</span>, string <span class="argument">$url</span>, array|\stdClass <span class="argument">$payload</span>, array <span class="argument">$curlOptions</span>) : string|\stdClass</pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$method</td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td>string</td>
+                                <td>$url</td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td>array|\stdClass</td>
+                                <td>$payload</td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td>array</td>
+                                <td>$curlOptions</td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    string|\stdClass
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getErrorAsString" name="method_getErrorAsString" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getErrorAsString()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getErrorAsString() : array</pre>
+                <p><em></em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    array
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_currentUrl" name="method_currentUrl" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">currentUrl()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">currentUrl(bool <span class="argument">$includeQuery</span>, bool <span class="argument">$includePath</span>) : string</pre>
+                <p><em>Returns the validated URL that has been called to get here</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>bool</td>
+                                <td>$includeQuery</td>
+                                <td><p>If true, query string is included</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>bool</td>
+                                <td>$includePath</td>
+                                <td><p>If true, the uri path is included</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    string
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_buildUrl" name="method_buildUrl" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">buildUrl()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">buildUrl(string <span class="argument">$url</span>, array <span class="argument">$payload</span>, string <span class="argument">$numericPrefix</span>, string <span class="argument">$argSeparator</span>, int <span class="argument">$encodingType</span>) : string</pre>
+                <p><em>Builds an URL, properly appending the payload as the query string.</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$url</td>
+                                <td><p>The target URL</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>array</td>
+                                <td>$payload</td>
+                                <td><p>The query string data. May be an array or object containing properties. The array form may be a simple one-dimensional</p>
+<pre><code>                         structure, or an array of arrays (who in turn may contain other arrays).</code></pre></td>
+                            </tr>
+                                                    <tr>
+                                <td>string</td>
+                                <td>$numericPrefix</td>
+                                <td><p>If numeric indices are used in the base array and this parameter is provided, it will be prepended to the numeric index for</p>
+<pre><code>                         elements in the base array only.
+                         This is meant to allow for legal variable names when the data is decoded by PHP or another CGI application later on.</code></pre></td>
+                            </tr>
+                                                    <tr>
+                                <td>string</td>
+                                <td>$argSeparator</td>
+                                <td><p>Character to use to separate arguments. Defaults to '&amp;'</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>int</td>
+                                <td>$encodingType</td>
+                                <td><p>If encodingType is PHP_QUERY_RFC1738 (the default), then encoding is as application/x-www-form-urlencoded, spaces will be</p>
+<pre><code>                         encoded with plus (+) signs
+                         If encodingType is PHP_QUERY_RFC3986, spaces will be encoded with %20</code></pre></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    string
+                                            &mdash; <p>an URL-encoded string</p>
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_urlSeparator" name="method_urlSeparator" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">urlSeparator()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">urlSeparator(string <span class="argument">$url</span>, string <span class="argument">$argSeparator</span>) : string</pre>
+                <p><em>Returns the proper separator for an addition to the URL (? or &amp;)</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$url</td>
+                                <td><p>The URL to test</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>string</td>
+                                <td>$argSeparator</td>
+                                <td><p>Defaults to '&amp;' but you can override</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    string
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getError" name="method_getError" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getError()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getError() : array</pre>
+                <p><em></em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    array
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_setHostPort" name="method_setHostPort" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">setHostPort()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">setHostPort(int <span class="argument">$hostPort</span>) : void</pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>int</td>
+                                <td>$hostPort</td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getHostPort" name="method_getHostPort" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getHostPort()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getHostPort() : int</pre>
+                <p><em></em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    int
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getInfo" name="method_getInfo" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getInfo()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getInfo(string <span class="argument">$key</span>, mixed <span class="argument">$defaultValue</span>) : array</pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$key</td>
+                                <td><p>Leaving this null will return the entire structure, otherwise just the value for the supplied key</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>mixed</td>
+                                <td>$defaultValue</td>
+                                <td><p>The default value to return if the $key was not found</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    array
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_setPassword" name="method_setPassword" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">setPassword()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">setPassword(string <span class="argument">$password</span>) : void</pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$password</td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getPassword" name="method_getPassword" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getPassword()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getPassword() : string</pre>
+                <p><em></em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    string
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_setUserName" name="method_setUserName" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">setUserName()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">setUserName(string <span class="argument">$userName</span>) : void</pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$userName</td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getUserName" name="method_getUserName" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getUserName()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getUserName() : string</pre>
+                <p><em></em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    string
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_setCurlOptions" name="method_setCurlOptions" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">setCurlOptions()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">setCurlOptions(array <span class="argument">$curlOptions</span>) : void</pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>array</td>
+                                <td>$curlOptions</td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getCurlOptions" name="method_getCurlOptions" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getCurlOptions()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getCurlOptions() : array</pre>
+                <p><em></em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    array
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getLastHttpCode" name="method_getLastHttpCode" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getLastHttpCode()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getLastHttpCode() : int</pre>
+                <p><em></em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    int
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_setDebug" name="method_setDebug" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">setDebug()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">setDebug(boolean <span class="argument">$debug</span>)</pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>boolean</td>
+                                <td>$debug</td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getDebug" name="method_getDebug" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getDebug()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getDebug() : boolean</pre>
+                <p><em></em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    boolean
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_setAutoDecodeJson" name="method_setAutoDecodeJson" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">setAutoDecodeJson()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">setAutoDecodeJson(boolean <span class="argument">$autoDecodeJson</span>)</pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>boolean</td>
+                                <td>$autoDecodeJson</td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getAutoDecodeJson" name="method_getAutoDecodeJson" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getAutoDecodeJson()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getAutoDecodeJson() : boolean</pre>
+                <p><em></em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    boolean
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_setDecodeToArray" name="method_setDecodeToArray" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">setDecodeToArray()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">setDecodeToArray(boolean <span class="argument">$decodeToArray</span>)</pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>boolean</td>
+                                <td>$decodeToArray</td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getDecodeToArray" name="method_getDecodeToArray" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getDecodeToArray()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getDecodeToArray() : boolean</pre>
+                <p><em></em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    boolean
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getLastResponseHeaders" name="method_getLastResponseHeaders" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getLastResponseHeaders()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getLastResponseHeaders() : array</pre>
+                <p><em></em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    array
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getLastRequestHeaders" name="method_getLastRequestHeaders" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getLastRequestHeaders()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getLastRequestHeaders() : array</pre>
+                <p><em></em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    array
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method___invoke" name="method___invoke" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">__invoke()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">__invoke()</pre>
+                <p><em>Returns the default value for this enum if called as a function: $_x = SeedEnum()</em></p>
+                
+
+                
+                
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/Kisma.Core.Enums.SeedEnum.html"><div class="path-wrapper">\Kisma\Core\Enums\SeedEnum</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_introspect" name="method_introspect" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">introspect()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">introspect(string <span class="argument">$class</span>, array <span class="argument">$seedConstants</span>, bool <span class="argument">$overwrite</span>) : string</pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$class</td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td>array</td>
+                                <td>$seedConstants</td>
+                                <td><p>Seeds the cache with these optional KVPs</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>bool</td>
+                                <td>$overwrite</td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    string
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/Kisma.Core.Enums.SeedEnum.html"><div class="path-wrapper">\Kisma\Core\Enums\SeedEnum</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_seedConstants" name="method_seedConstants" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">seedConstants()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">seedConstants(array <span class="argument">$constants</span>, string <span class="argument">$class</span>) : void</pre>
+                <p><em>Adds constants to the cache for a particular class. Roll-your-own ENUM</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>array</td>
+                                <td>$constants</td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td>string</td>
+                                <td>$class</td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/Kisma.Core.Enums.SeedEnum.html"><div class="path-wrapper">\Kisma\Core\Enums\SeedEnum</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getDefinedConstants" name="method_getDefinedConstants" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getDefinedConstants()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getDefinedConstants(bool <span class="argument">$flipped</span>, string <span class="argument">$class</span>, bool <span class="argument">$listData</span>) : array</pre>
+                <p><em>Returns a hash of the called class&#039;s constants ( CONSTANT_NAME =&gt; value ). Caches for speed
+(class cache hash, say that ten times fast!).</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>bool</td>
+                                <td>$flipped</td>
+                                <td><p>If true, the array is flipped before return ( value => CONSTANT_NAME )</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>string</td>
+                                <td>$class</td>
+                                <td><p>Used internally to cache constants</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>bool</td>
+                                <td>$listData</td>
+                                <td><p>If true, the constant names themselves are cleaned up for display purposes.</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    array
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/Kisma.Core.Enums.SeedEnum.html"><div class="path-wrapper">\Kisma\Core\Enums\SeedEnum</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_contains" name="method_contains" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">contains()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">contains(mixed <span class="argument">$value</span>) : bool</pre>
+                <p><em>Returns true or false if this class contains a specific constant value.</em></p>
+                <p>Use for validity checks:</p>
+<p>   if ( false === VeryCoolShit::contains( $evenCoolerShit ) ) {</p>
+<pre><code>   throw new \InvalidArgumentException( 'Sorry, your selection of "' . $evenCoolerShit . '" is invalid.' );</code></pre>
+<p>   }</p>
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>mixed</td>
+                                <td>$value</td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    bool
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/Kisma.Core.Enums.SeedEnum.html"><div class="path-wrapper">\Kisma\Core\Enums\SeedEnum</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_nameOf" name="method_nameOf" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">nameOf()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">nameOf(string <span class="argument">$constant</span>, bool <span class="argument">$flipped</span>) : string</pre>
+                <p><em>Returns the constant name as a string</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$constant</td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td>bool</td>
+                                <td>$flipped</td>
+                                <td><p>If false, the $constantValue should contain the constant name and the value will be returned</p></td>
+                            </tr>
+                                            </table>
+                
+                                    <h4>Throws</h4>
+                    <dl>
+                                                    <dt>\InvalidArgumentException</dt>
+                            <dd></dd>
+                                                                    </dl>
+                
+                                    <h4>Returns</h4>
+                    string
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/Kisma.Core.Enums.SeedEnum.html"><div class="path-wrapper">\Kisma\Core\Enums\SeedEnum</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_defines" name="method_defines" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">defines()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">defines(string <span class="argument">$constant</span>, bool <span class="argument">$returnValue</span>) : bool</pre>
+                <p><em>Returns true or false if this class defines a specific constant.</em></p>
+                <p>Optionally returns the value of the constant, but throws an
+exception if not found.</p>
+<p>Use for validity checks:</p>
+<p>   if ( false === VeryCoolShit::contains( $evenCoolerShit ) ) {</p>
+<pre><code>   throw new \InvalidArgumentException( 'Sorry, your selection of "' . $evenCoolerShit . '" is invalid.' );</code></pre>
+<p>   }</p>
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$constant</td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td>bool</td>
+                                <td>$returnValue</td>
+                                <td><p>If true, returns the value of the constant if found, but throws an exception if not</p></td>
+                            </tr>
+                                            </table>
+                
+                                    <h4>Throws</h4>
+                    <dl>
+                                                    <dt>\InvalidArgumentException</dt>
+                            <dd></dd>
+                                                                    </dl>
+                
+                                    <h4>Returns</h4>
+                    bool
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/Kisma.Core.Enums.SeedEnum.html"><div class="path-wrapper">\Kisma\Core\Enums\SeedEnum</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method__formatPayload" name="method__formatPayload" class="anchor"></a>
+            <article class="method">
+                <h3 class="protected ">_formatPayload()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">_formatPayload(mixed <span class="argument">$payload</span>, array <span class="argument">$headers</span>) : array</pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>mixed</td>
+                                <td>$payload</td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td>array</td>
+                                <td>$headers</td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    array
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method__formatResponse" name="method__formatResponse" class="anchor"></a>
+            <article class="method">
+                <h3 class="protected ">_formatResponse()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">_formatResponse(mixed <span class="argument">$response</span>) : mixed</pre>
+                <p><em>Based on the response content type, the result is formatted</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>mixed</td>
+                                <td>$response</td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    mixed
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method__parseHeaders" name="method__parseHeaders" class="anchor"></a>
+            <article class="method">
+                <h3 class="protected ">_parseHeaders()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">_parseHeaders(string <span class="argument">$headers</span>, int <span class="argument">$size</span>) : array</pre>
+                <p><em>Separate the headers from the body of a response</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$headers</td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td>int</td>
+                                <td>$size</td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    array
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method__httpRequest" name="method__httpRequest" class="anchor"></a>
+            <article class="method">
+                <h3 class="protected ">_httpRequest()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">_httpRequest(string <span class="argument">$method</span>, string <span class="argument">$url</span>, array <span class="argument">$payload</span>, array <span class="argument">$curlOptions</span>) : bool|mixed|\stdClass</pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$method</td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td>string</td>
+                                <td>$url</td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td>array</td>
+                                <td>$payload</td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td>array</td>
+                                <td>$curlOptions</td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                                    <h4>Throws</h4>
+                    <dl>
+                                                    <dt>\InvalidArgumentException</dt>
+                            <dd></dd>
+                                                                    </dl>
+                
+                                    <h4>Returns</h4>
+                    bool|mixed|\stdClass
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method__setError" name="method__setError" class="anchor"></a>
+            <article class="method">
+                <h3 class="protected ">_setError()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">_setError(array <span class="argument">$error</span>) : void</pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>array</td>
+                                <td>$error</td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method__setInfo" name="method__setInfo" class="anchor"></a>
+            <article class="method">
+                <h3 class="protected ">_setInfo()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">_setInfo(array <span class="argument">$info</span>) : void</pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>array</td>
+                                <td>$info</td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method__setLastHttpCode" name="method__setLastHttpCode" class="anchor"></a>
+            <article class="method">
+                <h3 class="protected ">_setLastHttpCode()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">_setLastHttpCode(int <span class="argument">$lastHttpCode</span>)</pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>int</td>
+                                <td>$lastHttpCode</td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method__cacheKey" name="method__cacheKey" class="anchor"></a>
+            <article class="method">
+                <h3 class="protected ">_cacheKey()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">_cacheKey(string <span class="argument">$class</span>) : string</pre>
+                <p><em>Gets a guaranteed cache key</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$class</td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    string
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/Kisma.Core.Enums.SeedEnum.html"><div class="path-wrapper">\Kisma\Core\Enums\SeedEnum</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                                    </div>
+    </section>
+
+    <div id="source-view" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="source-view-label" aria-hidden="true">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h3 id="source-view-label">Curl.php</h3>
+        </div>
+        <div class="modal-body">
+            <pre data-src="../files/Kisma/Core/Utility/Curl.php.txt" class="language-php line-numbers"></pre>
+        </div>
+    </div>
+
+    <footer class="row-fluid">
+        <section class="span10 offset2">
+            <section class="row-fluid">
+                <section class="span10 offset1">
+                    <section class="row-fluid footer-sections">
+                        <section class="span4">
+                                                        <h1><i class="icon-code"></i></h1>
+                            <div>
+                                <ul>
+                                                                            <li><a href="../namespaces/Kisma.html">\Kisma</a></li>
+                                                                    </ul>
+                            </div>
+                        </section>
+                        <section class="span4">
+                                                        <h1><i class="icon-bar-chart"></i></h1>
+                            <div>
+                                <ul>
+                                    <li><a href="../graphs/class.html">Class Hierarchy Diagram</a></li>
+                                </ul>
+                            </div>
+                        </section>
+                        <section class="span4">
+                                                        <h1><i class="icon-pushpin"></i></h1>
+                            <div>
+                                <ul>
+                                    <li><a href="../reports/errors.html">Errors</a></li>
+                                    <li><a href="../reports/markers.html">Markers</a></li>
+                                </ul>
+                            </div>
+                        </section>
+                    </section>
+                </section>
+            </section>
+            <section class="row-fluid">
+                <section class="span10 offset1">
+                    <hr />
+                    Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor </a> and authored
+                    on January 9th, 2014 at 13:06.
+                </section>
+            </section>
+        </section>
+    </footer>
+</div>
+
+</body>
+</html>

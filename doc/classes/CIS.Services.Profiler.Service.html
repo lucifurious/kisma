@@ -1,0 +1,2183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+    <meta charset="utf-8"/>
+    <title>API Documentation</title>
+    <meta name="author" content=""/>
+    <meta name="description" content=""/>
+
+    <link href="https://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.no-icons.min.css" rel="stylesheet">
+    <link href="https://netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.min.css" rel="stylesheet">
+    <link href="../css/prism.css" rel="stylesheet" media="all"/>
+    <link href="../css/template.css" rel="stylesheet" media="all"/>
+    
+    <!--[if lt IE 9]>
+    <script src="https://html5shim.googlecode.com/svn/trunk/html5.js" type="text/javascript"></script>
+    <![endif]-->
+    <script src="https://code.jquery.com/jquery-1.10.2.min.js" type="text/javascript"></script>
+    <script src="https://code.jquery.com/ui/1.10.3/jquery-ui.min.js" type="text/javascript"></script>
+    <script src="https://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
+    <script src="../js/jquery.smooth-scroll.js"></script>
+    <script src="../js/prism.min.js"></script>
+    <!-- TODO: Add http://jscrollpane.kelvinluck.com/ to style the scrollbars for browsers not using webkit-->
+    <script type="text/javascript">
+    function loadExternalCodeSnippets() {
+        Array.prototype.slice.call(document.querySelectorAll('pre[data-src]')).forEach(function (pre) {
+            var src = pre.getAttribute('data-src');
+            var extension = (src.match(/\.(\w+)$/) || [, ''])[1];
+            var language = 'php';
+
+            var code = document.createElement('code');
+            code.className = 'language-' + language;
+
+            pre.textContent = '';
+
+            code.textContent = 'Loading…';
+
+            pre.appendChild(code);
+
+            var xhr = new XMLHttpRequest();
+
+            xhr.open('GET', src, true);
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 4) {
+
+                    if (xhr.status < 400 && xhr.responseText) {
+                        code.textContent = xhr.responseText;
+
+                        Prism.highlightElement(code);
+                    }
+                    else if (xhr.status >= 400) {
+                        code.textContent = '✖ Error ' + xhr.status + ' while fetching file: ' + xhr.statusText;
+                    }
+                    else {
+                        code.textContent = '✖ Error: File does not exist or is empty';
+                    }
+                }
+            };
+
+            xhr.send(null);
+        });
+    }
+
+    $(document).ready(function(){
+        loadExternalCodeSnippets();
+    });
+    $('#source-view').on('shown', function () {
+        loadExternalCodeSnippets();
+    })
+</script>
+
+    <link rel="shortcut icon" href="../images/favicon.ico"/>
+    <link rel="apple-touch-icon" href="../images/apple-touch-icon.png"/>
+    <link rel="apple-touch-icon" sizes="72x72" href="../images/apple-touch-icon-72x72.png"/>
+    <link rel="apple-touch-icon" sizes="114x114" href="../images/apple-touch-icon-114x114.png"/>
+</head>
+<body>
+
+<div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+        <div class="container">
+            <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                <i class="icon-ellipsis-vertical"></i>
+            </a>
+            <a class="brand" href="../index.html">API Documentation</a>
+
+            <div class="nav-collapse">
+                <ul class="nav pull-right">
+                    <li class="dropdown">
+                        <a href="../index.html" class="dropdown-toggle" data-toggle="dropdown">
+                            API Documentation <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                                                        <li><a href="../namespaces/CIS.html">\CIS</a></li>
+                                                        <li><a href="../namespaces/Kisma.html">\Kisma</a></li>
+                                                    </ul>
+                    </li>
+                    <li class="dropdown" id="charts-menu">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            Charts <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="../graphs/class.html">
+                                    <i class="icon-list-alt"></i>&#160;Class hierarchy diagram
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="dropdown" id="reports-menu">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            Reports <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="../reports/errors.html">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <i class="icon-list-alt"></i>&#160;Errors <span class="label label-info pull-right">574</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="../reports/markers.html">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <i class="icon-list-alt"></i>&#160;Markers <span class="label label-info pull-right">1</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <!--<div class="go_to_top">-->
+    <!--<a href="#___" style="color: inherit">Back to top&#160;&#160;<i class="icon-upload icon-white"></i></a>-->
+    <!--</div>-->
+</div>
+
+<div id="___" class="container-fluid">
+        <section class="row-fluid">
+        <div class="span2 sidebar">
+                                <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle " data-toggle="collapse" data-target="#namespace-1188298208"></a>
+                                <a href="../namespaces/default.html" style="margin-left: 30px; padding-left: 0">\</a>
+            </div>
+            <div id="namespace-1188298208" class="accordion-body collapse in">
+                <div class="accordion-inner">
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-517999066"></a>
+                                <a href="../namespaces/CIS.html" style="margin-left: 30px; padding-left: 0">CIS</a>
+            </div>
+            <div id="namespace-517999066" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-532975473"></a>
+                                <a href="../namespaces/CIS.Services.html" style="margin-left: 30px; padding-left: 0">Services</a>
+            </div>
+            <div id="namespace-532975473" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-134429619"></a>
+                                <a href="../namespaces/CIS.Services.Graylog.html" style="margin-left: 30px; padding-left: 0">Graylog</a>
+            </div>
+            <div id="namespace-134429619" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                    <li class="interface"><a href="../classes/CIS.Services.Graylog.Graylog.html">Graylog</a></li>
+                                                                                                    <li class="class"><a href="../classes/CIS.Services.Graylog.Message.html">Message</a></li>
+                                                    <li class="class"><a href="../classes/CIS.Services.Graylog.Handler.html">Handler</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1704969779"></a>
+                                <a href="../namespaces/CIS.Services.OAuth.html" style="margin-left: 30px; padding-left: 0">OAuth</a>
+            </div>
+            <div id="namespace-1704969779" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/CIS.Services.OAuth.BaseClient.html">BaseClient</a></li>
+                                                    <li class="class"><a href="../classes/CIS.Services.OAuth.Client.html">Client</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-36545259"></a>
+                                <a href="../namespaces/CIS.Services.Console.html" style="margin-left: 30px; padding-left: 0">Console</a>
+            </div>
+            <div id="namespace-36545259" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/CIS.Services.Console.OutputTest.html">OutputTest</a></li>
+                                                    <li class="class"><a href="../classes/CIS.Services.Console.Output.html">Output</a></li>
+                                                    <li class="class"><a href="../classes/CIS.Services.Console.ConsoleOutput.html">ConsoleOutput</a></li>
+                                                    <li class="class"><a href="../classes/CIS.Services.Console.Styles.html">Styles</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1811790934"></a>
+                                <a href="../namespaces/CIS.Services.Storage.html" style="margin-left: 30px; padding-left: 0">Storage</a>
+            </div>
+            <div id="namespace-1811790934" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-454043063"></a>
+                                <a href="../namespaces/CIS.Services.Storage.MongoDb.html" style="margin-left: 30px; padding-left: 0">MongoDb</a>
+            </div>
+            <div id="namespace-454043063" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/CIS.Services.Storage.MongoDb.Service.html">Service</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                    
+                    <ul>
+                                                                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-69234186"></a>
+                                <a href="../namespaces/CIS.Services.Delivery.html" style="margin-left: 30px; padding-left: 0">Delivery</a>
+            </div>
+            <div id="namespace-69234186" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/CIS.Services.Delivery.Settings.html">Settings</a></li>
+                                                    <li class="class"><a href="../classes/CIS.Services.Delivery.Email.html">Email</a></li>
+                                                    <li class="class"><a href="../classes/CIS.Services.Delivery.Sftp.html">Sftp</a></li>
+                                                    <li class="class"><a href="../classes/CIS.Services.Delivery.Mount.html">Mount</a></li>
+                                                    <li class="class"><a href="../classes/CIS.Services.Delivery.Ftp.html">Ftp</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1824291326"></a>
+                                <a href="../namespaces/CIS.Services.Profiler.html" style="margin-left: 30px; padding-left: 0">Profiler</a>
+            </div>
+            <div id="namespace-1824291326" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/CIS.Services.Profiler.Service.html">Service</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                    
+                    <ul>
+                                                                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                    
+                    <ul>
+                                                                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1604433981"></a>
+                                <a href="../namespaces/Kisma.html" style="margin-left: 30px; padding-left: 0">Kisma</a>
+            </div>
+            <div id="namespace-1604433981" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1758884133"></a>
+                                <a href="../namespaces/Kisma.Core.html" style="margin-left: 30px; padding-left: 0">Core</a>
+            </div>
+            <div id="namespace-1758884133" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1807415086"></a>
+                                <a href="../namespaces/Kisma.Core.Components.html" style="margin-left: 30px; padding-left: 0">Components</a>
+            </div>
+            <div id="namespace-1807415086" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/Kisma.Core.Components.LineWriter.html">LineWriter</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Components.Map.html">Map</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Components.LineReader.html">LineReader</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Components.ParsingLineReader.html">ParsingLineReader</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1930488772"></a>
+                                <a href="../namespaces/Kisma.Core.Exceptions.html" style="margin-left: 30px; padding-left: 0">Exceptions</a>
+            </div>
+            <div id="namespace-1930488772" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.UtilityException.html">UtilityException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.StorageException.html">StorageException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.InvalidSettingKeyException.html">InvalidSettingKeyException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.ServiceException.html">ServiceException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.CouchDbException.html">CouchDbException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.NotImplementedException.html">NotImplementedException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.ProcessLockException.html">ProcessLockException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.ProcessLockExistsException.html">ProcessLockExistsException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.ProcessLockAgeException.html">ProcessLockAgeException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.ProcessLockFileException.html">ProcessLockFileException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.SettingException.html">SettingException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.SeedException.html">SeedException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.EventException.html">EventException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.HaltPropagationException.html">HaltPropagationException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.InvalidEventHandlerException.html">InvalidEventHandlerException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.InvalidRequestException.html">InvalidRequestException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.HttpException.html">HttpException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.DuplicateKeyException.html">DuplicateKeyException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.BagException.html">BagException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.FileSystemException.html">FileSystemException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.EventHandlerException.html">EventHandlerException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.DataStoreException.html">DataStoreException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.InvalidSettingValueException.html">InvalidSettingValueException</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-2103870143"></a>
+                                <a href="../namespaces/Kisma.Core.Events.html" style="margin-left: 30px; padding-left: 0">Events</a>
+            </div>
+            <div id="namespace-2103870143" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/Kisma.Core.Events.ServiceEvent.html">ServiceEvent</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Events.SeedEvent.html">SeedEvent</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-948046359"></a>
+                                <a href="../namespaces/Kisma.Core.Services.html" style="margin-left: 30px; padding-left: 0">Services</a>
+            </div>
+            <div id="namespace-948046359" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1241836333"></a>
+                                <a href="../namespaces/Kisma.Core.Services.Network.html" style="margin-left: 30px; padding-left: 0">Network</a>
+            </div>
+            <div id="namespace-1241836333" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/Kisma.Core.Services.Network.HttpRequest.html">HttpRequest</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Services.Network.Ssh.html">Ssh</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Services.Network.Http.html">Http</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Services.Network.WebDav.html">WebDav</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Services.Network.Ftp.html">Ftp</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/Kisma.Core.Services.SeedRequest.html">SeedRequest</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Services.DeliveryService.html">DeliveryService</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Services.Session.html">Session</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Services.HttpService.html">HttpService</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Services.SeedCli.html">SeedCli</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Services.SeedService.html">SeedService</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Services.SeedResponse.html">SeedResponse</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1754117214"></a>
+                                <a href="../namespaces/Kisma.Core.Tools.html" style="margin-left: 30px; padding-left: 0">Tools</a>
+            </div>
+            <div id="namespace-1754117214" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/Kisma.Core.Tools.DataReader.html">DataReader</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1373831609"></a>
+                                <a href="../namespaces/Kisma.Core.Utility.html" style="margin-left: 30px; padding-left: 0">Utility</a>
+            </div>
+            <div id="namespace-1373831609" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.Log.html">Log</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.Markup.html">Markup</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.Bootstrap.html">Bootstrap</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.ChairLift.html">ChairLift</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.Hasher.html">Hasher</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.Detector.html">Detector</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.FileSystem.html">FileSystem</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.Inflector.html">Inflector</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.Xml.html">Xml</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.FilterInput.html">FilterInput</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.Scalar.html">Scalar</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.SchemaFormBuilder.html">SchemaFormBuilder</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.DateTime.html">DateTime</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.EventManager.html">EventManager</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.ErrorHandler.html">ErrorHandler</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.Composer.html">Composer</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.Convert.html">Convert</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.Curl.html">Curl</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.Render.html">Render</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.Sql.html">Sql</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.Storage.html">Storage</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.HtmlMarkup.html">HtmlMarkup</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.Option.html">Option</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1937290339"></a>
+                                <a href="../namespaces/Kisma.Core.Enums.html" style="margin-left: 30px; padding-left: 0">Enums</a>
+            </div>
+            <div id="namespace-1937290339" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/Kisma.Core.Enums.Levels.html">Levels</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Enums.PhpFrameworks.html">PhpFrameworks</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Enums.SeedEnum.html">SeedEnum</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Enums.HttpMethod.html">HttpMethod</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Enums.HttpResponse.html">HttpResponse</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Enums.TimerPrecision.html">TimerPrecision</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Enums.AnsiColor.html">AnsiColor</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Enums.KismaSettings.html">KismaSettings</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Enums.OutputFormat.html">OutputFormat</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Enums.AccessLevels.html">AccessLevels</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Enums.GlobFlags.html">GlobFlags</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Enums.DateTime.html">DateTime</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Enums.LineBreak.html">LineBreak</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Enums.HashSeed.html">HashSeed</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Enums.HashType.html">HashType</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Enums.DataSeparator.html">DataSeparator</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Enums.DataEnclosure.html">DataEnclosure</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Enums.DebugLevel.html">DebugLevel</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Enums.AnsiConsole.html">AnsiConsole</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-611052234"></a>
+                                <a href="../namespaces/Kisma.Core.Interfaces.html" style="margin-left: 30px; padding-left: 0">Interfaces</a>
+            </div>
+            <div id="namespace-611052234" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-273573770"></a>
+                                <a href="../namespaces/Kisma.Core.Interfaces.Events.html" style="margin-left: 30px; padding-left: 0">Events</a>
+            </div>
+            <div id="namespace-273573770" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.Events.Database.html">Database</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.Events.PublisherLike.html">PublisherLike</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.Events.ServiceLike.html">ServiceLike</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.Events.Http.html">Http</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.Events.SeedLike.html">SeedLike</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.Events.Kisma.html">Kisma</a></li>
+                                                                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                    
+                    <ul>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.MapLike.html">MapLike</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.InputTypes.html">InputTypes</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.RequestLike.html">RequestLike</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.Levels.html">Levels</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.PhpFrameworks.html">PhpFrameworks</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.HttpMethod.html">HttpMethod</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.ResponseLike.html">ResponseLike</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.SubscriberLike.html">SubscriberLike</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.HttpResponse.html">HttpResponse</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.PublisherLike.html">PublisherLike</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.RequestSource.html">RequestSource</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.KismaSettings.html">KismaSettings</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.OutputFormat.html">OutputFormat</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.AccessLevels.html">AccessLevels</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.ServiceLike.html">ServiceLike</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.GlobFlags.html">GlobFlags</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.ServiceState.html">ServiceState</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.ReaderLike.html">ReaderLike</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.DateTime.html">DateTime</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.UtilityLike.html">UtilityLike</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.FormTypes.html">FormTypes</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.ProviderLike.html">ProviderLike</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.EscapeStyle.html">EscapeStyle</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.ConsumerLike.html">ConsumerLike</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.HashSeed.html">HashSeed</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.SeedLike.html">SeedLike</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.HashType.html">HashType</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.FormTemplates.html">FormTemplates</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.JobLike.html">JobLike</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.Seed.html">Seed</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.BagLike.html">BagLike</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.WriterLike.html">WriterLike</a></li>
+                                                                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/Kisma.Core.TestCase.html">TestCase</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.SeedBag.html">SeedBag</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.SeedQueue.html">SeedQueue</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Seed.html">Seed</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.SeedUtility.html">SeedUtility</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.SeedBagIterator.html">SeedBagIterator</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-809676177"></a>
+                                <a href="../namespaces/Kisma.Services.html" style="margin-left: 30px; padding-left: 0">Services</a>
+            </div>
+            <div id="namespace-809676177" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1269547016"></a>
+                                <a href="../namespaces/Kisma.Services.Network.html" style="margin-left: 30px; padding-left: 0">Network</a>
+            </div>
+            <div id="namespace-1269547016" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/Kisma.Services.Network.Email.html">Email</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                    
+                    <ul>
+                                                                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                    
+                    <ul>
+                                                                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/Kisma.html">Kisma</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+        </div>
+    </section>
+    <section class="row-fluid">
+        <div class="span10 offset2">
+            <div class="row-fluid">
+                <div class="span8 content class">
+                    <nav>
+                                                <a href="../namespaces/CIS.Services.Profiler.html">\CIS\Services\Profiler</a> <i class="icon-level-up"></i>
+                                            </nav>
+                    <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal"><i class="icon-code"></i></a>
+
+                    <h1><small>\CIS\Services\Profiler</small>Service</h1>
+                    <p><em>Service</em></p>
+                    <p>In order to stay light-weight, this class doesn't do very much at all.
+Merely starts and stops a timer. Suitable for use in tight loops</p>
+
+                    <section id="summary">
+                        <h2>Summary</h2>
+                        <section class="row-fluid heading">
+                            <section class="span4">
+                                <a href="#methods">Methods</a>
+                            </section>
+                            <section class="span4">
+                                <a href="#properties">Properties</a>
+                            </section>
+                            <section class="span4">
+                                <a href="#constants">Constants</a>
+                            </section>
+                        </section>
+                        <section class="row-fluid public">
+                            <section class="span4">
+                                                                    <a href="../classes/CIS.Services.Profiler.Service.html#method___construct" class="">__construct()</a><br />
+                                                                    <a href="../classes/CIS.Services.Profiler.Service.html#method_register" class="">register()</a><br />
+                                                                    <a href="../classes/CIS.Services.Profiler.Service.html#method_profile" class="">profile()</a><br />
+                                                                    <a href="../classes/CIS.Services.Profiler.Service.html#method_logTimers" class="">logTimers()</a><br />
+                                                                    <a href="../classes/CIS.Services.Profiler.Service.html#method_stopAll" class="">stopAll()</a><br />
+                                                                    <a href="../classes/CIS.Services.Profiler.Service.html#method_logTimer" class="">logTimer()</a><br />
+                                                                    <a href="../classes/CIS.Services.Profiler.Service.html#method_addAdditionalData" class="">addAdditionalData()</a><br />
+                                                                    <a href="../classes/CIS.Services.Profiler.Service.html#method_onTimerStart" class="">onTimerStart()</a><br />
+                                                                    <a href="../classes/CIS.Services.Profiler.Service.html#method_onTimerStop" class="">onTimerStop()</a><br />
+                                                                    <a href="../classes/CIS.Services.Profiler.Service.html#method_onTimerDestroyed" class="">onTimerDestroyed()</a><br />
+                                                                    <a href="../classes/CIS.Services.Profiler.Service.html#method_setAdditionalData" class="">setAdditionalData()</a><br />
+                                                                    <a href="../classes/CIS.Services.Profiler.Service.html#method_getAdditionalData" class="">getAdditionalData()</a><br />
+                                                                    <a href="../classes/CIS.Services.Profiler.Service.html#method_setLevel" class="">setLevel()</a><br />
+                                                                    <a href="../classes/CIS.Services.Profiler.Service.html#method_getLevel" class="">getLevel()</a><br />
+                                                                    <a href="../classes/CIS.Services.Profiler.Service.html#method_setStreamName" class="">setStreamName()</a><br />
+                                                                    <a href="../classes/CIS.Services.Profiler.Service.html#method_getStreamName" class="">getStreamName()</a><br />
+                                                                    <a href="../classes/CIS.Services.Profiler.Service.html#method_getCollection" class="">getCollection()</a><br />
+                                                                    <a href="../classes/CIS.Services.Profiler.Service.html#method_setStorage" class="">setStorage()</a><br />
+                                                                    <a href="../classes/CIS.Services.Profiler.Service.html#method_getStorage" class="">getStorage()</a><br />
+                                                                    <a href="../classes/CIS.Services.Profiler.Service.html#method_setCollection" class="">setCollection()</a><br />
+                                                                    <a href="../classes/CIS.Services.Profiler.Service.html#method_getPid" class="">getPid()</a><br />
+                                                                    <a href="../classes/CIS.Services.Profiler.Service.html#method_getTimer" class="">getTimer()</a><br />
+                                                                    <a href="../classes/CIS.Services.Profiler.Service.html#method_getTimers" class="">getTimers()</a><br />
+                                                            </section>
+                            <section class="span4">
+                                                                    <em>No public properties found</em>
+                                                            </section>
+                            <section class="span4">
+                                                                    <a href="../classes/CIS.Services.Profiler.Service.html#constant_GraylogFacility" class="">GraylogFacility</a><br />
+                                                                    <a href="../classes/CIS.Services.Profiler.Service.html#constant_LogTimeFormat" class="">LogTimeFormat</a><br />
+                                                                    <a href="../classes/CIS.Services.Profiler.Service.html#constant_MongoConnectionString" class="">MongoConnectionString</a><br />
+                                                                    <a href="../classes/CIS.Services.Profiler.Service.html#constant_MongoDatabase" class="">MongoDatabase</a><br />
+                                                                    <a href="../classes/CIS.Services.Profiler.Service.html#constant_MongoCollection" class="">MongoCollection</a><br />
+                                                            </section>
+                        </section>
+                        <section class="row-fluid protected">
+                            <section class="span4">
+                                                                    <em>No protected methods found</em>
+                                                            </section>
+                            <section class="span4">
+                                                                    <a href="../classes/CIS.Services.Profiler.Service.html#property__timers" class="">$_timers</a><br />
+                                                                    <a href="../classes/CIS.Services.Profiler.Service.html#property__profiles" class="">$_profiles</a><br />
+                                                                    <a href="../classes/CIS.Services.Profiler.Service.html#property__pid" class="">$_pid</a><br />
+                                                                    <a href="../classes/CIS.Services.Profiler.Service.html#property__additionalData" class="">$_additionalData</a><br />
+                                                                    <a href="../classes/CIS.Services.Profiler.Service.html#property__streamName" class="">$_streamName</a><br />
+                                                                    <a href="../classes/CIS.Services.Profiler.Service.html#property__level" class="">$_level</a><br />
+                                                                    <a href="../classes/CIS.Services.Profiler.Service.html#property__storage" class="">$_storage</a><br />
+                                                                    <a href="../classes/CIS.Services.Profiler.Service.html#property__collection" class="">$_collection</a><br />
+                                                            </section>
+                            <section class="span4">
+                                <em>N/A</em>
+                            </section>
+                        </section>
+                        <section class="row-fluid private">
+                            <section class="span4">
+                                                                    <em>No private methods found</em>
+                                                            </section>
+                            <section class="span4">
+                                                                    <em>No private properties found</em>
+                                                            </section>
+                            <section class="span4">
+                                <em>N/A</em>
+                            </section>
+                        </section>
+                    </section>
+                </div>
+                <aside class="span4 detailsbar">
+                                        
+                    
+                    <dl>
+                        <dt>File</dt>
+                            <dd><a href="../files/temp.Profiler.Service.php.html"><div class="path-wrapper">temp/Profiler/Service.php</div></a></dd>
+                                                <dt>Package</dt>
+                            <dd><div class="namespace-wrapper">\Default</div></dd>
+                                                <dt>Class hierarchy</dt>
+                            <dd class="hierarchy">
+                                                                                                                                                                                                                                                                                                
+                                        <div class="namespace-wrapper">\CIS\Services\BaseService</div>
+                                                                                                    <div class="namespace-wrapper">\CIS\Services\Profiler\Service</div>
+                            </dd>
+
+                        
+                        
+                        
+                        
+                                                                        </dl>
+                    <h2>Tags</h2>
+                    <table class="table table-condensed">
+                                            <tr>
+                            <th>
+                                todo
+                            </th>
+                            <td>
+                                                            </td>
+                        </tr>
+                                        </table>
+                </aside>
+            </div>
+
+                                    <a id="constants" name="constants"></a>
+            <div class="row-fluid">
+                <div class="span8 content class">
+                    <h2>Constants</h2>
+                </div>
+                <aside class="span4 detailsbar"></aside>
+            </div>
+
+                                <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_GraylogFacility" name="constant_GraylogFacility" class="anchor"></a>
+            <article id="constant_GraylogFacility" class="constant">
+                <h3 class="">GraylogFacility</h3>
+                <pre class="signature">GraylogFacility</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_LogTimeFormat" name="constant_LogTimeFormat" class="anchor"></a>
+            <article id="constant_LogTimeFormat" class="constant">
+                <h3 class="">LogTimeFormat</h3>
+                <pre class="signature">LogTimeFormat</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_MongoConnectionString" name="constant_MongoConnectionString" class="anchor"></a>
+            <article id="constant_MongoConnectionString" class="constant">
+                <h3 class="">MongoConnectionString</h3>
+                <pre class="signature">MongoConnectionString</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_MongoDatabase" name="constant_MongoDatabase" class="anchor"></a>
+            <article id="constant_MongoDatabase" class="constant">
+                <h3 class="">MongoDatabase</h3>
+                <pre class="signature">MongoDatabase</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_MongoCollection" name="constant_MongoCollection" class="anchor"></a>
+            <article id="constant_MongoCollection" class="constant">
+                <h3 class="">MongoCollection</h3>
+                <pre class="signature">MongoCollection</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                            
+                                    <a id="properties" name="properties"></a>
+            <div class="row-fluid">
+                <div class="span8 content class">
+                    <h2>Properties</h2>
+                </div>
+                <aside class="span4 detailsbar"></aside>
+            </div>
+
+                                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property__timers" name="property__timers" class="anchor"></a>
+            <article class="property">
+                <h3 class="protected ">$_timers</h3>
+                <pre class="signature">$_timers : \CIS\Components\Timer[]</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                \CIS\Components\Timer[]
+                                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property__profiles" name="property__profiles" class="anchor"></a>
+            <article class="property">
+                <h3 class="protected ">$_profiles</h3>
+                <pre class="signature">$_profiles : array</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                array
+                                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property__pid" name="property__pid" class="anchor"></a>
+            <article class="property">
+                <h3 class="protected ">$_pid</h3>
+                <pre class="signature">$_pid : int</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                int
+                                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property__additionalData" name="property__additionalData" class="anchor"></a>
+            <article class="property">
+                <h3 class="protected ">$_additionalData</h3>
+                <pre class="signature">$_additionalData : array</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                array
+                                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property__streamName" name="property__streamName" class="anchor"></a>
+            <article class="property">
+                <h3 class="protected ">$_streamName</h3>
+                <pre class="signature">$_streamName : string</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                string
+                                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property__level" name="property__level" class="anchor"></a>
+            <article class="property">
+                <h3 class="protected ">$_level</h3>
+                <pre class="signature">$_level : int</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                int
+                &mdash; The level for profile info                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property__storage" name="property__storage" class="anchor"></a>
+            <article class="property">
+                <h3 class="protected ">$_storage</h3>
+                <pre class="signature">$_storage : \CIS\Services\Storage\MongoDb\Service</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                <a href="../classes/CIS.Services.Storage.MongoDb.Service.html">\CIS\Services\Storage\MongoDb\Service</a>
+                &mdash; Set to false to not have profiles stored                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property__collection" name="property__collection" class="anchor"></a>
+            <article class="property">
+                <h3 class="protected ">$_collection</h3>
+                <pre class="signature">$_collection : \MongoCollection</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                \MongoCollection
+                                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                            
+                                    <a id="methods" name="methods"></a>
+            <div class="row-fluid">
+                <div class="span8 content class"><h2>Methods</h2></div>
+                <aside class="span4 detailsbar"></aside>
+            </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method___construct" name="method___construct" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">__construct()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">__construct(array <span class="argument">$options</span>)</pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>array</td>
+                                <td>$options</td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_register" name="method_register" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">register()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">register(string <span class="argument">$label</span>, bool <span class="argument">$autoStart</span>) : \CIS\Components\Timer</pre>
+                <p><em>Registers a process to be profiled</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$label</td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td>bool</td>
+                                <td>$autoStart</td>
+                                <td><p>If true, the timer will automatically start after constructed.</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    \CIS\Components\Timer
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_profile" name="method_profile" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">profile()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">profile(string <span class="argument">$label</span>, callable <span class="argument">$callable</span>) : mixed</pre>
+                <p><em>Registers, runs and profiles a process. Returns whatever the profiled process returned</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$label</td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td>callable</td>
+                                <td>$callable</td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                                    <h4>Throws</h4>
+                    <dl>
+                                                    <dt>\Exception</dt>
+                            <dd></dd>
+                                                                    </dl>
+                
+                                    <h4>Returns</h4>
+                    mixed
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_logTimers" name="method_logTimers" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">logTimers()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">logTimers()</pre>
+                <p><em>Call before the end of your process
+Dumps the timers out to graylog if wanted</em></p>
+                
+
+                
+                
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_stopAll" name="method_stopAll" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">stopAll()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">stopAll()</pre>
+                <p><em>Stops all active timers</em></p>
+                
+
+                
+                
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_logTimer" name="method_logTimer" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">logTimer()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">logTimer(\CIS\Components\Timer <span class="argument">$timer</span>, string <span class="argument">$message</span>, string <span class="argument">$streamName</span>, int <span class="argument">$level</span>) : mixed</pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>\CIS\Components\Timer</td>
+                                <td>$timer</td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td>string</td>
+                                <td>$message</td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td>string</td>
+                                <td>$streamName</td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td>int</td>
+                                <td>$level</td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    mixed
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_addAdditionalData" name="method_addAdditionalData" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">addAdditionalData()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">addAdditionalData(array|string <span class="argument">$key</span>, mixed <span class="argument">$value</span>) : bool</pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>array|string</td>
+                                <td>$key</td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td>mixed</td>
+                                <td>$value</td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    bool
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_onTimerStart" name="method_onTimerStart" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">onTimerStart()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">onTimerStart(\CIS\Services\ServiceEvent <span class="argument">$event</span>) : bool</pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>\CIS\Services\ServiceEvent</td>
+                                <td>$event</td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    bool
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_onTimerStop" name="method_onTimerStop" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">onTimerStop()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">onTimerStop(\CIS\Services\ServiceEvent <span class="argument">$event</span>) : bool</pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>\CIS\Services\ServiceEvent</td>
+                                <td>$event</td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    bool
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_onTimerDestroyed" name="method_onTimerDestroyed" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">onTimerDestroyed()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">onTimerDestroyed(\CIS\Services\ServiceEvent <span class="argument">$event</span>) : bool</pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>\CIS\Services\ServiceEvent</td>
+                                <td>$event</td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    bool
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_setAdditionalData" name="method_setAdditionalData" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">setAdditionalData()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">setAdditionalData(array <span class="argument">$additionalData</span>) : array</pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>array</td>
+                                <td>$additionalData</td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    array
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getAdditionalData" name="method_getAdditionalData" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getAdditionalData()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getAdditionalData() : array</pre>
+                <p><em></em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    array
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_setLevel" name="method_setLevel" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">setLevel()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">setLevel(int <span class="argument">$level</span>) : int</pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>int</td>
+                                <td>$level</td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    int
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getLevel" name="method_getLevel" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getLevel()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getLevel() : int</pre>
+                <p><em></em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    int
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_setStreamName" name="method_setStreamName" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">setStreamName()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">setStreamName(string <span class="argument">$streamName</span>) : string</pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$streamName</td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    string
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getStreamName" name="method_getStreamName" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getStreamName()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getStreamName() : string</pre>
+                <p><em></em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    string
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getCollection" name="method_getCollection" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getCollection()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getCollection() : \MongoCollection</pre>
+                <p><em></em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    \MongoCollection
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_setStorage" name="method_setStorage" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">setStorage()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">setStorage(\CIS\Services\Storage\MongoDb\Service <span class="argument">$storage</span>) : \CIS\Services\Storage\MongoDb\Service</pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td><a href="../classes/CIS.Services.Storage.MongoDb.Service.html">\CIS\Services\Storage\MongoDb\Service</a></td>
+                                <td>$storage</td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    <a href="../classes/CIS.Services.Storage.MongoDb.Service.html">\CIS\Services\Storage\MongoDb\Service</a>
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getStorage" name="method_getStorage" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getStorage()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getStorage() : \CIS\Services\Storage\MongoDb\Service</pre>
+                <p><em></em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    <a href="../classes/CIS.Services.Storage.MongoDb.Service.html">\CIS\Services\Storage\MongoDb\Service</a>
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_setCollection" name="method_setCollection" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">setCollection()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">setCollection(\MongoCollection <span class="argument">$collection</span>) : \MongoCollection</pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>\MongoCollection</td>
+                                <td>$collection</td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    \MongoCollection
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getPid" name="method_getPid" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getPid()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getPid() : int</pre>
+                <p><em></em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    int
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getTimer" name="method_getTimer" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getTimer()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getTimer(string <span class="argument">$label</span>) : \CIS\Components\Timer</pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$label</td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    \CIS\Components\Timer
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getTimers" name="method_getTimers" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getTimers()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getTimers() : array|\CIS\Components\Timer[]</pre>
+                <p><em></em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    array|\CIS\Components\Timer[]
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                                                    </div>
+    </section>
+
+    <div id="source-view" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="source-view-label" aria-hidden="true">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h3 id="source-view-label">Service.php</h3>
+        </div>
+        <div class="modal-body">
+            <pre data-src="../files/temp/Profiler/Service.php.txt" class="language-php line-numbers"></pre>
+        </div>
+    </div>
+
+    <footer class="row-fluid">
+        <section class="span10 offset2">
+            <section class="row-fluid">
+                <section class="span10 offset1">
+                    <section class="row-fluid footer-sections">
+                        <section class="span4">
+                                                        <h1><i class="icon-code"></i></h1>
+                            <div>
+                                <ul>
+                                                                            <li><a href="../namespaces/CIS.html">\CIS</a></li>
+                                                                            <li><a href="../namespaces/Kisma.html">\Kisma</a></li>
+                                                                    </ul>
+                            </div>
+                        </section>
+                        <section class="span4">
+                                                        <h1><i class="icon-bar-chart"></i></h1>
+                            <div>
+                                <ul>
+                                    <li><a href="../graphs/class.html">Class Hierarchy Diagram</a></li>
+                                </ul>
+                            </div>
+                        </section>
+                        <section class="span4">
+                                                        <h1><i class="icon-pushpin"></i></h1>
+                            <div>
+                                <ul>
+                                    <li><a href="../reports/errors.html">Errors</a></li>
+                                    <li><a href="../reports/markers.html">Markers</a></li>
+                                </ul>
+                            </div>
+                        </section>
+                    </section>
+                </section>
+            </section>
+            <section class="row-fluid">
+                <section class="span10 offset1">
+                    <hr />
+                    Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor </a> and authored
+                    on January 9th, 2014 at 12:04.
+                </section>
+            </section>
+        </section>
+    </footer>
+</div>
+
+</body>
+</html>

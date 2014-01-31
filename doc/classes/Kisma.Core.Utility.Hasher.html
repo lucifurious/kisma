@@ -1,0 +1,1960 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+    <meta charset="utf-8"/>
+    <title>API Documentation</title>
+    <meta name="author" content=""/>
+    <meta name="description" content=""/>
+
+    <link href="https://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.no-icons.min.css" rel="stylesheet">
+    <link href="https://netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.min.css" rel="stylesheet">
+    <link href="../css/prism.css" rel="stylesheet" media="all"/>
+    <link href="../css/template.css" rel="stylesheet" media="all"/>
+    
+    <!--[if lt IE 9]>
+    <script src="https://html5shim.googlecode.com/svn/trunk/html5.js" type="text/javascript"></script>
+    <![endif]-->
+    <script src="https://code.jquery.com/jquery-1.10.2.min.js" type="text/javascript"></script>
+    <script src="https://code.jquery.com/ui/1.10.3/jquery-ui.min.js" type="text/javascript"></script>
+    <script src="https://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
+    <script src="../js/jquery.smooth-scroll.js"></script>
+    <script src="../js/prism.min.js"></script>
+    <!-- TODO: Add http://jscrollpane.kelvinluck.com/ to style the scrollbars for browsers not using webkit-->
+    <script type="text/javascript">
+    function loadExternalCodeSnippets() {
+        Array.prototype.slice.call(document.querySelectorAll('pre[data-src]')).forEach(function (pre) {
+            var src = pre.getAttribute('data-src');
+            var extension = (src.match(/\.(\w+)$/) || [, ''])[1];
+            var language = 'php';
+
+            var code = document.createElement('code');
+            code.className = 'language-' + language;
+
+            pre.textContent = '';
+
+            code.textContent = 'Loading…';
+
+            pre.appendChild(code);
+
+            var xhr = new XMLHttpRequest();
+
+            xhr.open('GET', src, true);
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 4) {
+
+                    if (xhr.status < 400 && xhr.responseText) {
+                        code.textContent = xhr.responseText;
+
+                        Prism.highlightElement(code);
+                    }
+                    else if (xhr.status >= 400) {
+                        code.textContent = '✖ Error ' + xhr.status + ' while fetching file: ' + xhr.statusText;
+                    }
+                    else {
+                        code.textContent = '✖ Error: File does not exist or is empty';
+                    }
+                }
+            };
+
+            xhr.send(null);
+        });
+    }
+
+    $(document).ready(function(){
+        loadExternalCodeSnippets();
+    });
+    $('#source-view').on('shown', function () {
+        loadExternalCodeSnippets();
+    })
+</script>
+
+    <link rel="shortcut icon" href="../images/favicon.ico"/>
+    <link rel="apple-touch-icon" href="../images/apple-touch-icon.png"/>
+    <link rel="apple-touch-icon" sizes="72x72" href="../images/apple-touch-icon-72x72.png"/>
+    <link rel="apple-touch-icon" sizes="114x114" href="../images/apple-touch-icon-114x114.png"/>
+</head>
+<body>
+
+<div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+        <div class="container">
+            <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                <i class="icon-ellipsis-vertical"></i>
+            </a>
+            <a class="brand" href="../index.html">API Documentation</a>
+
+            <div class="nav-collapse">
+                <ul class="nav pull-right">
+                    <li class="dropdown">
+                        <a href="../index.html" class="dropdown-toggle" data-toggle="dropdown">
+                            API Documentation <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                                                        <li><a href="../namespaces/Kisma.html">\Kisma</a></li>
+                                                    </ul>
+                    </li>
+                    <li class="dropdown" id="charts-menu">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            Charts <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="../graphs/class.html">
+                                    <i class="icon-list-alt"></i>&#160;Class hierarchy diagram
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="dropdown" id="reports-menu">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            Reports <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="../reports/errors.html">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <i class="icon-list-alt"></i>&#160;Errors <span class="label label-info pull-right">390</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="../reports/markers.html">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <i class="icon-list-alt"></i>&#160;Markers <span class="label label-info pull-right">0</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <!--<div class="go_to_top">-->
+    <!--<a href="#___" style="color: inherit">Back to top&#160;&#160;<i class="icon-upload icon-white"></i></a>-->
+    <!--</div>-->
+</div>
+
+<div id="___" class="container-fluid">
+        <section class="row-fluid">
+        <div class="span2 sidebar">
+                                <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle " data-toggle="collapse" data-target="#namespace-371752920"></a>
+                                <a href="../namespaces/default.html" style="margin-left: 30px; padding-left: 0">\</a>
+            </div>
+            <div id="namespace-371752920" class="accordion-body collapse in">
+                <div class="accordion-inner">
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1814699204"></a>
+                                <a href="../namespaces/Kisma.html" style="margin-left: 30px; padding-left: 0">Kisma</a>
+            </div>
+            <div id="namespace-1814699204" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1950807859"></a>
+                                <a href="../namespaces/Kisma.Core.html" style="margin-left: 30px; padding-left: 0">Core</a>
+            </div>
+            <div id="namespace-1950807859" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1910494677"></a>
+                                <a href="../namespaces/Kisma.Core.Interfaces.html" style="margin-left: 30px; padding-left: 0">Interfaces</a>
+            </div>
+            <div id="namespace-1910494677" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-569768753"></a>
+                                <a href="../namespaces/Kisma.Core.Interfaces.Events.html" style="margin-left: 30px; padding-left: 0">Events</a>
+            </div>
+            <div id="namespace-569768753" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.Events.PublisherLike.html">PublisherLike</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.Events.ServiceLike.html">ServiceLike</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.Events.SeedLike.html">SeedLike</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.Events.Http.html">Http</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.Events.Kisma.html">Kisma</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.Events.Database.html">Database</a></li>
+                                                                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                    
+                    <ul>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.PhpFrameworks.html">PhpFrameworks</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.JobLike.html">JobLike</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.AccessLevels.html">AccessLevels</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.OutputFormat.html">OutputFormat</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.HashType.html">HashType</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.GlobFlags.html">GlobFlags</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.FormTemplates.html">FormTemplates</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.UtilityLike.html">UtilityLike</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.Levels.html">Levels</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.InputTypes.html">InputTypes</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.HttpMethod.html">HttpMethod</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.ServiceLike.html">ServiceLike</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.HttpResponse.html">HttpResponse</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.WriterLike.html">WriterLike</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.DateTime.html">DateTime</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.ReaderLike.html">ReaderLike</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.BagLike.html">BagLike</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.SeedLike.html">SeedLike</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.ProviderLike.html">ProviderLike</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.ResponseLike.html">ResponseLike</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.FormTypes.html">FormTypes</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.KismaSettings.html">KismaSettings</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.Seed.html">Seed</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.SubscriberLike.html">SubscriberLike</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.HashSeed.html">HashSeed</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.MapLike.html">MapLike</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.RequestSource.html">RequestSource</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.RequestLike.html">RequestLike</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.PublisherLike.html">PublisherLike</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.ServiceState.html">ServiceState</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.ConsumerLike.html">ConsumerLike</a></li>
+                                                    <li class="interface"><a href="../classes/Kisma.Core.Interfaces.EscapeStyle.html">EscapeStyle</a></li>
+                                                                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1823941143"></a>
+                                <a href="../namespaces/Kisma.Core.Exceptions.html" style="margin-left: 30px; padding-left: 0">Exceptions</a>
+            </div>
+            <div id="namespace-1823941143" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.InvalidEventHandlerException.html">InvalidEventHandlerException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.InvalidSettingValueException.html">InvalidSettingValueException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.SeedException.html">SeedException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.EventException.html">EventException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.InvalidSettingKeyException.html">InvalidSettingKeyException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.EventHandlerException.html">EventHandlerException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.ProcessLockException.html">ProcessLockException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.ProcessLockExistsException.html">ProcessLockExistsException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.ProcessLockAgeException.html">ProcessLockAgeException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.ProcessLockFileException.html">ProcessLockFileException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.HaltPropagationException.html">HaltPropagationException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.InvalidRequestException.html">InvalidRequestException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.FileSystemException.html">FileSystemException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.UtilityException.html">UtilityException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.SettingException.html">SettingException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.CouchDbException.html">CouchDbException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.DataStoreException.html">DataStoreException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.BagException.html">BagException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.ServiceException.html">ServiceException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.NotImplementedException.html">NotImplementedException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.StorageException.html">StorageException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.HttpException.html">HttpException</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Exceptions.DuplicateKeyException.html">DuplicateKeyException</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1457598340"></a>
+                                <a href="../namespaces/Kisma.Core.Enums.html" style="margin-left: 30px; padding-left: 0">Enums</a>
+            </div>
+            <div id="namespace-1457598340" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/Kisma.Core.Enums.LineBreak.html">LineBreak</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Enums.TimerPrecision.html">TimerPrecision</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Enums.HashSeed.html">HashSeed</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Enums.SeedEnum.html">SeedEnum</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Enums.AccessLevels.html">AccessLevels</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Enums.DateTime.html">DateTime</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Enums.KismaSettings.html">KismaSettings</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Enums.GlobFlags.html">GlobFlags</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Enums.HttpResponse.html">HttpResponse</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Enums.OutputFormat.html">OutputFormat</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Enums.HashType.html">HashType</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Enums.AnsiColor.html">AnsiColor</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Enums.HttpMethod.html">HttpMethod</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Enums.DebugLevel.html">DebugLevel</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Enums.Levels.html">Levels</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Enums.DataSeparator.html">DataSeparator</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Enums.PhpFrameworks.html">PhpFrameworks</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Enums.DataEnclosure.html">DataEnclosure</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Enums.AnsiConsole.html">AnsiConsole</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-122678812"></a>
+                                <a href="../namespaces/Kisma.Core.Utility.html" style="margin-left: 30px; padding-left: 0">Utility</a>
+            </div>
+            <div id="namespace-122678812" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.EventManager.html">EventManager</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.Option.html">Option</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.Hasher.html">Hasher</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.ChairLift.html">ChairLift</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.FilterInput.html">FilterInput</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.Markup.html">Markup</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.HtmlMarkup.html">HtmlMarkup</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.Inflector.html">Inflector</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.Composer.html">Composer</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.DateTime.html">DateTime</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.Xml.html">Xml</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.Render.html">Render</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.Log.html">Log</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.Sql.html">Sql</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.Convert.html">Convert</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.FileSystem.html">FileSystem</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.SchemaFormBuilder.html">SchemaFormBuilder</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.ErrorHandler.html">ErrorHandler</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.Storage.html">Storage</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.Bootstrap.html">Bootstrap</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.Scalar.html">Scalar</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.Detector.html">Detector</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Utility.Curl.html">Curl</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-2073812524"></a>
+                                <a href="../namespaces/Kisma.Core.Services.html" style="margin-left: 30px; padding-left: 0">Services</a>
+            </div>
+            <div id="namespace-2073812524" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1349124535"></a>
+                                <a href="../namespaces/Kisma.Core.Services.Network.html" style="margin-left: 30px; padding-left: 0">Network</a>
+            </div>
+            <div id="namespace-1349124535" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/Kisma.Core.Services.Network.WebDav.html">WebDav</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Services.Network.HttpRequest.html">HttpRequest</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Services.Network.Http.html">Http</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Services.Network.Ssh.html">Ssh</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Services.Network.Ftp.html">Ftp</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/Kisma.Core.Services.HttpService.html">HttpService</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Services.SeedService.html">SeedService</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Services.SeedResponse.html">SeedResponse</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Services.SeedCli.html">SeedCli</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Services.Session.html">Session</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Services.SeedRequest.html">SeedRequest</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Services.DeliveryService.html">DeliveryService</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-839063140"></a>
+                                <a href="../namespaces/Kisma.Core.Events.html" style="margin-left: 30px; padding-left: 0">Events</a>
+            </div>
+            <div id="namespace-839063140" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/Kisma.Core.Events.SeedEvent.html">SeedEvent</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Events.ServiceEvent.html">ServiceEvent</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-372260956"></a>
+                                <a href="../namespaces/Kisma.Core.Components.html" style="margin-left: 30px; padding-left: 0">Components</a>
+            </div>
+            <div id="namespace-372260956" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/Kisma.Core.Components.ParsingLineReader.html">ParsingLineReader</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Components.LineReader.html">LineReader</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Components.LineWriter.html">LineWriter</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Components.Map.html">Map</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-471745555"></a>
+                                <a href="../namespaces/Kisma.Core.Tools.html" style="margin-left: 30px; padding-left: 0">Tools</a>
+            </div>
+            <div id="namespace-471745555" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/Kisma.Core.Tools.DataReader.html">DataReader</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/Kisma.Core.SeedUtility.html">SeedUtility</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.SeedBagIterator.html">SeedBagIterator</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.SeedBag.html">SeedBag</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.Seed.html">Seed</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.TestCase.html">TestCase</a></li>
+                                                    <li class="class"><a href="../classes/Kisma.Core.SeedQueue.html">SeedQueue</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-756227990"></a>
+                                <a href="../namespaces/Kisma.Services.html" style="margin-left: 30px; padding-left: 0">Services</a>
+            </div>
+            <div id="namespace-756227990" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-2000303324"></a>
+                                <a href="../namespaces/Kisma.Services.Network.html" style="margin-left: 30px; padding-left: 0">Network</a>
+            </div>
+            <div id="namespace-2000303324" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/Kisma.Services.Network.Email.html">Email</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                    
+                    <ul>
+                                                                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                    
+                    <ul>
+                                                                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/Kisma.html">Kisma</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+        </div>
+    </section>
+    <section class="row-fluid">
+        <div class="span10 offset2">
+            <div class="row-fluid">
+                <div class="span8 content class">
+                    <nav>
+                                                <a href="../namespaces/Kisma.Core.Utility.html">\Kisma\Core\Utility</a> <i class="icon-level-up"></i>
+                                            </nav>
+                    <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal"><i class="icon-code"></i></a>
+
+                    <h1><small>\Kisma\Core\Utility</small>Hasher</h1>
+                    <p><em>Hasher
+Hashing utility class</em></p>
+                    <p>Seed provides a simple publish/subscribe service. You're free to use it or not. Never required.</p>
+<h1>Publish/Subscribe</h1>
+<p>A simple publish/subscribe service. Yeah, fancy name for event system.</p>
+<p>An event is defined by the presence of a method whose name starts with 'on'.
+The event name is the method name. When an event is triggered, event handlers attached
+to the event will be invoked automatically.</p>
+<p>An event is triggered by calling the {@link publish} method. Attached event
+handlers will be invoked automatically in the order they were attached to the event.</p>
+<p>Event handlers should have the following signature:</p>
+<pre>
+public|protected|private function [_]onEventName( $event = null ) { ... }
+</pre>
+<p>$event (\Kisma\Core\Events\SeedEvent) will contain details about the event in question.</p>
+<p>To subscribe to an event, call the {@link EventManager::subscribe} method.</p>
+<p>You may also use closures for event handlers, ala jQuery</p>
+<p>This class has a two default events:</p>
+<ul>
+<li>after_construct</li>
+<li>before_destruct</li>
+</ul>
+<p>Unless otherwise specified, the object will automatically search for and
+attach any event handlers that exist in your object.</p>
+<p>To disable this feature, set $discoverEvents to false before calling the parent constructor.</p>
+<h1>Properties</h1>
+<p>The properties below are default in every Seed object. In addition, when you constract a Seed
+object, any values passed to the constructor will be set in the created object. There are no
+checks for invalid properties. If the property does not exist, it will be added as public. No
+getter or setter will be created however. Use of the new property is entirely up to you.</p>
+
+                    <section id="summary">
+                        <h2>Summary</h2>
+                        <section class="row-fluid heading">
+                            <section class="span4">
+                                <a href="#methods">Methods</a>
+                            </section>
+                            <section class="span4">
+                                <a href="#properties">Properties</a>
+                            </section>
+                            <section class="span4">
+                                <a href="#constants">Constants</a>
+                            </section>
+                        </section>
+                        <section class="row-fluid public">
+                            <section class="span4">
+                                                                    <a href="../classes/Kisma.Core.Utility.Hasher.html#method___invoke" class="">__invoke()</a><br />
+                                                                    <a href="../classes/Kisma.Core.Utility.Hasher.html#method_generate" class="">generate()</a><br />
+                                                                    <a href="../classes/Kisma.Core.Utility.Hasher.html#method_generateUnique" class="">generateUnique()</a><br />
+                                                                    <a href="../classes/Kisma.Core.Utility.Hasher.html#method_hash" class="">hash()</a><br />
+                                                                    <a href="../classes/Kisma.Core.Utility.Hasher.html#method_encryptString" class="">encryptString()</a><br />
+                                                                    <a href="../classes/Kisma.Core.Utility.Hasher.html#method_decryptString" class="">decryptString()</a><br />
+                                                                    <a href="../classes/Kisma.Core.Seed.html#method___construct" class="">__construct()</a><br />
+                                                                    <a href="../classes/Kisma.Core.Seed.html#method___wakeup" class="">__wakeup()</a><br />
+                                                                    <a href="../classes/Kisma.Core.Seed.html#method___destruct" class="">__destruct()</a><br />
+                                                                    <a href="../classes/Kisma.Core.Seed.html#method_publish" class="">publish()</a><br />
+                                                                    <a href="../classes/Kisma.Core.Seed.html#method_on" class="">on()</a><br />
+                                                                    <a href="../classes/Kisma.Core.Seed.html#method_setDiscoverEvents" class="">setDiscoverEvents()</a><br />
+                                                                    <a href="../classes/Kisma.Core.Seed.html#method_getDiscoverEvents" class="">getDiscoverEvents()</a><br />
+                                                                    <a href="../classes/Kisma.Core.Seed.html#method_setEventManager" class="">setEventManager()</a><br />
+                                                                    <a href="../classes/Kisma.Core.Seed.html#method_getEventManager" class="">getEventManager()</a><br />
+                                                                    <a href="../classes/Kisma.Core.Seed.html#method_getId" class="">getId()</a><br />
+                                                                    <a href="../classes/Kisma.Core.Seed.html#method_setName" class="">setName()</a><br />
+                                                                    <a href="../classes/Kisma.Core.Seed.html#method_getName" class="">getName()</a><br />
+                                                                    <a href="../classes/Kisma.Core.Seed.html#method_setTag" class="">setTag()</a><br />
+                                                                    <a href="../classes/Kisma.Core.Seed.html#method_getTag" class="">getTag()</a><br />
+                                                            </section>
+                            <section class="span4">
+                                                                    <a href="../classes/Kisma.Core.Seed.html#property_tag" class="">$tag</a><br />
+                                                                    <a href="../classes/Kisma.Core.Seed.html#property_name" class="">$name</a><br />
+                                                                    <a href="../classes/Kisma.Core.Seed.html#property_discoverEvents" class="">$discoverEvents</a><br />
+                                                                    <a href="../classes/Kisma.Core.Seed.html#property_eventManager" class="">$eventManager</a><br />
+                                                                    <a href="../classes/Kisma.Core.Seed.html#property_id" class="">$id</a><br />
+                                                            </section>
+                            <section class="span4">
+                                                                    <a href="../classes/Kisma.Core.Utility.Hasher.html#constant_MAX_HASH_LENGTH" class="">MAX_HASH_LENGTH</a><br />
+                                                            </section>
+                        </section>
+                        <section class="row-fluid protected">
+                            <section class="span4">
+                                                                    <em>No protected methods found</em>
+                                                            </section>
+                            <section class="span4">
+                                                                    <a href="../classes/Kisma.Core.Utility.Hasher.html#property__hashSeeds" class="">$_hashSeeds</a><br />
+                                                                    <a href="../classes/Kisma.Core.Seed.html#property__tag" class="">$_tag</a><br />
+                                                                    <a href="../classes/Kisma.Core.Seed.html#property__name" class="">$_name</a><br />
+                                                                    <a href="../classes/Kisma.Core.Seed.html#property__discoverEvents" class="">$_discoverEvents</a><br />
+                                                                    <a href="../classes/Kisma.Core.Seed.html#property__eventManager" class="">$_eventManager</a><br />
+                                                            </section>
+                            <section class="span4">
+                                <em>N/A</em>
+                            </section>
+                        </section>
+                        <section class="row-fluid private">
+                            <section class="span4">
+                                                                    <em>No private methods found</em>
+                                                            </section>
+                            <section class="span4">
+                                                                    <a href="../classes/Kisma.Core.Seed.html#property__id" class="">$_id</a><br />
+                                                            </section>
+                            <section class="span4">
+                                <em>N/A</em>
+                            </section>
+                        </section>
+                    </section>
+                </div>
+                <aside class="span4 detailsbar">
+                                        
+                    
+                    <dl>
+                        <dt>File</dt>
+                            <dd><a href="../files/Kisma.Core.Utility.Hasher.php.html"><div class="path-wrapper">Kisma/Core/Utility/Hasher.php</div></a></dd>
+                                                <dt>Package</dt>
+                            <dd><div class="namespace-wrapper">\Default</div></dd>
+                                                <dt>Class hierarchy</dt>
+                            <dd class="hierarchy">
+                                                                                                                                                                                                                                                                                                
+                                        <div class="namespace-wrapper"><a href="../classes/Kisma.Core.Seed.html">\Kisma\Core\Seed</a></div>
+                                                                                                    <div class="namespace-wrapper">\Kisma\Core\Utility\Hasher</div>
+                            </dd>
+
+                        
+                        
+                        
+                        
+                                                                        </dl>
+                    <h2>Tags</h2>
+                    <table class="table table-condensed">
+                                            <tr>
+                            <th>
+                                todo
+                            </th>
+                            <td>
+                                                            </td>
+                        </tr>
+                                        </table>
+                </aside>
+            </div>
+
+                                    <a id="constants" name="constants"></a>
+            <div class="row-fluid">
+                <div class="span8 content class">
+                    <h2>Constants</h2>
+                </div>
+                <aside class="span4 detailsbar"></aside>
+            </div>
+
+                                <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="constant_MAX_HASH_LENGTH" name="constant_MAX_HASH_LENGTH" class="anchor"></a>
+            <article id="constant_MAX_HASH_LENGTH" class="constant">
+                <h3 class="">MAX_HASH_LENGTH</h3>
+                <pre class="signature">MAX_HASH_LENGTH</pre>
+                <p><em></em></p>
+                
+            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                            
+                                    <a id="properties" name="properties"></a>
+            <div class="row-fluid">
+                <div class="span8 content class">
+                    <h2>Properties</h2>
+                </div>
+                <aside class="span4 detailsbar"></aside>
+            </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_tag" name="property_tag" class="anchor"></a>
+            <article class="property">
+                <h3 class="public ">$tag</h3>
+                <pre class="signature">$tag : string</pre>
+                <p><em></em></p>
+                <p>The tag of this object. Defaults to the base name of the class</p>
+
+                                <h4>Type</h4>
+                string
+                                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/Kisma.Core.Seed.html"><div class="path-wrapper">\Kisma\Core\Seed</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_name" name="property_name" class="anchor"></a>
+            <article class="property">
+                <h3 class="public ">$name</h3>
+                <pre class="signature">$name : string</pre>
+                <p><em></em></p>
+                <p>The name of this object. Defaults tot he class name</p>
+
+                                <h4>Type</h4>
+                string
+                                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/Kisma.Core.Seed.html"><div class="path-wrapper">\Kisma\Core\Seed</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_discoverEvents" name="property_discoverEvents" class="anchor"></a>
+            <article class="property">
+                <h3 class="public ">$discoverEvents</h3>
+                <pre class="signature">$discoverEvents : bool</pre>
+                <p><em></em></p>
+                <p>Defaults to true.</p>
+
+                                <h4>Type</h4>
+                bool
+                                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/Kisma.Core.Seed.html"><div class="path-wrapper">\Kisma\Core\Seed</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_eventManager" name="property_eventManager" class="anchor"></a>
+            <article class="property">
+                <h3 class="public ">$eventManager</h3>
+                <pre class="signature">$eventManager : string</pre>
+                <p><em></em></p>
+                <p>Defaults to \Kisma\Core\Utility\EventManager</p>
+
+                                <h4>Type</h4>
+                string
+                                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/Kisma.Core.Seed.html"><div class="path-wrapper">\Kisma\Core\Seed</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_id" name="property_id" class="anchor"></a>
+            <article class="property">
+                <h3 class="public ">$id</h3>
+                <pre class="signature">$id : string</pre>
+                <p><em></em></p>
+                <p>A unique ID assigned to this object, the last part of which is the creation time</p>
+
+                                <h4>Type</h4>
+                string
+                                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/Kisma.Core.Seed.html"><div class="path-wrapper">\Kisma\Core\Seed</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property__hashSeeds" name="property__hashSeeds" class="anchor"></a>
+            <article class="property">
+                <h3 class="protected ">$_hashSeeds</h3>
+                <pre class="signature">$_hashSeeds : array</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                array
+                &mdash; The various hash seeds used by this class                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property__tag" name="property__tag" class="anchor"></a>
+            <article class="property">
+                <h3 class="protected ">$_tag</h3>
+                <pre class="signature">$_tag : string</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                string
+                &mdash; A &quot;key&quot; quality tag for this object. Defaults to the key-inflected base class name (i.e. &quot;seed&quot;)                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/Kisma.Core.Seed.html"><div class="path-wrapper">\Kisma\Core\Seed</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property__name" name="property__name" class="anchor"></a>
+            <article class="property">
+                <h3 class="protected ">$_name</h3>
+                <pre class="signature">$_name : string</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                string
+                &mdash; A display quality name for this object. Defaults to the full class name (i.e. &quot;\Kisma\Core\Seed&quot;)                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/Kisma.Core.Seed.html"><div class="path-wrapper">\Kisma\Core\Seed</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property__discoverEvents" name="property__discoverEvents" class="anchor"></a>
+            <article class="property">
+                <h3 class="protected ">$_discoverEvents</h3>
+                <pre class="signature">$_discoverEvents : bool</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                bool
+                &mdash; If false, event handlers must be defined manually                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/Kisma.Core.Seed.html"><div class="path-wrapper">\Kisma\Core\Seed</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property__eventManager" name="property__eventManager" class="anchor"></a>
+            <article class="property">
+                <h3 class="protected ">$_eventManager</h3>
+                <pre class="signature">$_eventManager : string</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                string
+                &mdash; The class name of the event manager                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/Kisma.Core.Seed.html"><div class="path-wrapper">\Kisma\Core\Seed</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property__id" name="property__id" class="anchor"></a>
+            <article class="property">
+                <h3 class="private ">$_id</h3>
+                <pre class="signature">$_id : string</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                string
+                &mdash; The unique ID of this seed                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/Kisma.Core.Seed.html"><div class="path-wrapper">\Kisma\Core\Seed</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                            
+                                    <a id="methods" name="methods"></a>
+            <div class="row-fluid">
+                <div class="span8 content class"><h2>Methods</h2></div>
+                <aside class="span4 detailsbar"></aside>
+            </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method___invoke" name="method___invoke" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">__invoke()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">__invoke() : mixed</pre>
+                <p><em>Our default function</em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    mixed
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            static
+                        </th>
+                        <td>
+                                                                                            
+                                                    </td>
+                    </tr>
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_generate" name="method_generate" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">generate()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">generate(int <span class="argument">$hashLength</span>, int <span class="argument">$hashSeed</span>) : string</pre>
+                <p><em>Generates a unique hash code</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>int</td>
+                                <td>$hashLength</td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td>int</td>
+                                <td>$hashSeed</td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    string
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_generateUnique" name="method_generateUnique" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">generateUnique()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">generateUnique(string <span class="argument">$seed</span>, int <span class="argument">$length</span>, string <span class="argument">$algorithm</span>) : string</pre>
+                <p><em>Generates a pseudo-random/mostly-unique hash code. If you need guaranteed uniqueness, write yourself a GUID method</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$seed</td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td>int</td>
+                                <td>$length</td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td>string</td>
+                                <td>$algorithm</td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    string
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_hash" name="method_hash" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">hash()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">hash(string <span class="argument">$hashTarget</span>, int <span class="argument">$hashType</span>, integer <span class="argument">$hashLength</span>, boolean <span class="argument">$rawOutput</span>) : string</pre>
+                <p><em>Generic hashing method. Will hash any string or generate a random hash and hash that!</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$hashTarget</td>
+                                <td><p>The value to hash..</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>int</td>
+                                <td>$hashType</td>
+                                <td><p>[optional] The type of hash to create. Can be {@see Hasher::MD5}, {@see Hash#SHA1},</p>
+<pre><code>                          or {@link Hash#CRC32}. Defaults to {@see Hasher::SHA1}.</code></pre></td>
+                            </tr>
+                                                    <tr>
+                                <td>integer</td>
+                                <td>$hashLength</td>
+                                <td><p>[optional] The length of the hash to return. Only applies if <b>$hashType</b></p>
+<pre><code>                          is not MD5, SH1,
+                          or CRC32. . Defaults to static::MAX_HASH_LENGTH.</code></pre></td>
+                            </tr>
+                                                    <tr>
+                                <td>boolean</td>
+                                <td>$rawOutput</td>
+                                <td><p>[optional] If <b>$rawOutput</b> is true, then the hash digest is returned in</p>
+<pre><code>                          raw binary format instead of
+                          ASCII.</code></pre></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    string
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_encryptString" name="method_encryptString" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">encryptString()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">encryptString(string <span class="argument">$text</span>, string <span class="argument">$salt</span>, boolean <span class="argument">$urlEncode</span>) : string</pre>
+                <p><em>Simple string encryption using $salt</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$text</td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td>string</td>
+                                <td>$salt</td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td>boolean</td>
+                                <td>$urlEncode</td>
+                                <td><p>If true, the string will be url-encoded after encryption</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    string
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_decryptString" name="method_decryptString" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">decryptString()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">decryptString(string <span class="argument">$text</span>, string <span class="argument">$salt</span>, boolean <span class="argument">$urlDecode</span>) : string</pre>
+                <p><em>* Simple string decryption using the $salt as a key</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$text</td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td>string</td>
+                                <td>$salt</td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td>boolean</td>
+                                <td>$urlDecode</td>
+                                <td><p>If true, the string will be url-decoded before decryption</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    string
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method___construct" name="method___construct" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">__construct()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">__construct(array|object <span class="argument">$settings</span>)</pre>
+                <p><em>Base constructor</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>array|object</td>
+                                <td>$settings</td>
+                                <td><p>An array of key/value pairs that will be placed into storage</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/Kisma.Core.Seed.html"><div class="path-wrapper">\Kisma\Core\Seed</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method___wakeup" name="method___wakeup" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">__wakeup()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">__wakeup()</pre>
+                <p><em>When unserializing an object, this will re-attach any event handlers.</em></p>
+                <p>..</p>
+
+                
+                
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/Kisma.Core.Seed.html"><div class="path-wrapper">\Kisma\Core\Seed</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method___destruct" name="method___destruct" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">__destruct()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">__destruct()</pre>
+                <p><em>Choose your destructor!</em></p>
+                
+
+                
+                
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/Kisma.Core.Seed.html"><div class="path-wrapper">\Kisma\Core\Seed</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_publish" name="method_publish" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">publish()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">publish(string <span class="argument">$eventName</span>, mixed <span class="argument">$eventData</span>) : bool|int</pre>
+                <p><em>Triggers an object event to all subscribers. Convenient wrapper on EM::publish</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$eventName</td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td>mixed</td>
+                                <td>$eventData</td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    bool|int
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/Kisma.Core.Seed.html"><div class="path-wrapper">\Kisma\Core\Seed</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_on" name="method_on" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">on()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">on(string <span class="argument">$tag</span>, callable|null <span class="argument">$listener</span>) : bool</pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$tag</td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td>callable|null</td>
+                                <td>$listener</td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    bool
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/Kisma.Core.Seed.html"><div class="path-wrapper">\Kisma\Core\Seed</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_setDiscoverEvents" name="method_setDiscoverEvents" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">setDiscoverEvents()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">setDiscoverEvents(boolean <span class="argument">$discoverEvents</span>) : \Kisma\Core\Seed</pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>boolean</td>
+                                <td>$discoverEvents</td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    <a href="../classes/Kisma.Core.Seed.html">\Kisma\Core\Seed</a>
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/Kisma.Core.Seed.html"><div class="path-wrapper">\Kisma\Core\Seed</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getDiscoverEvents" name="method_getDiscoverEvents" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getDiscoverEvents()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getDiscoverEvents() : boolean</pre>
+                <p><em></em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    boolean
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/Kisma.Core.Seed.html"><div class="path-wrapper">\Kisma\Core\Seed</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_setEventManager" name="method_setEventManager" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">setEventManager()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">setEventManager(string <span class="argument">$eventManager</span>) : \Kisma\Core\Seed</pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$eventManager</td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    <a href="../classes/Kisma.Core.Seed.html">\Kisma\Core\Seed</a>
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/Kisma.Core.Seed.html"><div class="path-wrapper">\Kisma\Core\Seed</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getEventManager" name="method_getEventManager" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getEventManager()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getEventManager() : string</pre>
+                <p><em></em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    string
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/Kisma.Core.Seed.html"><div class="path-wrapper">\Kisma\Core\Seed</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getId" name="method_getId" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getId()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getId() : string</pre>
+                <p><em></em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    string
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/Kisma.Core.Seed.html"><div class="path-wrapper">\Kisma\Core\Seed</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_setName" name="method_setName" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">setName()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">setName(string <span class="argument">$name</span>) : \Kisma\Core\Seed</pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$name</td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    <a href="../classes/Kisma.Core.Seed.html">\Kisma\Core\Seed</a>
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/Kisma.Core.Seed.html"><div class="path-wrapper">\Kisma\Core\Seed</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getName" name="method_getName" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getName()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getName() : string</pre>
+                <p><em></em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    string
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/Kisma.Core.Seed.html"><div class="path-wrapper">\Kisma\Core\Seed</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_setTag" name="method_setTag" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">setTag()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">setTag(string <span class="argument">$tag</span>) : \Kisma\Core\Seed</pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$tag</td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    <a href="../classes/Kisma.Core.Seed.html">\Kisma\Core\Seed</a>
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/Kisma.Core.Seed.html"><div class="path-wrapper">\Kisma\Core\Seed</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getTag" name="method_getTag" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getTag()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getTag() : string</pre>
+                <p><em></em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    string
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/Kisma.Core.Seed.html"><div class="path-wrapper">\Kisma\Core\Seed</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr>
+                        <th>
+                            todo
+                        </th>
+                        <td>
+                                                    </td>
+                    </tr>
+                            </table>
+        </aside>
+    </div>
+
+                                                                    </div>
+    </section>
+
+    <div id="source-view" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="source-view-label" aria-hidden="true">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h3 id="source-view-label">Hasher.php</h3>
+        </div>
+        <div class="modal-body">
+            <pre data-src="../files/Kisma/Core/Utility/Hasher.php.txt" class="language-php line-numbers"></pre>
+        </div>
+    </div>
+
+    <footer class="row-fluid">
+        <section class="span10 offset2">
+            <section class="row-fluid">
+                <section class="span10 offset1">
+                    <section class="row-fluid footer-sections">
+                        <section class="span4">
+                                                        <h1><i class="icon-code"></i></h1>
+                            <div>
+                                <ul>
+                                                                            <li><a href="../namespaces/Kisma.html">\Kisma</a></li>
+                                                                    </ul>
+                            </div>
+                        </section>
+                        <section class="span4">
+                                                        <h1><i class="icon-bar-chart"></i></h1>
+                            <div>
+                                <ul>
+                                    <li><a href="../graphs/class.html">Class Hierarchy Diagram</a></li>
+                                </ul>
+                            </div>
+                        </section>
+                        <section class="span4">
+                                                        <h1><i class="icon-pushpin"></i></h1>
+                            <div>
+                                <ul>
+                                    <li><a href="../reports/errors.html">Errors</a></li>
+                                    <li><a href="../reports/markers.html">Markers</a></li>
+                                </ul>
+                            </div>
+                        </section>
+                    </section>
+                </section>
+            </section>
+            <section class="row-fluid">
+                <section class="span10 offset1">
+                    <hr />
+                    Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor </a> and authored
+                    on January 9th, 2014 at 13:05.
+                </section>
+            </section>
+        </section>
+    </footer>
+</div>
+
+</body>
+</html>
