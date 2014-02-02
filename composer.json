@@ -20,16 +20,8 @@
 		"php": ">=5.3.18"
 	},
 	"require-dev": {
-		"phpunit/phpunit":              "~3.7.30@stable",
-		"phpunit/phpunit-mock-objects": "@stable",
-		"phpunit/phpunit-selenium":     "@stable",
-		"phpunit/phpunit-story":        "@stable",
-		"phpunit/dbunit":               "@stable",
-		"phpunit/php-code-coverage":    "@stable",
-		"phpunit/php-text-template":    "@stable",
-		"phpunit/php-token-stream":     "@stable",
-		"phpunit/php-timer":            "@stable",
-		"phpunit/php-invoker":          "@stable"
+		"phpunit/phpunit":              "@stable",
+		"phpunit/php-code-coverage":    "@stable"
 	},
 	"autoload":    {
 		"psr-0": {
