@@ -41,7 +41,7 @@ class Log extends Seed implements UtilityLike, Levels
 	/**
 	 * @var string The relative path (from the Kisma base path) for the default log
 	 */
-	const DefaultLogFile = '/log/kisma.log';
+	const DefaultLogFile = '/kisma.log';
 
 	//********************************************************************************
 	//* Members
@@ -74,6 +74,10 @@ class Log extends Seed implements UtilityLike, Levels
 	 * @var bool If true, pid, uid, and hostname are added to log entry
 	 */
 	protected static $_includeProcessInfo = false;
+	/**
+	 * @var bool Set when log file has been validated
+	 */
+	protected static $_logFileValid = false;
 
 	//********************************************************************************
 	//* Methods
@@ -100,6 +104,23 @@ class Log extends Seed implements UtilityLike, Levels
 			{
 				return true;
 			}
+		}
+
+		if ( $_firstRun || !static::$_logFileValid )
+		{
+			static::$_logFileValid = static::_checkLogFile();
+
+			if ( !static::$_logFileValid ||
+				 is_numeric( static::$_defaultLog ) ||
+				 empty( static::$_defaultLog ) ||
+				 !file_exists( static::$_defaultLog )
+			)
+			{
+				static::setDefaultLog( LOG_SYSLOG );
+				static::$_logFileValid = true;
+			}
+
+			$_firstRun = false;
 		}
 
 		$_timestamp = time();
@@ -132,7 +153,14 @@ class Log extends Seed implements UtilityLike, Levels
 			)
 		);
 
-		error_log( $_entry, 3, static::$_defaultLog );
+		if ( static::$_logFileValid || is_numeric( static::$_defaultLog ) )
+		{
+			error_log( $_entry );
+		}
+		else
+		{
+			error_log( $_entry, 3, static::$_defaultLog );
+		}
 
 		//	Set indent level...
 		static::$_currentIndent += $_newIndent;
@@ -349,10 +377,12 @@ class Log extends Seed implements UtilityLike, Levels
 			if ( isset( $_backTrace[$_i]['method'] ) )
 			{
 				$_method = $_backTrace[$_i]['method'];
-			} else if ( isset( $_backTrace[$_i]['function'] ) )
+			}
+			else if ( isset( $_backTrace[$_i]['function'] ) )
 			{
 				$_method = $_backTrace[$_i]['function'];
-			} else
+			}
+			else
 			{
 				$_method = 'Unknown';
 			}
@@ -400,9 +430,32 @@ class Log extends Seed implements UtilityLike, Levels
 		//	Set a name for the default log
 		if ( null === static::$_defaultLog )
 		{
-			$_logPath = \Kisma::get( 'app.log_path', \Kisma::get( 'app.base_path' ) );
-			Log::setDefaultLog( $_logPath . static::DefaultLogFile );
+			$_logPath = \Kisma::get( 'app.log_path', \Kisma::get( 'app.base_path' ) ) ? : getcwd();
+			static::$_defaultLog = $_logPath . static::DefaultLogFile;
 		}
+		else
+		{
+			if ( !is_file( static::$_defaultLog ) && is_dir( static::$_defaultLog ) )
+			{
+				$_logPath = static::$_defaultLog;
+				static::$_defaultLog .= static::DefaultLogFile;
+			}
+			else
+			{
+				$_logPath = dirname( static::$_defaultLog );
+			}
+		}
+
+		//	Try and create the path
+		if ( !is_dir( $_logPath ) )
+		{
+			if ( false === @mkdir( $_logPath, 0777, true ) )
+			{
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	/**

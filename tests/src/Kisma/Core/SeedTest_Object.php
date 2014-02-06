@@ -1,10 +1,12 @@
 <?php
-namespace Kisma\Tests\Core;
+namespace Kisma\Core;
+
+use Kisma\Core\Interfaces\SubscriberLike;
 
 /**
  * SeedTest_Object
  */
-class SeedTest_Object extends \Kisma\Core\Seed implements \Kisma\Core\Interfaces\SubscriberLike
+class SeedTest_Object extends Seed implements SubscriberLike
 {
 	//*************************************************************************
 	//* Public Members

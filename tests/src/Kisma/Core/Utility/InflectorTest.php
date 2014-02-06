@@ -1,7 +1,7 @@
 <?php
-namespace Kisma\Tests\Core\Utility;
+namespace Kisma\Core\Utility;
 
-use Kisma\Core\Utility\Inflector;
+use Kisma\Core\Enums\Verbosity;
 
 /**
  * InflectorTest
@@ -12,7 +12,7 @@ class InflectorTest extends \PHPUnit_Framework_TestCase
 {
 
 	/**
-	 * @covers Inflector::pluralize
+	 * @covers \Kisma\Core\Utility\Inflector::pluralize
 	 */
 	public function testPluralize()
 	{
@@ -38,4 +38,22 @@ class InflectorTest extends \PHPUnit_Framework_TestCase
 			$this->assertEquals( $_expected, Inflector::pluralize( $_word ) );
 		}
 	}
+
+	/**
+	 * @covers \Kisma\Core\Enums\SeedEnum::prettyNameOf
+	 */
+	public function testPrettyNameOf()
+	{
+		$_tests = array(
+			Verbosity::VERBOSE      => 'Verbose',
+			Verbosity::VERY_VERBOSE => 'Very Verbose',
+			Verbosity::DEBUG        => 'Debug',
+		);
+
+		foreach ( $_tests as $_constant => $_expected )
+		{
+			$this->assertEquals( $_expected, Verbosity::prettyNameOf( $_constant ) );
+		}
+	}
+
 }

@@ -55,7 +55,13 @@ class Curl extends HttpMethod
 	/**
 	 * @var array Default cURL options
 	 */
-	protected static $_curlOptions = array();
+	protected static $_curlOptions = array(
+		CURLOPT_FOLLOWLOCATION => true,
+		CURLOPT_RETURNTRANSFER => true,
+		CURLOPT_HEADER         => true,
+		CURLINFO_HEADER_OUT    => true,
+		CURLOPT_SSL_VERIFYPEER => false,
+	);
 	/**
 	 * @var int The last http code
 	 */
@@ -232,37 +238,22 @@ class Curl extends HttpMethod
 		//	Build a curl request...
 		$_curl = curl_init( $url );
 
-		//	Defaults
-		$_curlOptions = array(
-			CURLOPT_FOLLOWLOCATION => true,
-			CURLOPT_RETURNTRANSFER => true,
-			CURLOPT_HEADER         => true,
-			CURLINFO_HEADER_OUT    => true,
-			CURLOPT_SSL_VERIFYPEER => false,
-		);
-
-		//	Merge in the global options if any
-		if ( !empty( static::$_curlOptions ) )
-		{
-			$curlOptions = array_merge(
-				$curlOptions,
-				static::$_curlOptions
-			);
-		}
-
-		//	Add/override user options
-		if ( !empty( $curlOptions ) )
-		{
-			foreach ( $curlOptions as $_key => $_value )
-			{
-				$_curlOptions[$_key] = $_value;
-			}
-		}
+		//	Default CURL options for this method
+		$_curlOptions = static::$_curlOptions;
 
 		if ( null !== static::$_userName || null !== static::$_password )
 		{
 			$_curlOptions[CURLOPT_HTTPAUTH] = CURLAUTH_BASIC;
 			$_curlOptions[CURLOPT_USERPWD] = static::$_userName . ':' . static::$_password;
+		}
+
+		//	Merge in user overrides...
+		if ( !empty( $curlOptions ) )
+		{
+			$_curlOptions = array_merge(
+				$_curlOptions,
+				$curlOptions
+			);
 		}
 
 		switch ( $method )
@@ -660,7 +651,11 @@ class Curl extends HttpMethod
 		}
 
 		$_currentUrl =
-			$_protocol . $_host . $_port . ( true === $includePath ? Option::get( $_parts, 'path' ) : null ) . ( true === $includeQuery ? $_query : null );
+			$_protocol .
+			$_host .
+			$_port .
+			( true === $includePath ? Option::get( $_parts, 'path' ) : null ) .
+			( true === $includeQuery ? $_query : null );
 
 		if ( \Kisma::get( 'debug.curl.current_url' ) )
 		{

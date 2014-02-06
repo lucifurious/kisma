@@ -20,7 +20,7 @@
  */
 namespace Kisma\Core\Enums;
 
-use Kisma\Core\Utility;
+use Kisma\Core\Utility\Inflector;
 
 /**
  * SeedEnum
@@ -86,7 +86,7 @@ abstract class SeedEnum
 	{
 		static $_key = null;
 
-		return $_key ? : Utility\Inflector::tag( $class ? : \get_called_class(), true );
+		return $_key ? : Inflector::tag( $class ? : \get_called_class(), true );
 	}
 
 	/**
@@ -127,7 +127,7 @@ abstract class SeedEnum
 
 		foreach ( static::$_constants[$_key] as $_constant => $_value )
 		{
-			$_temp[$_value] = Utility\Inflector::display( Utility\Inflector::neutralize( $_constant ) );
+			$_temp[$_value] = Inflector::display( Inflector::neutralize( $_constant ) );
 			unset( $_value, $_option );
 		}
 
@@ -150,25 +150,6 @@ abstract class SeedEnum
 	public static function contains( $value )
 	{
 		return in_array( $value, array_values( static::getDefinedConstants() ) );
-	}
-
-	/**
-	 * Returns the constant name as a string
-	 *
-	 * @param string $constant
-	 * @param bool   $flipped If false, the $constantValue should contain the constant name and the value will be returned
-	 *
-	 * @throws \InvalidArgumentException
-	 * @return string
-	 */
-	public static function nameOf( $constant, $flipped = true )
-	{
-		if ( in_array( $constant, array_keys( $_constants = static::getDefinedConstants( $flipped ) ) ) )
-		{
-			return $_constants[$constant];
-		}
-
-		throw new \InvalidArgumentException( 'A constant with the value of "' . $constant . '" does not exist.' );
 	}
 
 	/**
@@ -199,5 +180,36 @@ abstract class SeedEnum
 		}
 
 		return false === $returnValue ? $_has : $_constants[$constant];
+	}
+
+	/**
+	 * Returns the constant name as a string
+	 *
+	 * @param string $constant
+	 * @param bool   $flipped If false, the $constantValue should contain the constant name and the value will be returned
+	 * @param bool   $pretty  If true, returned value is prettified (acme.before_event becomes "Acme Before Event")
+	 *
+	 * @throws \InvalidArgumentException
+	 * @return string
+	 */
+	public static function nameOf( $constant, $flipped = true, $pretty = true )
+	{
+		if ( in_array( $constant, array_keys( $_constants = static::getDefinedConstants( $flipped ) ) ) )
+		{
+			return $pretty ? Inflector::display( Inflector::neutralize( $_constants[$constant] ) ) : $_constants[$constant];
+		}
+
+		throw new \InvalidArgumentException( 'A constant with the value of "' . $constant . '" does not exist.' );
+	}
+
+	/**
+	 * @param mixed $constant
+	 * @param bool  $flipped
+	 *
+	 * @return string
+	 */
+	public static function prettyNameOf( $constant, $flipped = true )
+	{
+		return static::nameOf( $constant, $flipped, true );
 	}
 }

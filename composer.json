@@ -6,7 +6,10 @@
 	],
 	"homepage":    "https://github.com/kisma/kisma",
 	"type":        "library",
-	"license":     "GPL3",
+	"license":     ["MIT"],
+	"config":      {
+		"bin-dir": "bin"
+	},
 	"authors":     [
 		{
 			"name":  "Jerry Ablan",
@@ -14,7 +17,19 @@
 		}
 	],
 	"require":     {
-		"php": ">=5.3.18"
+		"php": ">=5.3.10"
+	},
+	"require-dev": {
+		"phpunit/phpunit":              "@stable",
+		"phpunit/phpunit-mock-objects": "@stable",
+		"phpunit/phpunit-selenium":     "@stable",
+		"phpunit/phpunit-story":        "@stable",
+		"phpunit/dbunit":               "@stable",
+		"phpunit/php-code-coverage":    "@stable",
+		"phpunit/php-text-template":    "@stable",
+		"phpunit/php-token-stream":     "@stable",
+		"phpunit/php-timer":            "@stable",
+		"phpunit/php-invoker":          "@stable"
 	},
 	"autoload":    {
 		"psr-0": {

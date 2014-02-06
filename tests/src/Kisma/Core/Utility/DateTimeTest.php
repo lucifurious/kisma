@@ -1,5 +1,5 @@
 <?php
-namespace Kisma\Tests\Core\Utility;
+namespace Kisma\Core\Utility;
 
 use Kisma\Core\Enums;
 

@@ -1,5 +1,8 @@
 <?php
-namespace Kisma\Tests\Core;
+namespace Kisma\Core;
+
+use Kisma\Core\Utility\EventManager;
+use Kisma\Core\Utility\Log;
 
 require_once __DIR__ . '/SeedTest_Object.php';
 
@@ -8,7 +11,7 @@ require_once __DIR__ . '/SeedTest_Object.php';
 class SeedTest extends \PHPUnit_Framework_TestCase
 {
 	/**
-	 * @var \SeedTest_Object
+	 * @var SeedTest_Object
 	 */
 	protected $_object;
 	/**
@@ -34,18 +37,16 @@ class SeedTest extends \PHPUnit_Framework_TestCase
 			unset( $this->_object );
 		}
 
-		$this->_object = new \SeedTest_Object( array(
-			'tester' => $this
-		) );
+		$this->_object = new SeedTest_Object( array( 'tester' => $this ) );
 	}
 
 	protected function tearDown()
 	{
 		$this->_object = null;
 
-		foreach ( \Kisma\Core\Utility\EventManager::getEventMap() as $_eventTag => $_subscribers )
+		foreach ( EventManager::getEventMap() as $_eventTag => $_subscribers )
 		{
-			\Kisma\Core\Utility\Log::debug( 'Event "' . $_eventTag . '" listener dump:' );
+			Log::debug( 'Event "' . $_eventTag . '" listener dump:' );
 
 			foreach ( $_subscribers as $_listeners )
 			{
@@ -54,7 +55,7 @@ class SeedTest extends \PHPUnit_Framework_TestCase
 				{
 					foreach ( $_closures as $_closure )
 					{
-						\Kisma\Core\Utility\Log::debug(
+						Log::debug(
 							'-- "' . $_subscriberId . '" of ' . ( is_object( $_closure ) ? get_class( $_closure ) : gettype( $_closure ) )
 						);
 					}
@@ -62,7 +63,7 @@ class SeedTest extends \PHPUnit_Framework_TestCase
 			}
 		}
 
-		\Kisma\Core\Utility\Log::debug( 'Eventmap dump:' . json_encode( \Kisma\Core\Utility\EventManager::getEventMap() ) );
+		Log::debug( 'Eventmap dump:' . json_encode( EventManager::getEventMap() ) );
 	}
 
 	/**
@@ -141,8 +142,8 @@ class SeedTest extends \PHPUnit_Framework_TestCase
 	}
 
 	/**
-	 * @covers Kisma\Core\Seed::subscribe
-	 * @covers Kisma\Core\Seed::unsubscribe
+	 * @covers Kisma\Core\Seed::on
+	 * @covers Kisma\Core\Seed::publish
 	 */
 	public function testUnsubscribe()
 	{

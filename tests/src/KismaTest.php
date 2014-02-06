@@ -1,9 +1,5 @@
 <?php
-namespace Kisma\Tests;
-
 use Kisma\Core\TestCase;
-
-require_once __DIR__ . '/bootstrap.php';
 
 /**
  * KismaTest
@@ -21,24 +17,6 @@ class KismaTest extends TestCase
 	public function testConceive()
 	{
 		$this->assertTrue( \Kisma::getConception() );
-	}
-
-	/**
-	 * @covers Kisma::getAutoLoader
-	 */
-	public function testGetAutoLoader()
-	{
-		$_autoloader = \Kisma::getAutoLoader();
-
-		$this->assertInstanceOf( '\\Composer\\Autoload\\ClassLoader', $_autoloader );
-	}
-
-	/**
-	 * @covers Kisma::getBasePath
-	 */
-	public function testGetBasePath()
-	{
-		$this->assertTrue( dirname( __DIR__ ) . '/src' == \Kisma::get( 'app.base_path' ) );
 	}
 
 	/**

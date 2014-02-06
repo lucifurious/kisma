@@ -1,8 +1,11 @@
 <?php
-namespace Kisma\Tests\Core;
+namespace Kisma\Core;
 
-require_once __DIR__ . '/SeedTest_Object.php';
-
+/**
+ * SeedBagTest
+ *
+ * @package Kisma\Core
+ */
 class SeedBagTest extends \PHPUnit_Framework_TestCase
 {
 	/**
@@ -36,7 +39,7 @@ class SeedBagTest extends \PHPUnit_Framework_TestCase
 	public function testKeys()
 	{
 		$this->assertTrue( is_array( $_keys = $this->object->keys() ) );
-		$this->assertTrue( $_keys[0] == 'test_item' );
+		$this->assertTrue( $_keys[0] == 'testItem' );
 	}
 
 	/**
@@ -104,16 +107,16 @@ class SeedBagTest extends \PHPUnit_Framework_TestCase
 	public function testContains()
 	{
 		//	Yes
-		$this->assertTrue( $this->object->contains( 'TestItem' ) );
+		$this->assertTrue( $this->object->contains( 'testItem' ) );
 
 		//	No
-		$this->assertTrue( !$this->object->contains( 'newTestItem' ) );
+		$this->assertFalse( $this->object->contains( 'newTestItem' ) );
 
 		//	Yes
-		$this->assertTrue( $this->object->offsetExists( 'TestItem' ) );
+		$this->assertTrue( $this->object->offsetExists( 'test_item' ) );
 
 		//	No
-		$this->assertTrue( !$this->object->offsetExists( 'newTestItem' ) );
+		$this->assertFalse( $this->object->offsetExists( 'new_test_item' ) );
 	}
 
 	/**

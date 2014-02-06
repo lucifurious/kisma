@@ -1,12 +1,6 @@
-*/*.log/*
-kisma.log
-examples/blog/app/cache/
-.gitignore
+log
 vendor
-Original/
-.idea
-src/temp/
-src/Kisma/Pods
-src/Kisma/Strata
+.idea/
 tests/log/
+tests/metrics/
 doc
