@@ -55,13 +55,7 @@ class Curl extends HttpMethod
 	/**
 	 * @var array Default cURL options
 	 */
-	protected static $_curlOptions = array(
-		CURLOPT_FOLLOWLOCATION => true,
-		CURLOPT_RETURNTRANSFER => true,
-		CURLOPT_HEADER         => true,
-		CURLINFO_HEADER_OUT    => true,
-		CURLOPT_SSL_VERIFYPEER => false,
-	);
+	protected static $_curlOptions = array();
 	/**
 	 * @var int The last http code
 	 */
@@ -239,21 +233,36 @@ class Curl extends HttpMethod
 		$_curl = curl_init( $url );
 
 		//	Default CURL options for this method
-		$_curlOptions = static::$_curlOptions;
+		$_curlOptions = array(
+			CURLOPT_FOLLOWLOCATION => true,
+			CURLOPT_RETURNTRANSFER => true,
+			CURLOPT_HEADER         => true,
+			CURLINFO_HEADER_OUT    => true,
+			CURLOPT_SSL_VERIFYPEER => false,
+		);
+
+		//	Merge in the global options if any
+		if ( !empty( static::$_curlOptions ) )
+		{
+			$curlOptions = array_merge(
+				$curlOptions,
+				static::$_curlOptions
+			);
+		}
+
+		//	Add/override user options
+		if ( !empty( $curlOptions ) )
+		{
+			foreach ( $curlOptions as $_key => $_value )
+			{
+				$_curlOptions[$_key] = $_value;
+			}
+		}
 
 		if ( null !== static::$_userName || null !== static::$_password )
 		{
 			$_curlOptions[CURLOPT_HTTPAUTH] = CURLAUTH_BASIC;
 			$_curlOptions[CURLOPT_USERPWD] = static::$_userName . ':' . static::$_password;
-		}
-
-		//	Merge in user overrides...
-		if ( !empty( $curlOptions ) )
-		{
-			$_curlOptions = array_merge(
-				$_curlOptions,
-				$curlOptions
-			);
 		}
 
 		switch ( $method )

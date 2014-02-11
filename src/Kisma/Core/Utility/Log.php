@@ -110,7 +110,11 @@ class Log extends Seed implements UtilityLike, Levels
 		{
 			static::$_logFileValid = static::_checkLogFile();
 
-			if ( !static::$_logFileValid || empty( static::$_defaultLog ) || !file_exists( static::$_defaultLog ) )
+			if ( !static::$_logFileValid ||
+				 is_numeric( static::$_defaultLog ) ||
+				 empty( static::$_defaultLog ) ||
+				 !file_exists( static::$_defaultLog )
+			)
 			{
 				static::setDefaultLog( LOG_SYSLOG );
 				static::$_logFileValid = true;
@@ -213,16 +217,16 @@ class Log extends Seed implements UtilityLike, Levels
 		);
 
 		return str_ireplace(
-			array(
-				'%%level%%',
-				'%%date%%',
-				'%%time%%',
-				'%%message%%',
-				'%%extra%%',
-			),
-			$_replacements,
-			static::$_logFormat
-		) . ( $newline ? PHP_EOL : null );
+				   array(
+					   '%%level%%',
+					   '%%date%%',
+					   '%%time%%',
+					   '%%message%%',
+					   '%%extra%%',
+				   ),
+				   $_replacements,
+				   static::$_logFormat
+			   ) . ( $newline ? PHP_EOL : null );
 	}
 
 	/**
