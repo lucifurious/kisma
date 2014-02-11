@@ -17,7 +17,11 @@
 		}
 	],
 	"require":     {
-		"php":             ">=5.3.18"
+		"php": ">=5.3.18"
+	},
+	"require-dev": {
+		"phpunit/phpunit":              "@stable",
+		"phpunit/php-code-coverage":    "@stable"
 	},
 	"autoload":    {
 		"psr-0": {

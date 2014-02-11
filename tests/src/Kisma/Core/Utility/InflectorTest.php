@@ -31,6 +31,10 @@ class InflectorTest extends \PHPUnit_Framework_TestCase
 			'hive'    => 'hives',
 			'thief'   => 'thieves',
 			'tomato'  => 'tomatoes',
+			'glass'   => 'glasses',
+			'cows'    => 'cows',
+			'geese'   => 'geese',
+			'deer'    => 'deer',
 		);
 
 		foreach ( $_words as $_word => $_expected )

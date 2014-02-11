@@ -1,8 +1,6 @@
 <?php
 use Kisma\Core\TestCase;
 
-require_once __DIR__ . '/bootstrap.php';
-
 /**
  * KismaTest
  */
