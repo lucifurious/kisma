@@ -33,5 +33,5 @@ interface PublisherLike extends Events\PublisherLike
 	/**
 	 * @var string The default event manager for an object
 	 */
-	const DefaultEventManager = '\\Kisma\\Core\\Utility\\EventManager';
+	const DefaultEventManager = 'Kisma\\Core\\Utility\\EventManager';
 }
