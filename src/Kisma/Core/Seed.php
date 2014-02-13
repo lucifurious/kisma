@@ -20,7 +20,14 @@
  */
 namespace Kisma\Core;
 
-use Kisma\Core\Utility;
+use Kisma\Core\Events\SeedEvent;
+use Kisma\Core\Interfaces\Events\Enums\LifeEvents;
+use Kisma\Core\Interfaces\Events\SeedLike;
+use Kisma\Core\Interfaces\PublisherLike;
+use Kisma\Core\Interfaces\SubscriberLike;
+use Kisma\Core\Utility\EventManager;
+use Kisma\Core\Utility\Inflector;
+use Kisma\Core\Utility\Option;
 
 /**
  * Seed
@@ -58,29 +65,15 @@ use Kisma\Core\Utility;
  * attach any event handlers that exist in your object.
  *
  * To disable this feature, set $discoverEvents to false before calling the parent constructor.
- *
- * Properties
- * ==========
- *
- * The properties below are default in every Seed object. In addition, when you constract a Seed
- * object, any values passed to the constructor will be set in the created object. There are no
- * checks for invalid properties. If the property does not exist, it will be added as public. No
- * getter or setter will be created however. Use of the new property is entirely up to you.
- *
- * @property-read string $id              A unique ID assigned to this object, the last part of which is the creation time
- * @property string      $tag             The tag of this object. Defaults to the base name of the class
- * @property string      $name            The name of this object. Defaults tot he class name
- * @property bool        $discoverEvents  Defaults to true.
- * @property string      $eventManager    Defaults to \Kisma\Core\Utility\EventManager
  */
-class Seed implements Interfaces\SeedLike, Interfaces\PublisherLike
+class Seed implements SeedLike, PublisherLike, SubscriberLike
 {
 	//********************************************************************************
 	//* Variables
 	//********************************************************************************
 
 	/**
-	 * @var string The unique ID of this seed
+	 * @var string A unique ID assigned to this object, the last part of which is the creation time
 	 */
 	private $_id;
 	/**
@@ -91,14 +84,6 @@ class Seed implements Interfaces\SeedLike, Interfaces\PublisherLike
 	 * @var string A display quality name for this object. Defaults to the full class name (i.e. "\Kisma\Core\Seed")
 	 */
 	protected $_name;
-	/**
-	 * @var bool If false, event handlers must be defined manually
-	 */
-	protected $_discoverEvents = true;
-	/**
-	 * @var string The class name of the event manager
-	 */
-	protected $_eventManager = self::DefaultEventManager;
 
 	//********************************************************************************
 	//* Methods
@@ -111,38 +96,15 @@ class Seed implements Interfaces\SeedLike, Interfaces\PublisherLike
 	 */
 	public function __construct( $settings = array() )
 	{
-		//	Since $_id is read-only we remove if you try to set it
-		if ( null !== ( $_id = Utility\Option::get( $settings, 'id' ) ) )
-		{
-			Utility\Option::remove( $settings, 'id' );
-		}
+		//	Since $_id is read-only we remove it
+		Option::remove( $settings, 'id' );
 
-		//	Otherwise, set the rest
-		if ( is_array( $settings ) || is_object( $settings ) || $settings instanceof \Traversable )
+		//	Now, set the rest
+		if ( !empty( $settings ) )
 		{
 			foreach ( $settings as $_key => $_value )
 			{
-				if ( property_exists( $this, $_key ) )
-				{
-					try
-					{
-						Utility\Option::set( $this, $_key, $_value );
-						unset( $settings, $_key );
-						continue;
-					}
-					catch ( \Exception $_ex )
-					{
-						//	Ignore...
-					}
-				}
-
-				$_setter = Utility\Inflector::tag( 'set_' . $_key );
-
-				if ( method_exists( $this, $_setter ) )
-				{
-					call_user_func( array( $this, $_setter ), $_value );
-					unset( $settings, $_key, $_setter );
-				}
+				Option::set( $this, $_key, $_value );
 			}
 		}
 
@@ -157,38 +119,18 @@ class Seed implements Interfaces\SeedLike, Interfaces\PublisherLike
 	{
 		//	This is my hash. There are many like it, but this one is mine.
 		$this->_id = hash( 'sha256', spl_object_hash( $this ) . getmypid() . microtime( true ) );
-		//Utility\Log::debug( 'New seed spawned: ' . $this->_id );
 
-		//	Auto-set tag and name if they're empty
-		if ( null === $this->_tag )
-		{
-			$this->_tag = Utility\Inflector::tag( get_called_class(), true );
-		}
+		//	Auto-set tag and name if empty
+		$this->_tag = $this->_tag ? : Inflector::neutralize( get_called_class() );
+		$this->_name = $this->_name ? : $this->_tag;
 
-		if ( null === $this->_name )
+		if ( $this instanceof SubscriberLike )
 		{
-			$this->_name = Utility\Inflector::tag( get_called_class() );
-		}
-
-		if ( !( $this instanceof Interfaces\SubscriberLike ) || empty( $this->_eventManager ) )
-		{
-			//	Ignore event junk later
-			$this->_eventManager = false;
-			$this->_discoverEvents = false;
-		}
-
-		//	Add the event service and attach any event handlers we find...
-		if ( false !== $this->_discoverEvents )
-		{
-			//	Subscribe to events...
-			call_user_func(
-				array( $this->_eventManager, 'subscribe' ),
-				$this
-			);
+			EventManager::discoverListeners( $this );
 		}
 
 		//	Publish after_construct event
-		$this->publish( self::AfterConstruct );
+		$this->trigger( LifeEvents::AFTER_CONSTRUCT );
 	}
 
 	/**
@@ -199,7 +141,7 @@ class Seed implements Interfaces\SeedLike, Interfaces\PublisherLike
 		try
 		{
 			//	Publish after_destruct event
-			$this->publish( self::BeforeDestruct );
+			$this->trigger( LifeEvents::BEFORE_DESTRUCT );
 		}
 		catch ( \Exception $_ex )
 		{
@@ -211,77 +153,45 @@ class Seed implements Interfaces\SeedLike, Interfaces\PublisherLike
 	/**
 	 * Triggers an object event to all subscribers. Convenient wrapper on EM::publish
 	 *
-	 * @param string $eventName
-	 * @param mixed  $eventData
+	 * @param string    $eventName
+	 * @param SeedEvent $event
 	 *
 	 * @return bool|int
 	 */
-	public function publish( $eventName, $eventData = null )
+	public function trigger( $eventName, $event = null )
 	{
-		//	A little chicanery...
-		return false !== $this->_eventManager ? call_user_func( array( $this->_eventManager, 'publish' ), $this, $eventName, $eventData ) : false;
-	}
-
-	/**
-	 * @param string        $tag
-	 * @param callable|null $listener
-	 *
-	 * @return bool
-	 */
-	public function on( $tag, $listener = null )
-	{
-		//  Add our event handlers
-		if ( $this instanceof Interfaces\SubscriberLike && !empty( $this->_eventManager ) )
+		if ( null === $event )
 		{
-			return call_user_func(
-				array( $this->_eventManager, 'on' ),
-				$this,
-				$tag,
-				$listener
-			);
+			$event = new SeedEvent( $this );
 		}
 
-		return false;
+		return EventManager::trigger( $eventName, $event );
 	}
 
 	/**
-	 * @param boolean $discoverEvents
+	 * Adds an event listener that listens on the specified events.
 	 *
-	 * @return Seed
+	 * @param string   $eventName            The event to listen on
+	 * @param callable $listener             The listener
+	 * @param integer  $priority             The higher this value, the earlier an event
+	 *                                       listener will be triggered in the chain (defaults to 0)
 	 */
-	public function setDiscoverEvents( $discoverEvents )
+	public function on( $eventName, $listener, $priority = 0 )
 	{
-		$this->_discoverEvents = $discoverEvents;
-
-		return $this;
+		EventManager::on( $eventName, $listener, $priority );
 	}
 
 	/**
-	 * @return boolean
-	 */
-	public function getDiscoverEvents()
-	{
-		return $this->_discoverEvents;
-	}
-
-	/**
-	 * @param string $eventManager
+	 * Turn off/unbind/remove $listener from an event
 	 *
-	 * @return Seed
+	 * @param string   $eventName
+	 * @param callable $listener
+	 *
+	 * @return void
 	 */
-	public function setEventManager( $eventManager )
+	public function off( $eventName, $listener )
 	{
-		$this->_eventManager = $eventManager;
-
-		return $this;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getEventManager()
-	{
-		return $this->_eventManager;
+		EventManager::off( $eventName, $listener );
 	}
 
 	/**
@@ -331,4 +241,5 @@ class Seed implements Interfaces\SeedLike, Interfaces\PublisherLike
 	{
 		return $this->_tag;
 	}
+
 }

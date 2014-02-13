@@ -17,11 +17,13 @@
 		}
 	],
 	"require":     {
-		"php": ">=5.3.10"
+		"php":                      ">=5.3.10",
+		"symfony/event-dispatcher": "@stable",
+		"symfony/http-foundation":  "@stable"
 	},
 	"require-dev": {
-		"phpunit/phpunit":              "@stable",
-		"phpunit/php-code-coverage":    "@stable"
+		"phpunit/phpunit":           "@stable",
+		"phpunit/php-code-coverage": "@stable"
 	},
 	"autoload":    {
 		"psr-0": {

@@ -1,15 +1,16 @@
 <?php
 namespace Kisma\Core;
 
-use Kisma\Core\Utility\EventManager;
-use Kisma\Core\Utility\Log;
-
 require_once __DIR__ . '/SeedTest_Object.php';
 
 /**
  */
 class SeedTest extends \PHPUnit_Framework_TestCase
 {
+	//*************************************************************************
+	//	Members
+	//*************************************************************************
+
 	/**
 	 * @var SeedTest_Object
 	 */
@@ -18,6 +19,10 @@ class SeedTest extends \PHPUnit_Framework_TestCase
 	 * @var int
 	 */
 	protected $_destructorEventFired = 0;
+
+	//*************************************************************************
+	//	Methods
+	//*************************************************************************
 
 	/**
 	 * @param int $how Used to capture the destructor event in the fixture
@@ -38,32 +43,6 @@ class SeedTest extends \PHPUnit_Framework_TestCase
 		}
 
 		$this->_object = new SeedTest_Object( array( 'tester' => $this ) );
-	}
-
-	protected function tearDown()
-	{
-		$this->_object = null;
-
-		foreach ( EventManager::getEventMap() as $_eventTag => $_subscribers )
-		{
-			Log::debug( 'Event "' . $_eventTag . '" listener dump:' );
-
-			foreach ( $_subscribers as $_listeners )
-			{
-				/** @var $_listener \Closure */
-				foreach ( $_listeners as $_subscriberId => $_closures )
-				{
-					foreach ( $_closures as $_closure )
-					{
-						Log::debug(
-							'-- "' . $_subscriberId . '" of ' . ( is_object( $_closure ) ? get_class( $_closure ) : gettype( $_closure ) )
-						);
-					}
-				}
-			}
-		}
-
-		Log::debug( 'Eventmap dump:' . json_encode( EventManager::getEventMap() ) );
 	}
 
 	/**
@@ -92,8 +71,8 @@ class SeedTest extends \PHPUnit_Framework_TestCase
 	public function testGetId()
 	{
 		$this->assertNotEmpty(
-			$_id = $this->_object->getId(),
-			'The object ID has not been set properly.'
+			 $_id = $this->_object->getId(),
+			 'The object ID has not been set properly.'
 		);
 	}
 
@@ -151,11 +130,11 @@ class SeedTest extends \PHPUnit_Framework_TestCase
 
 		//	Subscribe and publish to set flag
 		$this->_object->on(
-			'crazy.event',
-			function ( $event ) use ( &$_eventFired )
-			{
-				$_eventFired = true;
-			}
+					  'crazy.event',
+						  function ( $event ) use ( &$_eventFired )
+						  {
+							  $_eventFired = true;
+						  }
 		);
 
 		$this->_object->publish( 'crazy.event' );

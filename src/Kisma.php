@@ -18,6 +18,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Kisma(tm).  If not, see <http://www.gnu.org/licenses/>.
  */
+use Kisma\Core\Events\SeedEvent;
 use Kisma\Core\Interfaces\KismaSettings;
 use Kisma\Core\Interfaces\PublisherLike;
 use Kisma\Core\Utility\Detector;
@@ -97,7 +98,7 @@ class Kisma implements PublisherLike, \Kisma\Core\Interfaces\Events\Kisma, Kisma
 				function ( $eventName = Kisma::Death )
 				{
 					\Kisma::__sleep();
-					EventManager::publish( null, $eventName );
+					EventManager::trigger( $eventName );
 				}
 			);
 
@@ -113,7 +114,7 @@ class Kisma implements PublisherLike, \Kisma\Core\Interfaces\Events\Kisma, Kisma
 			}
 
 			//	And let the world know we're alive
-			EventManager::publish( null, Kisma::Birth );
+			EventManager::trigger( Kisma::Birth );
 		}
 
 		return $_conceived;
@@ -262,5 +263,16 @@ class Kisma implements PublisherLike, \Kisma\Core\Interfaces\Events\Kisma, Kisma
 	public static function postUpdate( \Composer\Script\Event $event )
 	{
 		//	Nada
+	}
+
+	/**
+	 * @param string    $eventName
+	 * @param SeedEvent $event
+	 *
+	 * @return SeedEvent
+	 */
+	public function trigger( $eventName, $event = null )
+	{
+		// TODO: Implement trigger() method.
 	}
 }
