@@ -18,26 +18,17 @@
  * You should have received a copy of the GNU General Public License
  * along with Kisma(tm).  If not, see <http://www.gnu.org/licenses/>.
  */
-use Kisma\Core\Interfaces\KismaSettings;
-use Kisma\Core\Interfaces\PublisherLike;
+use Kisma\Core\Enums\CoreSettings;
+use Kisma\Core\Events\Enums\KismaEvents;
 use Kisma\Core\Utility\Detector;
 use Kisma\Core\Utility\EventManager;
-use Kisma\Core\Utility\Inflector;
 use Kisma\Core\Utility\Option;
-use Kisma\Core\Utility\Scalar;
+use Kisma\Core\Utility\Storage;
 
 /**
- * Kisma
- * Contains a few core functions implemented statically to be lightweight and single instance.
- *
- * @method static bool getConception() Gets the conception flag
- * @method static bool setConception( bool $how ) Sets the conception flag
- * @method static mixed getDebug() Gets the debug setting( s )
- * @method static mixed setDebug( mixed $how ) Sets the debug setting( s )
- * @method static \Composer\Autoload\ClassLoader getAutoLoader()
- * @method static mixed setAutoLoader( mixed $autoLoader )
+ * Top-level bootstrap class with a few core functions
  */
-class Kisma implements PublisherLike, \Kisma\Core\Interfaces\Events\Kisma, KismaSettings
+class Kisma
 {
 	//*************************************************************************
 	//* Constants
@@ -45,8 +36,13 @@ class Kisma implements PublisherLike, \Kisma\Core\Interfaces\Events\Kisma, Kisma
 
 	/**
 	 * @var string The current version
+	 * @deprecated Deprecated in 0.2.19, to be removed in 0.3.x
 	 */
-	const KismaVersion = '0.2.17';
+	const KismaVersion = '0.2.19';
+	/**
+	 * @var string The current version
+	 */
+	const KISMA_VERSION = '0.2.19';
 
 	//*************************************************************************
 	//* Members
@@ -56,13 +52,13 @@ class Kisma implements PublisherLike, \Kisma\Core\Interfaces\Events\Kisma, Kisma
 	 * @var array The library configuration options
 	 */
 	protected static $_options = array(
-		self::BasePath   => __DIR__,
-		self::AutoLoader => null,
-		self::Conception => false,
-		self::Version    => self::KismaVersion,
-		self::Name       => 'App',
-		self::NavBar     => null,
-		self::Framework  => null,
+		CoreSettings::BASE_PATH   => __DIR__,
+		CoreSettings::AUTO_LOADER => null,
+		CoreSettings::CONCEPTION  => false,
+		CoreSettings::VERSION     => self::KISMA_VERSION,
+		CoreSettings::NAME        => 'App',
+		CoreSettings::NAV_BAR     => null,
+		CoreSettings::FRAMEWORK   => null,
 	);
 
 	//**************************************************************************
@@ -91,13 +87,13 @@ class Kisma implements PublisherLike, \Kisma\Core\Interfaces\Events\Kisma, Kisma
 		static::$_options = Option::merge( static::$_options, $options );
 
 		//	Register our faux-destructor
-		if ( false === ( $_conceived = static::getConception() ) )
+		if ( false === ( $_conceived = static::get( CoreSettings::CONCEPTION ) ) )
 		{
 			\register_shutdown_function(
-				function ( $eventName = Kisma::Death )
+				function ( $eventName = KismaEvents::DEATH )
 				{
 					\Kisma::__sleep();
-					EventManager::publish( null, $eventName );
+					EventManager::trigger( $eventName );
 				}
 			);
 
@@ -105,15 +101,15 @@ class Kisma implements PublisherLike, \Kisma\Core\Interfaces\Events\Kisma, Kisma
 			Detector::framework();
 
 			//	We done baby!
-			static::setConception( true );
+			static::set( CoreSettings::CONCEPTION, true );
 
-			if ( null === static::getAutoLoader() && class_exists( '\\ComposerAutoloaderInit', false ) )
+			if ( null === static::get( CoreSettings::AUTO_LOADER ) && class_exists( '\\ComposerAutoloaderInit', false ) )
 			{
-				static::setAutoLoader( \ComposerAutoloaderInit::getLoader() );
+				static::set( CoreSettings::AUTO_LOADER, \ComposerAutoloaderInit::getLoader() );
 			}
 
 			//	And let the world know we're alive
-			EventManager::publish( null, Kisma::Birth );
+			EventManager::trigger( KismaEvents::BIRTH );
 		}
 
 		return $_conceived;
@@ -127,7 +123,7 @@ class Kisma implements PublisherLike, \Kisma\Core\Interfaces\Events\Kisma, Kisma
 		//	Save options out to session...
 		if ( isset( $_SESSION ) )
 		{
-			$_SESSION['kisma.options'] = static::$_options;
+			$_SESSION[CoreSettings::SESSION_KEY] = Storage::freeze( static::$_options );
 		}
 	}
 
@@ -137,13 +133,14 @@ class Kisma implements PublisherLike, \Kisma\Core\Interfaces\Events\Kisma, Kisma
 	public static function __wakeup()
 	{
 		//	Load options from session...
-		if ( isset( $_SESSION, $_SESSION['kisma.options'] ) )
+		if ( isset( $_SESSION, $_SESSION[CoreSettings::SESSION_KEY] ) )
 		{
 			//	Merge them into the fold
-			static::$_options = array_merge(
-				$_SESSION['kisma.options'],
-				static::$_options
-			);
+			static::$_options =
+				Options::merge(
+					   Storage::defrost( $_SESSION[CoreSettings::SESSION_KEY] ),
+					   static::$_options
+				);
 		}
 	}
 
@@ -196,32 +193,6 @@ class Kisma implements PublisherLike, \Kisma\Core\Interfaces\Events\Kisma, Kisma
 		}
 
 		return Option::get( static::$_options, $key, $defaultValue, $removeIfFound );
-	}
-
-	/**
-	 * An easy way to get Kisma settings out of the bag
-	 *
-	 * @param string $name
-	 * @param array  $arguments
-	 *
-	 * @throws \BadMethodCallException
-	 * @return mixed
-	 */
-	public static function __callStatic( $name, $arguments )
-	{
-		if ( Scalar::in( $_type = strtolower( substr( $name, 0, 3 ) ), 'get', 'set' ) )
-		{
-			$_tag = 'app.' . Inflector::tag( substr( $name, 3 ), true );
-
-			if ( \Kisma\Core\Enums\KismaSettings::contains( $_tag ) )
-			{
-				array_unshift( $arguments, $_tag );
-
-				return call_user_func_array( array( __CLASS__, $_type ), $arguments );
-			}
-		}
-
-		throw new \BadMethodCallException( 'The method "' . $name . '" does not exist, or at least, I can\'t find it.' );
 	}
 
 	/**

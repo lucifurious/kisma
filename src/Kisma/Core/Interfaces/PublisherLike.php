@@ -20,11 +20,12 @@
  */
 namespace Kisma\Core\Interfaces;
 
+use Kisma\Core\Events\SeedEvent;
+
 /**
- * PublisherLike
- * Defines an object as being a publisher of things
+ * Something that looks like a publisher
  */
-interface PublisherLike extends Events\PublisherLike
+interface PublisherLike
 {
 	//*************************************************************************
 	//* Constants
@@ -32,6 +33,24 @@ interface PublisherLike extends Events\PublisherLike
 
 	/**
 	 * @var string The default event manager for an object
+	 * @deprecated Deprecated in  v0.2.19, to be removed in v0.3.0
+	 * @see        PublisherLike::DEFAULT_EVENT_MANAGER
 	 */
-	const DefaultEventManager = '\\Kisma\\Core\\Utility\\EventManager';
+	const DefaultEventManager = 'Kisma\\Core\\Utility\\EventManager';
+	/**
+	 * @var string The default event manager for the publisher
+	 */
+	const DEFAULT_EVENT_MANAGER = 'Kisma\\Core\\Utility\\EventManager';
+
+	//*************************************************************************
+	//	Methods
+	//*************************************************************************
+
+	/**
+	 * @param string    $eventName
+	 * @param SeedEvent $event
+	 *
+	 * @return SeedEvent
+	 */
+	public function trigger( $eventName, $event = null );
 }

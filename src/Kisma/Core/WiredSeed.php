@@ -20,30 +20,24 @@
  */
 namespace Kisma\Core;
 
-use Kisma\Core\Events\Enums\LifeEvents;
-use Kisma\Core\Events\SeedEvent;
-use Kisma\Core\Interfaces\Events\SeedLike;
+use Kisma\Core\Interfaces\Events\Enums\LifeEvents;
 use Kisma\Core\Interfaces\PublisherLike;
 use Kisma\Core\Interfaces\SubscriberLike;
 use Kisma\Core\Utility\EventManager;
 use Kisma\Core\Utility\Inflector;
 use Kisma\Core\Utility\Option;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Seed
- * A nugget of goodness that grows into something wonderful
+ * WiredSeed provides event dispatching via the Symfony Event Dispatcher library.
  *
- * Seed provides a simple publish/subscribe service. You're free to use it or not. Never required.
- *
- * Publish/Subscribe
- * =================
- * A simple publish/subscribe service. Yeah, fancy name for event system.
- *
+ * Events
+ * ======
  * An event is defined by the presence of a method whose name starts with 'on'.
  * The event name is the method name. When an event is triggered, event handlers attached
  * to the event will be invoked automatically.
  *
- * An event is triggered by calling the {@link publish} method. Attached event
+ * An event is fired by calling the object's {@link trigger} method. Attached event
  * handlers will be invoked automatically in the order they were attached to the event.
  *
  * Event handlers should have the following signature:
@@ -66,7 +60,7 @@ use Kisma\Core\Utility\Option;
  *
  * To disable this feature, set $discoverEvents to false before calling the parent constructor.
  */
-class Seed implements SeedLike, PublisherLike, SubscriberLike
+class WiredSeed extends Seed implements PublisherLike, SubscriberLike
 {
 	//********************************************************************************
 	//* Variables
@@ -90,46 +84,15 @@ class Seed implements SeedLike, PublisherLike, SubscriberLike
 	//********************************************************************************
 
 	/**
-	 * Base constructor
-	 *
-	 * @param array|object $settings An array of key/value pairs that will be placed into storage
-	 */
-	public function __construct( $settings = array() )
-	{
-		//	Since $_id is read-only we remove it
-		Option::remove( $settings, 'id' );
-
-		//	Now, set the rest
-		if ( !empty( $settings ) )
-		{
-			foreach ( $settings as $_key => $_value )
-			{
-				Option::set( $this, $_key, $_value );
-			}
-		}
-
-		//	Wake-up the events
-		$this->__wakeup();
-	}
-
-	/**
 	 * When unserializing an object, this will re-attach any event handlers...
 	 */
 	public function __wakeup()
 	{
-		//	This is my hash. There are many like it, but this one is mine.
-		$this->_id = hash( 'sha256', spl_object_hash( $this ) . getmypid() . microtime( true ) );
+		parent::__wakeup();
 
-		//	Auto-set tag and name if empty
-		$this->_tag = $this->_tag ? : Inflector::neutralize( get_called_class() );
-		$this->_name = $this->_name ? : $this->_tag;
+		//	Discover events and send after_construct event
+		EventManager::discoverListeners( $this );
 
-		if ( $this instanceof SubscriberLike )
-		{
-			EventManager::discoverListeners( $this );
-		}
-
-		//	Publish after_construct event
 		$this->trigger( LifeEvents::AFTER_CONSTRUCT );
 	}
 
@@ -148,6 +111,8 @@ class Seed implements SeedLike, PublisherLike, SubscriberLike
 			//	Does nothing, like the goggles.,,
 			//	Well, may stop those bogus frame 0 errors too...
 		}
+
+		parent::__destruct();
 	}
 
 	/**
@@ -160,11 +125,6 @@ class Seed implements SeedLike, PublisherLike, SubscriberLike
 	 */
 	public function trigger( $eventName, $event = null )
 	{
-		if ( null === $event )
-		{
-			$event = new SeedEvent( $this );
-		}
-
 		return EventManager::trigger( $eventName, $event );
 	}
 
@@ -195,51 +155,42 @@ class Seed implements SeedLike, PublisherLike, SubscriberLike
 	}
 
 	/**
-	 * @return string
-	 */
-	public function getId()
-	{
-		return $this->_id;
-	}
-
-	/**
-	 * @param string $name
+	 * @param string $eventName
+	 * @param array  $keys
 	 *
-	 * @return Seed
-	 */
-	public function setName( $name )
-	{
-		$this->_name = $name;
-
-		return $this;
-	}
-
-	/**
 	 * @return string
 	 */
-	public function getName()
+	protected function _normalizeEventName( $eventName, $keys = null )
 	{
-		return $this->_name;
+		static $_cache = array();
+
+		$_tagParts = explode( '.', $_tag = Inflector::neutralize( $eventName ) );
+
+		if ( null !== ( $_name = Option::get( $_cache, $_tag ) ) )
+		{
+			return $_name;
+		}
+
+		$_replacements = array_merge(
+			get_class_vars( 'Symfony\\Component\\HttpFoundation\\Request' ),
+			Option::clean( $keys )
+		);
+
+		foreach ( $_replacements as $_key )
+		{
+			foreach ( $_tagParts as &$_part )
+			{
+				if ( preg_match( "/^{(.*)+}$", $_part ) )
+				{
+					$_part = str_ireplace(
+						'{' . $_key . '}',
+						Option::get( $_request, $_key ),
+						$_part
+					);
+				}
+			}
+		}
+
+		return $_cache[$eventName] = implode( '.', $_tagParts );
 	}
-
-	/**
-	 * @param string $tag
-	 *
-	 * @return Seed
-	 */
-	public function setTag( $tag )
-	{
-		$this->_tag = $tag;
-
-		return $this;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getTag()
-	{
-		return $this->_tag;
-	}
-
 }

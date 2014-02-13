@@ -18,32 +18,40 @@
  * You should have received a copy of the GNU General Public License
  * along with Kisma(tm).  If not, see <http://www.gnu.org/licenses/>.
  */
-namespace Kisma\Core\Interfaces;
+namespace Kisma\Core;
 
 /**
- * Seed
- * All seeds have this
- *
- * @deprecated Please use SeedLike instead
+ * The nucleus of a seed...
  */
-interface Seed extends Events\Seed
+class Germ implements KismaLike
 {
-	//*************************************************************************
-	//* Public Methods
-	//*************************************************************************
+	//********************************************************************************
+	//* Variables
+	//********************************************************************************
+
+	/**
+	 * @var string A unique ID assigned to this object, the last part of which is the creation time
+	 */
+	private $_id;
+
+	//********************************************************************************
+	//* Methods
+	//********************************************************************************
+
+	/**
+	 * Base constructor
+	 */
+	public function __construct()
+	{
+		//	This is my hash. There are many like it, but this one is mine.
+		$this->_id = hash( 'sha256', spl_object_hash( $this ) . getmypid() . microtime( true ) );
+	}
 
 	/**
 	 * @return string
 	 */
-	public function getId();
-
-	/**
-	 * @return string
-	 */
-	public function getTag();
-
-	/**
-	 * @return string
-	 */
-	public function getName();
+	public function getId()
+	{
+		return $this->_id;
+	}
 }

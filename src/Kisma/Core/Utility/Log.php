@@ -20,6 +20,7 @@
  */
 namespace Kisma\Core\Utility;
 
+use Kisma\Core\Enums\CoreSettings;
 use Kisma\Core\Interfaces\Levels;
 use Kisma\Core\Interfaces\UtilityLike;
 use Kisma\Core\Seed;
@@ -93,7 +94,7 @@ class Log extends Seed implements UtilityLike, Levels
 		//	If we're not debugging, don't log debug statements
 		if ( static::Debug == $level )
 		{
-			$_debug = \Kisma::getDebug();
+			$_debug = \Kisma::get( CoreSettings::DEBUG );
 
 			if ( is_callable( $_debug ) )
 			{
@@ -111,9 +112,9 @@ class Log extends Seed implements UtilityLike, Levels
 			static::$_logFileValid = static::_checkLogFile();
 
 			if ( !static::$_logFileValid ||
-				 is_numeric( static::$_defaultLog ) ||
-				 empty( static::$_defaultLog ) ||
-				 !file_exists( static::$_defaultLog )
+				is_numeric( static::$_defaultLog ) ||
+				empty( static::$_defaultLog ) ||
+				!file_exists( static::$_defaultLog )
 			)
 			{
 				static::setDefaultLog( LOG_SYSLOG );
@@ -144,13 +145,13 @@ class Log extends Seed implements UtilityLike, Levels
 		$_levelName = static::_getLogLevel( $level );
 
 		$_entry = static::formatLogEntry(
-			array(
-				'level'     => $_levelName,
-				'message'   => static::$_prefix . str_repeat( '  ', $_tempIndent ) . $message,
-				'timestamp' => $_timestamp,
-				'context'   => $context,
-				'extra'     => $extra,
-			)
+						array(
+							'level'     => $_levelName,
+							'message'   => static::$_prefix . str_repeat( '  ', $_tempIndent ) . $message,
+							'timestamp' => $_timestamp,
+							'context'   => $context,
+							'extra'     => $extra,
+						)
 		);
 
 		if ( static::$_logFileValid || is_numeric( static::$_defaultLog ) )
@@ -217,16 +218,16 @@ class Log extends Seed implements UtilityLike, Levels
 		);
 
 		return str_ireplace(
-				   array(
-					   '%%level%%',
-					   '%%date%%',
-					   '%%time%%',
-					   '%%message%%',
-					   '%%extra%%',
-				   ),
-				   $_replacements,
-				   static::$_logFormat
-			   ) . ( $newline ? PHP_EOL : null );
+			array(
+				'%%level%%',
+				'%%date%%',
+				'%%time%%',
+				'%%message%%',
+				'%%extra%%',
+			),
+			$_replacements,
+			static::$_logFormat
+		) . ( $newline ? PHP_EOL : null );
 	}
 
 	/**

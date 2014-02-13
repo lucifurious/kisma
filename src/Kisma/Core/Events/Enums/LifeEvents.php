@@ -18,13 +18,14 @@
  * You should have received a copy of the GNU General Public License
  * along with Kisma(tm).  If not, see <http://www.gnu.org/licenses/>.
  */
-namespace Kisma\Core\Interfaces\Events;
+namespace Kisma\Core\Events\Enums;
+
+use Kisma\Core\Enums\SeedEnum;
 
 /**
- * PublisherLike
- * Events for event publishers
+ * The core life-cycle events
  */
-interface PublisherLike
+class LifeEvents extends SeedEnum
 {
 	//*************************************************************************
 	//* Constants
@@ -33,9 +34,9 @@ interface PublisherLike
 	/**
 	 * @var string
 	 */
-	const BeforePublish = 'kisma.core.publisher.before_publish';
+	const AFTER_CONSTRUCT = 'after_construct';
 	/**
 	 * @var string
 	 */
-	const AfterPublish = 'kisma.core.publisher.after_publish';
+	const BEFORE_DESTRUCT = 'before_destruct';
 }
