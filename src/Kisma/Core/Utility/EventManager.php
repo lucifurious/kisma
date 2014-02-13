@@ -75,12 +75,14 @@ class EventManager extends SeedUtility implements EventDispatcherLike
 		$_listeners = $listeners ? : static::_discoverObjectListeners( $object, $pattern );
 
 		//	And wire them up...
-		if ( !empty( $_listeners ) )
+		if ( empty( $_listeners ) || !is_array( $_listeners ) )
 		{
-			foreach ( $_listeners as $_eventName => $_callables )
-			{
-				static::on( $_eventName, $_callables );
-			}
+			return;
+		}
+
+		foreach ( $_listeners as $_eventName => $_callables )
+		{
+			static::on( $_eventName, $_callables );
 		}
 	}
 
@@ -117,7 +119,7 @@ class EventManager extends SeedUtility implements EventDispatcherLike
 			foreach ( $_methods as $_method )
 			{
 				//	Event handler?
-				if ( 0 == preg_match( $pattern, $_method->name, $_matches ) )
+				if ( 0 == preg_match( $pattern, $_method->name, $_matches ) || empty( $_matches[1] ) )
 				{
 					continue;
 				}
@@ -155,7 +157,13 @@ class EventManager extends SeedUtility implements EventDispatcherLike
 	 */
 	public static function on( $eventName, $listener, $priority = 0 )
 	{
-		static::getDispatcher()->addListener( $eventName, $listener, $priority );
+		$_listeners = is_callable( $listener ) ? array( $listener ) : $listener;
+		$_dispatcher = static::getDispatcher();
+
+		foreach ( $_listeners as $_listener )
+		{
+			$_dispatcher->addListener( $eventName, $_listener, $priority );
+		}
 	}
 
 	/**

@@ -20,12 +20,11 @@
  */
 namespace Kisma\Core\Events\Enums;
 
-use Kisma\Core\Enums\SeedEnum;
-
 /**
- * The core life-cycle events
+ * Kisma
+ * The Kisma application-level events
  */
-class LifeEvents extends SeedEnum
+class KismaEvents extends LifeEvents
 {
 	//*************************************************************************
 	//* Constants
@@ -34,9 +33,9 @@ class LifeEvents extends SeedEnum
 	/**
 	 * @var string
 	 */
-	const AFTER_CONSTRUCT = 'after_construct';
+	const BIRTH = 'kisma.birth';
 	/**
 	 * @var string
 	 */
-	const BEFORE_DESTRUCT = 'before_destruct';
+	const DEATH = 'kisma.death';
 }

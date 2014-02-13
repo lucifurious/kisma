@@ -20,8 +20,8 @@
  */
 namespace Kisma\Core;
 
+use Kisma\Core\Events\Enums\LifeEvents;
 use Kisma\Core\Events\SeedEvent;
-use Kisma\Core\Interfaces\Events\Enums\LifeEvents;
 use Kisma\Core\Interfaces\Events\SeedLike;
 use Kisma\Core\Interfaces\PublisherLike;
 use Kisma\Core\Interfaces\SubscriberLike;
