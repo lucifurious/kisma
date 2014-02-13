@@ -21,27 +21,16 @@
 namespace Kisma\Core\Interfaces;
 
 /**
- * Something that contains event listeners
+ * Something that looks like it belongs in Kisma
  */
-interface SubscriberLike
+interface KismaLike
 {
-	/**
-	 * Adds an event listener that listens on the specified events.
-	 *
-	 * @param string   $eventName            The event to listen on
-	 * @param callable $listener             The listener
-	 * @param integer  $priority             The higher this value, the earlier an event
-	 *                                       listener will be triggered in the chain (defaults to 0)
-	 */
-	public function on( $eventName, $listener, $priority = 0 );
+	//*************************************************************************
+	//	Methods
+	//*************************************************************************
 
 	/**
-	 * Turn off/unbind/remove $listener from an event
-	 *
-	 * @param string   $eventName
-	 * @param callable $listener
-	 *
-	 * @return void
+	 * @return string Returns the object's unique ID
 	 */
-	public function off( $eventName, $listener );
+	public function getId();
 }

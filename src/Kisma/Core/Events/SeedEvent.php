@@ -20,6 +20,9 @@
  */
 namespace Kisma\Core\Events;
 
+use Kisma\Core\Interfaces\PublisherLike;
+use Symfony\Component\EventDispatcher\Event;
+
 /**
  * SeedEvent
  * The base class for Kisma events
@@ -29,14 +32,14 @@ namespace Kisma\Core\Events;
  *
  * If an event handler calls the kill() method, propagation will halt.
  */
-class SeedEvent
+class SeedEvent extends Event
 {
 	//**************************************************************************
 	//* Members
 	//**************************************************************************
 
 	/**
-	 * @var \Kisma\Core\Interfaces\SeedLike The source of this event
+	 * @var PublisherLike The source of this event
 	 */
 	protected $_source;
 	/**
@@ -63,8 +66,8 @@ class SeedEvent
 	/**
 	 * Constructor.
 	 *
-	 * @param \Kisma\Core\Interfaces\SeedLike $source
-	 * @param mixed                           $data
+	 * @param PublisherLike $source
+	 * @param mixed         $data
 	 */
 	public function __construct( $source = null, $data = null )
 	{
@@ -80,7 +83,7 @@ class SeedEvent
 	 */
 	public function kill()
 	{
-		$this->_kill = true;
+		$this->stopPropagation();
 
 		return $this;
 	}
@@ -90,7 +93,7 @@ class SeedEvent
 	 */
 	public function wasKilled()
 	{
-		return ( false !== $this->_kill );
+		return $this->isPropagationStopped();
 	}
 
 	/**
@@ -111,18 +114,6 @@ class SeedEvent
 	public function getData()
 	{
 		return $this->_data;
-	}
-
-	/**
-	 * @param \Kisma\Core\Interfaces\SeedLike $source
-	 *
-	 * @return SeedEvent
-	 */
-	public function setSource( $source )
-	{
-		$this->_source = $source;
-
-		return $this;
 	}
 
 	/**

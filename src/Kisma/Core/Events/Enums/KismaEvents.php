@@ -18,30 +18,24 @@
  * You should have received a copy of the GNU General Public License
  * along with Kisma(tm).  If not, see <http://www.gnu.org/licenses/>.
  */
-namespace Kisma\Core\Interfaces;
+namespace Kisma\Core\Events\Enums;
 
 /**
- * Something that contains event listeners
+ * Kisma
+ * The Kisma application-level events
  */
-interface SubscriberLike
+class KismaEvents extends LifeEvents
 {
-	/**
-	 * Adds an event listener that listens on the specified events.
-	 *
-	 * @param string   $eventName            The event to listen on
-	 * @param callable $listener             The listener
-	 * @param integer  $priority             The higher this value, the earlier an event
-	 *                                       listener will be triggered in the chain (defaults to 0)
-	 */
-	public function on( $eventName, $listener, $priority = 0 );
+	//*************************************************************************
+	//* Constants
+	//*************************************************************************
 
 	/**
-	 * Turn off/unbind/remove $listener from an event
-	 *
-	 * @param string   $eventName
-	 * @param callable $listener
-	 *
-	 * @return void
+	 * @var string
 	 */
-	public function off( $eventName, $listener );
+	const BIRTH = 'kisma.birth';
+	/**
+	 * @var string
+	 */
+	const DEATH = 'kisma.death';
 }
