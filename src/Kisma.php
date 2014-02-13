@@ -36,13 +36,13 @@ class Kisma
 
 	/**
 	 * @var string The current version
-	 * @deprecated Deprecated in 0.2.18-dev, to be removed in 0.3.x
+	 * @deprecated Deprecated in 0.2.19, to be removed in 0.3.x
 	 */
-	const KismaVersion = '0.2.18-dev';
+	const KismaVersion = '0.2.19';
 	/**
 	 * @var string The current version
 	 */
-	const KISMA_VERSION = '0.2.18-dev';
+	const KISMA_VERSION = '0.2.19';
 
 	//*************************************************************************
 	//* Members
