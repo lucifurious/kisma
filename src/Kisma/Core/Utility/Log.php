@@ -20,10 +20,12 @@
  */
 namespace Kisma\Core\Utility;
 
-use Kisma\Core\Enums\CoreSettings;
 use Kisma\Core\Interfaces\Levels;
 use Kisma\Core\Interfaces\UtilityLike;
 use Kisma\Core\Seed;
+use Monolog\Handler\StreamHandler;
+use Monolog\Handler\SyslogHandler;
+use Monolog\Logger;
 
 /**
  * Log
@@ -41,8 +43,13 @@ class Log extends Seed implements UtilityLike, Levels
 	const DefaultLogFormat = '%%date%% %%time%% %%level%% %%message%% %%extra%%';
 	/**
 	 * @var string The relative path (from the Kisma base path) for the default log
+	 * @deprecated in 0.2.20. To be removed in 0.3.0
 	 */
 	const DefaultLogFile = '/kisma.log';
+	/**
+	 * @var string The default log file name if not specified
+	 */
+	const DEFAULT_LOG_FILE_NAME = 'kisma.log';
 
 	//********************************************************************************
 	//* Members
@@ -64,7 +71,7 @@ class Log extends Seed implements UtilityLike, Levels
 		false => '*>',
 	);
 	/**
-	 * @var string
+	 * @var string The full path and name of the log file
 	 */
 	protected static $_defaultLog = null;
 	/**
@@ -79,6 +86,22 @@ class Log extends Seed implements UtilityLike, Levels
 	 * @var bool Set when log file has been validated
 	 */
 	protected static $_logFileValid = false;
+	/**
+	 * @var string The path of the log file
+	 */
+	protected static $_logFilePath = null;
+	/**
+	 * @var string The name of the log file
+	 */
+	protected static $_logFileName = null;
+	/**
+	 * @var Logger
+	 */
+	protected static $_logger = null;
+	/**
+	 * @var Logger
+	 */
+	protected static $_fallbackLogger = null;
 
 	//********************************************************************************
 	//* Methods
@@ -87,47 +110,32 @@ class Log extends Seed implements UtilityLike, Levels
 	/**
 	 * {@InheritDoc}
 	 */
-	public static function log( $message, $level = self::Info, $context = array(), $extra = null, $tag = null )
+	public static function log( $message, $level = Logger::INFO, $context = array(), $extra = null, $tag = null )
 	{
 		static $_firstRun = true;
 
-		//	If we're not debugging, don't log debug statements
-		if ( static::Debug == $level )
-		{
-			$_debug = \Kisma::get( CoreSettings::DEBUG );
-
-			if ( is_callable( $_debug ) )
-			{
-				$_debug = call_user_func( $_debug, $message, $level, $context, $extra, $tag );
-			}
-
-			if ( false === $_debug )
-			{
-				return true;
-			}
-		}
-
 		if ( $_firstRun || !static::$_logFileValid )
 		{
-			static::$_logFileValid = static::_checkLogFile();
+			static::_checkLogFile();
 
-			if ( !static::$_logFileValid ||
-				is_numeric( static::$_defaultLog ) ||
-				empty( static::$_defaultLog ) ||
-				!file_exists( static::$_defaultLog )
-			)
+			if ( !static::$_logFileValid )
 			{
 				static::setDefaultLog( LOG_SYSLOG );
-				static::$_logFileValid = true;
+
+				if ( is_numeric( static::$_defaultLog ) || empty( static::$_defaultLog ) || !file_exists( static::$_defaultLog ) )
+				{
+					static::setDefaultLog( static::$_defaultLog ? : LOG_SYSLOG );
+				}
 			}
 
+			static::$_logFileValid = true;
 			$_firstRun = false;
 		}
 
 		$_timestamp = time();
 
 		//	Get the indent, if any
-		$_unindent = ( ( $_newIndent = static::_processMessage( $message ) ) > 0 );
+		$_unindent = ( ( $_newIndent = static ::_processMessage( $message ) ) > 0 );
 
 		//	Indent...
 		$_tempIndent = static::$_currentIndent;
@@ -142,32 +150,32 @@ class Log extends Seed implements UtilityLike, Levels
 			$_tempIndent = 0;
 		}
 
-		$_levelName = static::_getLogLevel( $level );
+//		$_entry = static::formatLogEntry(
+//			array(
+//				'level'     => $level,
+//				'message'   => static::$_prefix . str_repeat( '  ', $_tempIndent ) . $message,
+//				'timestamp' => $_timestamp,
+//				'context'   => $context,
+//				'extra'     => $extra,
+//			)
+//		);
 
-		$_entry = static::formatLogEntry(
-						array(
-							'level'     => $_levelName,
-							'message'   => static::$_prefix . str_repeat( '  ', $_tempIndent ) . $message,
-							'timestamp' => $_timestamp,
-							'context'   => $context,
-							'extra'     => $extra,
-						)
-		);
+		$_message = static::$_prefix . str_repeat( '  ', $_tempIndent ) . $message;
 
-		if ( static::$_logFileValid || is_numeric( static::$_defaultLog ) )
+		if ( static::$_logFileValid )
 		{
-			error_log( $_entry );
+			static::$_logger->addRecord( $level, $_message, !is_array( $context ) ? array() : $context );
 		}
 		else
 		{
-			error_log( $_entry, 3, static::$_defaultLog );
+			static::$_fallbackLogger->addRecord( $level, $_message, $context );
 		}
 
 		//	Set indent level...
 		static::$_currentIndent += $_newIndent;
 
 		//	Anything over a warning returns false so you can chain
-		return ( static::Warning > $level );
+		return ( Logger::WARNING > $level );
 	}
 
 	/**
@@ -182,6 +190,7 @@ class Log extends Seed implements UtilityLike, Levels
 	public static function formatLogEntry( array $entry, $newline = true )
 	{
 		$_level = Option::get( $entry, 'level' );
+		$_levelName = static::_getLogLevel( $_level );
 		$_timestamp = Option::get( $entry, 'timestamp' );
 		$_message = preg_replace( '/\033\[[\d;]+m/', null, Option::get( $entry, 'message' ) );
 		$_context = Option::get( $entry, 'context' );
@@ -196,38 +205,42 @@ class Log extends Seed implements UtilityLike, Levels
 			$_blob->hostname = gethostname();
 		}
 
-		if ( !empty( $_context ) || !empty( $_extra ) )
+		if ( !empty( $_context ) )
 		{
-			if ( null !== $_context )
-			{
-				$_blob->context = $_context;
-			}
+			$_blob->context = $_context;
+		}
 
-			if ( null !== $_extra )
-			{
-				$_context->extra = $_extra;
-			}
+		if ( !empty( $_extra ) )
+		{
+			$_context->extra = $_extra;
+		}
+
+		$_blob = json_encode( $_blob );
+
+		if ( false === $_blob || '{}' == $_blob )
+		{
+			$_blob = null;
 		}
 
 		$_replacements = array(
-			0 => $_level,
+			0 => $_levelName,
 			1 => date( 'M d', $_timestamp ),
 			2 => date( 'H:i:s', $_timestamp ),
 			3 => $_message,
-			4 => json_encode( $_blob ),
+			4 => $_blob,
 		);
 
 		return str_ireplace(
-			array(
-				'%%level%%',
-				'%%date%%',
-				'%%time%%',
-				'%%message%%',
-				'%%extra%%',
-			),
-			$_replacements,
-			static::$_logFormat
-		) . ( $newline ? PHP_EOL : null );
+				   array(
+					   '%%level%%',
+					   '%%date%%',
+					   '%%time%%',
+					   '%%message%%',
+					   '%%extra%%',
+				   ),
+				   $_replacements,
+				   static::$_logFormat
+			   ) . ( $newline ? PHP_EOL : null );
 	}
 
 	/**
@@ -320,10 +333,12 @@ class Log extends Seed implements UtilityLike, Levels
 	 */
 	public static function checkSystemLogPath()
 	{
-		if ( null !== ( $_path = getenv( 'KISMA_SYSTEM_LOG_PATH' ) ) )
+		if ( null === static::$_fallbackLogger )
 		{
-			@mkdir( $_path, 0777, true );
+			static::$_fallbackLogger = new Logger( 'kisma.fallback' );
 		}
+
+		static::$_fallbackLogger->pushHandler( new SyslogHandler( static::$_fallbackLogger->getName() ) );
 	}
 
 	/**
@@ -428,35 +443,39 @@ class Log extends Seed implements UtilityLike, Levels
 	 */
 	protected static function _checkLogFile()
 	{
-		//	Set a name for the default log
-		if ( null === static::$_defaultLog )
+		if ( null !== static::$_logger )
 		{
-			$_logPath = \Kisma::get( 'app.log_path', \Kisma::get( 'app.base_path' ) ) ? : getcwd();
-			static::$_defaultLog = $_logPath . static::DefaultLogFile;
+			return static::$_logFileValid = true;
 		}
-		else
+
+		if ( empty( static::$_logFilePath ) )
 		{
-			if ( !is_file( static::$_defaultLog ) && is_dir( static::$_defaultLog ) )
+			//	Try and figure out a good place to log...
+			static::$_logFilePath = ( \Kisma::get( 'app.log_path', \Kisma::get( 'app.base_path' ) ) ? : getcwd() ) . '/log';
+
+		}
+
+		if ( !is_dir( static::$_logFilePath ) )
+		{
+			if ( false === @mkdir( static::$_logFilePath, 0777, true ) )
 			{
-				$_logPath = static::$_defaultLog;
-				static::$_defaultLog .= static::DefaultLogFile;
-			}
-			else
-			{
-				$_logPath = dirname( static::$_defaultLog );
+				error_log( 'Unable to create default log directory: ' . static::$_logFilePath );
+
+				return static::$_logFileValid = false;
 			}
 		}
 
-		//	Try and create the path
-		if ( !is_dir( $_logPath ) )
+		if ( empty( static::$_logFileName ) )
 		{
-			if ( false === @mkdir( $_logPath, 0777, true ) )
-			{
-				return false;
-			}
+			static::$_logFileName = static::DEFAULT_LOG_FILE_NAME;
 		}
 
-		return true;
+		static::$_defaultLog = static::$_logFilePath . '/' . trim( static::$_logFileName, '/' );
+
+		static::$_logger = new Logger( 'kisma' );
+		static::$_logger->pushHandler( new StreamHandler( static::$_defaultLog ) );
+
+		return static::$_logFileValid = true;
 	}
 
 	/**
@@ -519,15 +538,24 @@ class Log extends Seed implements UtilityLike, Levels
 
 	/**
 	 * @param string $defaultLog
+	 *
+	 * @return bool
 	 */
 	public static function setDefaultLog( $defaultLog )
 	{
-		static::$_defaultLog = $defaultLog;
-
-		if ( null !== $defaultLog )
+		if ( null === $defaultLog )
 		{
-			@mkdir( dirname( static::$_defaultLog ), 0777, true );
+			static::$_defaultLog = null;
+
+			return;
 		}
+
+		//	Set up a new log file...
+		static::$_logger = null;
+		static::$_logFilePath = dirname( $defaultLog );
+		static::$_logFileName = basename( $defaultLog );
+
+		static::_checkLogFile();
 	}
 
 	/**
@@ -559,7 +587,7 @@ class Log extends Seed implements UtilityLike, Levels
 	 */
 	public static function setIncludeProcessInfo( $includeProcessInfo )
 	{
-		self::$_includeProcessInfo = $includeProcessInfo;
+		static::$_includeProcessInfo = $includeProcessInfo;
 	}
 
 	/**
@@ -567,8 +595,81 @@ class Log extends Seed implements UtilityLike, Levels
 	 */
 	public static function getIncludeProcessInfo()
 	{
-		return self::$_includeProcessInfo;
+		return static::$_includeProcessInfo;
 	}
+
+	/**
+	 * @param string $logFileName
+	 */
+	public static function setLogFileName( $logFileName )
+	{
+		static::$_logFileName = $logFileName;
+	}
+
+	/**
+	 * @return string
+	 */
+	public static function getLogFileName()
+	{
+		return static::$_logFileName;
+	}
+
+	/**
+	 * @param string $logFilePath
+	 */
+	public static function setLogFilePath( $logFilePath )
+	{
+		static::$_logFilePath = $logFilePath;
+	}
+
+	/**
+	 * @return string
+	 */
+	public static function getLogFilePath()
+	{
+		return static::$_logFilePath;
+	}
+
+	/**
+	 * @return boolean
+	 */
+	public static function getLogFileValid()
+	{
+		return static::$_logFileValid;
+	}
+
+	/**
+	 * @return \Monolog\Logger
+	 */
+	public static function getLogger()
+	{
+		return static::$_logger;
+	}
+
+	/**
+	 * @param \Monolog\Logger $logger
+	 */
+	public static function setLogger( $logger )
+	{
+		static::$_logger = $logger;
+	}
+
+	/**
+	 * @param \Monolog\Logger $fallbackLogger
+	 */
+	public static function setFallbackLogger( $fallbackLogger )
+	{
+		static::$_fallbackLogger = $fallbackLogger;
+	}
+
+	/**
+	 * @return \Monolog\Logger
+	 */
+	public static function getFallbackLogger()
+	{
+		return static::$_fallbackLogger;
+	}
+
 }
 
 Log::checkSystemLogPath();

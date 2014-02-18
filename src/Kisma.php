@@ -136,11 +136,10 @@ class Kisma
 		if ( isset( $_SESSION, $_SESSION[CoreSettings::SESSION_KEY] ) )
 		{
 			//	Merge them into the fold
-			static::$_options =
-				Options::merge(
-					   Storage::defrost( $_SESSION[CoreSettings::SESSION_KEY] ),
-					   static::$_options
-				);
+			static::$_options = Options::merge(
+									   Storage::defrost( $_SESSION[CoreSettings::SESSION_KEY] ),
+									   static::$_options
+			);
 		}
 	}
 
