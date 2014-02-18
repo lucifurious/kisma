@@ -38,11 +38,11 @@ class Kisma
 	 * @var string The current version
 	 * @deprecated Deprecated in 0.2.19, to be removed in 0.3.x
 	 */
-	const KismaVersion = '0.2.19';
+	const KismaVersion = '0.2.20';
 	/**
 	 * @var string The current version
 	 */
-	const KISMA_VERSION = '0.2.19';
+	const KISMA_VERSION = '0.2.20';
 
 	//*************************************************************************
 	//* Members
@@ -136,11 +136,10 @@ class Kisma
 		if ( isset( $_SESSION, $_SESSION[CoreSettings::SESSION_KEY] ) )
 		{
 			//	Merge them into the fold
-			static::$_options =
-				Options::merge(
-					   Storage::defrost( $_SESSION[CoreSettings::SESSION_KEY] ),
-					   static::$_options
-				);
+			static::$_options = Options::merge(
+									   Storage::defrost( $_SESSION[CoreSettings::SESSION_KEY] ),
+									   static::$_options
+			);
 		}
 	}
 

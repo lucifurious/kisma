@@ -18,6 +18,7 @@
 	],
 	"require":     {
 		"php":                      ">=5.3.10",
+		"monolog/monolog":          "*",
 		"symfony/event-dispatcher": "@stable",
 		"symfony/http-foundation":  "@stable"
 	},
