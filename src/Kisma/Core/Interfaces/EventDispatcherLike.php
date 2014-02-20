@@ -21,6 +21,7 @@
 namespace Kisma\Core\Interfaces;
 
 use Kisma\Core\Events\SeedEvent;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Something that looks like an  event dispatcher
@@ -79,4 +80,18 @@ interface EventDispatcherLike
 	 * @return int The number of listeners found. False returned on an error
 	 */
 	public static function discoverListeners( SubscriberLike $object, $listeners = null, $pattern = self::LISTENER_DISCOVERY_PATTERN );
+
+	/**
+	 * @param EventSubscriberInterface $subscriber
+	 *
+	 * @return void
+	 */
+	public static function addSubscriber( EventSubscriberInterface $subscriber );
+
+	/**
+	 * @param EventSubscriberInterface $subscriber
+	 *
+	 * @return void
+	 */
+	public static function removeSubscriber( EventSubscriberInterface $subscriber );
 }

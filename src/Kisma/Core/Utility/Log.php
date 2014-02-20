@@ -139,18 +139,6 @@ class Log extends Seed implements UtilityLike, Levels
 		if ( $_firstRun || !static::$_logFileValid )
 		{
 			static::_checkLogFile();
-
-			if ( !static::$_logFileValid )
-			{
-				static::setDefaultLog( LOG_SYSLOG );
-
-				if ( is_numeric( static::$_defaultLog ) || empty( static::$_defaultLog ) || !file_exists( static::$_defaultLog ) )
-				{
-					static::setDefaultLog( static::$_defaultLog ? : LOG_SYSLOG );
-				}
-			}
-
-			static::$_logFileValid = true;
 			$_firstRun = false;
 		}
 
@@ -163,13 +151,18 @@ class Log extends Seed implements UtilityLike, Levels
 			$_tempIndent = 0;
 		}
 
-		$_message = static::$_prefix . str_repeat( '  ', $_tempIndent ) . $message;
+		$_message = str_repeat( '  ', $_tempIndent ) . $message;
 
-		if ( static::$_logFileValid )
+		if ( !is_numeric( $level ) )
+		{
+			$level = Logger::INFO;
+		}
+
+		if ( static::$_logger )
 		{
 			static::$_logger->addRecord( $level, $_message, !is_array( $context ) ? array() : $context );
 		}
-		else
+		elseif ( static::$_fallbackLogger )
 		{
 			static::$_fallbackLogger->addRecord( $level, $_message, $context );
 		}
@@ -297,7 +290,7 @@ class Log extends Seed implements UtilityLike, Levels
 			static::$_fallbackLogger = new Logger( static::DEFAULT_CHANNEL_NAME . '.fallback' );
 		}
 
-		static::$_fallbackLogger->pushHandler( new SyslogHandler( static::$_fallbackLogger->getName() ) );
+		static::$_fallbackLogger->pushHandler( new SyslogHandler( static::DEFAULT_CHANNEL_NAME . '.fallback' ) );
 	}
 
 	/**
