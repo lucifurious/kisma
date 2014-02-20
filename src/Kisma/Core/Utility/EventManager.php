@@ -25,6 +25,7 @@ use Kisma\Core\Interfaces\Events\PublisherLike;
 use Kisma\Core\Interfaces\SubscriberLike;
 use Kisma\Core\SeedUtility;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * EventManager class
@@ -180,6 +181,22 @@ class EventManager extends SeedUtility implements EventDispatcherLike
 	public static function trigger( $eventName, $event = null )
 	{
 		return static::getDispatcher()->dispatch( $eventName, $event );
+	}
+
+	/**
+	 * {@InheritDoc}
+	 */
+	public static function addSubscriber( EventSubscriberInterface $subscriber )
+	{
+		static::getDispatcher()->addSubscriber( $subscriber );
+	}
+
+	/**
+	 * {@InheritDoc}
+	 */
+	public static function removeSubscriber( EventSubscriberInterface $subscriber )
+	{
+		static::getDispatcher()->removeSubscriber( $subscriber );
 	}
 
 	/**

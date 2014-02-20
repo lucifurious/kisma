@@ -20,9 +20,12 @@
  */
 namespace Kisma\Core\Utility;
 
+use Kisma\Core\Enums\CoreSettings;
 use Kisma\Core\Interfaces\Levels;
 use Kisma\Core\Interfaces\UtilityLike;
 use Kisma\Core\Seed;
+use Monolog\Handler\ChromePHPHandler;
+use Monolog\Handler\FirePHPHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\SyslogHandler;
 use Monolog\Logger;
@@ -39,26 +42,27 @@ class Log extends Seed implements UtilityLike, Levels
 
 	/**
 	 * @var string The default log line format
+	 * @deprecated in v0.2.20. To be removed in v0.3.0. Replaced by Monolog
 	 */
 	const DefaultLogFormat = '%%date%% %%time%% %%level%% %%message%% %%extra%%';
 	/**
 	 * @var string The relative path (from the Kisma base path) for the default log
-	 * @deprecated in 0.2.20. To be removed in 0.3.0
+	 * @deprecated in v0.2.20. To be removed in v0.3.0. Replaced by Monolog
 	 */
-	const DefaultLogFile = '/kisma.log';
+	const DefaultLogFile = '/app.log';
 	/**
 	 * @var string The default log file name if not specified
 	 */
-	const DEFAULT_LOG_FILE_NAME = 'kisma.log';
+	const DEFAULT_LOG_FILE_NAME = 'app.log';
+	/**
+	 * @var string The default channel
+	 */
+	const DEFAULT_CHANNEL_NAME = 'app';
 
 	//********************************************************************************
 	//* Members
 	//********************************************************************************
 
-	/**
-	 * @var string Prepended to each log entry before writing.
-	 */
-	protected static $_prefix = null;
 	/**
 	 * @var integer The current indent level
 	 */
@@ -71,30 +75,6 @@ class Log extends Seed implements UtilityLike, Levels
 		false => '*>',
 	);
 	/**
-	 * @var string The full path and name of the log file
-	 */
-	protected static $_defaultLog = null;
-	/**
-	 * @var string The format of the log entries
-	 */
-	protected static $_logFormat = self::DefaultLogFormat;
-	/**
-	 * @var bool If true, pid, uid, and hostname are added to log entry
-	 */
-	protected static $_includeProcessInfo = false;
-	/**
-	 * @var bool Set when log file has been validated
-	 */
-	protected static $_logFileValid = false;
-	/**
-	 * @var string The path of the log file
-	 */
-	protected static $_logFilePath = null;
-	/**
-	 * @var string The name of the log file
-	 */
-	protected static $_logFileName = null;
-	/**
 	 * @var Logger
 	 */
 	protected static $_logger = null;
@@ -102,6 +82,48 @@ class Log extends Seed implements UtilityLike, Levels
 	 * @var Logger
 	 */
 	protected static $_fallbackLogger = null;
+	/**
+	 * @var bool If true, entries will also go to FirePHP
+	 */
+	protected static $_enableFirePhp = false;
+	/**
+	 * @var bool If true, entries will also go to ChromePHP
+	 */
+	protected static $_enableChromePhp = false;
+	/**
+	 * @var bool If true, pid, uid, and hostname are added to log entry
+	 */
+	protected static $_includeProcessInfo = false;
+	/**
+	 * @var string Prepended to each log entry before writing.
+	 * @deprecated in v0.2.20. To be removed in v0.3.0. Replaced by Monolog formatter
+	 */
+	protected static $_prefix = null;
+	/**
+	 * @var string The full path and name of the log file
+	 * @deprecated in v0.2.20. To be removed in v0.3.0. Replaced by Monolog
+	 */
+	protected static $_defaultLog = null;
+	/**
+	 * @var string The format of the log entries
+	 * @deprecated in v0.2.20. To be removed in v0.3.0. Replaced by Monolog
+	 */
+	protected static $_logFormat = self::DefaultLogFormat;
+	/**
+	 * @var bool Set when log file has been validated
+	 * @deprecated in v0.2.20. To be removed in v0.3.0. Replaced by Monolog formatter
+	 */
+	protected static $_logFileValid = false;
+	/**
+	 * @var string The path of the log file
+	 * @deprecated in v0.2.20. To be removed in v0.3.0. Replaced by Monolog formatter
+	 */
+	protected static $_logFilePath = null;
+	/**
+	 * @var string The name of the log file
+	 * @deprecated in v0.2.20. To be removed in v0.3.0. Replaced by Monolog formatter
+	 */
+	protected static $_logFileName = null;
 
 	//********************************************************************************
 	//* Methods
@@ -110,63 +132,37 @@ class Log extends Seed implements UtilityLike, Levels
 	/**
 	 * {@InheritDoc}
 	 */
-	public static function log( $message, $level = Logger::INFO, $context = array(), $extra = null, $tag = null )
+	public static function log( $message, $level = Logger::INFO, $context = array() )
 	{
 		static $_firstRun = true;
 
 		if ( $_firstRun || !static::$_logFileValid )
 		{
 			static::_checkLogFile();
-
-			if ( !static::$_logFileValid )
-			{
-				static::setDefaultLog( LOG_SYSLOG );
-
-				if ( is_numeric( static::$_defaultLog ) || empty( static::$_defaultLog ) || !file_exists( static::$_defaultLog ) )
-				{
-					static::setDefaultLog( static::$_defaultLog ? : LOG_SYSLOG );
-				}
-			}
-
-			static::$_logFileValid = true;
 			$_firstRun = false;
 		}
-
-		$_timestamp = time();
 
 		//	Get the indent, if any
 		$_unindent = ( ( $_newIndent = static ::_processMessage( $message ) ) > 0 );
 
 		//	Indent...
-		$_tempIndent = static::$_currentIndent;
-
-		if ( $_unindent )
-		{
-			$_tempIndent--;
-		}
-
-		if ( $_tempIndent < 0 )
+		if ( 0 > ( $_tempIndent = static::$_currentIndent - ( $_unindent ? 1 : 0 ) ) )
 		{
 			$_tempIndent = 0;
 		}
 
-//		$_entry = static::formatLogEntry(
-//			array(
-//				'level'     => $level,
-//				'message'   => static::$_prefix . str_repeat( '  ', $_tempIndent ) . $message,
-//				'timestamp' => $_timestamp,
-//				'context'   => $context,
-//				'extra'     => $extra,
-//			)
-//		);
+		$_message = str_repeat( '  ', $_tempIndent ) . $message;
 
-		$_message = static::$_prefix . str_repeat( '  ', $_tempIndent ) . $message;
+		if ( !is_numeric( $level ) )
+		{
+			$level = Logger::INFO;
+		}
 
-		if ( static::$_logFileValid )
+		if ( static::$_logger )
 		{
 			static::$_logger->addRecord( $level, $_message, !is_array( $context ) ? array() : $context );
 		}
-		else
+		elseif ( static::$_fallbackLogger )
 		{
 			static::$_fallbackLogger->addRecord( $level, $_message, $context );
 		}
@@ -179,6 +175,341 @@ class Log extends Seed implements UtilityLike, Levels
 	}
 
 	/**
+	 * Pass-thru to Logger for access to push/pop handlers and formatters
+	 *
+	 * @param string $name
+	 * @param array  $arguments
+	 *
+	 * @return mixed
+	 */
+	public static function __callStatic( $name, $arguments )
+	{
+		if ( static::$_logger && method_exists( static::$_logger, $name ) )
+		{
+			return call_user_func_array( array( static::$_logger, $name ), $arguments );
+		}
+
+		if ( static::$_fallbackLogger && method_exists( static::$_fallbackLogger, $name ) )
+		{
+			return call_user_func_array( array( static::$_fallbackLogger, $name ), $arguments );
+		}
+	}
+
+	/**
+	 * Creates an 'error' log entry
+	 *
+	 * @param string $message The message to send to the log
+	 * @param array  $context
+	 * @param mixed  $extra
+	 *
+	 * @return bool
+	 */
+	public static function error( $message, $context = array(), $extra = null )
+	{
+		return static::log( $message, static::Error, $context, $extra );
+	}
+
+	/**
+	 * Creates a 'warning' log entry
+	 *
+	 * @param string $message The message to send to the log
+	 * @param array  $context
+	 * @param mixed  $extra
+	 *
+	 * @return bool
+	 */
+	public static function warning( $message, $context = array(), $extra = null )
+	{
+		return static::log( $message, static::Warning, $context, $extra );
+	}
+
+	/**
+	 * Creates a 'notice' log entry
+	 *
+	 * @param string $message The message to send to the log
+	 * @param array  $context
+	 * @param mixed  $extra
+	 *
+	 * @return bool
+	 */
+	public static function notice( $message, $context = array(), $extra = null )
+	{
+		return static::log( $message, static::Notice, $context, $extra );
+	}
+
+	/**
+	 * Creates an 'info' log entry
+	 *
+	 * @param string $message The message to send to the log
+	 * @param array  $context
+	 * @param mixed  $extra
+	 *
+	 * @return bool
+	 */
+	public static function info( $message, $context = array(), $extra = null )
+	{
+		return static::log( $message, static::Info, $context, $extra );
+	}
+
+	/**
+	 * Creates a 'debug' log entry
+	 *
+	 * @param string $message The message to send to the log
+	 * @param array  $context
+	 * @param mixed  $extra
+	 *
+	 * @return bool
+	 */
+	public static function debug( $message, $context = array(), $extra = null )
+	{
+		return static::log( $message, static::Debug, $context, $extra );
+	}
+
+	/**
+	 * Safely decrements the current indent level
+	 *
+	 * @param int $howMuch
+	 */
+	public static function decrementIndent( $howMuch = 1 )
+	{
+		static::$_currentIndent -= $howMuch;
+
+		if ( static::$_currentIndent < 0 )
+		{
+			static::$_currentIndent = 0;
+		}
+	}
+
+	/**
+	 * Makes the system log path if not there...
+	 */
+	public static function checkSystemLogPath()
+	{
+		if ( null === static::$_fallbackLogger )
+		{
+			static::$_fallbackLogger = new Logger( static::DEFAULT_CHANNEL_NAME . '.fallback' );
+		}
+
+		static::$_fallbackLogger->pushHandler( new SyslogHandler( static::DEFAULT_CHANNEL_NAME . '.fallback' ) );
+	}
+
+	/**
+	 * Processes the indent level for the messages
+	 *
+	 * @param string $message
+	 *
+	 * @return integer The indent difference AFTER this message
+	 */
+	protected static function _processMessage( &$message )
+	{
+		$_newIndent = 0;
+
+		foreach ( static::$_indentTokens as $_key => $_token )
+		{
+			if ( $_token == substr( $message, 0, $_length = strlen( $_token ) ) )
+			{
+				$_newIndent = ( false === $_key ? -1 : 1 );
+				$message = substr( $message, $_length );
+			}
+		}
+
+		return $_newIndent;
+	}
+
+	/**
+	 * @param boolean $includeProcessInfo
+	 */
+	public static function setIncludeProcessInfo( $includeProcessInfo )
+	{
+		static::$_includeProcessInfo = $includeProcessInfo;
+	}
+
+	/**
+	 * @return boolean
+	 */
+	public static function getIncludeProcessInfo()
+	{
+		return static::$_includeProcessInfo;
+	}
+
+	/**
+	 * @param array $indentTokens
+	 */
+	public static function setIndentTokens( $indentTokens )
+	{
+		static::$_indentTokens = $indentTokens;
+	}
+
+	/**
+	 * @return array
+	 */
+	public static function getIndentTokens()
+	{
+		return static::$_indentTokens;
+	}
+
+	/**
+	 * @static
+	 *
+	 * @param int $currentIndent
+	 *
+	 * @return void
+	 */
+	public static function setCurrentIndent( $currentIndent = 0 )
+	{
+		static::$_currentIndent = $currentIndent;
+	}
+
+	/**
+	 * @return \Monolog\Logger
+	 */
+	public static function getLogger()
+	{
+		return static::$_logger;
+	}
+
+	/**
+	 * @param \Monolog\Logger $logger
+	 */
+	public static function setLogger( $logger )
+	{
+		static::$_logger = $logger;
+	}
+
+	/**
+	 * @param \Monolog\Logger $fallbackLogger
+	 */
+	public static function setFallbackLogger( $fallbackLogger )
+	{
+		static::$_fallbackLogger = $fallbackLogger;
+	}
+
+	/**
+	 * @return \Monolog\Logger
+	 */
+	public static function getFallbackLogger()
+	{
+		return static::$_fallbackLogger;
+	}
+
+	/**
+	 * @param boolean $enableChromePhp
+	 */
+	public static function setEnableChromePhp( $enableChromePhp )
+	{
+		static::$_enableChromePhp = $enableChromePhp;
+	}
+
+	/**
+	 * @return boolean
+	 */
+	public static function getEnableChromePhp()
+	{
+		return static::$_enableChromePhp;
+	}
+
+	/**
+	 * @param boolean $enableFirePhp
+	 */
+	public static function setEnableFirePhp( $enableFirePhp )
+	{
+		static::$_enableFirePhp = $enableFirePhp;
+	}
+
+	/**
+	 * @return boolean
+	 */
+	public static function getEnableFirePhp()
+	{
+		return static::$_enableFirePhp;
+	}
+
+	/**
+	 * @static
+	 * @return int
+	 */
+	public static function getCurrentIndent()
+	{
+		return static::$_currentIndent;
+	}
+
+	/**
+	 * @param int  $level
+	 * @param bool $fullName
+	 *
+	 * @return string
+	 * @deprecated in v0.2.20. To be removed in v0.3.0. Replaced by Monolog
+	 */
+	protected static function _getLogLevel( $level = self::Info, $fullName = false )
+	{
+		static $_logLevels = null;
+
+		if ( empty( $_logLevels ) )
+		{
+			$_logLevels = \Kisma\Core\Enums\Levels::getDefinedConstants();
+		}
+
+		$_levels = ( is_string( $level ) ? $_logLevels : array_flip( $_logLevels ) );
+
+		if ( null === ( $_tag = Option::get( $_levels, $level ) ) )
+		{
+			$_tag = 'INFO';
+		}
+
+		return ( false === $fullName ? substr( strtoupper( $_tag ), 0, 4 ) : $_tag );
+	}
+
+	/**
+	 * Returns the name of the method that made the call
+	 *
+	 * @return string
+	 * @deprecated in v0.2.20. To be removed in v0.3.0. Replaced by Monolog
+	 */
+	protected static function _getCallingMethod()
+	{
+		$_backTrace = debug_backtrace();
+
+		$_thisClass = get_called_class();
+		$_type = $_class = $_method = null;
+
+		for ( $_i = 0, $_size = sizeof( $_backTrace ); $_i < $_size; $_i++ )
+		{
+			if ( isset( $_backTrace[$_i]['class'] ) )
+			{
+				$_class = $_backTrace[$_i]['class'];
+			}
+
+			if ( $_class == $_thisClass )
+			{
+				continue;
+			}
+
+			if ( isset( $_backTrace[$_i]['method'] ) )
+			{
+				$_method = $_backTrace[$_i]['method'];
+			}
+			else if ( isset( $_backTrace[$_i]['function'] ) )
+			{
+				$_method = $_backTrace[$_i]['function'];
+			}
+			else
+			{
+				$_method = 'Unknown';
+			}
+
+			$_type = $_backTrace[$_i]['type'];
+			break;
+		}
+
+		if ( $_i >= 0 )
+		{
+			return str_ireplace( 'Kisma\\Core\\', 'Core\\', $_class ) . $_type . $_method;
+		}
+
+		return 'Unknown';
+	}
+
+	/**
 	 * Formats the log entry. You can override this method to provide you own formatting.
 	 * It will strip out any console escape sequences as well
 	 *
@@ -186,6 +517,7 @@ class Log extends Seed implements UtilityLike, Levels
 	 * @param bool  $newline
 	 *
 	 * @return string
+	 * @deprecated in v0.2.20. To be removed in v0.3.0. Replaced by Monolog formatter
 	 */
 	public static function formatLogEntry( array $entry, $newline = true )
 	{
@@ -244,202 +576,9 @@ class Log extends Seed implements UtilityLike, Levels
 	}
 
 	/**
-	 * Creates an 'error' log entry
-	 *
-	 * @param string $message The message to send to the log
-	 * @param array  $context
-	 * @param mixed  $extra
-	 *
-	 * @return bool
-	 */
-	public static function error( $message, $context = array(), $extra = null )
-	{
-		return static::log( $message, static::Error, $context, $extra, static::_getCallingMethod() );
-	}
-
-	/**
-	 * Creates a 'warning' log entry
-	 *
-	 * @param string $message The message to send to the log
-	 * @param array  $context
-	 * @param mixed  $extra
-	 *
-	 * @return bool
-	 */
-	public static function warning( $message, $context = array(), $extra = null )
-	{
-		return static::log( $message, static::Warning, $context, $extra, static::_getCallingMethod() );
-	}
-
-	/**
-	 * Creates a 'notice' log entry
-	 *
-	 * @param string $message The message to send to the log
-	 * @param array  $context
-	 * @param mixed  $extra
-	 *
-	 * @return bool
-	 */
-	public static function notice( $message, $context = array(), $extra = null )
-	{
-		return static::log( $message, static::Notice, $context, $extra, static::_getCallingMethod() );
-	}
-
-	/**
-	 * Creates an 'info' log entry
-	 *
-	 * @param string $message The message to send to the log
-	 * @param array  $context
-	 * @param mixed  $extra
-	 *
-	 * @return bool
-	 */
-	public static function info( $message, $context = array(), $extra = null )
-	{
-		return static::log( $message, static::Info, $context, $extra, static::_getCallingMethod() );
-	}
-
-	/**
-	 * Creates a 'debug' log entry
-	 *
-	 * @param string $message The message to send to the log
-	 * @param array  $context
-	 * @param mixed  $extra
-	 *
-	 * @return bool
-	 */
-	public static function debug( $message, $context = array(), $extra = null )
-	{
-		return static::log( $message, static::Debug, $context, $extra, static::_getCallingMethod() );
-	}
-
-	/**
-	 * Safely decrements the current indent level
-	 *
-	 * @param int $howMuch
-	 */
-	public static function decrementIndent( $howMuch = 1 )
-	{
-		static::$_currentIndent -= $howMuch;
-
-		if ( static::$_currentIndent < 0 )
-		{
-			static::$_currentIndent = 0;
-		}
-	}
-
-	/**
-	 * Makes the system log path if not there...
-	 */
-	public static function checkSystemLogPath()
-	{
-		if ( null === static::$_fallbackLogger )
-		{
-			static::$_fallbackLogger = new Logger( 'kisma.fallback' );
-		}
-
-		static::$_fallbackLogger->pushHandler( new SyslogHandler( static::$_fallbackLogger->getName() ) );
-	}
-
-	/**
-	 * @param int  $level
-	 * @param bool $fullName
-	 *
-	 * @return string
-	 */
-	protected static function _getLogLevel( $level = self::Info, $fullName = false )
-	{
-		static $_logLevels = null;
-
-		if ( empty( $_logLevels ) )
-		{
-			$_logLevels = \Kisma\Core\Enums\Levels::getDefinedConstants();
-		}
-
-		$_levels = ( is_string( $level ) ? $_logLevels : array_flip( $_logLevels ) );
-
-		if ( null === ( $_tag = Option::get( $_levels, $level ) ) )
-		{
-			$_tag = 'INFO';
-		}
-
-		return ( false === $fullName ? substr( strtoupper( $_tag ), 0, 4 ) : $_tag );
-	}
-
-	/**
-	 * Returns the name of the method that made the call
-	 *
-	 * @return string
-	 */
-	protected static function _getCallingMethod()
-	{
-		$_backTrace = debug_backtrace();
-
-		$_thisClass = get_called_class();
-		$_type = $_class = $_method = null;
-
-		for ( $_i = 0, $_size = sizeof( $_backTrace ); $_i < $_size; $_i++ )
-		{
-			if ( isset( $_backTrace[$_i]['class'] ) )
-			{
-				$_class = $_backTrace[$_i]['class'];
-			}
-
-			if ( $_class == $_thisClass )
-			{
-				continue;
-			}
-
-			if ( isset( $_backTrace[$_i]['method'] ) )
-			{
-				$_method = $_backTrace[$_i]['method'];
-			}
-			else if ( isset( $_backTrace[$_i]['function'] ) )
-			{
-				$_method = $_backTrace[$_i]['function'];
-			}
-			else
-			{
-				$_method = 'Unknown';
-			}
-
-			$_type = $_backTrace[$_i]['type'];
-			break;
-		}
-
-		if ( $_i >= 0 )
-		{
-			return str_ireplace( 'Kisma\\Core\\', 'Core\\', $_class ) . $_type . $_method;
-		}
-
-		return 'Unknown';
-	}
-
-	/**
-	 * Processes the indent level for the messages
-	 *
-	 * @param string $message
-	 *
-	 * @return integer The indent difference AFTER this message
-	 */
-	protected static function _processMessage( &$message )
-	{
-		$_newIndent = 0;
-
-		foreach ( static::$_indentTokens as $_key => $_token )
-		{
-			if ( $_token == substr( $message, 0, strlen( $_token ) ) )
-			{
-				$_newIndent = ( false === $_key ? -1 : 1 );
-				$message = substr( $message, strlen( static::$_indentTokens[true] ) );
-			}
-		}
-
-		return $_newIndent;
-	}
-
-	/**
 	 * Makes sure we have a log file name and path
+	 *
+	 * @deprecated in v0.2.20. To be removed in v0.3.0. Replaced by Monolog
 	 */
 	protected static function _checkLogFile()
 	{
@@ -452,7 +591,6 @@ class Log extends Seed implements UtilityLike, Levels
 		{
 			//	Try and figure out a good place to log...
 			static::$_logFilePath = ( \Kisma::get( 'app.log_path', \Kisma::get( 'app.base_path' ) ) ? : getcwd() ) . '/log';
-
 		}
 
 		if ( !is_dir( static::$_logFilePath ) )
@@ -472,31 +610,28 @@ class Log extends Seed implements UtilityLike, Levels
 
 		static::$_defaultLog = static::$_logFilePath . '/' . trim( static::$_logFileName, '/' );
 
-		static::$_logger = new Logger( 'kisma' );
+		static::$_logger = new Logger( static::DEFAULT_CHANNEL_NAME );
 		static::$_logger->pushHandler( new StreamHandler( static::$_defaultLog ) );
 
+		//	If we're in debug mode and these haven't been disabled, enable...
+		if ( \Kisma::get( CoreSettings::DEBUG ) )
+		{
+			static::$_enableChromePhp = static::$_enableChromePhp ? : true;
+			static::$_enableFirePhp = static::$_enableFirePhp ? : true;
+		}
+
+		//	Enable conditional handlers
+		if ( static::$_enableFirePhp )
+		{
+			static::$_logger->pushHandler( new FirePHPHandler() );
+		}
+
+		if ( static::$_enableChromePhp )
+		{
+			static::$_logger->pushHandler( new ChromePHPHandler() );
+		}
+
 		return static::$_logFileValid = true;
-	}
-
-	/**
-	 * @static
-	 *
-	 * @param int $currentIndent
-	 *
-	 * @return void
-	 */
-	public static function setCurrentIndent( $currentIndent = 0 )
-	{
-		static::$_currentIndent = $currentIndent;
-	}
-
-	/**
-	 * @static
-	 * @return int
-	 */
-	public static function getCurrentIndent()
-	{
-		return static::$_currentIndent;
 	}
 
 	/**
@@ -505,6 +640,7 @@ class Log extends Seed implements UtilityLike, Levels
 	 * @param string $prefix
 	 *
 	 * @return void
+	 * @deprecated in v0.2.20. To be removed in v0.3.0. Replaced by Monolog
 	 */
 	public static function setPrefix( $prefix = null )
 	{
@@ -514,6 +650,7 @@ class Log extends Seed implements UtilityLike, Levels
 	/**
 	 * @static
 	 * @return null|string
+	 * @deprecated in v0.2.20. To be removed in v0.3.0. Replaced by Monolog
 	 */
 	public static function getPrefix()
 	{
@@ -521,25 +658,10 @@ class Log extends Seed implements UtilityLike, Levels
 	}
 
 	/**
-	 * @param array $indentTokens
-	 */
-	public static function setIndentTokens( $indentTokens )
-	{
-		static::$_indentTokens = $indentTokens;
-	}
-
-	/**
-	 * @return array
-	 */
-	public static function getIndentTokens()
-	{
-		return static::$_indentTokens;
-	}
-
-	/**
 	 * @param string $defaultLog
 	 *
 	 * @return bool
+	 * @deprecated in v0.2.20. To be removed in v0.3.0. Replaced by Monolog
 	 */
 	public static function setDefaultLog( $defaultLog )
 	{
@@ -560,6 +682,7 @@ class Log extends Seed implements UtilityLike, Levels
 
 	/**
 	 * @return null|string
+	 * @deprecated in v0.2.20. To be removed in v0.3.0. Replaced by Monolog
 	 */
 	public static function getDefaultLog()
 	{
@@ -568,6 +691,8 @@ class Log extends Seed implements UtilityLike, Levels
 
 	/**
 	 * @param string $logFormat
+	 *
+	 * @deprecated in v0.2.20. To be removed in v0.3.0. Replaced by Monolog
 	 */
 	public static function setLogFormat( $logFormat )
 	{
@@ -576,6 +701,7 @@ class Log extends Seed implements UtilityLike, Levels
 
 	/**
 	 * @return string
+	 * @deprecated in v0.2.20. To be removed in v0.3.0. Replaced by Monolog
 	 */
 	public static function getLogFormat()
 	{
@@ -583,23 +709,9 @@ class Log extends Seed implements UtilityLike, Levels
 	}
 
 	/**
-	 * @param boolean $includeProcessInfo
-	 */
-	public static function setIncludeProcessInfo( $includeProcessInfo )
-	{
-		static::$_includeProcessInfo = $includeProcessInfo;
-	}
-
-	/**
-	 * @return boolean
-	 */
-	public static function getIncludeProcessInfo()
-	{
-		return static::$_includeProcessInfo;
-	}
-
-	/**
 	 * @param string $logFileName
+	 *
+	 * @deprecated in v0.2.20. To be removed in v0.3.0. Replaced by Monolog formatter
 	 */
 	public static function setLogFileName( $logFileName )
 	{
@@ -608,6 +720,7 @@ class Log extends Seed implements UtilityLike, Levels
 
 	/**
 	 * @return string
+	 * @deprecated in v0.2.20. To be removed in v0.3.0. Replaced by Monolog formatter
 	 */
 	public static function getLogFileName()
 	{
@@ -616,6 +729,8 @@ class Log extends Seed implements UtilityLike, Levels
 
 	/**
 	 * @param string $logFilePath
+	 *
+	 * @deprecated in v0.2.20. To be removed in v0.3.0. Replaced by Monolog formatter
 	 */
 	public static function setLogFilePath( $logFilePath )
 	{
@@ -624,6 +739,7 @@ class Log extends Seed implements UtilityLike, Levels
 
 	/**
 	 * @return string
+	 * @deprecated in v0.2.20. To be removed in v0.3.0. Replaced by Monolog formatter
 	 */
 	public static function getLogFilePath()
 	{
@@ -632,44 +748,12 @@ class Log extends Seed implements UtilityLike, Levels
 
 	/**
 	 * @return boolean
+	 * @deprecated in v0.2.20. To be removed in v0.3.0. Replaced by Monolog formatter
 	 */
 	public static function getLogFileValid()
 	{
 		return static::$_logFileValid;
 	}
-
-	/**
-	 * @return \Monolog\Logger
-	 */
-	public static function getLogger()
-	{
-		return static::$_logger;
-	}
-
-	/**
-	 * @param \Monolog\Logger $logger
-	 */
-	public static function setLogger( $logger )
-	{
-		static::$_logger = $logger;
-	}
-
-	/**
-	 * @param \Monolog\Logger $fallbackLogger
-	 */
-	public static function setFallbackLogger( $fallbackLogger )
-	{
-		static::$_fallbackLogger = $fallbackLogger;
-	}
-
-	/**
-	 * @return \Monolog\Logger
-	 */
-	public static function getFallbackLogger()
-	{
-		return static::$_fallbackLogger;
-	}
-
 }
 
 Log::checkSystemLogPath();

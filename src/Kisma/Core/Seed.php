@@ -28,6 +28,7 @@ use Kisma\Core\Interfaces\SubscriberLike;
 use Kisma\Core\Utility\EventManager;
 use Kisma\Core\Utility\Inflector;
 use Kisma\Core\Utility\Option;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Seed
@@ -192,6 +193,22 @@ class Seed implements SeedLike, PublisherLike, SubscriberLike
 	public function off( $eventName, $listener )
 	{
 		EventManager::off( $eventName, $listener );
+	}
+
+	/**
+	 * @param EventSubscriberInterface $subscriber
+	 */
+	public static function addSubscriber( EventSubscriberInterface $subscriber )
+	{
+		return EventManager::addSubscriber( $subscriber );
+	}
+
+	/**
+	 * @param EventSubscriberInterface $subscriber
+	 */
+	public static function removeSubscriber( EventSubscriberInterface $subscriber )
+	{
+		return EventManager::removeSubscriber( $subscriber );
 	}
 
 	/**
