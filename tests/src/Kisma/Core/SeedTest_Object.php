@@ -36,7 +36,7 @@ class SeedTest_Object extends Seed implements SubscriberLike
 	/**
 	 * {@InheritDoc}
 	 */
-	public function onAfterConstruct( $event = null )
+	public function onAfterConstruct( $event = null, $event, $dispatcher )
 	{
 		return $this->constructEvent = true;
 	}

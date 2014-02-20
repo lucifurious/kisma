@@ -590,7 +590,8 @@ class Log extends Seed implements UtilityLike, Levels
 		if ( empty( static::$_logFilePath ) )
 		{
 			//	Try and figure out a good place to log...
-			static::$_logFilePath = ( \Kisma::get( 'app.log_path', \Kisma::get( 'app.base_path' ) ) ? : getcwd() ) . '/log';
+			static::$_logFilePath = ( \Kisma::get( 'app.log_path', \Kisma::get( 'app.base_path' ) ) ? : dirname( getcwd() )
+									) . '/log';
 		}
 
 		if ( !is_dir( static::$_logFilePath ) )

@@ -143,6 +143,9 @@ class Seed implements SeedLike, PublisherLike, SubscriberLike
 		{
 			//	Publish after_destruct event
 			$this->trigger( LifeEvents::BEFORE_DESTRUCT );
+
+			//	And clean up our listeners
+			EventManager::removeDiscoveredListeners( $this );
 		}
 		catch ( \Exception $_ex )
 		{
