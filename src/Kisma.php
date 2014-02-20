@@ -22,6 +22,7 @@ use Kisma\Core\Enums\CoreSettings;
 use Kisma\Core\Events\Enums\KismaEvents;
 use Kisma\Core\Utility\Detector;
 use Kisma\Core\Utility\EventManager;
+use Kisma\Core\Utility\Inflector;
 use Kisma\Core\Utility\Option;
 use Kisma\Core\Utility\Storage;
 
@@ -80,9 +81,6 @@ class Kisma
 			$options = call_user_func( $options );
 		}
 
-		//	Load from session...
-		static::__wakeup();
-
 		//	Set any application-level options passed in
 		static::$_options = Option::merge( static::$_options, $options );
 
@@ -112,6 +110,9 @@ class Kisma
 			EventManager::trigger( KismaEvents::BIRTH );
 		}
 
+		//	Load any session data...
+		static::__wakeup();
+
 		return $_conceived;
 	}
 
@@ -121,9 +122,13 @@ class Kisma
 	public static function __sleep()
 	{
 		//	Save options out to session...
-		if ( isset( $_SESSION ) )
+		if ( PHP_SESSION_DISABLED != session_status() && isset( $_SESSION ) )
 		{
-			$_SESSION[CoreSettings::SESSION_KEY] = Storage::freeze( static::$_options );
+			//	Freeze the options and stow, but not the autoloader
+			$_SESSION[CoreSettings::SESSION_KEY] = static::$_options;
+			Option::remove( $_SESSION[CoreSettings::SESSION_KEY], CoreSettings::AUTO_LOADER );
+			Option::remove( $_SESSION[CoreSettings::SESSION_KEY], 'app.autoloader' );
+			$_SESSION[CoreSettings::SESSION_KEY] = Storage::freeze( $_SESSION[CoreSettings::SESSION_KEY] );
 		}
 	}
 
@@ -132,11 +137,25 @@ class Kisma
 	 */
 	public static function __wakeup()
 	{
+//		Log::debug( 'Session status: ' . session_status() );
+
 		//	Load options from session...
-		if ( isset( $_SESSION, $_SESSION[CoreSettings::SESSION_KEY] ) )
+		if ( PHP_SESSION_DISABLED != session_status() && null !== ( $_frozen = Option::get( $_SESSION, CoreSettings::SESSION_KEY ) ) )
 		{
 			//	Merge them into the fold
-			static::$_options = Options::merge( Storage::defrost( $_SESSION[CoreSettings::SESSION_KEY] ), static::$_options );
+			$_data = Storage::defrost( $_frozen );
+
+			//	If this object wasn't stored by me, don't use it.
+			if ( $_data == $_frozen )
+			{
+				Log::debug( '  - Retrieved data is not compressed or bogus. Removing. ' );
+				unset( $_SESSION[CoreSettings::SESSION_KEY] );
+
+				return;
+			}
+
+//			Log::debug( '  - Retrieved stored data from session' );
+			static::$_options = Options::merge( $_data, static::$_options );
 		}
 	}
 
@@ -175,11 +194,13 @@ class Kisma
 	}
 
 	/**
-	 * @param string $key If you pass in a null, you'll get the entire array of options
+	 * @param string $key If you pass in a null, you'
+	 *                    }
+	 *                    ll get the entire array of options
 	 * @param mixed  $defaultValue
 	 * @param bool   $removeIfFound
 	 *
-	 * @return mixed|array
+	 * @return mixed | array
 	 */
 	public static function get( $key, $defaultValue = null, $removeIfFound = false )
 	{
@@ -192,27 +213,38 @@ class Kisma
 	}
 
 	/**
-	 * @param \Kisma\Core\Events\SeedEvent $event
+	 * Easier access to Kisma core settings (app-wide options).
+	 * Use "get" and "set" with a CoreSetting constant name.
 	 *
-	 * @return bool
-	 */
-	public static function onBirth( $event = null )
-	{
-		static::__wakeup();
-
-		return true;
-	}
-
-	/**
-	 * @param \Kisma\Core\Events\SeedEvent $event
+	 * Examples:
 	 *
-	 * @return bool
+	 *        $_autoloader = \Kisma::getAutoLoader();    //    Returns \Kisma::get( 'app.auto_loader' )
+	 *        $_debug = \Kisma::getDebug();              //    Returns \Kisma::get( 'app.debug' )
+	 *        $_aLife = \Kisma::getALife();              //    throws bad method call exception
+	 *
+	 * @param string $name
+	 * @param array  $arguments
+	 *
+	 * @throws \BadMethodCallException
+	 * @return mixed
 	 */
-	public static function onDeath( $event = null )
+	public static function __callStatic( $name, $arguments )
 	{
-		static::__sleep();
+		$_type = substr( $_name = strtolower( $name ), 0, 3 );
 
-		return true;
+		if ( $_type == 'get' || $_type == 'set' )
+		{
+			$_tag = 'app.' . Inflector::tag( substr( $name, 3 ), true );
+
+			if ( CoreSettings::contains( $_tag ) )
+			{
+				array_unshift( $arguments, $_tag );
+
+				return call_user_func_array( array( get_called_class(), $_type ), $arguments );
+			}
+		}
+
+		throw new \BadMethodCallException( 'The method "' . $name . '" does not exist, or at least, I can\'t find it.' );
 	}
 
 	/**
@@ -230,4 +262,5 @@ class Kisma
 	{
 		//	Nada
 	}
+
 }

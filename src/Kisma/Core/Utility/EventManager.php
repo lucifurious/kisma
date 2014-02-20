@@ -62,6 +62,32 @@ class EventManager extends SeedUtility implements EventDispatcherLike
 	//*************************************************************************
 
 	/**
+	 * @param SubscriberLike $object
+	 * @param string         $pattern
+	 */
+	public static function removeDiscoveredListeners( SubscriberLike $object, $pattern = self::LISTENER_DISCOVERY_PATTERN )
+	{
+		//	Allow for passed in listeners
+		$_listeners = static::_discoverObjectListeners( $object, $pattern, true );
+
+		foreach ( $_listeners as $_eventName => $_callables )
+		{
+			foreach ( $_callables as $_listener )
+			{
+				try
+				{
+					static::off( $_eventName, $_listener );
+				}
+				catch ( \Exception $_ex )
+				{
+					//	Ignore missing listener errors
+				}
+			}
+		}
+
+	}
+
+	/**
 	 * Wires up any event handlers automatically
 	 *
 	 * @param \Kisma\Core\Interfaces\SubscriberLike $object
@@ -83,7 +109,10 @@ class EventManager extends SeedUtility implements EventDispatcherLike
 
 		foreach ( $_listeners as $_eventName => $_callables )
 		{
-			static::on( $_eventName, $_callables );
+			foreach ( $_callables as $_listener )
+			{
+				static::on( $_eventName, $_listener );
+			}
 		}
 	}
 
@@ -91,14 +120,15 @@ class EventManager extends SeedUtility implements EventDispatcherLike
 	 * Builds a hash of events and handlers that are present in this object based on the event handler signature.
 	 * This merely builds the hash, nothing is done with it.
 	 *
-	 * @param \Kisma\Core\Interfaces\SubscriberLike $object
-	 * @param string                                $pattern
-	 *
-	 * @internal param bool $appendToList
+	 * @param \Kisma\Core\Interfaces\SubscriberLike $object     The object to scan
+	 * @param string                                $pattern    The method listener pattern to scan for
+	 * @param bool                                  $rediscover By default, the discoverer will not wire up the same object's events more than once.
+	 *                                                          Setting $rediscover to TRUE will force the rediscovery of the listeners, if any.
+	 *                                                          The default is false.
 	 *
 	 * @return array|bool The listeners discovered. True if already discovered, False on error
 	 */
-	public static function _discoverObjectListeners( SubscriberLike $object, $pattern = self::LISTENER_DISCOVERY_PATTERN )
+	public static function _discoverObjectListeners( SubscriberLike $object, $pattern = self::LISTENER_DISCOVERY_PATTERN, $rediscover = false )
 	{
 		static $_discovered = array();
 
@@ -106,7 +136,7 @@ class EventManager extends SeedUtility implements EventDispatcherLike
 
 		$_objectId = spl_object_hash( $object );
 
-		if ( isset( $_discovered[$_objectId] ) )
+		if ( false === $rediscover && isset( $_discovered[$_objectId] ) )
 		{
 			return true;
 		}
@@ -158,13 +188,7 @@ class EventManager extends SeedUtility implements EventDispatcherLike
 	 */
 	public static function on( $eventName, $listener, $priority = 0 )
 	{
-		$_listeners = is_callable( $listener ) ? array( $listener ) : $listener;
-		$_dispatcher = static::getDispatcher();
-
-		foreach ( $_listeners as $_listener )
-		{
-			$_dispatcher->addListener( $eventName, $_listener, $priority );
-		}
+		static::getDispatcher()->addListener( $eventName, $listener, $priority );
 	}
 
 	/**

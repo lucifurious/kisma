@@ -1,5 +1,4 @@
 <?php
-use Kisma\Core\Enums\CoreSettings;
 use Kisma\Core\TestCase;
 
 /**
@@ -7,12 +6,17 @@ use Kisma\Core\TestCase;
  */
 class KismaTest extends TestCase
 {
+	public function testCallStatic()
+	{
+		$this->assertEquals( 'App', \Kisma::get( 'app.name' ) );
+	}
+
 	/**
 	 * @covers Kisma::conceive
 	 */
 	public function testConceive()
 	{
-		$this->assertTrue( Kisma::get( CoreSettings::CONCEPTION ) );
+		$this->assertTrue( \Kisma::getConception() );
 	}
 
 	/**

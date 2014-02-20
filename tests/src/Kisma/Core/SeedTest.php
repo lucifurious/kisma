@@ -24,6 +24,20 @@ class SeedTest extends \PHPUnit_Framework_TestCase
 	//	Methods
 	//*************************************************************************
 
+	protected function setUp()
+	{
+		parent::setUp();
+
+		$this->_object = new SeedTest_Object( array( 'tester' => $this ) );
+	}
+
+	protected function tearDown()
+	{
+		unset( $this->_object );
+
+		parent::tearDown();
+	}
+
 	/**
 	 * @param int $how Used to capture the destructor event in the fixture
 	 */
@@ -33,26 +47,21 @@ class SeedTest extends \PHPUnit_Framework_TestCase
 	}
 
 	/**
-	 * Creates our test object
-	 */
-	protected function setUp()
-	{
-		if ( null !== $this->_object )
-		{
-			unset( $this->_object );
-		}
-
-		$this->_object = new SeedTest_Object( array( 'tester' => $this ) );
-	}
-
-	/**
 	 * @covers Kisma\Core\Seed::__destruct
 	 */
 	public function testOnBeforeDestruct()
 	{
+		//	Test destruct method
 		$this->_destructorEventFired = 0;
-		$this->_object->__destruct();
-		$this->assertTrue( $this->_destructorEventFired > 0, 'Destructor event was not fired.' );
+		$_object = new SeedTest_Object( array( 'tester' => $this ) );
+		$_object->__destruct();
+		$this->assertTrue( $this->_destructorEventFired > 0, 'Destructor (__destruct) event was not fired.' );
+
+		//	Test unsetting
+		$this->_destructorEventFired = 0;
+		$_object = new SeedTest_Object( array( 'tester' => $this ) );
+		unset( $_object );
+		$this->assertTrue( $this->_destructorEventFired > 0, 'Destructor (unset) event was not fired.' );
 	}
 
 	/**
@@ -61,7 +70,9 @@ class SeedTest extends \PHPUnit_Framework_TestCase
 	 */
 	public function testOnAfterConstruct()
 	{
-		$this->assertTrue( false !== $this->_object->constructEvent );
+		$_object = new SeedTest_Object( array( 'tester' => $this ) );
+		$this->assertTrue( false !== $_object->constructEvent );
+		unset( $_object );
 	}
 
 	/**
