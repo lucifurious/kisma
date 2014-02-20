@@ -43,7 +43,7 @@ class Kisma
 	/**
 	 * @var string The current version
 	 */
-	const KISMA_VERSION = '0.2.21';
+	const KISMA_VERSION = '0.2.22';
 
 	//*************************************************************************
 	//* Members
