@@ -1,11 +1,10 @@
 <?php
 use Kisma\Core\Enums\CoreSettings;
-use Kisma\Core\TestCase;
 
 /**
  * KismaTest
  */
-class KismaTest extends TestCase
+class KismaTest extends \PHPUnit_Framework_TestCase
 {
 	/**
 	 * @covers \Kisma::__callStatic
