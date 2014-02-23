@@ -1,28 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit bootstrap="./tests/bootstrap.php" verbose="true">
-	<php>
-		<ini name="memory_limit" value="2048M" />
-	</php>
-
-	<testsuite name="Release">
-		<directory>./tests/src</directory>
-		<exclude>./vendor</exclude>
-	</testsuite>
-
-	<filter>
-		<blacklist>
-			<directory>./vendor</directory>
-		</blacklist>
-	</filter>
+<phpunit bootstrap="tests/bootstrap.php" verbose="true">
+	<testsuites>
+		<testsuite name="Release">
+			<directory suffix="Test.php">tests/src</directory>
+		</testsuite>
+	</testsuites>
 
 	<logging>
-		<log type="coverage-html" target="/tmp/kisma/report" charset="UTF-8" highlight="false" lowUpperBound="35" highLowerBound="70" />
-		<log type="coverage-clover" target="/tmp/kisma/coverage.xml" />
-		<log type="coverage-php" target="/tmp/kisma/coverage.serialized" />
-		<log type="junit" target="/tmp/kisma/logfile.xml" logIncompleteSkipped="true" />
-		<log type="json" target="/tmp/kisma/logfile.json" />
-		<log type="tap" target="/tmp/kisma/logfile.tap" />
-		<log type="testdox-html" target="/tmp/kisma/testdox.html" />
-		<log type="testdox-text" target="/tmp/kisma/testdox.txt" />
+		<log type="coverage-html" target="build/coverage" title="kisma" charset="UTF-8" yui="true" highlight="true" lowUpperBound="35" highLowerBound="70" />
+		<log type="coverage-clover" target="build/logs/clover.xml" />
+		<log type="coverage-php" target="build/logs/coverage.serialized" />
+		<log type="junit" target="build/logs/junit.xml" logIncompleteSkipped="false" />
 	</logging>
 </phpunit>
