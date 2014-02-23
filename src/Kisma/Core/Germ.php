@@ -20,6 +20,8 @@
  */
 namespace Kisma\Core;
 
+use Kisma\Core\Interfaces\KismaLike;
+
 /**
  * The nucleus of a seed...
  */

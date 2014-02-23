@@ -36,6 +36,18 @@ class DateTime extends SeedEnum
 	const __default = self::SecondsPerMinute;
 
 	/**
+	 * @var int Microseconds per hour
+	 */
+	const US_PER_HOUR = 3600000;
+	/**
+	 * @var int Microseconds per minute
+	 */
+	const US_PER_MINUTE = 60000;
+	/**
+	 * @var int Microseconds per second
+	 */
+	const US_PER_SECOND = 1000;
+	/**
 	 * @var int circa 01/01/1980 (Ahh... my TRS-80... good times)
 	 */
 	const TheBeginning = 315550800;

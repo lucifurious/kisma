@@ -65,4 +65,8 @@ class CoreSettings extends SeedEnum
 	 * @var string The detected framework, if any
 	 */
 	const FRAMEWORK = 'app.framework';
+	/**
+	 * @var string The value to prepend to any keys at the top level
+	 */
+	const OPTION_KEY_PREFIX = 'app.';
 }
