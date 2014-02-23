@@ -17,19 +17,18 @@
 		}
 	],
 	"require":     {
-		"php":                      ">=5.3.10",
+		"php":                      ">=5.3.18",
 		"monolog/monolog":          "*",
-		"symfony/event-dispatcher": "@stable",
-		"symfony/http-foundation":  "@stable"
+		"symfony/event-dispatcher": "~2.4@stable",
+		"symfony/http-foundation":  "~2.4@stable"
 	},
 	"require-dev": {
-		"phpunit/phpunit":           "@stable",
-		"phpunit/php-code-coverage": "@stable"
+		"phpunit/phpunit": "@stable"
 	},
 	"autoload":    {
-		"psr-0": {
-			"Kisma": "src/"
+		"psr-4": {
+			"Kisma\\": "src/Kisma"
 		},
-		"files": ["src/autoload.php"]
+		"files": ["src/Kisma.php", "src/autoload.php"]
 	}
 }

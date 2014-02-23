@@ -1,4 +1,5 @@
 <?php
+use Kisma\Core\Enums\CoreSettings;
 use Kisma\Core\TestCase;
 
 /**
@@ -6,27 +7,38 @@ use Kisma\Core\TestCase;
  */
 class KismaTest extends TestCase
 {
+	/**
+	 * @covers \Kisma::__callStatic
+	 */
 	public function testCallStatic()
 	{
-		$this->assertEquals( 'App', \Kisma::get( 'app.name' ) );
+		$this->assertEquals( 'App', \Kisma::getName() );
 	}
 
 	/**
-	 * @covers Kisma::conceive
+	 * @covers \Kisma::conceive
+	 * @covers \Kisma::__callStatic
+	 * @covers \Kisma::get
 	 */
 	public function testConceive()
 	{
-		$this->assertTrue( \Kisma::getConception() );
+		//	Go both ways ;)
+		$this->assertTrue( true === \Kisma::get( CoreSettings::CONCEPTION ) );
+		$this->assertTrue( true === \Kisma::getConception() );
 	}
 
 	/**
-	 * @covers Kisma::set
-	 * @covers Kisma::get
+	 * @covers \Kisma::set
+	 * @covers \Kisma::get
+	 * @cover  \Kisma\Core\Utility\Inflector::neutralize
 	 */
 	public function testSet()
 	{
 		\Kisma::set( 'testSetOption', true );
-		$this->assertTrue( \Kisma::get( 'testSetOption' ) );
+
+		//	These two keys are identical, but one is neutralized
+		$this->assertTrue( true === \Kisma::get( 'testSetOption' ) );
+		$this->assertTrue( true === \Kisma::get( 'test_set_option' ) );
 	}
 
 	/**

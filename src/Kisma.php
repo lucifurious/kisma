@@ -37,22 +37,22 @@ class Kisma
 
 	/**
 	 * @var string The current version
+	 */
+	const KISMA_VERSION = '0.2.22';
+	/**
+	 * @var string The current version
 	 * @deprecated Deprecated in 0.2.19, to be removed in 0.3.x
 	 */
 	const KismaVersion = self::KISMA_VERSION;
-	/**
-	 * @var string The current version
-	 */
-	const KISMA_VERSION = '0.2.22';
 
 	//*************************************************************************
 	//* Members
 	//*************************************************************************
 
 	/**
-	 * @var array The library configuration options
+	 * @var array Kisma global settings
 	 */
-	protected static $_options = array(
+	private static $_options = array(
 		CoreSettings::BASE_PATH   => __DIR__,
 		CoreSettings::AUTO_LOADER => null,
 		CoreSettings::CONCEPTION  => false,
@@ -126,8 +126,12 @@ class Kisma
 		{
 			//	Freeze the options and stow, but not the autoloader
 			$_SESSION[CoreSettings::SESSION_KEY] = static::$_options;
+			//	Remove the autoloader from the SESSION.
 			Option::remove( $_SESSION[CoreSettings::SESSION_KEY], CoreSettings::AUTO_LOADER );
+			//	Remove the autoloader at this key if there is one (some apps used the wrong key)
 			Option::remove( $_SESSION[CoreSettings::SESSION_KEY], 'app.autoloader' );
+
+			//	Now store our options
 			$_SESSION[CoreSettings::SESSION_KEY] = Storage::freeze( $_SESSION[CoreSettings::SESSION_KEY] );
 		}
 	}
@@ -137,8 +141,6 @@ class Kisma
 	 */
 	public static function __wakeup()
 	{
-//		Log::debug( 'Session status: ' . session_status() );
-
 		//	Load options from session...
 		if ( PHP_SESSION_DISABLED != session_status() && null !== ( $_frozen = Option::get( $_SESSION, CoreSettings::SESSION_KEY ) ) )
 		{
@@ -154,7 +156,6 @@ class Kisma
 				return;
 			}
 
-//			Log::debug( '  - Retrieved stored data from session' );
 			static::$_options = Options::merge( $_data, static::$_options );
 		}
 	}
@@ -167,7 +168,7 @@ class Kisma
 	 */
 	public static function set( $key, $value = null )
 	{
-		Option::set( static::$_options, $key, $value );
+		Option::set( static::$_options, static::_getKeyTag( $key ), $value );
 	}
 
 	/**
@@ -179,7 +180,7 @@ class Kisma
 	 */
 	public static function addTo( $key, $subKey, $value = null )
 	{
-		Option::addTo( static::$_options, $key, $subKey, $value );
+		Option::addTo( static::$_options, static::_getKeyTag( $key ), $subKey, $value );
 	}
 
 	/**
@@ -190,15 +191,13 @@ class Kisma
 	 */
 	public static function removeFrom( $key, $subKey )
 	{
-		Option::removeFrom( static::$_options, $key, $subKey );
+		Option::removeFrom( static::$_options, static::_getKeyTag( $key ), $subKey );
 	}
 
 	/**
-	 * @param string $key If you pass in a null, you'
-	 *                    }
-	 *                    ll get the entire array of options
-	 * @param mixed  $defaultValue
-	 * @param bool   $removeIfFound
+	 * @param string $key           The key to get. If you pass in a null, you'll get the entire array of options
+	 * @param mixed  $defaultValue  The value to return if the key is not found
+	 * @param bool   $removeIfFound If this is true, and the key is found, it will be removed and the value returned
 	 *
 	 * @return mixed | array
 	 */
@@ -209,7 +208,7 @@ class Kisma
 			return static::$_options;
 		}
 
-		return Option::get( static::$_options, $key, $defaultValue, $removeIfFound );
+		return Option::get( static::$_options, static::_getKeyTag( $key ), $defaultValue, $removeIfFound );
 	}
 
 	/**
@@ -234,7 +233,7 @@ class Kisma
 
 		if ( $_type == 'get' || $_type == 'set' )
 		{
-			$_tag = 'app.' . Inflector::tag( substr( $name, 3 ), true );
+			$_tag = static::_getKeyTag( $name );
 
 			if ( CoreSettings::contains( $_tag ) )
 			{
@@ -261,6 +260,21 @@ class Kisma
 	public static function postUpdate( \Composer\Script\Event $event )
 	{
 		//	Nada
+	}
+
+	/**
+	 * @param string $name Cleans up a user-supplied option key
+	 *
+	 * @return string
+	 */
+	protected static function _getKeyTag( $name )
+	{
+		if ( false === strpos( 'app.', $_tag = Inflector::tag( substr( $name, 3 ), true ), 0 ) )
+		{
+			$_tag = CoreSettings::OPTION_KEY_PREFIX . $_tag;
+		}
+
+		return $_tag;
 	}
 
 }
