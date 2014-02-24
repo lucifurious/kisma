@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="PublishConfigData" serverName="bender.cloud">
+    <serverData>
+      <paths name="developer.dreamfactory.com">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/var/www/developer" local="$PROJECT_DIR$/../dreamfactory/web/developer" web="/" />
+          </mappings>
+        </serverdata>
+      </paths>
+    </serverData>
+  </component>
+</project>
+
