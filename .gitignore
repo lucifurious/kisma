@@ -4,5 +4,5 @@ vendor
 .idea/tasks.xml
 .idea/dictionaries/
 tests/log/
-tests/metrics/
 doc
+build/
