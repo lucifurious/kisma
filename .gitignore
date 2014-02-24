@@ -6,3 +6,4 @@ vendor
 tests/log/
 tests/metrics/
 doc
+build/
