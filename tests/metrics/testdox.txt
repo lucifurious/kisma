@@ -1,0 +1,50 @@
+Kisma\Core\Components\ReaderWriter
+ [x] Line reader
+ [x] Read csv
+ [x] Read psv
+ [x] Read tsv
+ [x] Write csv
+
+Kisma\Core\SeedBag
+ [x] Keys
+ [x] Values
+ [x] Get
+ [x] Set
+ [x] Clear
+ [x] Merge
+ [x] Contains
+ [x] Get iterator
+ [x] Count
+
+Kisma\Core\Seed
+ [x] On before destruct
+ [x] On after construct
+ [x] Get id
+ [x] Get tag
+ [x] Get name
+ [x] Get event manager
+ [x] Discover events
+ [x] Unsubscribe
+
+Kisma\Core\Utility\DateTime
+ [x] Pretty seconds
+
+Kisma\Core\Utility\Hasher
+ [x] Generate unique
+
+Kisma\Core\Utility\Inflector
+ [x] Pluralize
+ [x] Pretty name of
+
+Kisma\Core\Utility\Option
+ [x] Get
+
+Kisma\Core\Utility\SchemaFormBuilder
+ [x] Create
+
+Kisma
+ [x] Call static
+ [x] Conceive
+ [x] Set
+ [x] Get
+
