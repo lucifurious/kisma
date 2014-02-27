@@ -52,15 +52,16 @@ class Kisma
 	/**
 	 * @var array Kisma global settings
 	 */
-	private static $_options = array(
-		CoreSettings::BASE_PATH   => __DIR__,
-		CoreSettings::AUTO_LOADER => null,
-		CoreSettings::CONCEPTION  => false,
-		CoreSettings::VERSION     => self::KISMA_VERSION,
-		CoreSettings::NAME        => 'App',
-		CoreSettings::NAV_BAR     => null,
-		CoreSettings::FRAMEWORK   => null,
-	);
+	private static $_options
+		= array(
+			CoreSettings::BASE_PATH   => __DIR__,
+			CoreSettings::AUTO_LOADER => null,
+			CoreSettings::CONCEPTION  => false,
+			CoreSettings::VERSION     => self::KISMA_VERSION,
+			CoreSettings::NAME        => 'App',
+			CoreSettings::NAV_BAR     => null,
+			CoreSettings::FRAMEWORK   => null,
+		);
 
 	//**************************************************************************
 	//* Methods
@@ -269,12 +270,31 @@ class Kisma
 	 */
 	protected static function _getKeyTag( $name )
 	{
-		if ( false === strpos( 'app.', $_tag = Inflector::tag( substr( $name, 3 ), true ), 0 ) )
+		//	If this is an array, apply to all keys
+		if ( is_array( $name ) )
 		{
-			$_tag = CoreSettings::OPTION_KEY_PREFIX . $_tag;
+			$_items = array();;
+
+			foreach ( $name as $_key => $_value )
+			{
+				$_items[$_key] = $_value;
+			}
+
+			return $_items;
 		}
 
-		return $_tag;
+		if ( is_string( $name ) )
+		{
+			if ( false === strpos( 'app.', $_tag = Inflector::tag( substr( $name, 3 ), true ), 0 ) )
+			{
+				$_tag = CoreSettings::OPTION_KEY_PREFIX . $_tag;
+			}
+
+			return $_tag;
+		}
+
+		//	Dunno, have it back the same I guess...
+		return $name;
 	}
 
 }

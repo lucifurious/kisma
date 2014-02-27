@@ -32,14 +32,36 @@ class OptionTest extends \PHPUnit_Framework_TestCase
 	}
 
 	/**
+	 * @covers Kisma\Core\Utility\Inflector::neutralize
+	 * @covers Kisma\Core\Utility\Inflector::deneutralize
 	 * @covers Kisma\Core\Utility\Option::get
-	 * @todo   Implement testGet().
 	 */
 	public function testGet()
 	{
 		$this->assertEquals(
-			'camel case',
-			Option::get( $this->object, 'ThisIsCamelCase' )
+			 'camel case',
+			 Option::get( $this->object, 'ThisIsCamelCase' )
 		);
 	}
+
+	/**
+	 * @covers Kisma\Core\Utility\Option::set
+	 */
+	public function testSetWithArray()
+	{
+		$_sourceOptions = array(
+			'ThisIsCamelCase'        => 'camel case',
+			'this_is_not_camel_case' => 'not camel case',
+			'one'                    => 'one',
+			'eight'                  => 'eight',
+			'zero'                   => 'zero',
+		);
+
+		$_targetOptions = array();
+
+		Option::set( $_targetOptions, $_sourceOptions );
+
+		$this->assertEquals( $_sourceOptions, $_targetOptions );
+	}
+
 }
