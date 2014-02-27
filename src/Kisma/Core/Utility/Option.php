@@ -222,6 +222,22 @@ class Option
 	}
 
 	/**
+	 * @param array $target
+	 * @param array $data Array of key => value pairs to set
+	 *
+	 * @return bool
+	 */
+	public static function setMany( &$target = array(), $data )
+	{
+		foreach ( Option::clean( $data ) as $_key => $_value )
+		{
+			static::set( $target, $_key, $_value );
+		}
+
+		return true;
+	}
+
+	/**
 	 * Sets an value in the given array at key.
 	 *
 	 * @param array|\ArrayAccess|object $options
@@ -232,6 +248,11 @@ class Option
 	 */
 	public static function set( &$options = array(), $key, $value = null )
 	{
+		if ( is_array( $key ) )
+		{
+			return static::setMany( $options, $key );
+		}
+
 		$_options = static::collapse( $key, $value );
 
 		foreach ( $_options as $_key => $_value )
