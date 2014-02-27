@@ -1,15 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit bootstrap="tests/bootstrap.php" verbose="true">
+<phpunit bootstrap="./tests/bootstrap.php" verbose="true">
 	<testsuites>
 		<testsuite name="Release">
-			<directory suffix="Test.php">tests/src</directory>
+			<directory suffix="Test.php">./tests/src</directory>
 		</testsuite>
 	</testsuites>
 
+	<filter>
+		<blacklist>
+			<directory>./vendor</directory>
+		</blacklist>
+	</filter>
+
 	<logging>
-		<log type="coverage-html" target="build/coverage" charset="UTF-8" yui="true" highlight="true" lowUpperBound="35" highLowerBound="70" />
-		<log type="coverage-clover" target="build/coverage/clover.xml" />
-		<log type="coverage-php" target="build/coverage/coverage.serialized" />
-		<log type="junit" target="build/log/junit.xml" logIncompleteSkipped="true" />
+		<log type="coverage-html" target="./build/coverage" charset="UTF-8" yui="true" highlight="true" lowUpperBound="35" highLowerBound="70" />
+		<log type="coverage-clover" target="./build/log/clover.xml" />
+		<log type="coverage-php" target="./build/log/coverage.serialized" />
+		<log type="junit" target="./build/log/junit.xml" logIncompleteSkipped="true" />
 	</logging>
 </phpunit>

@@ -23,7 +23,7 @@
 		"symfony/http-foundation":  "~2.4@stable"
 	},
 	"require-dev": {
-		"phpunit/phpunit": "@stable"
+		"phpunit/phpunit": "~3.7@stable"
 	},
 	"autoload":    {
 		"psr-4": {
