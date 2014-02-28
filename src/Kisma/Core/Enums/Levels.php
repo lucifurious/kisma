@@ -22,6 +22,8 @@ namespace Kisma\Core\Enums;
 
 /**
  * Levels
+ *
+ * @deprecated in 0.2.27, to be removed in 0.3.0. {@see Kism\Core\Enums\LogLevels}
  */
 abstract class Levels extends SeedEnum implements \Kisma\Core\Interfaces\Levels
 {
@@ -41,16 +43,17 @@ abstract class Levels extends SeedEnum implements \Kisma\Core\Interfaces\Levels
 	/**
 	 * @var array
 	 */
-	protected static $_indicators = array(
-		self::Emergency => 'X',
-		self::Alert     => 'A',
-		self::Critical  => 'C',
-		self::Error     => 'E',
-		self::Warning   => 'W',
-		self::Notice    => 'N',
-		self::Info      => 'I',
-		self::Debug     => 'D',
-	);
+	protected static $_indicators
+		= array(
+			self::Emergency => 'X',
+			self::Alert     => 'A',
+			self::Critical  => 'C',
+			self::Error     => 'E',
+			self::Warning   => 'W',
+			self::Notice    => 'N',
+			self::Info      => 'I',
+			self::Debug     => 'D',
+		);
 
 	//*************************************************************************
 	//* Methods

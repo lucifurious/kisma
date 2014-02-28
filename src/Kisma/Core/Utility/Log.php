@@ -21,6 +21,7 @@
 namespace Kisma\Core\Utility;
 
 use Kisma\Core\Enums\CoreSettings;
+use Kisma\Core\Enums\LoggingLevels;
 use Kisma\Core\Interfaces\Levels;
 use Kisma\Core\Interfaces\UtilityLike;
 use Kisma\Core\Seed;
@@ -70,10 +71,11 @@ class Log extends Seed implements UtilityLike, Levels
 	/**
 	 * @var array The strings to watch for at the beginning of a log line to control the indenting
 	 */
-	protected static $_indentTokens = array(
-		true  => '<*',
-		false => '*>',
-	);
+	protected static $_indentTokens
+		= array(
+			true  => '<*',
+			false => '*>',
+		);
 	/**
 	 * @var Logger
 	 */
@@ -155,7 +157,7 @@ class Log extends Seed implements UtilityLike, Levels
 
 		if ( !is_numeric( $level ) )
 		{
-			$level = Logger::INFO;
+			$level = LoggingLevels::toNumeric( $level );
 		}
 
 		if ( static::$_logger )
@@ -563,16 +565,16 @@ class Log extends Seed implements UtilityLike, Levels
 		);
 
 		return str_ireplace(
-				   array(
-					   '%%level%%',
-					   '%%date%%',
-					   '%%time%%',
-					   '%%message%%',
-					   '%%extra%%',
-				   ),
-				   $_replacements,
-				   static::$_logFormat
-			   ) . ( $newline ? PHP_EOL : null );
+			array(
+				'%%level%%',
+				'%%date%%',
+				'%%time%%',
+				'%%message%%',
+				'%%extra%%',
+			),
+			$_replacements,
+			static::$_logFormat
+		) . ( $newline ? PHP_EOL : null );
 	}
 
 	/**
@@ -590,8 +592,7 @@ class Log extends Seed implements UtilityLike, Levels
 		if ( empty( static::$_logFilePath ) )
 		{
 			//	Try and figure out a good place to log...
-			static::$_logFilePath = ( \Kisma::get( 'app.log_path', \Kisma::get( 'app.base_path' ) ) ? : dirname( getcwd() )
-									) . '/log';
+			static::$_logFilePath = ( \Kisma::get( 'app.log_path', \Kisma::get( 'app.base_path' ) ) ? : dirname( getcwd() ) ) . '/log';
 		}
 
 		if ( !is_dir( static::$_logFilePath ) )
