@@ -298,3 +298,5 @@ class Kisma
 	}
 
 }
+
+\Kisma::conceive();
