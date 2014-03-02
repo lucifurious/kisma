@@ -106,7 +106,7 @@ class LoggingLevels extends SeedEnum
 			throw new \InvalidArgumentException( 'The level "' . $stringLevel . '" is invalid.' );
 		}
 
-		return static::defines( $stringLevel, true );
+		return static::defines( strtoupper( $stringLevel ), true );
 	}
 
 	/**
