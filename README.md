@@ -1,6 +1,6 @@
 ![Kisma](https://github.com/lucifurious/kisma/raw/master/assets/logo-kisma.png)
 
-# Kisma&trade;: PHP Utility Belt v0.2.26
+# Kisma&trade;: PHP Utility Belt v0.2.27
 Thanks for checking out *Kisma*!
 
 <a href="http://www.jetbrains.com/phpstorm/" style="display:block;alt="PHP IDE with advanced HTML/CSS/JavaScript editor for hardcore web-developers" title="PHP IDE with advanced HTML/CSS/JavaScript editor for hardcore web-developers">
