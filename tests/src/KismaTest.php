@@ -11,7 +11,7 @@ class KismaTest extends \PHPUnit_Framework_TestCase
 	 */
 	public function testCallStatic()
 	{
-		$this->assertEquals( 'App', \Kisma::getName() );
+		$this->assertEquals( 'App', \Kisma::get( CoreSettings::NAME ) );
 	}
 
 	/**
@@ -23,7 +23,6 @@ class KismaTest extends \PHPUnit_Framework_TestCase
 	{
 		//	Go both ways ;)
 		$this->assertTrue( true === \Kisma::get( CoreSettings::CONCEPTION ) );
-		$this->assertTrue( true === \Kisma::getConception() );
 	}
 
 	/**

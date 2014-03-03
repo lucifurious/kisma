@@ -38,7 +38,7 @@ class Kisma
 	/**
 	 * @var string The current version
 	 */
-	const KISMA_VERSION = '0.2.26';
+	const KISMA_VERSION = '0.2.27';
 	/**
 	 * @var string The current version
 	 * @deprecated Deprecated in 0.2.19, to be removed in 0.3.x
@@ -273,7 +273,7 @@ class Kisma
 		//	If this is an array, apply to all keys
 		if ( is_array( $name ) )
 		{
-			$_items = array();;
+			$_items = array();
 
 			foreach ( $name as $_key => $_value )
 			{
@@ -285,9 +285,11 @@ class Kisma
 
 		if ( is_string( $name ) )
 		{
-			if ( false === strpos( 'app.', $_tag = Inflector::tag( substr( $name, 3 ), true ), 0 ) )
+			$_tag = Inflector::neutralize( $name );
+
+			if ( false === strpos( $_tag, CoreSettings::OPTION_KEY_PREFIX, 0 ) )
 			{
-				$_tag = CoreSettings::OPTION_KEY_PREFIX . $_tag;
+				$_tag = CoreSettings::OPTION_KEY_PREFIX . ltrim( $_tag, '.' );
 			}
 
 			return $_tag;
@@ -298,3 +300,5 @@ class Kisma
 	}
 
 }
+
+\Kisma::conceive();
