@@ -62,6 +62,14 @@ class LoggingLevels extends SeedEnum
 	 * @var int
 	 */
 	const DEBUG = 100;
+	/**
+	 * @var int Trace information gets routed to debug
+	 */
+	const TRACE = self::DEBUG;
+	/**
+	 * @var int Profile information gets routed to debug
+	 */
+	const PROFILE = self::DEBUG;
 
 	//*************************************************************************
 	//* Members
