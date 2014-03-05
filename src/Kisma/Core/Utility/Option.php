@@ -492,4 +492,33 @@ class Option
 
 		return $_cleaned;
 	}
+
+	/**
+	 * Spins through an array and prefixes the keys with a string
+	 *
+	 * @param string $prefix
+	 * @param array  $data
+	 *
+	 * @return mixed
+	 */
+	public static function prefixKeys( $prefix, array $data = array() )
+	{
+		foreach ( static::clean( $data ) as $_key => $_value )
+		{
+			if ( is_numeric( $_key ) )
+			{
+				continue;
+			}
+
+			if ( is_array( $_value ) )
+			{
+				$_value = static::prefixKeys( $prefix, $_value );
+			}
+
+			$data[$prefix . $_key] = $_value;
+			unset( $data[$_key] );
+		}
+
+		return $data;
+	}
 }
