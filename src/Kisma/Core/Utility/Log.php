@@ -71,11 +71,10 @@ class Log extends Seed implements UtilityLike, Levels
 	/**
 	 * @var array The strings to watch for at the beginning of a log line to control the indenting
 	 */
-	protected static $_indentTokens
-		= array(
-			true  => '<*',
-			false => '*>',
-		);
+	protected static $_indentTokens = array(
+		true  => '<*',
+		false => '*>',
+	);
 	/**
 	 * @var Logger
 	 */
@@ -565,16 +564,16 @@ class Log extends Seed implements UtilityLike, Levels
 		);
 
 		return str_ireplace(
-			array(
-				'%%level%%',
-				'%%date%%',
-				'%%time%%',
-				'%%message%%',
-				'%%extra%%',
-			),
-			$_replacements,
-			static::$_logFormat
-		) . ( $newline ? PHP_EOL : null );
+				   array(
+					   '%%level%%',
+					   '%%date%%',
+					   '%%time%%',
+					   '%%message%%',
+					   '%%extra%%',
+				   ),
+				   $_replacements,
+				   static::$_logFormat
+			   ) . ( $newline ? PHP_EOL : null );
 	}
 
 	/**

@@ -223,7 +223,8 @@ HTML;
 		{
 			$_labelAttributes = Option::get( $_label, 'attributes', array() );
 			$_labelText = Option::get( $_label, 'value', array() );
-		} else
+		}
+		else
 		{
 			$_labelText = $_label;
 		}
@@ -379,10 +380,12 @@ HTML;
 			if ( $_length <= 64 )
 			{
 				$attributes['class'] = static::addValue( $_class, 'input-large' );
-			} else if ( $_length < 128 )
+			}
+			else if ( $_length < 128 )
 			{
 				$attributes['class'] = static::addValue( $_class, 'input-xlarge' );
-			} else if ( $_length >= 128 )
+			}
+			else if ( $_length >= 128 )
 			{
 				$attributes['class'] = static::addValue( $_class, 'input-xxlarge' );
 			}
@@ -502,7 +505,8 @@ HTML;
 			if ( !is_array( $_menuItem ) )
 			{
 				$_liTags .= $_menuItem;
-			} else
+			}
+			else
 			{
 				if ( null !== ( $_icon = Option::get( $_menuItem, 'icon' ) ) )
 				{

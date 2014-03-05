@@ -89,7 +89,8 @@ class Scalar implements UtilityLike
 		if ( 'y' == $_value )
 		{
 			$_value = 'yes';
-		} elseif ( 'n' == $_value )
+		}
+		elseif ( 'n' == $_value )
 		{
 			$_value = 'no';
 		}
@@ -143,11 +144,13 @@ class Scalar implements UtilityLike
 				if ( $deep )
 				{
 					$array[$key] = self::array_prepend( $element, $string, $deep );
-				} else
+				}
+				else
 				{
 					trigger_error( 'array_prepend: array element', E_USER_WARNING );
 				}
-			} else
+			}
+			else
 			{
 				$array[$key] = $string . $element;
 			}

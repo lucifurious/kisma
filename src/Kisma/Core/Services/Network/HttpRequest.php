@@ -92,7 +92,8 @@ class HttpRequest extends SeedRequest
 
 					$_tag = Inflector::tag( $_key, true, 'HTTP_' );
 					$_goodies['server.headers'][$_tag] = $_value;
-				} else
+				}
+				else
 				{
 					$_tag = 'server.' . Inflector::tag( $_key, true );
 					$_goodies[$_tag] = $_value;

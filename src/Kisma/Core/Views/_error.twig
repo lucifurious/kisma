@@ -2,59 +2,60 @@
 
 {% block all_content %}
 
-    <h2 style="color: #888;">{{ error.type }}</h2>
+	<h2 style="color: #888;">{{ error.type }}</h2>
 
-    <h4>
-        <span style="display: block; font-style: oblique;">{{ error.message }}</span>
-        <span style="font-size: 80%; float: right;"><a href="#dump">Dump</a> | <a href="#trace">Trace</a> </span>
-    </h4>
+	<h4>
+		<span style="display: block; font-style: oblique;">{{ error.message }}</span> <span style="font-size: 80%; float: right;"><a href="#dump">Dump</a> | <a
+					href="#trace">Trace</a> </span>
+	</h4>
 
-    {% if error.source %}
-        <div style="margin-top: 25px;">
-            <h2 style="color: #888;"><a name="dump" style="text-decoration: none;">Source Dump</a></h2>
+	{% if error.source %}
+		<div style="margin-top: 25px;">
+			<h2 style="color: #888;"><a name="dump" style="text-decoration: none;">Source Dump</a></h2>
 
-            <div>{{ error.file }} ({{ error.line }})</div>
-            <script type="syntaxhighlighter"
-                    class="pad-line-numbers: true; unindent: true; brush: php; toolbar: false; first-line: {{ error.start_line }}; highlight: [{{ error.line }}];">
+			<div>{{ error.file }} ({{ error.line }})</div>
+			<script type="syntaxhighlighter"
+					class="pad-line-numbers: true; unindent: true; brush: php; toolbar: false; first-line: {{ error.start_line }}; highlight: [{{ error.line }}];">
             <![CDATA[
             {{ error.source }}
             ]]>
 
 
 
-            </script>
-        </div>
-    {% endif %}
 
-    {% if error.trace %}
-        <div style="margin-top: 25px;">
-            <h2 style="color: #888;"><a name="trace" style="text-decoration: none;">Backtrace</a></h2>
+			</script>
+		</div>
+	{% endif %}
 
-            <div style="padding-left: 20px;padding-right:20px;">
-                <table class="condensed-table zebra-striped">
-                    <tr>
-                        <th>When</th>
-                        <th>Where</th>
-                    </tr>
-                    {% for item in error.trace %}
-                        <tr>
-                            <td style="text-align: right;">{{ item.index }}</td>
-                            <td><strong>{{ item.function }}</strong>
-                                <br /><span style="font-size: 80%;">{{ item.file_name }} (<em>Line {{ item.line }}</em>)</span></td>
-                        </tr>
-                    {% endfor %}
-                </table>
-            </div>
-        </div>
-    {% endif %}
+	{% if error.trace %}
+		<div style="margin-top: 25px;">
+			<h2 style="color: #888;"><a name="trace" style="text-decoration: none;">Backtrace</a></h2>
+
+			<div style="padding-left: 20px;padding-right:20px;">
+				<table class="condensed-table zebra-striped">
+					<tr>
+						<th>When</th>
+						<th>Where</th>
+					</tr>
+					{% for item in error.trace %}
+						<tr>
+							<td style="text-align: right;">{{ item.index }}</td>
+							<td><strong>{{ item.function }}</strong>
+								<br /><span style="font-size: 80%;">{{ item.file_name }} (<em>Line {{ item.line }}</em>)</span></td>
+						</tr>
+					{% endfor %}
+				</table>
+			</div>
+		</div>
+	{% endif %}
 
 {% endblock %}
 
 {% block page_scripts %}
-    <script type="text/javascript">
-    $(function() {
-        SyntaxHighlighter.config.stripBrs = true;
-        SyntaxHighlighter.all();
-    });
-    </script>
+	<script type="text/javascript">
+	$(function() {
+		SyntaxHighlighter.config.stripBrs = true;
+		SyntaxHighlighter.all();
+	});
+	</script>
 {% endblock %}

@@ -111,7 +111,8 @@ class LineWriter extends ParsingLineReader implements WriterLike
 		if ( empty( $this->_keys ) )
 		{
 			$_data = $data;
-		} else
+		}
+		else
 		{
 			$_data = array();
 
@@ -201,7 +202,8 @@ class LineWriter extends ParsingLineReader implements WriterLike
 		if ( !$this->_appendEOL )
 		{
 			$_line .= $this->_lineBreak;
-		} else if ( $this->_linesOut > 0 )
+		}
+		else if ( $this->_linesOut > 0 )
 		{
 			$_line = $this->_lineBreak . $_line;
 		}

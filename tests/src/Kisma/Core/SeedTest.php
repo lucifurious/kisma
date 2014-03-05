@@ -81,8 +81,8 @@ class SeedTest extends \PHPUnit_Framework_TestCase
 	public function testGetId()
 	{
 		$this->assertNotEmpty(
-			 $_id = $this->_object->getId(),
-			 'The object ID has not been set properly.'
+			$_id = $this->_object->getId(),
+			'The object ID has not been set properly.'
 		);
 	}
 

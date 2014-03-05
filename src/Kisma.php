@@ -52,16 +52,15 @@ class Kisma
 	/**
 	 * @var array Kisma global settings
 	 */
-	private static $_options
-		= array(
-			CoreSettings::BASE_PATH   => __DIR__,
-			CoreSettings::AUTO_LOADER => null,
-			CoreSettings::CONCEPTION  => false,
-			CoreSettings::VERSION     => self::KISMA_VERSION,
-			CoreSettings::NAME        => 'App',
-			CoreSettings::NAV_BAR     => null,
-			CoreSettings::FRAMEWORK   => null,
-		);
+	private static $_options = array(
+		CoreSettings::BASE_PATH   => __DIR__,
+		CoreSettings::AUTO_LOADER => null,
+		CoreSettings::CONCEPTION  => false,
+		CoreSettings::VERSION     => self::KISMA_VERSION,
+		CoreSettings::NAME        => 'App',
+		CoreSettings::NAV_BAR     => null,
+		CoreSettings::FRAMEWORK   => null,
+	);
 
 	//**************************************************************************
 	//* Methods

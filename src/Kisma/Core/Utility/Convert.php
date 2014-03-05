@@ -52,7 +52,8 @@ class Convert extends Seed implements UtilityLike
 			{
 				$_properties->{$_key} = $_value;
 			}
-		} else
+		}
+		else
 		{
 			$_me = new \ReflectionObject( $object );
 			$_properties = $_me->getProperties();
@@ -66,7 +67,8 @@ class Convert extends Seed implements UtilityLike
 			if ( is_object( $object ) )
 			{
 				$_myClass = get_class( $object );
-			} else
+			}
+			else
 			{
 				$_myClass = '_array_';
 			}
@@ -140,7 +142,8 @@ class Convert extends Seed implements UtilityLike
 				if ( !is_array( $_arg ) )
 				{
 					$_result[] = $_arg;
-				} else
+				}
+				else
 				{
 					foreach ( $_arg as $_value )
 					{
@@ -235,10 +238,12 @@ class Convert extends Seed implements UtilityLike
 				if ( false === $_value )
 				{
 					$_value = $falseConvert;
-				} else if ( true === $_value )
+				}
+				else if ( true === $_value )
 				{
 					$_value = $trueConvert;
-				} else if ( is_array( $_value ) )
+				}
+				else if ( is_array( $_value ) )
 				{
 					$_value = trim( implode( ' ', $_value ) );
 				}
