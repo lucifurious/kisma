@@ -62,8 +62,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  *   - after_construct
  *   - before_destruct
  *
- * Unless otherwise specified, the object will automatically search for and
- * attach any event handlers that exist in your object.
+ * Unless otherwise specified, these events will only be emitted
+ * if Seed::$enableLifeEvents is TRUE. Good for debugging
  *
  * To disable this feature, set $discoverEvents to false before calling the parent constructor.
  */
@@ -85,6 +85,10 @@ class Seed implements SeedLike, PublisherLike, SubscriberLike
 	 * @var string A display quality name for this object. Defaults to the full class name (i.e. "\Kisma\Core\Seed")
 	 */
 	protected $_name;
+	/**
+	 * @var bool Turn on/off life events
+	 */
+	protected $_enableLifeEvents = false;
 
 	//********************************************************************************
 	//* Methods
@@ -131,7 +135,10 @@ class Seed implements SeedLike, PublisherLike, SubscriberLike
 		}
 
 		//	Publish after_construct event
-		$this->trigger( LifeEvents::AFTER_CONSTRUCT );
+		if ( $this->_enableLifeEvents )
+		{
+			$this->trigger( LifeEvents::AFTER_CONSTRUCT );
+		}
 	}
 
 	/**
@@ -142,7 +149,10 @@ class Seed implements SeedLike, PublisherLike, SubscriberLike
 		try
 		{
 			//	Publish after_destruct event
-			$this->trigger( LifeEvents::BEFORE_DESTRUCT );
+			if ( $this->_enableLifeEvents )
+			{
+				$this->trigger( LifeEvents::BEFORE_DESTRUCT );
+			}
 
 			//	And clean up our listeners
 			EventManager::removeDiscoveredListeners( $this );
@@ -199,22 +209,6 @@ class Seed implements SeedLike, PublisherLike, SubscriberLike
 	}
 
 	/**
-	 * @param EventSubscriberInterface $subscriber
-	 */
-	public static function addSubscriber( EventSubscriberInterface $subscriber )
-	{
-		return EventManager::addSubscriber( $subscriber );
-	}
-
-	/**
-	 * @param EventSubscriberInterface $subscriber
-	 */
-	public static function removeSubscriber( EventSubscriberInterface $subscriber )
-	{
-		return EventManager::removeSubscriber( $subscriber );
-	}
-
-	/**
 	 * @return string
 	 */
 	public function getId()
@@ -260,6 +254,26 @@ class Seed implements SeedLike, PublisherLike, SubscriberLike
 	public function getTag()
 	{
 		return $this->_tag;
+	}
+
+	/**
+	 * @param boolean $enableLifeEvents
+	 *
+	 * @return Seed
+	 */
+	public function setEnableLifeEvents( $enableLifeEvents )
+	{
+		$this->_enableLifeEvents = $enableLifeEvents;
+
+		return $this;
+	}
+
+	/**
+	 * @return boolean
+	 */
+	public function getEnableLifeEvents()
+	{
+		return $this->_enableLifeEvents;
 	}
 
 }
