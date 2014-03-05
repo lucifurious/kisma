@@ -23,7 +23,7 @@
 		"psr-4": {
 			"Kisma\\": "src/Kisma"
 		},
-		"files": ["src/Kisma.php"]
+		"files": ["src/autoload.php"]
 	},
 	"extra":       {
 		"branch-alias": {
