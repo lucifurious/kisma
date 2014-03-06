@@ -51,16 +51,47 @@ class Inflector implements UtilityLike
 		//	Split by forward slash, backslash, period, or space...
 		$_parts = preg_split( "/[. \/\\\\]+/", $item );
 
-		array_walk(
-			$_parts,
+		array_walk( $_parts,
 			function ( &$part )
 			{
 				//      Clean
 				$part = Inflector::decamelize( $part );
-			}
-		);
+			} );
 
 		return implode( '.', $_parts );
+	}
+
+	/**
+	 * Given an object, returns an array containing the variables of the object and their values.
+	 * The keys for the object have been neutralized for your protection
+	 *
+	 * @param object $object
+	 * @param string $strip If provided, it's value is removed from item before it's neutralized.
+	 *                      Example: "REQUEST_URI" would be "URI" with $strip = "REQUEST_"
+	 *
+	 * @return string
+	 */
+	public static function neutralizeObject( $object, $strip = null )
+	{
+		$_variables = get_object_vars( $object );
+
+		if ( !empty( $_variables ) )
+		{
+			foreach ( $_variables as $_key => $_value )
+			{
+				$_originalKey = $_key;
+
+				if ( $strip )
+				{
+					$_key = str_replace( $strip, null, $_key );
+				}
+
+				$_variables[static::neutralize( $_key, '_' )] = $_value;
+				unset( $_variables[$_originalKey] );
+			}
+		}
+
+		return $_variables;
 	}
 
 	/**
@@ -89,14 +120,14 @@ class Inflector implements UtilityLike
 	public static function display( $item )
 	{
 		return self::camelize(
-			str_replace(
-				array( '_', '.', '\\', '/' ),
-				' ',
-				$item
-			),
-			'_',
-			true,
-			false
+				   str_replace(
+					   array( '_', '.', '\\', '/' ),
+					   ' ',
+					   $item
+				   ),
+				   '_',
+				   true,
+				   false
 		);
 	}
 
@@ -112,14 +143,14 @@ class Inflector implements UtilityLike
 	public static function deneutralize( $item, $isKey = false, $delimiter = '\\' )
 	{
 		return self::camelize(
-			str_replace(
-				array( '_', '.', $delimiter ),
-				' ',
-				$item
-			),
-			'_',
-			false,
-			$isKey
+				   str_replace(
+					   array( '_', '.', $delimiter ),
+					   ' ',
+					   $item
+				   ),
+				   '_',
+				   false,
+				   $isKey
 		);
 	}
 
