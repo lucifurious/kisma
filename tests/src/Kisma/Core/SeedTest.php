@@ -15,6 +15,10 @@ class SeedTest extends \PHPUnit_Framework_TestCase
 	 * @var SeedTest_Object
 	 */
 	protected $_object;
+	protected $_objectSettings = array(
+		'tester'             => null,
+		'enable_life_events' => true
+	);
 	/**
 	 * @var int
 	 */
@@ -28,7 +32,8 @@ class SeedTest extends \PHPUnit_Framework_TestCase
 	{
 		parent::setUp();
 
-		$this->_object = new SeedTest_Object( array( 'tester' => $this ) );
+		$this->_objectSettings['tester'] = $this;
+		$this->_object = new SeedTest_Object( $this->_objectSettings );
 	}
 
 	protected function tearDown()
@@ -53,13 +58,13 @@ class SeedTest extends \PHPUnit_Framework_TestCase
 	{
 		//	Test destruct method
 		$this->_destructorEventFired = 0;
-		$_object = new SeedTest_Object( array( 'tester' => $this ) );
+		$_object = new SeedTest_Object( $this->_objectSettings );
 		$_object->__destruct();
 		$this->assertTrue( $this->_destructorEventFired > 0, 'Destructor (__destruct) event was not fired.' );
 
 		//	Test unsetting
 		$this->_destructorEventFired = 0;
-		$_object = new SeedTest_Object( array( 'tester' => $this ) );
+		$_object = new SeedTest_Object( $this->_objectSettings );
 		unset( $_object );
 		$this->assertTrue( $this->_destructorEventFired > 0, 'Destructor (unset) event was not fired.' );
 	}
@@ -70,7 +75,7 @@ class SeedTest extends \PHPUnit_Framework_TestCase
 	 */
 	public function testOnAfterConstruct()
 	{
-		$_object = new SeedTest_Object( array( 'tester' => $this ) );
+		$_object = new SeedTest_Object( $this->_objectSettings );
 		$this->assertTrue( false !== $_object->constructEvent );
 		unset( $_object );
 	}
@@ -81,8 +86,8 @@ class SeedTest extends \PHPUnit_Framework_TestCase
 	public function testGetId()
 	{
 		$this->assertNotEmpty(
-			 $_id = $this->_object->getId(),
-			 'The object ID has not been set properly.'
+			$_id = $this->_object->getId(),
+			'The object ID has not been set properly.'
 		);
 	}
 

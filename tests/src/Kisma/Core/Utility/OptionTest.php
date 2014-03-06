@@ -39,8 +39,8 @@ class OptionTest extends \PHPUnit_Framework_TestCase
 	public function testGet()
 	{
 		$this->assertEquals(
-			 'camel case',
-			 Option::get( $this->object, 'ThisIsCamelCase' )
+			'camel case',
+			Option::get( $this->object, 'ThisIsCamelCase' )
 		);
 	}
 

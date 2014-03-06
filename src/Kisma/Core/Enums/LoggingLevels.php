@@ -62,6 +62,14 @@ class LoggingLevels extends SeedEnum
 	 * @var int
 	 */
 	const DEBUG = 100;
+	/**
+	 * @var int Trace information gets routed to debug
+	 */
+	const TRACE = self::DEBUG;
+	/**
+	 * @var int Profile information gets routed to debug
+	 */
+	const PROFILE = self::DEBUG;
 
 	//*************************************************************************
 	//* Members
@@ -70,19 +78,18 @@ class LoggingLevels extends SeedEnum
 	/**
 	 * @var array A hash of level names against Monolog levels
 	 */
-	protected static $_strings
-		= array(
-			'debug'     => self::DEBUG,
-			'trace'     => self::DEBUG,
-			'profile'   => self::DEBUG,
-			'info'      => self::INFO,
-			'warning'   => self::WARNING,
-			'notice'    => self::NOTICE,
-			'error'     => self::ERROR,
-			'critical'  => self::CRITICAL,
-			'alert'     => self::ALERT,
-			'emergency' => self::EMERGENCY,
-		);
+	protected static $_strings = array(
+		'debug'     => self::DEBUG,
+		'trace'     => self::DEBUG,
+		'profile'   => self::DEBUG,
+		'info'      => self::INFO,
+		'warning'   => self::WARNING,
+		'notice'    => self::NOTICE,
+		'error'     => self::ERROR,
+		'critical'  => self::CRITICAL,
+		'alert'     => self::ALERT,
+		'emergency' => self::EMERGENCY,
+	);
 
 	//*************************************************************************
 	//* Methods
@@ -96,17 +103,17 @@ class LoggingLevels extends SeedEnum
 	 */
 	public static function toNumeric( $stringLevel )
 	{
-		if ( !is_string( $stringLevel ) )
+		if ( !is_string( $_level = strtolower( $stringLevel ) ) )
 		{
-			throw new \InvalidArgumentException( 'The level "' . $stringLevel . '" is a string.' );
+			throw new \InvalidArgumentException( 'The level "' . $stringLevel . '" is not a string.' );
 		}
 
-		if ( !in_array( strtolower( $stringLevel ), array_keys( static::$_strings ) ) )
+		if ( !in_array( $_level, array_keys( static::$_strings ) ) )
 		{
-			throw new \InvalidArgumentException( 'The level "' . $stringLevel . '" is invalid.' );
+			throw new \InvalidArgumentException( 'The level "' . $stringLevel . '" is undefined.' );
 		}
 
-		return static::defines( strtoupper( $stringLevel ), true );
+		return static::$_strings[$_level];
 	}
 
 	/**
@@ -124,7 +131,7 @@ class LoggingLevels extends SeedEnum
 
 		if ( !in_array( $numericLevel, array_flip( static::$_strings ) ) )
 		{
-			throw new \InvalidArgumentException( 'The level "' . $numericLevel . '" is invalid.' );
+			throw new \InvalidArgumentException( 'The level "' . $numericLevel . '" is undefined.' );
 		}
 
 		return static::nameOf( $numericLevel );

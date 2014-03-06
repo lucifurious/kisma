@@ -94,10 +94,12 @@ abstract class SeedCli extends SeedService implements RequestSource
 			if ( $_value && $_value[0] == '-' && $_value[1] == '-' )
 			{
 				$_options[substr( $_value, 2 )] = str_replace( $_value . '=', '', $_argument );
-			} elseif ( $_value && $_value[0] == '-' )
+			}
+			elseif ( $_value && $_value[0] == '-' )
 			{
 				$_options[substr( $_value, 1 )] = str_replace( $_value . '=', '', $_argument );
-			} else
+			}
+			else
 			{
 				$_results['rebuilt'][] = $arguments[$_i];
 			}

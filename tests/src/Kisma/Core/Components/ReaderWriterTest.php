@@ -1,8 +1,6 @@
 <?php
 namespace Kisma\Core\Components;
 
-use Kisma\Core\Components\LineWriter;
-use Kisma\Core\Components\ParsingLineReader;
 use Kisma\Core\Enums\DataEnclosure;
 use Kisma\Core\Enums\DataSeparator;
 use Kisma\Core\Interfaces\EscapeStyle;
@@ -20,14 +18,14 @@ class ReaderWriterTest extends \PHPUnit_Framework_TestCase
 	protected function _getCsvReader( array $config = array() )
 	{
 		return new ParsingLineReader( array_merge(
-			array(
-				'file_name'    => __DIR__ . '/test-data.csv',
-				'escape_style' => EscapeStyle::DOUBLED,
-				'enclosure'    => DataEnclosure::DOUBLE_QUOTE,
-				'separator'    => DataSeparator::COMMA,
-			),
-			$config
-		) );
+										  array(
+											  'file_name'    => __DIR__ . '/test-data.csv',
+											  'escape_style' => EscapeStyle::DOUBLED,
+											  'enclosure'    => DataEnclosure::DOUBLE_QUOTE,
+											  'separator'    => DataSeparator::COMMA,
+										  ),
+										  $config
+									  ) );
 	}
 
 	/**
@@ -38,14 +36,14 @@ class ReaderWriterTest extends \PHPUnit_Framework_TestCase
 	protected function _getTsvReader( array $config = array() )
 	{
 		return new ParsingLineReader( array_merge(
-			array(
-				'file_name'    => __DIR__ . '/test-data.tsv',
-				'escape_style' => EscapeStyle::DOUBLED,
-				'enclosure'    => DataEnclosure::DOUBLE_QUOTE,
-				'separator'    => DataSeparator::TAB,
-			),
-			$config
-		) );
+										  array(
+											  'file_name'    => __DIR__ . '/test-data.tsv',
+											  'escape_style' => EscapeStyle::DOUBLED,
+											  'enclosure'    => DataEnclosure::DOUBLE_QUOTE,
+											  'separator'    => DataSeparator::TAB,
+										  ),
+										  $config
+									  ) );
 	}
 
 	/**
@@ -56,14 +54,14 @@ class ReaderWriterTest extends \PHPUnit_Framework_TestCase
 	protected function _getPsvReader( array $config = array() )
 	{
 		return new ParsingLineReader( array_merge(
-			array(
-				'file_name'    => __DIR__ . '/test-data.psv',
-				'escape_style' => EscapeStyle::NONE,
-				'enclosure'    => DataEnclosure::NONE,
-				'separator'    => DataSeparator::PIPE,
-			),
-			$config
-		) );
+										  array(
+											  'file_name'    => __DIR__ . '/test-data.psv',
+											  'escape_style' => EscapeStyle::NONE,
+											  'enclosure'    => DataEnclosure::NONE,
+											  'separator'    => DataSeparator::PIPE,
+										  ),
+										  $config
+									  ) );
 	}
 
 	public function testLineReader()
@@ -130,22 +128,22 @@ class ReaderWriterTest extends \PHPUnit_Framework_TestCase
 		$_reader = $this->_getCsvReader();
 
 		$_tsvWriter = new LineWriter( array(
-			'fileName'  => __DIR__ . '/write-test-out-test-data.tsv',
-			'keys'      => $_reader->getKeys(),
-			'separator' => DataSeparator::TAB,
-		) );
+										  'fileName'  => __DIR__ . '/write-test-out-test-data.tsv',
+										  'keys'      => $_reader->getKeys(),
+										  'separator' => DataSeparator::TAB,
+									  ) );
 
 		$_csvWriter = new LineWriter( array(
-			'fileName'  => __DIR__ . '/write-test-out-test-data.csv',
-			'keys'      => $_reader->getKeys(),
-			'separator' => DataSeparator::COMMA,
-		) );
+										  'fileName'  => __DIR__ . '/write-test-out-test-data.csv',
+										  'keys'      => $_reader->getKeys(),
+										  'separator' => DataSeparator::COMMA,
+									  ) );
 
 		$_psvWriter = new LineWriter( array(
-			'fileName'  => __DIR__ . '/write-test-out-test-data.psv',
-			'keys'      => $_reader->getKeys(),
-			'separator' => DataSeparator::PIPE,
-		) );
+										  'fileName'  => __DIR__ . '/write-test-out-test-data.psv',
+										  'keys'      => $_reader->getKeys(),
+										  'separator' => DataSeparator::PIPE,
+									  ) );
 
 		$_lines = 0;
 

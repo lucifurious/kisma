@@ -660,11 +660,7 @@ class Curl extends HttpMethod
 		}
 
 		$_currentUrl =
-			$_protocol .
-			$_host .
-			$_port .
-			( true === $includePath ? Option::get( $_parts, 'path' ) : null ) .
-			( true === $includeQuery ? $_query : null );
+			$_protocol . $_host . $_port . ( true === $includePath ? Option::get( $_parts, 'path' ) : null ) . ( true === $includeQuery ? $_query : null );
 
 		if ( \Kisma::get( 'debug.curl.current_url' ) )
 		{

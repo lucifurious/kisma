@@ -263,25 +263,31 @@ class ErrorHandler
 					if ( is_object( $_arg ) )
 					{
 						$_args .= get_class( $_arg ) . ', ';
-					} else if ( is_array( $_arg ) )
+					}
+					else if ( is_array( $_arg ) )
 					{
 						$_args .= '[array], ';
-					} else if ( is_bool( $_arg ) )
+					}
+					else if ( is_bool( $_arg ) )
 					{
 						if ( $_arg )
 						{
 							$_args .= 'true, ';
-						} else
+						}
+						else
 						{
 							$_args .= 'false, ';
 						}
-					} else if ( is_numeric( $_arg ) )
+					}
+					else if ( is_numeric( $_arg ) )
 					{
 						$_args .= $_arg . ', ';
-					} else if ( is_scalar( $_arg ) )
+					}
+					else if ( is_scalar( $_arg ) )
 					{
 						$_args .= '"' . $_arg . '", ';
-					} else
+					}
+					else
 					{
 						$_args .= '"' . gettype( $_arg ) . '", ';
 					}
@@ -293,7 +299,8 @@ class ErrorHandler
 			if ( isset( $_code['type'] ) )
 			{
 				$_traceItem['function'] = ( isset( $_code['class'] ) ? $_code['class'] : null ) . $_code['type'] . $_code['function'];
-			} else
+			}
+			else
 			{
 				$_traceItem['function'] = $_code['function'];
 			}
@@ -350,7 +357,8 @@ class ErrorHandler
 			if ( false === $html )
 			{
 				$_result .= $_line . PHP_EOL;
-			} else
+			}
+			else
 			{
 				$_result .= $_line . '<br />';
 			}

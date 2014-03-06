@@ -38,7 +38,7 @@ class Kisma
 	/**
 	 * @var string The current version
 	 */
-	const KISMA_VERSION = '0.2.28';
+	const KISMA_VERSION = '0.2.29';
 	/**
 	 * @var string The current version
 	 * @deprecated Deprecated in 0.2.19, to be removed in 0.3.x
@@ -52,16 +52,15 @@ class Kisma
 	/**
 	 * @var array Kisma global settings
 	 */
-	private static $_options
-		= array(
-			CoreSettings::BASE_PATH   => __DIR__,
-			CoreSettings::AUTO_LOADER => null,
-			CoreSettings::CONCEPTION  => false,
-			CoreSettings::VERSION     => self::KISMA_VERSION,
-			CoreSettings::NAME        => 'App',
-			CoreSettings::NAV_BAR     => null,
-			CoreSettings::FRAMEWORK   => null,
-		);
+	private static $_options = array(
+		CoreSettings::BASE_PATH   => __DIR__,
+		CoreSettings::AUTO_LOADER => null,
+		CoreSettings::CONCEPTION  => false,
+		CoreSettings::VERSION     => self::KISMA_VERSION,
+		CoreSettings::NAME        => 'App',
+		CoreSettings::NAV_BAR     => null,
+		CoreSettings::FRAMEWORK   => null,
+	);
 
 	//**************************************************************************
 	//* Methods

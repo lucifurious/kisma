@@ -81,7 +81,8 @@ class Xml extends SeedUtility
 
 				$_string .= Markup::tag( $_key, array(), static::fromArray( $_value, $nodeName ) );
 			}
-		} else
+		}
+		else
 		{
 			$_string = htmlspecialchars( $data, ENT_QUOTES );
 		}

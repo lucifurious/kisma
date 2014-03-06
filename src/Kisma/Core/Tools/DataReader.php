@@ -168,7 +168,8 @@ class DataReader extends Seed implements \Iterator, \Countable
 		if ( empty( $parameters ) )
 		{
 			$_result = $this->_statement->execute();
-		} else
+		}
+		else
 		{
 			$_result = $this->_statement->execute( $parameters );
 		}

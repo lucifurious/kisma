@@ -139,7 +139,8 @@ class SeedBag extends Seed implements \ArrayAccess, \Countable, \IteratorAggrega
 				}
 
 				return $this;
-			} else if ( $key instanceof Interfaces\SeedLike )
+			}
+			else if ( $key instanceof Interfaces\SeedLike )
 			{
 				$value = $key;
 				$key = $value->getId();

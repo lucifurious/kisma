@@ -1,21 +1,21 @@
 <div class="navbar navbar-inverse navbar-fixed-top">
-    <div class="navbar-inner">
-        <div class="container-fluid">
-            <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"> <span class="icon-bar"></span>
-                <span class="icon-bar"></span> <span class="icon-bar"></span> </a> <a class="brand" href="#">{{ navbar.project_name }}</a>
+	<div class="navbar-inner">
+		<div class="container-fluid">
+			<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"> <span class="icon-bar"></span> <span class="icon-bar"></span> <span
+						class="icon-bar"></span> </a> <a class="brand" href="#">{{ navbar.project_name }}</a>
 
-            <div class="nav-collapse collapse">
-                {% if navbar.items|length > 0 %}
-                    <ul class="nav">
-                        {% for item in navbar.items %}
-                            <li class="{{ item.active }}">
-                                <a href="{{ item.href }}" {% if item.target is defined %}target="{{ item.target }}" {% endif %}>{{ item.title }}</a>
-                            </li>
-                        {% endfor %}
-                    </ul>
-                {% endif %}
-            </div>
+			<div class="nav-collapse collapse">
+				{% if navbar.items|length > 0 %}
+					<ul class="nav">
+						{% for item in navbar.items %}
+							<li class="{{ item.active }}">
+								<a href="{{ item.href }}" {% if item.target is defined %}target="{{ item.target }}" {% endif %}>{{ item.title }}</a>
+							</li>
+						{% endfor %}
+					</ul>
+				{% endif %}
+			</div>
 
-        </div>
-    </div>
+		</div>
+	</div>
 </div>

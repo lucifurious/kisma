@@ -89,14 +89,14 @@ class Inflector implements UtilityLike
 	public static function display( $item )
 	{
 		return self::camelize(
-				   str_replace(
-					   array( '_', '.', '\\', '/' ),
-					   ' ',
-					   $item
-				   ),
-				   '_',
-				   true,
-				   false
+			str_replace(
+				array( '_', '.', '\\', '/' ),
+				' ',
+				$item
+			),
+			'_',
+			true,
+			false
 		);
 	}
 
@@ -112,14 +112,14 @@ class Inflector implements UtilityLike
 	public static function deneutralize( $item, $isKey = false, $delimiter = '\\' )
 	{
 		return self::camelize(
-				   str_replace(
-					   array( '_', '.', $delimiter ),
-					   ' ',
-					   $item
-				   ),
-				   '_',
-				   false,
-				   $isKey
+			str_replace(
+				array( '_', '.', $delimiter ),
+				' ',
+				$item
+			),
+			'_',
+			false,
+			$isKey
 		);
 	}
 
