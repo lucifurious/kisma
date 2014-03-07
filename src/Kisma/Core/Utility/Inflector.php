@@ -42,7 +42,12 @@ class Inflector implements UtilityLike
 	 * @return string
 	 */
 	public static function neutralize( $item, $strip = null )
-	{
+    {
+        if ( is_numeric( $item ) ) 
+        {
+            return $item;
+        }
+
 		if ( null !== $strip )
 		{
 			$item = str_ireplace( $strip, null, $item );
@@ -143,7 +148,12 @@ class Inflector implements UtilityLike
 	 * @return string
 	 */
 	public static function deneutralize( $item, $isKey = false, $delimiter = '\\' )
-	{
+    {
+        if ( is_numeric( $item ) )
+        {
+            return $item;
+        }
+        
 		return self::camelize(
 			str_replace(
 				array( '_', '.', $delimiter ),
