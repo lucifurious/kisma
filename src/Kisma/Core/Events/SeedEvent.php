@@ -30,7 +30,7 @@ use Symfony\Component\EventDispatcher\Event;
  * It encapsulates the parameters associated with an event.
  * The {@link source} property describes who raised the event.
  *
- * If an event handler calls the kill() method, propagation will halt.
+ * If an event handler calls the stopPropagation() method, propagation will halt.
  */
 class SeedEvent extends Event
 {
@@ -40,20 +40,18 @@ class SeedEvent extends Event
 
 	/**
 	 * @var PublisherLike The source of this event
+	 * @deprecated in 0.2.31, to be removed in 0.3.0
 	 */
 	protected $_source;
 	/**
 	 * @var boolean Set to true to stop the bubbling of events at any point
+	 * @deprecated in 0.2.31, to be removed in 0.3.0 {@see Event::stopPropagation}
 	 */
 	protected $_kill = false;
 	/**
 	 * @var mixed Any event data the sender wants to convey
 	 */
 	protected $_data;
-	/**
-	 * @var string
-	 */
-	protected $_eventTag = null;
 	/**
 	 * @var string A user-defined event ID
 	 */
@@ -66,14 +64,12 @@ class SeedEvent extends Event
 	/**
 	 * Constructor.
 	 *
-	 * @param PublisherLike $source
-	 * @param mixed         $data
+	 * @param mixed $data
 	 */
-	public function __construct( $source = null, $data = null )
+	public function __construct( $data = null )
 	{
-		$this->_source = $source;
+		$this->_id = spl_object_hash( $this );
 		$this->_data = $data;
-		$this->_kill = false;
 	}
 
 	/**
@@ -90,6 +86,7 @@ class SeedEvent extends Event
 
 	/**
 	 * @return bool
+	 * @deprecated in 0.2.31, to be removed in 0.3.0 {@see Event::isPropagationStopped}
 	 */
 	public function wasKilled()
 	{
@@ -117,14 +114,6 @@ class SeedEvent extends Event
 	}
 
 	/**
-	 * @return \Kisma\Core\Interfaces\SeedLike
-	 */
-	public function getSource()
-	{
-		return $this->_source;
-	}
-
-	/**
 	 * @param string $eventId
 	 *
 	 * @return SeedEvent
@@ -142,25 +131,5 @@ class SeedEvent extends Event
 	public function getEventId()
 	{
 		return $this->_eventId;
-	}
-
-	/**
-	 * @param string $eventTag
-	 *
-	 * @return SeedEvent
-	 */
-	public function setEventTag( $eventTag )
-	{
-		$this->_eventTag = $eventTag;
-
-		return $this;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getEventTag()
-	{
-		return $this->_eventTag;
 	}
 }
