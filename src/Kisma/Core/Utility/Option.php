@@ -79,11 +79,13 @@ class Option
 	 */
 	public static function get( &$options = array(), $key, $defaultValue = null, $unsetValue = false )
 	{
+		//	Get many?
 		if ( is_array( $key ) )
 		{
 			return static::getMany( $options, $key, $defaultValue, $unsetValue );
 		}
 
+		//	Now a deep search
 		$_originalKey = $key;
 
 		//	Inflect pain!
