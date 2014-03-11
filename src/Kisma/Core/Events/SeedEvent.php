@@ -20,7 +20,7 @@
  */
 namespace Kisma\Core\Events;
 
-use Kisma\Core\Interfaces\PublisherLike;
+use Kisma\Core\Utility\Inflector;
 use Symfony\Component\EventDispatcher\Event;
 
 /**
@@ -38,11 +38,6 @@ class SeedEvent extends Event
 	//* Members
 	//**************************************************************************
 
-	/**
-	 * @var PublisherLike The source of this event
-	 * @deprecated in 0.2.31, to be removed in 0.3.0
-	 */
-	protected $_source;
 	/**
 	 * @var boolean Set to true to stop the bubbling of events at any point
 	 * @deprecated in 0.2.31, to be removed in 0.3.0 {@see Event::stopPropagation}
@@ -68,7 +63,7 @@ class SeedEvent extends Event
 	 */
 	public function __construct( $data = null )
 	{
-		$this->_id = spl_object_hash( $this );
+		$this->_eventId = spl_object_hash( $this );
 		$this->_data = $data;
 	}
 
@@ -131,5 +126,23 @@ class SeedEvent extends Event
 	public function getEventId()
 	{
 		return $this->_eventId;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function toArray()
+	{
+		$_me = array();
+
+		foreach ( get_object_vars( $this ) as $_key => $_value )
+		{
+			if ( method_exists( $this, 'get' . ( $_cleanKey = ltrim( $_key, '_' ) ) ) )
+			{
+				$_me[Inflector::neutralize( $_cleanKey )] = $_value;
+			}
+		}
+
+		return $_me;
 	}
 }
