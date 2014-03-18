@@ -133,7 +133,9 @@ class SeedEvent extends Event
      */
     public function toArray()
     {
-        $_me = array();
+        $_me = array(
+            'stop_propagation' => $this->isPropagationStopped(),
+        );
 
         foreach ( get_object_vars( $this ) as $_key => $_value )
         {
