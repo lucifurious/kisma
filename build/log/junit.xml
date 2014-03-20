@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Release" tests="30" assertions="107" failures="0" errors="0" time="0.830956">
+    <testsuite name="Kisma\Core\Components\ReaderWriterTest" file="/opt/kisma/tests/src/Kisma/Core/Components/ReaderWriterTest.php" namespace="Kisma\Core\Components" fullPackage="Kisma.Core.Components" tests="5" assertions="50" failures="0" errors="0" time="0.402295">
+      <testcase name="testLineReader" class="Kisma\Core\Components\ReaderWriterTest" file="/opt/kisma/tests/src/Kisma/Core/Components/ReaderWriterTest.php" line="67" assertions="15" time="0.235360"/>
+      <testcase name="testReadCsv" class="Kisma\Core\Components\ReaderWriterTest" file="/opt/kisma/tests/src/Kisma/Core/Components/ReaderWriterTest.php" line="81" assertions="15" time="0.022599"/>
+      <testcase name="testReadPsv" class="Kisma\Core\Components\ReaderWriterTest" file="/opt/kisma/tests/src/Kisma/Core/Components/ReaderWriterTest.php" line="95" assertions="15" time="0.048144"/>
+      <testcase name="testReadTsv" class="Kisma\Core\Components\ReaderWriterTest" file="/opt/kisma/tests/src/Kisma/Core/Components/ReaderWriterTest.php" line="109" assertions="1" time="0.019860"/>
+      <testcase name="testWriteCsv" class="Kisma\Core\Components\ReaderWriterTest" file="/opt/kisma/tests/src/Kisma/Core/Components/ReaderWriterTest.php" line="126" assertions="4" time="0.076332"/>
+    </testsuite>
+    <testsuite name="Kisma\Core\SeedBagTest" file="/opt/kisma/tests/src/Kisma/Core/SeedBagTest.php" namespace="Kisma\Core" fullPackage="Kisma" package="Kisma" tests="9" assertions="17" failures="0" errors="0" time="0.101183">
+      <testcase name="testKeys" class="Kisma\Core\SeedBagTest" file="/opt/kisma/tests/src/Kisma/Core/SeedBagTest.php" line="39" assertions="2" time="0.025027"/>
+      <testcase name="testValues" class="Kisma\Core\SeedBagTest" file="/opt/kisma/tests/src/Kisma/Core/SeedBagTest.php" line="48" assertions="2" time="0.004907"/>
+      <testcase name="testGet" class="Kisma\Core\SeedBagTest" file="/opt/kisma/tests/src/Kisma/Core/SeedBagTest.php" line="58" assertions="2" time="0.005755"/>
+      <testcase name="testSet" class="Kisma\Core\SeedBagTest" file="/opt/kisma/tests/src/Kisma/Core/SeedBagTest.php" line="70" assertions="4" time="0.008826"/>
+      <testcase name="testClear" class="Kisma\Core\SeedBagTest" file="/opt/kisma/tests/src/Kisma/Core/SeedBagTest.php" line="90" assertions="1" time="0.005581"/>
+      <testcase name="testMerge" class="Kisma\Core\SeedBagTest" file="/opt/kisma/tests/src/Kisma/Core/SeedBagTest.php" line="99" assertions="0" time="0.004295"/>
+      <testcase name="testContains" class="Kisma\Core\SeedBagTest" file="/opt/kisma/tests/src/Kisma/Core/SeedBagTest.php" line="107" assertions="4" time="0.007881"/>
+      <testcase name="testGetIterator" class="Kisma\Core\SeedBagTest" file="/opt/kisma/tests/src/Kisma/Core/SeedBagTest.php" line="125" assertions="1" time="0.034447"/>
+      <testcase name="testCount" class="Kisma\Core\SeedBagTest" file="/opt/kisma/tests/src/Kisma/Core/SeedBagTest.php" line="133" assertions="1" time="0.004464"/>
+    </testsuite>
+    <testsuite name="Kisma\Core\SeedTest" file="/opt/kisma/tests/src/Kisma/Core/SeedTest.php" namespace="Kisma\Core" fullPackage="Kisma.Core" tests="5" assertions="8" failures="0" errors="0" time="0.063047">
+      <testcase name="testOnBeforeDestruct" class="Kisma\Core\SeedTest" file="/opt/kisma/tests/src/Kisma/Core/SeedTest.php" line="57" assertions="2" time="0.015463"/>
+      <testcase name="testOnAfterConstruct" class="Kisma\Core\SeedTest" file="/opt/kisma/tests/src/Kisma/Core/SeedTest.php" line="76" assertions="1" time="0.009267"/>
+      <testcase name="testGetId" class="Kisma\Core\SeedTest" file="/opt/kisma/tests/src/Kisma/Core/SeedTest.php" line="86" assertions="1" time="0.024612"/>
+      <testcase name="testGetTag" class="Kisma\Core\SeedTest" file="/opt/kisma/tests/src/Kisma/Core/SeedTest.php" line="98" assertions="2" time="0.006874"/>
+      <testcase name="testGetName" class="Kisma\Core\SeedTest" file="/opt/kisma/tests/src/Kisma/Core/SeedTest.php" line="109" assertions="2" time="0.006831"/>
+    </testsuite>
+    <testsuite name="Kisma\Core\Utility\DateTimeTest" file="/opt/kisma/tests/src/Kisma/Core/Utility/DateTimeTest.php" namespace="Kisma\Core\Utility" fullPackage="Kisma.Core.Utility" tests="1" assertions="2" failures="0" errors="0" time="0.045605">
+      <testcase name="testPrettySeconds" class="Kisma\Core\Utility\DateTimeTest" file="/opt/kisma/tests/src/Kisma/Core/Utility/DateTimeTest.php" line="20" assertions="2" time="0.045605"/>
+    </testsuite>
+    <testsuite name="Kisma\Core\Utility\HasherTest" file="/opt/kisma/tests/src/Kisma/Core/Utility/HasherTest.php" namespace="Kisma\Core\Utility" fullPackage="Kisma" package="Kisma" tests="1" assertions="1" failures="0" errors="0" time="0.007982">
+      <testcase name="testGenerateUnique" class="Kisma\Core\Utility\HasherTest" file="/opt/kisma/tests/src/Kisma/Core/Utility/HasherTest.php" line="31" assertions="1" time="0.007982"/>
+    </testsuite>
+    <testsuite name="Kisma\Core\Utility\InflectorTest" file="/opt/kisma/tests/src/Kisma/Core/Utility/InflectorTest.php" namespace="Kisma\Core\Utility" fullPackage="Kisma" package="Kisma" tests="2" assertions="21" failures="0" errors="0" time="0.038946">
+      <testcase name="testPluralize" class="Kisma\Core\Utility\InflectorTest" file="/opt/kisma/tests/src/Kisma/Core/Utility/InflectorTest.php" line="17" assertions="18" time="0.017756"/>
+      <testcase name="testPrettyNameOf" class="Kisma\Core\Utility\InflectorTest" file="/opt/kisma/tests/src/Kisma/Core/Utility/InflectorTest.php" line="49" assertions="3" time="0.021190"/>
+    </testsuite>
+    <testsuite name="Kisma\Core\Utility\OptionTest" file="/opt/kisma/tests/src/Kisma/Core/Utility/OptionTest.php" namespace="Kisma\Core\Utility" fullPackage="Kisma.Core.Utility" tests="2" assertions="2" failures="0" errors="0" time="0.033772">
+      <testcase name="testGet" class="Kisma\Core\Utility\OptionTest" file="/opt/kisma/tests/src/Kisma/Core/Utility/OptionTest.php" line="39" assertions="1" time="0.004644"/>
+      <testcase name="testSetWithArray" class="Kisma\Core\Utility\OptionTest" file="/opt/kisma/tests/src/Kisma/Core/Utility/OptionTest.php" line="50" assertions="1" time="0.029128"/>
+    </testsuite>
+    <testsuite name="Kisma\Core\Utility\SchemaFormBuilderTest" file="/opt/kisma/tests/src/Kisma/Core/Utility/SchemaFormBuilderTest.php" namespace="Kisma\Core\Utility" fullPackage="Kisma.Core.Utility" tests="1" assertions="1" failures="0" errors="0" time="0.121246">
+      <testcase name="testCreate" class="Kisma\Core\Utility\SchemaFormBuilderTest" file="/opt/kisma/tests/src/Kisma/Core/Utility/SchemaFormBuilderTest.php" line="56" assertions="1" time="0.121246"/>
+    </testsuite>
+    <testsuite name="KismaTest" file="/opt/kisma/tests/src/KismaTest.php" tests="4" assertions="5" failures="0" errors="0" time="0.016880">
+      <testcase name="testCallStatic" class="KismaTest" file="/opt/kisma/tests/src/KismaTest.php" line="12" assertions="1" time="0.004387"/>
+      <testcase name="testConceive" class="KismaTest" file="/opt/kisma/tests/src/KismaTest.php" line="22" assertions="1" time="0.003758"/>
+      <testcase name="testSet" class="KismaTest" file="/opt/kisma/tests/src/KismaTest.php" line="33" assertions="2" time="0.005071"/>
+      <testcase name="testGet" class="KismaTest" file="/opt/kisma/tests/src/KismaTest.php" line="45" assertions="1" time="0.003664"/>
+    </testsuite>
+  </testsuite>
+</testsuites>
