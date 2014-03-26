@@ -27,33 +27,31 @@ use Kisma\Core\Interfaces\KismaLike;
  */
 class Germ implements KismaLike
 {
-	//********************************************************************************
-	//* Variables
-	//********************************************************************************
+    //********************************************************************************
+    //* Variables
+    //********************************************************************************
 
-	/**
-	 * @var string A unique ID assigned to this object, the last part of which is the creation time
-	 */
-	private $_id;
+    /**
+     * @var string A unique ID assigned to this object, the last part of which is the creation time
+     */
+    private $_id;
 
-	//********************************************************************************
-	//* Methods
-	//********************************************************************************
+    //********************************************************************************
+    //* Methods
+    //********************************************************************************
 
-	/**
-	 * Base constructor
-	 */
-	public function __construct()
-	{
-		//	This is my hash. There are many like it, but this one is mine.
-		$this->_id = hash( 'sha256', spl_object_hash( $this ) . getmypid() . microtime( true ) );
-	}
+    /**
+     * @return string
+     */
+    public function getId()
+    {
+        //  Lazy creation
+        if ( empty( $this->_id ) )
+        {
+            //	This is my hash. There are many like it, but this one is mine.
+            $this->_id = hash( 'sha256', spl_object_hash( $this ) . getmypid() . microtime( true ) );
+        }
 
-	/**
-	 * @return string
-	 */
-	public function getId()
-	{
-		return $this->_id;
-	}
+        return $this->_id;
+    }
 }
