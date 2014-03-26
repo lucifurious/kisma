@@ -12,19 +12,32 @@ class StaticSeedTest extends \PHPUnit_Framework_TestCase
 {
     public $calledMethods = array();
 
-    public function testConstruct()
+    /**
+     * @covers \Kisma\Core\StaticSeed::_construct
+     * @covers \Kisma\Core\StaticSeed::_destruct
+     * @covers \Kisma\Core\StaticSeed::_wakeup
+     * @covers \Kisma\Core\StaticSeed::_sleep
+     * @covers \Kisma\Core\StaticSeed::__construct
+     * @covers \Kisma\Core\StaticSeed::__destruct
+     * @covers \Kisma\Core\StaticSeed::__wakeup
+     * @covers \Kisma\Core\StaticSeed::__sleep
+     * @covers \Kisma\Core\StaticSeed::destroy
+     * @covers \Kisma\Core\StaticSeed::getInstance
+     * @covers \Kisma\Core\StaticSeed::initialize
+     */
+    public function testStaticMagicMethods()
     {
-        $_object = new StaticSeedTest_Object();
+//        $_object = new StaticSeedTest_Object();
 
-        $this->assertTrue( 11 === StaticSeedTest_Object::add( 5, 6 ) );
+        $this->assertTrue( 18 === StaticSeedTest_Object::getInstance()->add( 5, 6, 7 ) );
 
         //  Kill object
         $_counts = StaticSeedTest_Object::destroy();
 
-        $this->assertTrue( $_counts['_construct'] > 0 );
-        $this->assertTrue( $_counts['_destruct'] > 0 );
-        $this->assertTrue( $_counts['_wakeup'] > 0 );
-        $this->assertTrue( $_counts['_sleep'] > 0 );
+        $this->assertTrue( 1 === $_counts['_construct'] );
+        $this->assertTrue( 1 === $_counts['_destruct'] );
+        $this->assertTrue( 1 === $_counts['_wakeup'] );
+        $this->assertTrue( 1 === $_counts['_sleep'] );
     }
 
 }

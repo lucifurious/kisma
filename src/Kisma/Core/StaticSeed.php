@@ -20,8 +20,6 @@
  */
 namespace Kisma\Core;
 
-use Kisma\Core\Utility\Option;
-
 /**
  * StaticSeed
  * A seed that can be used as a base class for your static classes.
@@ -66,14 +64,14 @@ class StaticSeed extends Seed
      */
     protected static function _construct( $instance )
     {
-        if ( null !== static::$_instance )
+        if ( null !== static::$_instance && $instance === static::$_instance )
         {
             return static::$_instance;
         }
 
         static::_wakeup();
 
-        return static::$_instance = $instance;
+        return static::$_instance;
     }
 
     /**
@@ -86,6 +84,7 @@ class StaticSeed extends Seed
             return;
         }
 
+        static::$_instance->__destruct();
         static::_destruct();
     }
 
@@ -153,10 +152,25 @@ class StaticSeed extends Seed
      */
     public static function __callStatic( $name, $arguments )
     {
-        if ( null !== static::$_instance && method_exists( static::$_instance, $name ) )
+        if ( null !== static::getInstance() && method_exists( static::$_instance, $name ) )
         {
             return call_user_func_array( array( static::$_instance, $name ), $arguments );
         }
+    }
+
+    /**
+     * Returns the static instance
+     *
+     * @return StaticSeed
+     */
+    public static function getInstance()
+    {
+        if ( null === static::$_instance )
+        {
+            static::$_instance = new static();
+        }
+
+        return static::$_instance;
     }
 
     /**
@@ -164,11 +178,6 @@ class StaticSeed extends Seed
      */
     public function __construct( $settings = array() )
     {
-        if ( null !== static::$_instance )
-        {
-            return static::$_instance;
-        }
-
         //  Wire up a destructor to call when I die
         register_shutdown_function(
             function ()
@@ -182,31 +191,8 @@ class StaticSeed extends Seed
         parent::__construct( $settings );
 
         //  Call static constructor and save our instance off
-        static::_construct( $settings );
+        static::_construct( $this );
         static::$_instance = $this;
-    }
-
-    public function __wakeup()
-    {
-        parent::__wakeup();
-        static::_wakeup();
-    }
-
-    /**
-     * @return array
-     */
-    public function __sleep()
-    {
-        return array_merge(
-            parent::__sleep(),
-            Option::clean( static::_sleep() )
-        );
-    }
-
-    public function __destruct()
-    {
-        parent::__destruct();
-        static::_destruct();
     }
 
 }
