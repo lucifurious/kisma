@@ -20,306 +20,319 @@
  */
 namespace Kisma\Core;
 
+use Kisma\Core\Exceptions\BagException;
+use Kisma\Core\Utility\Option;
+
 /**
  * SeedBag
  * A generic collection class
  */
 class SeedBag extends Seed implements \ArrayAccess, \Countable, \IteratorAggregate, Interfaces\BagLike
 {
-	//*************************************************************************
-	//* Members
-	//*************************************************************************
+    //*************************************************************************
+    //* Members
+    //*************************************************************************
 
-	/**
-	 * @var array The contents
-	 */
-	private $_bag = array();
-	/**
-	 * @var bool If true, no new keys will be allowed
-	 */
-	private $_fixedSize = false;
+    /**
+     * @var array The contents
+     */
+    private $_bag = array();
+    /**
+     * @var bool If true, no new keys will be allowed
+     */
+    private $_fixedSize = false;
 
-	//*************************************************************************
-	//* Methods
-	//*************************************************************************
+    //*************************************************************************
+    //* Methods
+    //*************************************************************************
 
-	/**
-	 * @param array $contents
-	 *
-	 * @return \Kisma\Core\SeedBag
-	 */
-	public function __construct( $contents = array() )
-	{
-		parent::__construct( $contents );
+    /**
+     * @param array $contents
+     *
+     * @throws \Kisma\Core\Exceptions\BagException
+     * @return \Kisma\Core\SeedBag
+     */
+    public function __construct( $contents = array() )
+    {
+        parent::__construct( $contents );
 
-		//	Anything left, goes in the bag
-		if ( !empty( $contents ) && ( is_array( $contents ) || $contents instanceof \Traversable ) )
-		{
-			foreach ( $contents as $_key => $_value )
-			{
-				$this->set( $_key, $_value );
-				unset( $contents[$_key] );
-			}
-		}
-	}
+        //	Anything left, goes in the bag
+        if ( !empty( $contents ) && ( is_array( $contents ) || $contents instanceof \Traversable ) )
+        {
+            foreach ( $contents as $_key => $_value )
+            {
+                $this->set( $_key, $_value );
+                unset( $contents[$_key] );
+            }
+        }
+    }
 
-	/**
-	 * @return array
-	 */
-	public function keys()
-	{
-		return array_keys( $this->_bag );
-	}
+    /**
+     * @return array
+     */
+    public function keys()
+    {
+        return array_keys( $this->_bag );
+    }
 
-	/**
-	 * @return array
-	 */
-	public function values()
-	{
-		return array_values( $this->_bag );
-	}
+    /**
+     * @return array
+     */
+    public function values()
+    {
+        return array_values( $this->_bag );
+    }
 
-	/**
-	 * @return array The contents of the bag
-	 */
-	public function contents()
-	{
-		return $this->_bag;
-	}
+    /**
+     * @return array The contents of the bag
+     */
+    public function contents()
+    {
+        return $this->_bag;
+    }
 
-	/**
-	 * Retrieves a value at the given key location, or the default value if key isn't found.
-	 * Setting $burnAfterReading to true will remove the key-value pair from the bag after it
-	 * is retrieved. Call with no arguments to get back a KVP array of contents
-	 *
-	 * @param string $key
-	 * @param mixed  $defaultValue
-	 * @param bool   $burnAfterReading
-	 *
-	 * @throws Exceptions\BagException
-	 * @return mixed
-	 */
-	public function get( $key = null, $defaultValue = null, $burnAfterReading = false )
-	{
-		$_exists = Utility\Option::contains( $this->_bag, $key );
+    /**
+     * Retrieves a value at the given key location, or the default value if key isn't found.
+     * Setting $burnAfterReading to true will remove the key-value pair from the bag after it
+     * is retrieved. Call with no arguments to get back a KVP array of contents
+     *
+     * @param string $key
+     * @param mixed  $defaultValue
+     * @param bool   $burnAfterReading
+     *
+     * @throws BagException
+     * @return mixed
+     */
+    public function get( $key = null, $defaultValue = null, $burnAfterReading = false )
+    {
+        $_exists = $this->_validateRequest( $key );
 
-		if ( false !== $this->_fixedSize && !$_exists )
-		{
-			throw new Exceptions\BagException( 'This class does not have a property named "' . $key . '"' );
-		}
+        $_value = $defaultValue;
 
-		$_value = $defaultValue;
+        if ( $_exists )
+        {
+            $_value = Option::get( $this->_bag, $key, $defaultValue, $burnAfterReading );
+        }
 
-		if ( $_exists )
-		{
-			$_value = Utility\Option::get( $this->_bag, $key, $defaultValue, $burnAfterReading );
-		}
+        return $_value;
+    }
 
-		return $_value;
-	}
+    /**
+     * @param string $key
+     * @param mixed  $value
+     * @param bool   $overwrite
+     *
+     * @throws BagException
+     * @return SeedBag
+     */
+    public function set( $key, $value = null, $overwrite = true )
+    {
+        //	Passed in an array or object
+        if ( null === $value )
+        {
+            if ( $key instanceof \Traversable )
+            {
+                foreach ( $key as $_key => $_value )
+                {
+                    $this->set( $_key, $_value, $overwrite );
+                }
 
-	/**
-	 * @param string $key
-	 * @param mixed  $value
-	 * @param bool   $overwrite
-	 *
-	 * @throws Exceptions\BagException
-	 * @return SeedBag
-	 */
-	public function set( $key, $value = null, $overwrite = true )
-	{
-		//	Passed in an array or object
-		if ( null === $value )
-		{
-			if ( $key instanceof \Traversable )
-			{
-				foreach ( $key as $_key => $_value )
-				{
-					$this->set( $_key, $_value, $overwrite );
-				}
+                return $this;
+            }
+            else if ( $key instanceof Interfaces\SeedLike )
+            {
+                $value = $key;
+                $key = $value->getId();
+            }
+        }
 
-				return $this;
-			}
-			else if ( $key instanceof Interfaces\SeedLike )
-			{
-				$value = $key;
-				$key = $value->getId();
-			}
-		}
+        $this->_validateRequest( $key, $overwrite );
 
-		$_exists = Utility\Option::contains( $this->_bag, $key );
+        Option::set( $this->_bag, $key, $value );
 
-		if ( false === $overwrite && $_exists && ( null !== ( $_oldValue = Utility\Option::get( $this->_bag, $key ) ) ) )
-		{
-			throw new Exceptions\BagException( 'The property "' . $key . '" is read-only.' );
-		}
+        return $this;
+    }
 
-		if ( false !== $this->_fixedSize && !$_exists )
-		{
-			throw new Exceptions\BagException( 'This class does not have a property named "' . $key . '"' );
-		}
+    /**
+     * @param string $key
+     *
+     * @return bool
+     */
+    public function remove( $key )
+    {
+        if ( $key instanceof Interfaces\SeedLike )
+        {
+            $key = $key->getId();
+        }
 
-		Utility\Option::set( $this->_bag, $key, $value );
+        if ( !Option::contains( $this->_bag, $key ) )
+        {
+            return false;
+        }
 
-		return $this;
-	}
+        Option::remove( $this->_bag, $key );
 
-	/**
-	 * @param string $key
-	 *
-	 * @return bool
-	 */
-	public function remove( $key )
-	{
-		if ( $key instanceof Interfaces\SeedLike )
-		{
-			$key = $key->getId();
-		}
+        return true;
+    }
 
-		if ( !Utility\Option::contains( $this->_bag, $key ) )
-		{
-			return false;
-		}
+    /**
+     * @return SeedBag
+     */
+    public function clear()
+    {
+        unset( $this->_bag );
+        $this->_bag = array();
 
-		Utility\Option::remove( $this->_bag, $key );
+        return $this;
+    }
 
-		return true;
-	}
+    /**
+     * @param array|\Traversable $source
+     * @param bool               $noNullOverwrite If true (default), inbound NULL values will not replace NON-NULL values in the bag
+     *
+     * @throws \InvalidArgumentException
+     * @return SeedBag
+     */
+    public function merge( $source, $noNullOverwrite = true )
+    {
+        if ( !is_array( $source ) && !( $source instanceof \Traversable ) )
+        {
+            throw new \InvalidArgumentException( 'The source must be an array or an object.' );
+        }
 
-	/**
-	 * @return SeedBag
-	 */
-	public function clear()
-	{
-		unset( $this->_bag );
-		$this->_bag = array();
+        foreach ( $source as $_key => $_value )
+        {
+            if ( null === $_value && true === $noNullOverwrite && Option::contains( $this->_bag, $_key ) )
+            {
+                //	If there is a value in the bag, and inbound value is null, skip...
+                if ( null !== Option::get( $this->_bag, $_key ) )
+                {
+                    continue;
+                }
+            }
 
-		return $this;
-	}
+            Option::set( $this->_bag, $_key, $_value );
+        }
 
-	/**
-	 * @param array|\Traversable $source
-	 * @param bool               $noNullOverwrite If true (default), inbound NULL values will not replace NON-NULL values in the bag
-	 *
-	 * @throws \InvalidArgumentException
-	 * @return SeedBag
-	 */
-	public function merge( $source, $noNullOverwrite = true )
-	{
-		if ( !is_array( $source ) && !( $source instanceof \Traversable ) )
-		{
-			throw new \InvalidArgumentException( 'The source must be an array or an object.' );
-		}
+        return $this;
+    }
 
-		foreach ( $source as $_key => $_value )
-		{
-			if ( null === $_value && true === $noNullOverwrite && Utility\Option::contains( $this->_bag, $_key ) )
-			{
-				//	If there is a value in the bag, and inbound value is null, skip...
-				if ( null !== Utility\Option::get( $this->_bag, $_key ) )
-				{
-					continue;
-				}
-			}
+    /**
+     * @param string $key
+     * @param bool   $enforceReadOnly
+     *
+     * @throws Exceptions\BagException
+     * @return bool
+     */
+    public function _validateRequest( $key, $enforceReadOnly = false )
+    {
+        $_exists = Option::contains( $this->_bag, $key );
 
-			Utility\Option::set( $this->_bag, $_key, $_value );
-		}
+        if ( $enforceReadOnly && $_exists && ( null !== Option::get( $this->_bag, $key ) ) )
+        {
+            throw new BagException( 'The key "' . $key . '" is read-only.' );
+        }
 
-		return $this;
-	}
+        if ( $this->_fixedSize && !$_exists )
+        {
+            throw new BagException( 'This bag does not contain a key named "' . $key . '"' );
+        }
 
-	/**
-	 * Checks to see if a key is in the bag.
-	 *
-	 * @param string $key
-	 *
-	 * @return bool
-	 */
-	public function contains( $key )
-	{
-		if ( $key instanceof Interfaces\SeedLike )
-		{
-			$key = $key->getId();
-		}
+        return true;
+    }
 
-		return Utility\Option::contains( $this->_bag, $key );
-	}
+    /**
+     * Checks to see if a key is in the bag.
+     *
+     * @param string $key
+     *
+     * @return bool
+     */
+    public function contains( $key )
+    {
+        if ( $key instanceof Interfaces\SeedLike )
+        {
+            $key = $key->getId();
+        }
 
-	/**
-	 * @param boolean $fixedSize
-	 *
-	 * @return SeedBag
-	 * @codeCoverageIgnore
-	 */
-	public function setFixedSize( $fixedSize )
-	{
-		$this->_fixedSize = $fixedSize;
+        return Option::contains( $this->_bag, $key );
+    }
 
-		return $this;
-	}
+    /**
+     * @param boolean $fixedSize
+     *
+     * @return SeedBag
+     * @codeCoverageIgnore
+     */
+    public function setFixedSize( $fixedSize )
+    {
+        $this->_fixedSize = $fixedSize;
 
-	/**
-	 * @return boolean
-	 * @codeCoverageIgnore
-	 */
-	public function getFixedSize()
-	{
-		return $this->_fixedSize;
-	}
+        return $this;
+    }
 
-	/**
-	 * {@InheritDoc}
-	 *
-	 * @codeCoverageIgnore
-	 */
-	public function offsetExists( $offset )
-	{
-		return $this->contains( $offset );
-	}
+    /**
+     * @return boolean
+     * @codeCoverageIgnore
+     */
+    public function getFixedSize()
+    {
+        return $this->_fixedSize;
+    }
 
-	/**
-	 * {@InheritDoc}
-	 *
-	 * @codeCoverageIgnore
-	 */
-	public function offsetGet( $offset )
-	{
-		return $this->get( $offset );
-	}
+    /**
+     * {@InheritDoc}
+     *
+     * @codeCoverageIgnore
+     */
+    public function offsetExists( $offset )
+    {
+        return $this->contains( $offset );
+    }
 
-	/**
-	 * {@InheritDoc}
-	 *
-	 * @codeCoverageIgnore
-	 */
-	public function offsetSet( $offset, $item )
-	{
-		$this->set( $offset, $item );
-	}
+    /**
+     * {@InheritDoc}
+     *
+     * @codeCoverageIgnore
+     */
+    public function offsetGet( $offset )
+    {
+        return $this->get( $offset );
+    }
 
-	/**
-	 * {@InheritDoc}
-	 *
-	 * @codeCoverageIgnore
-	 */
-	public function offsetUnset( $offset )
-	{
-		$this->remove( $offset );
-	}
+    /**
+     * {@InheritDoc}
+     *
+     * @codeCoverageIgnore
+     */
+    public function offsetSet( $offset, $item )
+    {
+        $this->set( $offset, $item );
+    }
 
-	/**
-	 * {@InheritDoc}
-	 */
-	public function getIterator()
-	{
-		return new SeedBagIterator( $this->_bag );
-	}
+    /**
+     * {@InheritDoc}
+     *
+     * @codeCoverageIgnore
+     */
+    public function offsetUnset( $offset )
+    {
+        $this->remove( $offset );
+    }
 
-	/**
-	 * {@InheritDoc}
-	 */
-	public function count()
-	{
-		return sizeof( $this->_bag );
-	}
+    /**
+     * {@InheritDoc}
+     */
+    public function getIterator()
+    {
+        return new SeedBagIterator( $this->_bag );
+    }
+
+    /**
+     * {@InheritDoc}
+     */
+    public function count()
+    {
+        return sizeof( $this->_bag );
+    }
 }
