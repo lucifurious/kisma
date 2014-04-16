@@ -20,6 +20,7 @@
  */
 namespace Kisma\Core\Components;
 
+use Aws\Common\Exception\LogicException;
 use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\Common\Cache\RedisCache;
 use Doctrine\Common\Cache\XcacheCache;
@@ -27,6 +28,7 @@ use Kisma\Core\Enums\CacheTypes;
 
 /**
  * Wrapper around doctrine/cache
+ *
  */
 class Flexistore
 {
@@ -65,13 +67,85 @@ class Flexistore
     //*************************************************************************
 
     /**
-     * @param string $type
      * @param string $namespace
      *
+     * @return Flexistore
+     */
+    public static function createSingleton( $namespace = null )
+    {
+        return new Flexistore( CacheTypes::ARRAY_CACHE, $namespace );
+    }
+
+    /**
+     * @param string $path
+     * @param string $namespace
+     * @param string $extension
+     *
+     * @return \Kisma\Core\Components\Flexistore
+     */
+    public static function createFileStore( $path = null, $extension = self::DEFAULT_CACHE_EXTENSION, $namespace = null )
+    {
+        if ( null === ( $_path = $path ) )
+        {
+            //  Get a unique temp directory
+            do
+            {
+                $_path = sys_get_temp_dir() . '/dffs.' . uniqid();
+            }
+            while ( is_dir( $_path ) );
+        }
+
+        $_store = new Flexistore( CacheTypes::PHP_FILE, $namespace, $extension, false );
+        /** @noinspection PhpUndefinedMethodInspection */
+        $_store->setDirectory( $path );
+
+        return $_store;
+    }
+
+    /**
+     * @param string $host
+     * @param int    $port
+     * @param float  $timeout
+     * @param string $namespace
+     *
+     * @throws \LogicException
+     * @throws \Aws\Common\Exception\LogicException
+     * @return Flexistore
+     */
+    public static function createRedisStore( $host = '127.0.0.1', $port = 6379, $timeout = 0.0, $namespace = null )
+    {
+        if ( !extension_loaded( 'redis' ) )
+        {
+            throw new LogicException( 'The PHP Redis extension is required to use this store type.' );
+        }
+
+        $_redis = new \Redis();
+
+        if ( false === $_redis->pconnect( $host, $port, $timeout ) )
+        {
+            throw new \LogicException( 'No redis server answering at ' . $host . ':' . $port );
+        }
+
+        $_store = new static( CacheTypes::REDIS, $namespace, false );
+
+        /** @noinspection PhpUndefinedMethodInspection */
+        $_store->setRedis( $_redis );
+
+        return $_store;
+    }
+
+    /**
+     * @param string $type
+     * @param string $namespace
+     * @param string $extension
+     * @param bool   $autoInit If true, automatically initialize with defaults. If false, you are responsible for setting the necessary settings
+     *
+     * @throws \Aws\Common\Exception\LogicException
+     * @throws \LogicException
      * @throws \InvalidArgumentException
      * @internal param string $storeId
      */
-    public function __construct( $type = CacheTypes::ARRAY_CACHE, $namespace = null )
+    public function __construct( $type = CacheTypes::ARRAY_CACHE, $namespace = null, $extension = self::DEFAULT_CACHE_EXTENSION, $autoInit = true )
     {
         if ( !CacheTypes::contains( $type ) )
         {
@@ -80,7 +154,11 @@ class Flexistore
 
         $_class = static::STORE_NAMESPACE . $type . 'Cache';
 
-        $_mirror = new \ReflectionClass( $_class );
+        if ( !class_exists( $_class ) || null === ( $_mirror = new \ReflectionClass( $_class ) ) )
+        {
+            throw new LogicException( 'Associated driver for type "' . $type . '" not found. Looking for "' . $_class . '"' );
+        }
+
         $this->_store = $_mirror->getConstructor() ? $_mirror->newInstanceArgs( $this->_getCacheTypeArguments( $type ) ) : $_mirror->newInstance();
 
         if ( null !== $namespace )
@@ -88,7 +166,10 @@ class Flexistore
             $this->_store->setNamespace( $namespace );
         }
 
-        $this->_initializeCache( $type );
+        if ( $autoInit )
+        {
+            $this->_initializeCache( $type );
+        }
     }
 
     /**
@@ -223,5 +304,4 @@ class Flexistore
     {
         return $this->_storeId;
     }
-
 }
