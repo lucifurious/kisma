@@ -13,6 +13,7 @@
 	"require":     {
 		"php":                      ">=5.3.18",
 		"monolog/monolog":          "@stable",
+		"doctrine/cache":           "~1.3.0@stable",
 		"symfony/event-dispatcher": "~2.4@stable",
 		"symfony/http-foundation":  "~2.4@stable"
 	},
