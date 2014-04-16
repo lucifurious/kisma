@@ -117,7 +117,7 @@ class Flexistore
     /**
      * @param string $type
      *
-     * @throws InternalServerError
+     * @throws \LogicException
      */
     protected function _initializeCache( $type )
     {
@@ -128,7 +128,7 @@ class Flexistore
 
                 if ( false === $_redis->pconnect( '127.0.0.1' ) )
                 {
-                    throw new InternalServerError( 'Cannot connect to redis server @ 127.0.0.1' );
+                    throw new \LogicException( 'Cannot connect to redis server @ 127.0.0.1' );
                 }
 
                 $this->_store->setRedis( $_redis );
