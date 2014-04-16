@@ -31,272 +31,278 @@ use Kisma\Core\Utility\Storage;
  */
 class Kisma
 {
-	//*************************************************************************
-	//* Constants
-	//*************************************************************************
+    //*************************************************************************
+    //* Constants
+    //*************************************************************************
 
-	/**
-	 * @var string The current version
-	 */
-	const KISMA_VERSION = '0.2.35';
-	/**
-	 * @var string The current version
-	 * @deprecated Deprecated in 0.2.19, to be removed in 0.3.x
-	 */
-	const KismaVersion = self::KISMA_VERSION;
+    /**
+     * @var string The current version
+     */
+    const KISMA_VERSION = '0.2.36';
+    /**
+     * @var string The current version
+     * @deprecated Deprecated in 0.2.19, to be removed in 0.3.x
+     */
+    const KismaVersion = self::KISMA_VERSION;
 
-	//*************************************************************************
-	//* Members
-	//*************************************************************************
+    //*************************************************************************
+    //* Members
+    //*************************************************************************
 
-	/**
-	 * @var array Kisma global settings
-	 */
-	private static $_options = array(
-		CoreSettings::BASE_PATH   => __DIR__,
-		CoreSettings::AUTO_LOADER => null,
-		CoreSettings::CONCEPTION  => false,
-		CoreSettings::VERSION     => self::KISMA_VERSION,
-		CoreSettings::NAME        => 'App',
-		CoreSettings::NAV_BAR     => null,
-		CoreSettings::FRAMEWORK   => null,
-	);
+    /**
+     * @var array Kisma global settings
+     */
+    private static $_options = array(
+        CoreSettings::BASE_PATH   => __DIR__,
+        CoreSettings::AUTO_LOADER => null,
+        CoreSettings::CONCEPTION  => false,
+        CoreSettings::VERSION     => self::KISMA_VERSION,
+        CoreSettings::NAME        => 'App',
+        CoreSettings::NAV_BAR     => null,
+        CoreSettings::FRAMEWORK   => null,
+    );
+    /**
+     * @var bool Indicates if the object is awake yet
+     */
+    protected static $_awake = false;
 
-	//**************************************************************************
-	//* Methods
-	//**************************************************************************
+    //**************************************************************************
+    //* Methods
+    //**************************************************************************
 
-	/**
-	 * Plant the seed of life into Kisma!
-	 *
-	 * @param array $options
-	 *
-	 * @return bool
-	 */
-	public static function conceive( $options = array() )
-	{
-		//	Set any passed in options...
-		if ( is_callable( $options ) )
-		{
-			$options = call_user_func( $options );
-		}
+    /**
+     * Plant the seed of life into Kisma!
+     *
+     * @param array $options
+     *
+     * @return bool
+     */
+    public static function conceive( $options = array() )
+    {
+        //	Set any passed in options...
+        if ( is_callable( $options ) )
+        {
+            $options = call_user_func( $options );
+        }
 
-		//	Set any application-level options passed in
-		static::$_options = Option::merge( static::$_options, $options );
+        //	Set any application-level options passed in
+        static::$_options = Option::merge( static::$_options, $options );
 
-		//	Register our faux-destructor
-		if ( false === ( $_conceived = static::get( CoreSettings::CONCEPTION ) ) )
-		{
-			\register_shutdown_function(
-				function ( $eventName = KismaEvents::DEATH )
-				{
-					\Kisma::__sleep();
-					EventManager::trigger( $eventName );
-				}
-			);
+        //	Register our faux-destructor
+        if ( false === ( $_conceived = static::get( CoreSettings::CONCEPTION ) ) )
+        {
+            \register_shutdown_function(
+                function ( $eventName = KismaEvents::DEATH )
+                {
+                    \Kisma::__sleep();
+                    EventManager::trigger( $eventName );
+                }
+            );
 
-			//	Try and detect the framework being used...
-			Detector::framework();
+            //	Try and detect the framework being used...
+            Detector::framework();
 
-			//	We done baby!
-			static::set( CoreSettings::CONCEPTION, true );
+            //	We done baby!
+            static::set( CoreSettings::CONCEPTION, true );
 
-			if ( null === static::get( CoreSettings::AUTO_LOADER ) && class_exists( '\\ComposerAutoloaderInit', false ) )
-			{
-				static::set( CoreSettings::AUTO_LOADER, \ComposerAutoloaderInit::getLoader() );
-			}
+            if ( null === static::get( CoreSettings::AUTO_LOADER ) && class_exists( '\\ComposerAutoloaderInit', false ) )
+            {
+                static::set( CoreSettings::AUTO_LOADER, \ComposerAutoloaderInit::getLoader() );
+            }
 
-			//	And let the world know we're alive
-			EventManager::trigger( KismaEvents::BIRTH );
-		}
+            //	And let the world know we're alive
+            EventManager::trigger( KismaEvents::BIRTH );
+        }
 
-		//	Load any session data...
-		static::__wakeup();
+        //	Load any session data...
+        static::__wakeup();
 
-		return $_conceived;
-	}
+        return $_conceived;
+    }
 
-	/**
-	 * Serialize
-	 */
-	public static function __sleep()
-	{
-		//	Save options out to session...
-		if ( PHP_SESSION_DISABLED != session_status() && isset( $_SESSION ) )
-		{
-			//	Freeze the options and stow, but not the autoloader
-			$_SESSION[CoreSettings::SESSION_KEY] = static::$_options;
-			//	Remove the autoloader from the SESSION.
-			Option::remove( $_SESSION[CoreSettings::SESSION_KEY], CoreSettings::AUTO_LOADER );
-			//	Remove the autoloader at this key if there is one (some apps used the wrong key)
-			Option::remove( $_SESSION[CoreSettings::SESSION_KEY], 'app.autoloader' );
+    /**
+     * Serialize
+     */
+    public static function __sleep()
+    {
+        //	Save options out to session...
+        if ( static::$_awake && isset( $_SESSION ) )
+        {
+            //	Freeze the options and stow, but not the autoloader
+            $_SESSION[ CoreSettings::SESSION_KEY ] = static::$_options;
+            //	Remove the autoloader from the SESSION.
+            Option::remove( $_SESSION[ CoreSettings::SESSION_KEY ], CoreSettings::AUTO_LOADER );
+            //	Remove the autoloader at this key if there is one (some apps used the wrong key)
+            Option::remove( $_SESSION[ CoreSettings::SESSION_KEY ], 'app.autoloader' );
 
-			//	Now store our options
-			$_SESSION[CoreSettings::SESSION_KEY] = Storage::freeze( $_SESSION[CoreSettings::SESSION_KEY] );
-		}
-	}
+            //	Now store our options
+            $_SESSION[ CoreSettings::SESSION_KEY ] = Storage::freeze( $_SESSION[ CoreSettings::SESSION_KEY ] );
+        }
+    }
 
-	/**
-	 * Deserialize
-	 */
-	public static function __wakeup()
-	{
-		//	Load options from session...
-		if ( PHP_SESSION_DISABLED != session_status() && null !== ( $_frozen = Option::get( $_SESSION, CoreSettings::SESSION_KEY ) ) )
-		{
-			//	Merge them into the fold
-			$_data = Storage::defrost( $_frozen );
+    /**
+     * Deserialize
+     */
+    public static function __wakeup()
+    {
+        //	Load options from session...
+        if ( PHP_SESSION_DISABLED != session_status() && null !== ( $_frozen = Option::get( $_SESSION, CoreSettings::SESSION_KEY ) ) )
+        {
+            //	Merge them into the fold
+            $_data = Storage::defrost( $_frozen );
 
-			//	If this object wasn't stored by me, don't use it.
-			if ( $_data == $_frozen )
-			{
-				Log::debug( '  - Retrieved data is not compressed or bogus. Removing. ' );
-				unset( $_SESSION[CoreSettings::SESSION_KEY] );
+            //	If this object wasn't stored by me, don't use it.
+            if ( $_data == $_frozen )
+            {
+                Log::debug( '  - Retrieved data is not compressed or bogus. Removing. ' );
+                unset( $_SESSION[ CoreSettings::SESSION_KEY ] );
 
-				return;
-			}
+                return;
+            }
 
-			static::$_options = Options::merge( $_data, static::$_options );
-		}
-	}
+            static::$_options = Options::merge( $_data, static::$_options );
+        }
 
-	/**
-	 * @param string $key
-	 * @param mixed  $value
-	 *
-	 * @return mixed
-	 */
-	public static function set( $key, $value = null )
-	{
-		Option::set( static::$_options, static::_getKeyTag( $key ), $value );
-	}
+        static::$_awake = true;
+    }
 
-	/**
-	 * @param string $key
-	 * @param string $subKey
-	 * @param mixed  $value
-	 *
-	 * @return mixed
-	 */
-	public static function addTo( $key, $subKey, $value = null )
-	{
-		Option::addTo( static::$_options, static::_getKeyTag( $key ), $subKey, $value );
-	}
+    /**
+     * @param string $key
+     * @param mixed  $value
+     *
+     * @return mixed
+     */
+    public static function set( $key, $value = null )
+    {
+        Option::set( static::$_options, static::_getKeyTag( $key ), $value );
+    }
 
-	/**
-	 * @param string $key
-	 * @param string $subKey
-	 *
-	 * @return mixed
-	 */
-	public static function removeFrom( $key, $subKey )
-	{
-		Option::removeFrom( static::$_options, static::_getKeyTag( $key ), $subKey );
-	}
+    /**
+     * @param string $key
+     * @param string $subKey
+     * @param mixed  $value
+     *
+     * @return mixed
+     */
+    public static function addTo( $key, $subKey, $value = null )
+    {
+        Option::addTo( static::$_options, static::_getKeyTag( $key ), $subKey, $value );
+    }
 
-	/**
-	 * @param string $key           The key to get. If you pass in a null, you'll get the entire array of options
-	 * @param mixed  $defaultValue  The value to return if the key is not found
-	 * @param bool   $removeIfFound If this is true, and the key is found, it will be removed and the value returned
-	 *
-	 * @return mixed | array
-	 */
-	public static function get( $key, $defaultValue = null, $removeIfFound = false )
-	{
-		if ( null === $key )
-		{
-			return static::$_options;
-		}
+    /**
+     * @param string $key
+     * @param string $subKey
+     *
+     * @return mixed
+     */
+    public static function removeFrom( $key, $subKey )
+    {
+        Option::removeFrom( static::$_options, static::_getKeyTag( $key ), $subKey );
+    }
 
-		return Option::get( static::$_options, static::_getKeyTag( $key ), $defaultValue, $removeIfFound );
-	}
+    /**
+     * @param string $key           The key to get. If you pass in a null, you'll get the entire array of options
+     * @param mixed  $defaultValue  The value to return if the key is not found
+     * @param bool   $removeIfFound If this is true, and the key is found, it will be removed and the value returned
+     *
+     * @return mixed | array
+     */
+    public static function get( $key, $defaultValue = null, $removeIfFound = false )
+    {
+        if ( null === $key )
+        {
+            return static::$_options;
+        }
 
-	/**
-	 * Easier access to Kisma core settings (app-wide options).
-	 * Use "get" and "set" with a CoreSetting constant name.
-	 *
-	 * Examples:
-	 *
-	 *        $_autoloader = \Kisma::getAutoLoader();    //    Returns \Kisma::get( 'app.auto_loader' )
-	 *        $_debug = \Kisma::getDebug();              //    Returns \Kisma::get( 'app.debug' )
-	 *        $_aLife = \Kisma::getALife();              //    throws bad method call exception
-	 *
-	 * @param string $name
-	 * @param array  $arguments
-	 *
-	 * @throws \BadMethodCallException
-	 * @return mixed
-	 */
-	public static function __callStatic( $name, $arguments )
-	{
-		$_type = substr( $_name = strtolower( $name ), 0, 3 );
+        return Option::get( static::$_options, static::_getKeyTag( $key ), $defaultValue, $removeIfFound );
+    }
 
-		if ( $_type == 'get' || $_type == 'set' )
-		{
-			$_tag = static::_getKeyTag( $name );
+    /**
+     * Easier access to Kisma core settings (app-wide options).
+     * Use "get" and "set" with a CoreSetting constant name.
+     *
+     * Examples:
+     *
+     *        $_autoloader = \Kisma::getAutoLoader();    //    Returns \Kisma::get( 'app.auto_loader' )
+     *        $_debug = \Kisma::getDebug();              //    Returns \Kisma::get( 'app.debug' )
+     *        $_aLife = \Kisma::getALife();              //    throws bad method call exception
+     *
+     * @param string $name
+     * @param array  $arguments
+     *
+     * @throws \BadMethodCallException
+     * @return mixed
+     */
+    public static function __callStatic( $name, $arguments )
+    {
+        $_type = substr( $_name = strtolower( $name ), 0, 3 );
 
-			if ( CoreSettings::contains( $_tag ) )
-			{
-				array_unshift( $arguments, $_tag );
+        if ( $_type == 'get' || $_type == 'set' )
+        {
+            $_tag = static::_getKeyTag( $name );
 
-				return call_user_func_array( array( get_called_class(), $_type ), $arguments );
-			}
-		}
+            if ( CoreSettings::contains( $_tag ) )
+            {
+                array_unshift( $arguments, $_tag );
 
-		throw new \BadMethodCallException( 'The method "' . $name . '" does not exist, or at least, I can\'t find it.' );
-	}
+                return call_user_func_array( array( get_called_class(), $_type ), $arguments );
+            }
+        }
 
-	/**
-	 * @param Composer\Script\Event $event
-	 */
-	public static function postInstall( \Composer\Script\Event $event )
-	{
-		//	Nada
-	}
+        throw new \BadMethodCallException( 'The method "' . $name . '" does not exist, or at least, I can\'t find it.' );
+    }
 
-	/**
-	 * @param Composer\Script\Event $event
-	 */
-	public static function postUpdate( \Composer\Script\Event $event )
-	{
-		//	Nada
-	}
+    /**
+     * @param Composer\Script\Event $event
+     */
+    public static function postInstall( \Composer\Script\Event $event )
+    {
+        //	Nada
+    }
 
-	/**
-	 * @param string $name Cleans up a user-supplied option key
-	 *
-	 * @return string
-	 */
-	protected static function _getKeyTag( $name )
-	{
-		//	If this is an array, apply to all keys
-		if ( is_array( $name ) )
-		{
-			$_items = array();
+    /**
+     * @param Composer\Script\Event $event
+     */
+    public static function postUpdate( \Composer\Script\Event $event )
+    {
+        //	Nada
+    }
 
-			foreach ( $name as $_key => $_value )
-			{
-				$_items[$_key] = $_value;
-			}
+    /**
+     * @param string $name Cleans up a user-supplied option key
+     *
+     * @return string
+     */
+    protected static function _getKeyTag( $name )
+    {
+        //	If this is an array, apply to all keys
+        if ( is_array( $name ) )
+        {
+            $_items = array();
 
-			return $_items;
-		}
+            foreach ( $name as $_key => $_value )
+            {
+                $_items[ $_key ] = $_value;
+            }
 
-		if ( is_string( $name ) )
-		{
-			$_tag = Inflector::neutralize( $name );
+            return $_items;
+        }
 
-			if ( false === strpos( $_tag, CoreSettings::OPTION_KEY_PREFIX, 0 ) )
-			{
-				$_tag = CoreSettings::OPTION_KEY_PREFIX . ltrim( $_tag, '.' );
-			}
+        if ( is_string( $name ) )
+        {
+            $_tag = Inflector::neutralize( $name );
 
-			return $_tag;
-		}
+            if ( false === strpos( $_tag, CoreSettings::OPTION_KEY_PREFIX, 0 ) )
+            {
+                $_tag = CoreSettings::OPTION_KEY_PREFIX . ltrim( $_tag, '.' );
+            }
 
-		//	Dunno, have it back the same I guess...
-		return $name;
-	}
+            return $_tag;
+        }
+
+        //	Dunno, have it back the same I guess...
+        return $name;
+    }
 
 }
 
