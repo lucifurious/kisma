@@ -2,8 +2,10 @@
   <configuration default="false" name="Kisma Suite" type="PHPUnitRunConfigurationType" factoryName="PHPUnit" singleton="true">
     <TestRunner class="Kisma\Core\SeedTest" file="$PROJECT_DIR$/tests/src/Kisma/Core/SeedTest.php" scope="XML" />
     <RunnerSettings RunnerId="PhpRunner" />
+    <RunnerSettings RunnerId="PhpUnitCoverageRunner" />
     <RunnerSettings RunnerId="PhpUnitDebugRunner" />
     <ConfigurationWrapper RunnerId="PhpRunner" />
+    <ConfigurationWrapper RunnerId="PhpUnitCoverageRunner" />
     <ConfigurationWrapper RunnerId="PhpUnitDebugRunner" />
     <method />
   </configuration>

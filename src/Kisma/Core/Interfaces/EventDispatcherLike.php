@@ -28,70 +28,70 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 interface EventDispatcherLike
 {
-	//*************************************************************************
-	//	Constants
-	//*************************************************************************
+    //*************************************************************************
+    //	Constants
+    //*************************************************************************
 
-	/**
-	 * @var string The pattern to use when discovering listeners
-	 */
-	const LISTENER_DISCOVERY_PATTERN = '/^_?on(.*)$/';
+    /**
+     * @var string The pattern to use when discovering listeners
+     */
+    const LISTENER_DISCOVERY_PATTERN = '/^_?on(.*)$/';
 
-	//*************************************************************************
-	//	Methods
-	//*************************************************************************
+    //*************************************************************************
+    //	Methods
+    //*************************************************************************
 
-	/**
-	 * @param string    $eventName
-	 * @param SeedEvent $event
-	 *
-	 * @return void
-	 */
-	public static function trigger( $eventName, $event = null );
+    /**
+     * @param string    $eventName
+     * @param SeedEvent $event
+     *
+     * @return void
+     */
+    public static function trigger( $eventName, $event = null );
 
-	/**
-	 * Adds an event listener that listens on the specified events.
-	 *
-	 * @param string   $eventName            The event to listen on
-	 * @param callable $listener             The listener
-	 * @param integer  $priority             The higher this value, the earlier an event
-	 *                                       listener will be triggered in the chain (defaults to 0)
-	 */
-	public static function on( $eventName, $listener, $priority = 0 );
+    /**
+     * Adds an event listener that listens on the specified events.
+     *
+     * @param string   $eventName            The event to listen on
+     * @param callable $listener             The listener
+     * @param integer  $priority             The higher this value, the earlier an event
+     *                                       listener will be triggered in the chain (defaults to 0)
+     */
+    public static function on( $eventName, $listener, $priority = 0 );
 
-	/**
-	 * Turn off/unbind/remove $listener from an event
-	 *
-	 * @param string   $eventName
-	 * @param callable $listener
-	 *
-	 * @return void
-	 */
-	public static function off( $eventName, $listener );
+    /**
+     * Turn off/unbind/remove $listener from an event
+     *
+     * @param string   $eventName
+     * @param callable $listener
+     *
+     * @return void
+     */
+    public static function off( $eventName, $listener );
 
-	/**
-	 * Searches the methods of an object for event handlers to automatically register.
-	 * Method signature must match EventDispatcherLike::LISTENER_DISCOVERY_PATTERN
-	 *
-	 * @param SubscriberLike $object
-	 * @param array          $listeners Array of 'event.name' => callback/closure pairs
-	 * @param string         $pattern   The pattern to use for discovery. Override constant in your subclass or pass in a different string.
-	 *
-	 * @return int The number of listeners found. False returned on an error
-	 */
-	public static function discoverListeners( SubscriberLike $object, $listeners = null, $pattern = self::LISTENER_DISCOVERY_PATTERN );
+    /**
+     * Searches the methods of an object for event handlers to automatically register.
+     * Method signature must match EventDispatcherLike::LISTENER_DISCOVERY_PATTERN
+     *
+     * @param SubscriberLike|string $object    Object or class discovery target
+     * @param array                 $listeners Array of 'event.name' => callback/closure pairs
+     * @param string                $pattern   The pattern to use for discovery. Override constant in your subclass or pass in a different string.
+     *
+     * @return int The number of listeners found. False returned on an error
+     */
+    public static function discoverListeners( $object, $listeners = null, $pattern = self::LISTENER_DISCOVERY_PATTERN );
 
-	/**
-	 * @param EventSubscriberInterface $subscriber
-	 *
-	 * @return void
-	 */
-	public static function addSubscriber( EventSubscriberInterface $subscriber );
+    /**
+     * @param EventSubscriberInterface $subscriber
+     *
+     * @return void
+     */
+    public static function addSubscriber( EventSubscriberInterface $subscriber );
 
-	/**
-	 * @param EventSubscriberInterface $subscriber
-	 *
-	 * @return void
-	 */
-	public static function removeSubscriber( EventSubscriberInterface $subscriber );
+    /**
+     * @param EventSubscriberInterface $subscriber
+     *
+     * @return void
+     */
+    public static function removeSubscriber( EventSubscriberInterface $subscriber );
 }
