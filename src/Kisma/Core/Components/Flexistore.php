@@ -25,6 +25,7 @@ use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\Common\Cache\RedisCache;
 use Doctrine\Common\Cache\XcacheCache;
 use Kisma\Core\Enums\CacheTypes;
+use Kisma\Core\Utility\Option;
 
 /**
  * Wrapper around doctrine/cache
@@ -47,16 +48,12 @@ class Flexistore
     /**
      * @type string The suffix for the cache files
      */
-    const DEFAULT_CACHE_EXTENSION = '.flexistore.bin';
+    const DEFAULT_CACHE_EXTENSION = '.kfs.php';
 
     //*************************************************************************
     //	Members
     //*************************************************************************
 
-    /**
-     * @var string The ID of this store. Used as a prefix for cache keys
-     */
-    protected $_storeId = null;
     /**
      * @var CacheProvider|RedisCache|XcacheCache
      */
@@ -73,7 +70,7 @@ class Flexistore
      */
     public static function createSingleton( $namespace = null )
     {
-        return new Flexistore( CacheTypes::ARRAY_CACHE, $namespace );
+        return new Flexistore( CacheTypes::ARRAY_CACHE, array( 'namespace' => $namespace ) );
     }
 
     /**
@@ -85,21 +82,9 @@ class Flexistore
      */
     public static function createFileStore( $path = null, $extension = self::DEFAULT_CACHE_EXTENSION, $namespace = null )
     {
-        if ( null === ( $_path = $path ) )
-        {
-            //  Get a unique temp directory
-            do
-            {
-                $_path = sys_get_temp_dir() . '/dffs.' . uniqid();
-            }
-            while ( is_dir( $_path ) );
-        }
+        $_path = $path ? : static::_getUniqueTempPath();
 
-        $_store = new Flexistore( CacheTypes::PHP_FILE, $namespace, $extension, false );
-        /** @noinspection PhpUndefinedMethodInspection */
-        $_store->setDirectory( $path );
-
-        return $_store;
+        return new Flexistore( CacheTypes::PHP_FILE, array( 'namespace' => $namespace, 'arguments' => array( $_path, $extension ) ) );
     }
 
     /**
@@ -126,7 +111,7 @@ class Flexistore
             throw new \LogicException( 'No redis server answering at ' . $host . ':' . $port );
         }
 
-        $_store = new static( CacheTypes::REDIS, $namespace, false );
+        $_store = new static( CacheTypes::REDIS, array( 'namespace' => $namespace ), false );
 
         /** @noinspection PhpUndefinedMethodInspection */
         $_store->setRedis( $_redis );
@@ -136,16 +121,10 @@ class Flexistore
 
     /**
      * @param string $type
-     * @param string $namespace
-     * @param string $extension
-     * @param bool   $autoInit If true, automatically initialize with defaults. If false, you are responsible for setting the necessary settings
-     *
-     * @throws \Aws\Common\Exception\LogicException
-     * @throws \LogicException
-     * @throws \InvalidArgumentException
-     * @internal param string $storeId
+     * @param array  $settings You can set 'namespace', 'extension', and 'arguments'
+     * @param bool   $init
      */
-    public function __construct( $type = CacheTypes::ARRAY_CACHE, $namespace = null, $extension = self::DEFAULT_CACHE_EXTENSION, $autoInit = true )
+    public function __construct( $type = CacheTypes::ARRAY_CACHE, array $settings = array(), $init = true )
     {
         if ( !CacheTypes::contains( $type ) )
         {
@@ -159,14 +138,19 @@ class Flexistore
             throw new LogicException( 'Associated driver for type "' . $type . '" not found. Looking for "' . $_class . '"' );
         }
 
-        $this->_store = $_mirror->getConstructor() ? $_mirror->newInstanceArgs( $this->_getCacheTypeArguments( $type ) ) : $_mirror->newInstance();
+        $_arguments = Option::get( $settings, 'arguments' );
 
-        if ( null !== $namespace )
+        $this->_store =
+            $_mirror->getConstructor()
+                ? ( $_mirror->newInstanceArgs( $_arguments ? : $this->_getCacheTypeArguments( $type ) ) )
+                : $_mirror->newInstance();
+
+        if ( null !== ( $_namespace = Option::get( $settings, 'namespace' ) ) )
         {
-            $this->_store->setNamespace( $namespace );
+            $this->_store->setNamespace( $_namespace );
         }
 
-        if ( $autoInit )
+        if ( $init )
         {
             $this->_initializeCache( $type );
         }
@@ -185,7 +169,7 @@ class Flexistore
             case CacheTypes::PHP_FILE:
                 do
                 {
-                    $_directory = sys_get_temp_dir() . '/kfs.' . uniqid();
+                    $_directory = sys_get_temp_dir() . '/cache.' . uniqid();
                 }
                 while ( is_dir( $_directory ) );
 
@@ -263,7 +247,7 @@ class Flexistore
 
             foreach ( $id as $_key => $_value )
             {
-                $_result[$_key] = $this->_store->save( $_key, $_value, $lifeTime );
+                $_result[ $_key ] = $this->_store->save( $_key, $_value, $lifeTime );
             }
 
             return $_result;
@@ -298,10 +282,20 @@ class Flexistore
     }
 
     /**
+     * @param string $prefix
+     *
      * @return string
      */
-    public function getStoreId()
+    protected static function _getUniqueTempPath( $prefix = 'kfs' )
     {
-        return $this->_storeId;
+        //  Get a unique temp directory
+        do
+        {
+            $_path = sys_get_temp_dir() . '/' . $prefix . '.' . uniqid();
+        }
+        while ( is_dir( $_path ) );
+
+        return $_path;
     }
+
 }
