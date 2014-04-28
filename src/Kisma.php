@@ -292,10 +292,10 @@ class Kisma
         {
             $_tag = Inflector::neutralize( $name );
 
-            if ( false === strpos( $_tag, CoreSettings::OPTION_KEY_PREFIX, 0 ) )
-            {
-                $_tag = CoreSettings::OPTION_KEY_PREFIX . ltrim( $_tag, '.' );
-            }
+//            if ( false === strpos( $_tag, CoreSettings::OPTION_KEY_PREFIX, 0 ) )
+//            {
+//                $_tag = CoreSettings::OPTION_KEY_PREFIX . ltrim( $_tag, '.' );
+//            }
 
             return $_tag;
         }
