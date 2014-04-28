@@ -70,7 +70,7 @@ class Flexistore
      */
     public static function createSingleton( $namespace = null )
     {
-        return new Flexistore( CacheTypes::ARRAY_CACHE, array( 'namespace' => $namespace ) );
+        return new Flexistore( CacheTypes::ARRAY_CACHE, array('namespace' => $namespace) );
     }
 
     /**
@@ -84,7 +84,7 @@ class Flexistore
     {
         $_path = $path ? : static::_getUniqueTempPath();
 
-        return new Flexistore( CacheTypes::PHP_FILE, array( 'namespace' => $namespace, 'arguments' => array( $_path, $extension ) ) );
+        return new Flexistore( CacheTypes::PHP_FILE, array('namespace' => $namespace, 'arguments' => array($_path, $extension)) );
     }
 
     /**
@@ -111,7 +111,7 @@ class Flexistore
             throw new \LogicException( 'No redis server answering at ' . $host . ':' . $port );
         }
 
-        $_store = new static( CacheTypes::REDIS, array( 'namespace' => $namespace ), false );
+        $_store = new static( CacheTypes::REDIS, array('namespace' => $namespace), false );
 
         /** @noinspection PhpUndefinedMethodInspection */
         $_store->setRedis( $_redis );
@@ -141,9 +141,7 @@ class Flexistore
         $_arguments = Option::get( $settings, 'arguments' );
 
         $this->_store =
-            $_mirror->getConstructor()
-                ? ( $_mirror->newInstanceArgs( $_arguments ? : $this->_getCacheTypeArguments( $type ) ) )
-                : $_mirror->newInstance();
+            $_mirror->getConstructor() ? ( $_mirror->newInstanceArgs( $_arguments ? : $this->_getCacheTypeArguments( $type ) ) ) : $_mirror->newInstance();
 
         if ( null !== ( $_namespace = Option::get( $settings, 'namespace' ) ) )
         {
@@ -173,7 +171,7 @@ class Flexistore
                 }
                 while ( is_dir( $_directory ) );
 
-                return array( $_directory, static::DEFAULT_CACHE_EXTENSION );
+                return array($_directory, static::DEFAULT_CACHE_EXTENSION);
         }
 
         return array();
@@ -269,8 +267,26 @@ class Flexistore
     {
         if ( method_exists( $this->_store, $name ) )
         {
-            return call_user_func_array( array( $this->_store, $name ), $arguments );
+            return call_user_func_array( array($this->_store, $name), $arguments );
         }
+    }
+
+    /**
+     * @param string $id
+     *
+     * @return bool
+     */
+    public function delete( $id )
+    {
+        return $this->_store->delete( $id );
+    }
+
+    /**
+     * @return bool
+     */
+    public function deleteAll()
+    {
+        return $this->_store->deleteAll();
     }
 
     /**

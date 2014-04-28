@@ -38,7 +38,7 @@ class Kisma
     /**
      * @var string The current version
      */
-    const KISMA_VERSION = '0.2.37';
+    const KISMA_VERSION = '0.2.38';
     /**
      * @var string The current version
      * @deprecated Deprecated in 0.2.19, to be removed in 0.3.x
@@ -292,10 +292,10 @@ class Kisma
         {
             $_tag = Inflector::neutralize( $name );
 
-            if ( false === strpos( $_tag, CoreSettings::OPTION_KEY_PREFIX, 0 ) )
-            {
-                $_tag = CoreSettings::OPTION_KEY_PREFIX . ltrim( $_tag, '.' );
-            }
+//            if ( false === strpos( $_tag, CoreSettings::OPTION_KEY_PREFIX, 0 ) )
+//            {
+//                $_tag = CoreSettings::OPTION_KEY_PREFIX . ltrim( $_tag, '.' );
+//            }
 
             return $_tag;
         }
