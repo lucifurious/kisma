@@ -20,7 +20,6 @@
  */
 namespace Kisma\Core\Components;
 
-use Aws\Common\Exception\LogicException;
 use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\Common\Cache\RedisCache;
 use Doctrine\Common\Cache\XcacheCache;
@@ -70,7 +69,7 @@ class Flexistore
      */
     public static function createSingleton( $namespace = null )
     {
-        return new Flexistore( CacheTypes::ARRAY_CACHE, array('namespace' => $namespace) );
+        return new Flexistore( CacheTypes::ARRAY_CACHE, array( 'namespace' => $namespace ) );
     }
 
     /**
@@ -84,7 +83,7 @@ class Flexistore
     {
         $_path = $path ? : static::_getUniqueTempPath();
 
-        return new Flexistore( CacheTypes::PHP_FILE, array('namespace' => $namespace, 'arguments' => array($_path, $extension)) );
+        return new Flexistore( CacheTypes::PHP_FILE, array( 'namespace' => $namespace, 'arguments' => array( $_path, $extension ) ) );
     }
 
     /**
@@ -111,7 +110,7 @@ class Flexistore
             throw new \LogicException( 'No redis server answering at ' . $host . ':' . $port );
         }
 
-        $_store = new static( CacheTypes::REDIS, array('namespace' => $namespace), false );
+        $_store = new static( CacheTypes::REDIS, array( 'namespace' => $namespace ), false );
 
         /** @noinspection PhpUndefinedMethodInspection */
         $_store->setRedis( $_redis );
@@ -135,7 +134,10 @@ class Flexistore
 
         if ( !class_exists( $_class ) || null === ( $_mirror = new \ReflectionClass( $_class ) ) )
         {
-            throw new LogicException( 'Associated driver for type "' . $type . '" not found. Looking for "' . $_class . '"' );
+            if ( !class_exists( $type . 'Cache' ) || null === ( $_mirror = new \ReflectionClass( $type . 'Cache' ) ) )
+            {
+                throw new \InvalidArgumentException( 'Associated driver for type "' . $type . '" not found. Looking for "' . $_class . '"' );
+            }
         }
 
         $_arguments = Option::get( $settings, 'arguments' );
@@ -171,7 +173,7 @@ class Flexistore
                 }
                 while ( is_dir( $_directory ) );
 
-                return array($_directory, static::DEFAULT_CACHE_EXTENSION);
+                return array( $_directory, static::DEFAULT_CACHE_EXTENSION );
         }
 
         return array();
@@ -267,7 +269,7 @@ class Flexistore
     {
         if ( method_exists( $this->_store, $name ) )
         {
-            return call_user_func_array( array($this->_store, $name), $arguments );
+            return call_user_func_array( array( $this->_store, $name ), $arguments );
         }
     }
 
