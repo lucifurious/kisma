@@ -29,6 +29,8 @@ use Kisma\Core\Utility\Option;
 /**
  * Wrapper around doctrine/cache
  *
+ * @method fetch()
+ * @method save()
  */
 class Flexistore
 {
@@ -61,61 +63,6 @@ class Flexistore
     //*************************************************************************
     //* Methods
     //*************************************************************************
-
-    /**
-     * @param string $namespace
-     *
-     * @return Flexistore
-     */
-    public static function createSingleton( $namespace = null )
-    {
-        return new Flexistore( CacheTypes::ARRAY_CACHE, array( 'namespace' => $namespace ) );
-    }
-
-    /**
-     * @param string $path
-     * @param string $namespace
-     * @param string $extension
-     *
-     * @return \Kisma\Core\Components\Flexistore
-     */
-    public static function createFileStore( $path = null, $extension = self::DEFAULT_CACHE_EXTENSION, $namespace = null )
-    {
-        $_path = $path ? : static::_getUniqueTempPath();
-
-        return new Flexistore( CacheTypes::PHP_FILE, array( 'namespace' => $namespace, 'arguments' => array( $_path, $extension ) ) );
-    }
-
-    /**
-     * @param string $host
-     * @param int    $port
-     * @param float  $timeout
-     * @param string $namespace
-     *
-     * @throws LogicException
-     * @return Flexistore
-     */
-    public static function createRedisStore( $host = '127.0.0.1', $port = 6379, $timeout = 0.0, $namespace = null )
-    {
-        if ( !extension_loaded( 'redis' ) )
-        {
-            throw new LogicException( 'The PHP Redis extension is required to use this store type.' );
-        }
-
-        $_redis = new \Redis();
-
-        if ( false === $_redis->pconnect( $host, $port, $timeout ) )
-        {
-            throw new \LogicException( 'No redis server answering at ' . $host . ':' . $port );
-        }
-
-        $_store = new static( CacheTypes::REDIS, array( 'namespace' => $namespace ), false );
-
-        /** @noinspection PhpUndefinedMethodInspection */
-        $_store->setRedis( $_redis );
-
-        return $_store;
-    }
 
     /**
      * @param string $type
@@ -198,6 +145,78 @@ class Flexistore
                 $this->_store->setRedis( $_redis );
                 break;
         }
+    }
+
+    /**
+     * @param string $namespace
+     *
+     * @return Flexistore
+     */
+    public static function createSingleton( $namespace = null )
+    {
+        return new Flexistore( CacheTypes::ARRAY_CACHE, array( 'namespace' => $namespace ) );
+    }
+
+    /**
+     * @param string $path
+     * @param string $namespace
+     * @param string $extension
+     *
+     * @return \Kisma\Core\Components\Flexistore
+     */
+    public static function createFileStore( $path = null, $extension = self::DEFAULT_CACHE_EXTENSION, $namespace = null )
+    {
+        $_path = $path ? : static::_getUniqueTempPath();
+
+        return new Flexistore( CacheTypes::PHP_FILE, array( 'namespace' => $namespace, 'arguments' => array( $_path, $extension ) ) );
+    }
+
+    /**
+     * @param string $prefix
+     *
+     * @return string
+     */
+    protected static function _getUniqueTempPath( $prefix = 'flex' )
+    {
+        //  Get a unique temp directory
+        do
+        {
+            $_path = sys_get_temp_dir() . '/' . $prefix . '.' . uniqid();
+        }
+        while ( is_dir( $_path ) );
+
+        return $_path;
+    }
+
+    /**
+     * @param string $host
+     * @param int    $port
+     * @param float  $timeout
+     * @param string $namespace
+     *
+     * @throws LogicException
+     * @return Flexistore
+     */
+    public static function createRedisStore( $host = '127.0.0.1', $port = 6379, $timeout = 0.0, $namespace = null )
+    {
+        if ( !extension_loaded( 'redis' ) )
+        {
+            throw new LogicException( 'The PHP Redis extension is required to use this store type.' );
+        }
+
+        $_redis = new \Redis();
+
+        if ( false === $_redis->pconnect( $host, $port, $timeout ) )
+        {
+            throw new \LogicException( 'No redis server answering at ' . $host . ':' . $port );
+        }
+
+        $_store = new static( CacheTypes::REDIS, array( 'namespace' => $namespace ), false );
+
+        /** @noinspection PhpUndefinedMethodInspection */
+        $_store->setRedis( $_redis );
+
+        return $_store;
     }
 
     /**
@@ -289,23 +308,6 @@ class Flexistore
             //  Pass the buck...
             return call_user_func_array( array( $this->_store, $name ), $arguments );
         }
-    }
-
-    /**
-     * @param string $prefix
-     *
-     * @return string
-     */
-    protected static function _getUniqueTempPath( $prefix = 'flex' )
-    {
-        //  Get a unique temp directory
-        do
-        {
-            $_path = sys_get_temp_dir() . '/' . $prefix . '.' . uniqid();
-        }
-        while ( is_dir( $_path ) );
-
-        return $_path;
     }
 
     /**
