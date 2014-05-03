@@ -92,8 +92,7 @@ class Flexistore
      * @param float  $timeout
      * @param string $namespace
      *
-     * @throws \LogicException
-     * @throws \Aws\Common\Exception\LogicException
+     * @throws LogicException
      * @return Flexistore
      */
     public static function createRedisStore( $host = '127.0.0.1', $port = 6379, $timeout = 0.0, $namespace = null )
@@ -212,16 +211,16 @@ class Flexistore
      */
     public function get( $id, $defaultValue = null, $remove = false )
     {
-        if ( false === ( $_data = $this->_store->fetch( $id ) ) )
+        if ( false === ( $_data = $this->fetch( $id ) ) )
         {
             if ( !$remove )
             {
-                $this->_store->save( $id, $_data = $defaultValue );
+                $this->save( $id, $_data = $defaultValue );
             }
         }
         elseif ( $remove )
         {
-            $this->_store->delete( $id );
+            $this->delete( $id );
         }
 
         return $_data;
@@ -241,62 +240,55 @@ class Flexistore
      */
     public function set( $id, $data = null, $lifeTime = self::DEFAULT_CACHE_TTL )
     {
-        if ( is_array( $id ) && null === $data )
+        $_multi = false;
+        $_ids = null;
+
+        if ( is_string( $id ) )
         {
-            $_result = array();
-
-            foreach ( $id as $_key => $_value )
-            {
-                $_result[ $_key ] = $this->_store->save( $_key, $_value, $lifeTime );
-            }
-
-            return $_result;
+            $_ids = array( $id => $data );
+        }
+        else if ( is_array( $id ) )
+        {
+            $_ids = $id;
+            $_multi = true;
         }
 
-        return $this->_store->save( $id, $data, $lifeTime );
+        $_result = array();
+
+        foreach ( $_ids as $_key => $_value )
+        {
+            $_result[ $_key ] = $this->save( $id, $_value, $lifeTime );
+        }
+
+        return $_multi ? $_result : current( $_result );
     }
 
     /**
-     * Pass-thru for other cache methods to avoid extending CacheProvider
+     * Pass-thru for other cache methods to avoid extending CacheProvider. Also obscures keys.
      *
      * @param string $name
      * @param array  $arguments
      *
-     * @throws BadMethodException
      * @return mixed
      */
-    public function __call( $name, $arguments )
+    public function __call( $name, $arguments = array() )
     {
-        if ( method_exists( $this->_store, $name ) )
+        if ( $this->_store && method_exists( $this->_store, $name ) )
         {
+            switch ( $name )
+            {
+                //  Obscure the ids of pass-thru calls if they accept $id as the first argument
+                case 'doContains':
+                case 'doFetch':
+                case 'doSave':
+                case 'doDelete':
+                    array_unshift( $arguments, $this->_obscureKey( array_shift( $arguments ) ) );
+                    break;
+            }
+
+            //  Pass the buck...
             return call_user_func_array( array( $this->_store, $name ), $arguments );
         }
-    }
-
-    /**
-     * @param string $id
-     *
-     * @return bool
-     */
-    public function delete( $id )
-    {
-        return $this->_store->delete( $id );
-    }
-
-    /**
-     * @return bool
-     */
-    public function deleteAll()
-    {
-        return $this->_store->deleteAll();
-    }
-
-    /**
-     * @return CacheProvider
-     */
-    public function getStore()
-    {
-        return $this->_store;
     }
 
     /**
@@ -304,7 +296,7 @@ class Flexistore
      *
      * @return string
      */
-    protected static function _getUniqueTempPath( $prefix = 'kfs' )
+    protected static function _getUniqueTempPath( $prefix = 'flex' )
     {
         //  Get a unique temp directory
         do
@@ -314,6 +306,17 @@ class Flexistore
         while ( is_dir( $_path ) );
 
         return $_path;
+    }
+
+    /**
+     * @param string $key
+     *
+     * @return string mixed
+     */
+    protected function _obscureKey( $key )
+    {
+        //  No obscuring done but allows for children to obscure automatically
+        return $key;
     }
 
 }

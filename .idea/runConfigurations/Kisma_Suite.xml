@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Kisma Suite" type="PHPUnitRunConfigurationType" factoryName="PHPUnit" singleton="true">
-    <TestRunner class="Kisma\Core\SeedTest" file="$PROJECT_DIR$/tests/src/Kisma/Core/SeedTest.php" scope="XML" />
+    <TestRunner class="Kisma\Core\SeedTest" configuration_file="$PROJECT_DIR$/phpunit.xml" file="$PROJECT_DIR$/tests/src/Kisma/Core/SeedTest.php" scope="XML" />
     <RunnerSettings RunnerId="PhpRunner" />
     <RunnerSettings RunnerId="PhpUnitCoverageRunner" />
     <RunnerSettings RunnerId="PhpUnitDebugRunner" />
