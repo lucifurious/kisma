@@ -24,13 +24,17 @@ use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\Common\Cache\RedisCache;
 use Doctrine\Common\Cache\XcacheCache;
 use Kisma\Core\Enums\CacheTypes;
+use Kisma\Core\Interfaces\StoreLike;
 use Kisma\Core\Utility\Option;
 
 /**
  * Wrapper around doctrine/cache
  *
+ * @method bool|mixed fetch( $id )
+ * @method bool save( $id, $value, $ttl = 0 ) Saves a value to $key
+ * @method bool delete( string $key ) Delete a single key
  */
-class Flexistore
+class Flexistore implements StoreLike
 {
     //*************************************************************************
     //	Constants
@@ -61,62 +65,6 @@ class Flexistore
     //*************************************************************************
     //* Methods
     //*************************************************************************
-
-    /**
-     * @param string $namespace
-     *
-     * @return Flexistore
-     */
-    public static function createSingleton( $namespace = null )
-    {
-        return new Flexistore( CacheTypes::ARRAY_CACHE, array( 'namespace' => $namespace ) );
-    }
-
-    /**
-     * @param string $path
-     * @param string $namespace
-     * @param string $extension
-     *
-     * @return \Kisma\Core\Components\Flexistore
-     */
-    public static function createFileStore( $path = null, $extension = self::DEFAULT_CACHE_EXTENSION, $namespace = null )
-    {
-        $_path = $path ? : static::_getUniqueTempPath();
-
-        return new Flexistore( CacheTypes::PHP_FILE, array( 'namespace' => $namespace, 'arguments' => array( $_path, $extension ) ) );
-    }
-
-    /**
-     * @param string $host
-     * @param int    $port
-     * @param float  $timeout
-     * @param string $namespace
-     *
-     * @throws \LogicException
-     * @throws \Aws\Common\Exception\LogicException
-     * @return Flexistore
-     */
-    public static function createRedisStore( $host = '127.0.0.1', $port = 6379, $timeout = 0.0, $namespace = null )
-    {
-        if ( !extension_loaded( 'redis' ) )
-        {
-            throw new LogicException( 'The PHP Redis extension is required to use this store type.' );
-        }
-
-        $_redis = new \Redis();
-
-        if ( false === $_redis->pconnect( $host, $port, $timeout ) )
-        {
-            throw new \LogicException( 'No redis server answering at ' . $host . ':' . $port );
-        }
-
-        $_store = new static( CacheTypes::REDIS, array( 'namespace' => $namespace ), false );
-
-        /** @noinspection PhpUndefinedMethodInspection */
-        $_store->setRedis( $_redis );
-
-        return $_store;
-    }
 
     /**
      * @param string $type
@@ -202,101 +150,58 @@ class Flexistore
     }
 
     /**
-     * Fetches an entry from the cache.
+     * @param string $host
+     * @param int    $port
+     * @param float  $timeout
+     * @param string $namespace
      *
-     * @param string $id           The id of the cache entry to fetch
-     * @param mixed  $defaultValue The default value if $id not found
-     * @param bool   $remove
-     *
-     * @return mixed The cached data or FALSE, if no cache entry exists for the given id.
+     * @throws LogicException
+     * @return Flexistore
      */
-    public function get( $id, $defaultValue = null, $remove = false )
+    public static function createRedisStore( $host = '127.0.0.1', $port = 6379, $timeout = 0.0, $namespace = null )
     {
-        if ( false === ( $_data = $this->_store->fetch( $id ) ) )
+        if ( !extension_loaded( 'redis' ) )
         {
-            if ( !$remove )
-            {
-                $this->_store->save( $id, $_data = $defaultValue );
-            }
-        }
-        elseif ( $remove )
-        {
-            $this->_store->delete( $id );
+            throw new LogicException( 'The PHP Redis extension is required to use this store type.' );
         }
 
-        return $_data;
-    }
+        $_redis = new \Redis();
 
-    /**
-     * Puts data into the cache.
-     *
-     * $id can be specified as an array of key-value pairs: array( 'alpha' => 'xyz', 'beta' => 'qrs', 'gamma' => 'lmo', ... )
-     *
-     *
-     * @param string|array $id       The cache id or array of key-value pairs
-     * @param mixed        $data     The cache entry/data.
-     * @param int          $lifeTime The cache lifetime. Sets a specific lifetime for this cache entry. Defaults to 0, or "never expire"
-     *
-     * @return boolean|boolean[] TRUE if the entry was successfully stored in the cache, FALSE otherwise.
-     */
-    public function set( $id, $data = null, $lifeTime = self::DEFAULT_CACHE_TTL )
-    {
-        if ( is_array( $id ) && null === $data )
+        if ( false === $_redis->pconnect( $host, $port, $timeout ) )
         {
-            $_result = array();
-
-            foreach ( $id as $_key => $_value )
-            {
-                $_result[ $_key ] = $this->_store->save( $_key, $_value, $lifeTime );
-            }
-
-            return $_result;
+            throw new \LogicException( 'No redis server answering at ' . $host . ':' . $port );
         }
 
-        return $this->_store->save( $id, $data, $lifeTime );
+        $_store = new static( CacheTypes::REDIS, array( 'namespace' => $namespace ), false );
+
+        /** @noinspection PhpUndefinedMethodInspection */
+        $_store->setRedis( $_redis );
+
+        return $_store;
     }
 
     /**
-     * Pass-thru for other cache methods to avoid extending CacheProvider
+     * @param string $namespace
      *
-     * @param string $name
-     * @param array  $arguments
+     * @return Flexistore
+     */
+    public static function createSingleton( $namespace = null )
+    {
+        return new static( CacheTypes::ARRAY_CACHE, array( 'namespace' => $namespace ) );
+    }
+
+    /**
+     * @param string $path
+     * @param string $namespace
+     * @param string $extension
      *
-     * @throws BadMethodException
-     * @return mixed
+     * @return \Kisma\Core\Components\Flexistore
      */
-    public function __call( $name, $arguments )
+    public static function createFileStore( $path = null, $extension = self::DEFAULT_CACHE_EXTENSION, $namespace = null )
     {
-        if ( method_exists( $this->_store, $name ) )
-        {
-            return call_user_func_array( array( $this->_store, $name ), $arguments );
-        }
-    }
+        $_path = $path ? : static::_getUniqueTempPath();
 
-    /**
-     * @param string $id
-     *
-     * @return bool
-     */
-    public function delete( $id )
-    {
-        return $this->_store->delete( $id );
-    }
-
-    /**
-     * @return bool
-     */
-    public function deleteAll()
-    {
-        return $this->_store->deleteAll();
-    }
-
-    /**
-     * @return CacheProvider
-     */
-    public function getStore()
-    {
-        return $this->_store;
+        return new static( CacheTypes::PHP_FILE, array( 'namespace' => $namespace, 'arguments' => array( $_path, $extension ) ) );
     }
 
     /**
@@ -304,7 +209,7 @@ class Flexistore
      *
      * @return string
      */
-    protected static function _getUniqueTempPath( $prefix = 'kfs' )
+    protected static function _getUniqueTempPath( $prefix = 'flex' )
     {
         //  Get a unique temp directory
         do
@@ -316,4 +221,101 @@ class Flexistore
         return $_path;
     }
 
+    /**
+     * {@InheritDoc}
+     */
+    public function get( $key, $defaultValue = null, $remove = false, $ttl = self::DEFAULT_CACHE_TTL )
+    {
+        if ( false === ( $_data = $this->fetch( $key ) ) )
+        {
+            //  If the item was not found and is not to be removed, add it to the cache            
+            if ( !$remove )
+            {
+                $this->save( $key, $_data = $defaultValue, $ttl );
+            }
+        }
+        elseif ( $remove )
+        {
+            $this->delete( $key );
+        }
+
+        return $_data;
+    }
+
+    /**
+     * {@InheritDoc}
+     */
+    public function set( $id, $data = null, $ttl = self::DEFAULT_CACHE_TTL )
+    {
+        $_multi = false;
+        $_ids = null;
+
+        if ( is_string( $id ) )
+        {
+            $_ids = array( $id => $data );
+        }
+        else if ( is_array( $id ) )
+        {
+            $_ids = $id;
+            $_multi = true;
+        }
+
+        $_result = array();
+
+        foreach ( $_ids as $_key => $_value )
+        {
+            $_result[ $_key ] = $this->save( $id, $_value, $ttl );
+        }
+
+        return $_multi ? $_result : current( $_result );
+    }
+
+    /**
+     * Pass-thru for other cache methods to avoid extending CacheProvider. Also obscures keys.
+     *
+     * @param string $name
+     * @param array  $arguments
+     *
+     * @return mixed
+     */
+    public function __call( $name, $arguments = array() )
+    {
+        if ( $this->_store && method_exists( $this->_store, $name ) )
+        {
+            switch ( $name )
+            {
+                //  Obscure the ids of pass-thru calls if they accept $id as the first argument
+                case 'doContains':
+                case 'doFetch':
+                case 'doSave':
+                case 'doDelete':
+                    array_unshift( $arguments, $this->_obscureKey( array_shift( $arguments ) ) );
+                    break;
+            }
+
+            //  Pass the buck...
+            return call_user_func_array( array( $this->_store, $name ), $arguments );
+        }
+    }
+
+    /**
+     * @param string $key
+     *
+     * @return string mixed
+     */
+    protected function _obscureKey( $key )
+    {
+        //  No obscuring done but allows for children to obscure automatically
+        return $key;
+    }
+
+    /**
+     * Deletes all items from the store
+     *
+     * @return bool
+     */
+    public function deleteAll()
+    {
+        return $this->_store->deleteAll();
+    }
 }

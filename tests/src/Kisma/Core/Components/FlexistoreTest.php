@@ -24,11 +24,33 @@ use Doctrine\Common\Cache\Cache;
 use Doctrine\Common\Cache\CacheProvider;
 use Kisma\Core\Enums\CacheTypes;
 
+class ObscuredKeyTest extends Flexistore
+{
+    /**
+     * @param string $key
+     *
+     * @return string The MD5 hash of the key
+     */
+    protected function _obscureKey( $key )
+    {
+        return parent::_obscureKey( md5( $key ) );
+    }
+}
+
 /**
  * FlexistoreTest
  */
 class FlexistoreTest extends \PHPUnit_Framework_TestCase
 {
+    //*************************************************************************
+    //	Constants
+    //*************************************************************************
+
+    /**
+     * @type int Cache duration of 5 seconds for test
+     */
+    const EXPIRY_TEST_TTL = 5;
+
     //*************************************************************************
     //	Members
     //*************************************************************************
@@ -46,6 +68,10 @@ class FlexistoreTest extends \PHPUnit_Framework_TestCase
     //	Methods
     //*************************************************************************
 
+    /**
+     * @param $cache
+     * @param $stats
+     */
     protected function _getStats( $cache, $stats )
     {
         $stats = $stats ? : $cache->getStats();
@@ -60,31 +86,42 @@ class FlexistoreTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         static::$_testTypes = array(
-            CacheTypes::REDIS       => array(
-                'shared' => true,
-                'stats'  => function ( $cache, $stats )
-                {
-                    $this->_getStats( $cache, $stats );
-                },
-            ),
-            CacheTypes::ARRAY_CACHE => array(
-                'shared' => false,
-                'stats'  => function ( $cache, $stats )
-                {
-                    $this->assertNull( $stats );
-                },
-            ),
-            CacheTypes::PHP_FILE    => array(
-                'shared' => false,
-                'stats'  => function ( $cache, $stats )
-                {
-                    $this->assertNull( $stats[Cache::STATS_HITS] );
-                    $this->assertNull( $stats[Cache::STATS_MISSES] );
-                    $this->assertNull( $stats[Cache::STATS_UPTIME] );
-                    $this->assertEquals( 0, $stats[Cache::STATS_MEMORY_USAGE] );
-                    $this->assertGreaterThan( 0, $stats[Cache::STATS_MEMORY_AVAILABLE] );
-                },
-            ),
+//            CacheTypes::REDIS       => array(
+//                'shared' => true,
+//                'stats'  => function ( $cache, $stats )
+//                {
+//                    $this->_getStats( $cache, $stats );
+//                },
+//            ),
+//            CacheTypes::ARRAY_CACHE => array(
+//                'shared' => false,
+//                'stats'  => function ( $cache, $stats )
+//                {
+//                    $this->assertNull( $stats );
+//                },
+//            ),
+CacheTypes::FILE_SYSTEM => array(
+    'shared' => false,
+    'stats'  => function ( $cache, $stats )
+    {
+        $this->assertNull( $stats[ Cache::STATS_HITS ] );
+        $this->assertNull( $stats[ Cache::STATS_MISSES ] );
+        $this->assertNull( $stats[ Cache::STATS_UPTIME ] );
+        $this->assertEquals( 0, $stats[ Cache::STATS_MEMORY_USAGE ] );
+        $this->assertGreaterThan( 0, $stats[ Cache::STATS_MEMORY_AVAILABLE ] );
+    },
+),
+CacheTypes::PHP_FILE    => array(
+    'shared' => false,
+    'stats'  => function ( $cache, $stats )
+    {
+        $this->assertNull( $stats[ Cache::STATS_HITS ] );
+        $this->assertNull( $stats[ Cache::STATS_MISSES ] );
+        $this->assertNull( $stats[ Cache::STATS_UPTIME ] );
+        $this->assertEquals( 0, $stats[ Cache::STATS_MEMORY_USAGE ] );
+        $this->assertGreaterThan( 0, $stats[ Cache::STATS_MEMORY_AVAILABLE ] );
+    },
+),
         );
 
         parent::setUp();
@@ -101,21 +138,44 @@ class FlexistoreTest extends \PHPUnit_Framework_TestCase
     {
         foreach ( static::$_testTypes as $_type => $_tests )
         {
-            $cache = $this->_getDriver( $_type );
+            foreach ( array( false, true ) as $_obscure )
+            {
+                $cache = $this->_getDriver( $_type, $_obscure );
 
-            // Test saving a value, checking if it exists, and fetching it back
-            $this->assertTrue( $cache->save( 'key', 'value' ) );
-            $this->assertTrue( $cache->contains( 'key' ) );
-            $this->assertEquals( 'value', $cache->fetch( 'key' ) );
+                // Test saving a value, checking if it exists, and fetching it back
+                $this->assertTrue( $cache->save( 'key', 'value' ) );
+                $this->assertTrue( $cache->contains( 'key' ) );
+                $this->assertEquals( 'value', $cache->fetch( 'key' ) );
 
-            // Test updating the value of a cache entry
-            $this->assertTrue( $cache->save( 'key', 'value-changed' ) );
-            $this->assertTrue( $cache->contains( 'key' ) );
-            $this->assertEquals( 'value-changed', $cache->fetch( 'key' ) );
+                // Test updating the value of a cache entry
+                $this->assertTrue( $cache->save( 'key', 'value-changed' ) );
+                $this->assertTrue( $cache->contains( 'key' ) );
+                $this->assertEquals( 'value-changed', $cache->fetch( 'key' ) );
 
-            // Test deleting a value
-            $this->assertTrue( $cache->delete( 'key' ) );
-            $this->assertFalse( $cache->contains( 'key' ) );
+                // Test deleting a value
+                $this->assertTrue( $cache->delete( 'key' ) );
+                $this->assertFalse( $cache->contains( 'key' ) );
+            }
+        }
+    }
+
+    public function testCacheExpiry()
+    {
+        foreach ( static::$_testTypes as $_type => $_tests )
+        {
+            foreach ( array( true, false ) as $_obscureKeys )
+            {
+                $cache = $this->_getDriver( $_type, $_obscureKeys );
+
+                $this->assertTrue( $cache->save( 'short-lived', 'shorty', static::EXPIRY_TEST_TTL ) );
+                $this->assertTrue( $cache->save( 'long-lived', 'stretch' ) );
+
+                //  Wait for the cache to expire...
+                sleep( static::EXPIRY_TEST_TTL + 1 );
+
+                $this->assertTrue( false === $cache->fetch( 'short-lived' ) );
+                $this->assertTrue( 'stretch' == $cache->fetch( 'long-lived' ) );
+            }
         }
     }
 
@@ -133,22 +193,30 @@ class FlexistoreTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     */
     public function testDeleteAll()
     {
         foreach ( static::$_testTypes as $_type => $_tests )
         {
-            $cache = $this->_getDriver( $_type );
+            foreach ( array( true, false ) as $_obscureKeys )
+            {
+                $cache = $this->_getDriver( $_type, $_obscureKeys );
 
-            $this->assertTrue( $cache->save( 'key1', 1 ) );
-            $this->assertTrue( $cache->save( 'key2', 2 ) );
-            $this->assertTrue( $cache->deleteAll() );
-            $cache->flushAll();
+                $this->assertTrue( $cache->save( 'key1', 1 ) );
+                $this->assertTrue( $cache->save( 'key2', 2 ) );
 
-            $this->assertFalse( $cache->contains( 'key1' ) );
-            $this->assertFalse( $cache->contains( 'key2' ) );
+                $this->assertTrue( $cache->deleteAll() );
+                $cache->flushAll();
+
+                $this->assertFalse( $cache->contains( 'key1' ) );
+                $this->assertFalse( $cache->contains( 'key2' ) );
+            }
         }
     }
 
+    /**
+     */
     public function testDeleteAllAndNamespaceVersioningBetweenCaches()
     {
         foreach ( static::$_testTypes as $_type => $_tests )
@@ -194,6 +262,8 @@ class FlexistoreTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    /**
+     */
     public function testFlushAll()
     {
         foreach ( static::$_testTypes as $_type => $_tests )
@@ -208,6 +278,8 @@ class FlexistoreTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    /**
+     */
     public function testFlushAllAndNamespaceVersioningBetweenCaches()
     {
         foreach ( static::$_testTypes as $_type => $_tests )
@@ -313,7 +385,7 @@ class FlexistoreTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @group DCOM-43
+     * @group  DCOM-43
      */
     public function testGetStats()
     {
@@ -353,18 +425,20 @@ class FlexistoreTest extends \PHPUnit_Framework_TestCase
      */
     protected function isSharedStorage( $type )
     {
-        return static::$_testTypes[$type]['shared'];
+        return static::$_testTypes[ $type ]['shared'];
     }
 
     /**
      * @param string $type
+     * @param bool   $obscured If true, an obscured key store is returned
      *
      * @return CacheProvider
-     * @throws \PHPUnit_Framework_SkippedTestError
      */
-    protected function _getDriver( $type )
+    protected function _getDriver( $type, $obscured = false )
     {
-        return new Flexistore( $type );
+        echo $obscured ? 'O' : null;
+
+        return $obscured ? new ObscuredKeyTest( $type ) : new Flexistore( $type );
     }
 }
 
