@@ -24,17 +24,15 @@ use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\Common\Cache\RedisCache;
 use Doctrine\Common\Cache\XcacheCache;
 use Kisma\Core\Enums\CacheTypes;
-use Kisma\Core\Interfaces\StoreLike;
 use Kisma\Core\Utility\Option;
 
 /**
  * Wrapper around doctrine/cache
  *
- * @method bool|mixed fetch( $id )
- * @method bool save( $id, $value, $ttl = 0 ) Saves a value to $key
- * @method bool delete( string $key ) Delete a single key
+ * @method bool fetch( string $key, mixed $defaultValue = null, bool $remove = false )
+ * @method bool save( string $key, mixed $value )
  */
-class Flexistore implements StoreLike
+class Flexistore
 {
     //*************************************************************************
     //	Constants
@@ -150,6 +148,47 @@ class Flexistore implements StoreLike
     }
 
     /**
+     * @param string $namespace
+     *
+     * @return Flexistore
+     */
+    public static function createSingleton( $namespace = null )
+    {
+        return new Flexistore( CacheTypes::ARRAY_CACHE, array( 'namespace' => $namespace ) );
+    }
+
+    /**
+     * @param string $path
+     * @param string $namespace
+     * @param string $extension
+     *
+     * @return \Kisma\Core\Components\Flexistore
+     */
+    public static function createFileStore( $path = null, $extension = self::DEFAULT_CACHE_EXTENSION, $namespace = null )
+    {
+        $_path = $path ? : static::_getUniqueTempPath();
+
+        return new Flexistore( CacheTypes::PHP_FILE, array( 'namespace' => $namespace, 'arguments' => array( $_path, $extension ) ) );
+    }
+
+    /**
+     * @param string $prefix
+     *
+     * @return string
+     */
+    protected static function _getUniqueTempPath( $prefix = 'flex' )
+    {
+        //  Get a unique temp directory
+        do
+        {
+            $_path = sys_get_temp_dir() . '/' . $prefix . '.' . uniqid();
+        }
+        while ( is_dir( $_path ) );
+
+        return $_path;
+    }
+
+    /**
      * @param string $host
      * @param int    $port
      * @param float  $timeout
@@ -181,71 +220,44 @@ class Flexistore implements StoreLike
     }
 
     /**
-     * @param string $namespace
+     * Fetches an entry from the cache.
      *
-     * @return Flexistore
-     */
-    public static function createSingleton( $namespace = null )
-    {
-        return new static( CacheTypes::ARRAY_CACHE, array( 'namespace' => $namespace ) );
-    }
-
-    /**
-     * @param string $path
-     * @param string $namespace
-     * @param string $extension
+     * @param string $id           The id of the cache entry to fetch
+     * @param mixed  $defaultValue The default value if $id not found
+     * @param bool   $remove
      *
-     * @return \Kisma\Core\Components\Flexistore
+     * @return mixed The cached data or FALSE, if no cache entry exists for the given id.
      */
-    public static function createFileStore( $path = null, $extension = self::DEFAULT_CACHE_EXTENSION, $namespace = null )
+    public function get( $id, $defaultValue = null, $remove = false )
     {
-        $_path = $path ? : static::_getUniqueTempPath();
-
-        return new static( CacheTypes::PHP_FILE, array( 'namespace' => $namespace, 'arguments' => array( $_path, $extension ) ) );
-    }
-
-    /**
-     * @param string $prefix
-     *
-     * @return string
-     */
-    protected static function _getUniqueTempPath( $prefix = 'flex' )
-    {
-        //  Get a unique temp directory
-        do
+        if ( false === ( $_data = $this->fetch( $id ) ) )
         {
-            $_path = sys_get_temp_dir() . '/' . $prefix . '.' . uniqid();
-        }
-        while ( is_dir( $_path ) );
-
-        return $_path;
-    }
-
-    /**
-     * {@InheritDoc}
-     */
-    public function get( $key, $defaultValue = null, $remove = false, $ttl = self::DEFAULT_CACHE_TTL )
-    {
-        if ( false === ( $_data = $this->fetch( $key ) ) )
-        {
-            //  If the item was not found and is not to be removed, add it to the cache            
             if ( !$remove )
             {
-                $this->save( $key, $_data = $defaultValue, $ttl );
+                $this->save( $id, $_data = $defaultValue );
             }
         }
         elseif ( $remove )
         {
-            $this->delete( $key );
+            $this->delete( $id );
         }
 
         return $_data;
     }
 
     /**
-     * {@InheritDoc}
+     * Puts data into the cache.
+     *
+     * $id can be specified as an array of key-value pairs: array( 'alpha' => 'xyz', 'beta' => 'qrs', 'gamma' => 'lmo', ... )
+     *
+     *
+     * @param string|array $id       The cache id or array of key-value pairs
+     * @param mixed        $data     The cache entry/data.
+     * @param int          $lifeTime The cache lifetime. Sets a specific lifetime for this cache entry. Defaults to 0, or "never expire"
+     *
+     * @return boolean|boolean[] TRUE if the entry was successfully stored in the cache, FALSE otherwise.
      */
-    public function set( $id, $data = null, $ttl = self::DEFAULT_CACHE_TTL )
+    public function set( $id, $data = null, $lifeTime = self::DEFAULT_CACHE_TTL )
     {
         $_multi = false;
         $_ids = null;
@@ -264,7 +276,7 @@ class Flexistore implements StoreLike
 
         foreach ( $_ids as $_key => $_value )
         {
-            $_result[ $_key ] = $this->save( $id, $_value, $ttl );
+            $_result[ $_key ] = $this->save( $id, $_value, $lifeTime );
         }
 
         return $_multi ? $_result : current( $_result );
@@ -309,13 +321,4 @@ class Flexistore implements StoreLike
         return $key;
     }
 
-    /**
-     * Deletes all items from the store
-     *
-     * @return bool
-     */
-    public function deleteAll()
-    {
-        return $this->_store->deleteAll();
-    }
 }

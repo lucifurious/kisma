@@ -50,7 +50,7 @@ class SeedEvent extends Event
     /**
      * @var string A user-defined event ID
      */
-    protected $_eventId = null;
+    private $_eventId = null;
 
     //**************************************************************************
     //* Methods
@@ -63,29 +63,8 @@ class SeedEvent extends Event
      */
     public function __construct( $data = null )
     {
-        $this->_eventId = spl_object_hash( $this );
+        $this->_eventId = hash( 'sha256', spl_object_hash( $this ) . get_class( $this ) );
         $this->_data = $data;
-    }
-
-    /**
-     * Kills propagation immediately
-     *
-     * @return SeedEvent
-     */
-    public function kill()
-    {
-        $this->stopPropagation();
-
-        return $this;
-    }
-
-    /**
-     * @return bool
-     * @deprecated in 0.2.31, to be removed in 0.3.0 {@see Event::isPropagationStopped}
-     */
-    public function wasKilled()
-    {
-        return $this->isPropagationStopped();
     }
 
     /**
@@ -109,18 +88,6 @@ class SeedEvent extends Event
     }
 
     /**
-     * @param string $eventId
-     *
-     * @return SeedEvent
-     */
-    public function setEventId( $eventId )
-    {
-        $this->_eventId = $eventId;
-
-        return $this;
-    }
-
-    /**
      * @return string
      */
     public function getEventId()
@@ -141,7 +108,7 @@ class SeedEvent extends Event
         {
             if ( method_exists( $this, 'get' . ( $_cleanKey = ltrim( $_key, '_' ) ) ) )
             {
-                $_me[Inflector::neutralize( $_cleanKey )] = $_value;
+                $_me[ Inflector::neutralize( $_cleanKey ) ] = $_value;
             }
         }
 
@@ -175,4 +142,27 @@ class SeedEvent extends Event
 
         return $this;
     }
+
+    /**
+     * Kills propagation immediately
+     *
+     * @return SeedEvent
+     * @deprecated in 0.2.41, to be removed in 0.3.0 {@see Event::stopPropagation}
+     */
+    public function kill()
+    {
+        $this->stopPropagation();
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     * @deprecated in 0.2.31, to be removed in 0.3.0 {@see Event::isPropagationStopped}
+     */
+    public function wasKilled()
+    {
+        return $this->isPropagationStopped();
+    }
+
 }
