@@ -56,16 +56,14 @@ class Inflector implements UtilityLike
         //	Split by forward slash, backslash, period, or space...
         $_parts = preg_split( "/[. \/\\\\]+/", $item );
 
-        array_walk(
-            $_parts,
-            function ( $segment, $index ) use ( $_parts )
+        //  Make it perdee...
+        if ( !empty( $_parts ) )
+        {
+            foreach ( $_parts as $_index => $_part )
             {
-                if ( !empty( $segment ) )
-                {
-                    $_parts[ $index ] = Inflector::decamelize( $segment );
-                }
+                $_parts[ $_index ] = Inflector::decamelize( $_part );
             }
-        );
+        }
 
         return implode( '.', $_parts );
     }
