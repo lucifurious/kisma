@@ -58,10 +58,12 @@ class Inflector implements UtilityLike
 
         array_walk(
             $_parts,
-            function ( &$part )
+            function ( $segment, $index ) use ( $_parts )
             {
-                //      Clean
-                $part = Inflector::decamelize( $part );
+                if ( !empty( $segment ) )
+                {
+                    $_parts[ $index ] = Inflector::decamelize( $segment );
+                }
             }
         );
 
@@ -93,8 +95,8 @@ class Inflector implements UtilityLike
                     $_key = str_replace( $strip, null, $_key );
                 }
 
-                $_variables[static::neutralize( ltrim( $_key, '_' ) )] = $_value;
-                unset( $_variables[$_originalKey] );
+                $_variables[ static::neutralize( ltrim( $_key, '_' ) ) ] = $_value;
+                unset( $_variables[ $_originalKey ] );
             }
         }
 
@@ -255,7 +257,7 @@ class Inflector implements UtilityLike
             return false;
         }
 
-        $_temp = $word[strlen( $word ) - 1];
+        $_temp = $word[ strlen( $word ) - 1 ];
 
         if ( 's' == $_temp && $word == static::pluralize( substr( $word, 0, -1 ) ) )
         {

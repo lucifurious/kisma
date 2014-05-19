@@ -21,6 +21,7 @@
 namespace Kisma\Core\Utility;
 
 use Doctrine\Common\Cache\Cache;
+use Kisma\Core\SeedUtility;
 
 /**
  * System utilities
