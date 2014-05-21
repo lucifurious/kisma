@@ -25,10 +25,14 @@
     <orderEntry type="module-library">
       <library name="PHARS">
         <CLASSES>
-          <root url="phar:///usr/share/php/composer.phar" />
+          <root url="phar:///usr/share/php/data/phpDocumentor/vendor/phpdocumentor/fileset/tests/data/test.phar" />
+          <root url="phar:///usr/share/php/data/phpDocumentor/box.phar" />
+          <root url="phar:///usr/share/php/phpDocumentor/tests/data/test.phar" />
         </CLASSES>
         <SOURCES>
-          <root url="phar:///usr/share/php/composer.phar" />
+          <root url="phar:///usr/share/php/data/phpDocumentor/vendor/phpdocumentor/fileset/tests/data/test.phar" />
+          <root url="phar:///usr/share/php/data/phpDocumentor/box.phar" />
+          <root url="phar:///usr/share/php/phpDocumentor/tests/data/test.phar" />
         </SOURCES>
       </library>
     </orderEntry>

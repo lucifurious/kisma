@@ -25,6 +25,7 @@ use Kisma\Core\Enums\LoggingLevels;
 use Kisma\Core\Interfaces\Levels;
 use Kisma\Core\Interfaces\UtilityLike;
 use Kisma\Core\Seed;
+use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\ChromePHPHandler;
 use Monolog\Handler\FirePHPHandler;
 use Monolog\Handler\StreamHandler;
@@ -286,12 +287,18 @@ class Log extends Seed implements UtilityLike, Levels
 	 */
 	public static function checkSystemLogPath()
 	{
-		if ( null === static::$_fallbackLogger )
+		if ( !static::$_fallbackLogger )
 		{
-			static::$_fallbackLogger = new Logger( static::DEFAULT_CHANNEL_NAME . '.fallback' );
+			static::$_fallbackLogger =
+				static::createLogger(
+					static::DEFAULT_CHANNEL_NAME . '.fallback',
+					array(
+						new SyslogHandler( static::DEFAULT_CHANNEL_NAME . '.fallback' )
+					)
+				);
 		}
 
-		static::$_fallbackLogger->pushHandler( new SyslogHandler( static::DEFAULT_CHANNEL_NAME . '.fallback' ) );
+		return static::$_fallbackLogger;
 	}
 
 	/**
@@ -370,6 +377,30 @@ class Log extends Seed implements UtilityLike, Levels
 	}
 
 	/**
+	 * @param string $channel
+	 * @param array  $handlers
+	 * @param array  $processors
+	 *
+	 * @return \Monolog\Logger
+	 */
+	public static function createLogger( $channel, $handlers = null, $processors = null )
+	{
+		if ( !$handlers )
+		{
+			$_handler = new StreamHandler( static::$_defaultLog );
+			$_handler->setFormatter( new LineFormatter( null, null, true ) );
+
+			$handlers = array( $_handler );
+		}
+
+		return new Logger(
+			$channel ? : static::DEFAULT_CHANNEL_NAME,
+			$handlers,
+			$processors
+		);
+	}
+
+	/**
 	 * @param \Monolog\Logger $logger
 	 */
 	public static function setLogger( $logger )
@@ -414,7 +445,12 @@ class Log extends Seed implements UtilityLike, Levels
 	 */
 	public static function setEnableFirePhp( $enableFirePhp )
 	{
-		static::$_enableFirePhp = $enableFirePhp;
+		if ( !( static::$_enableFirePhp = $enableFirePhp ) || !static::$_logger )
+		{
+			return;
+		}
+
+		static::$_logger->pushHandler( new FirePHPHandler() );
 	}
 
 	/**
@@ -475,9 +511,9 @@ class Log extends Seed implements UtilityLike, Levels
 
 		for ( $_i = 0, $_size = sizeof( $_backTrace ); $_i < $_size; $_i++ )
 		{
-			if ( isset( $_backTrace[$_i]['class'] ) )
+			if ( isset( $_backTrace[ $_i ]['class'] ) )
 			{
-				$_class = $_backTrace[$_i]['class'];
+				$_class = $_backTrace[ $_i ]['class'];
 			}
 
 			if ( $_class == $_thisClass )
@@ -485,20 +521,20 @@ class Log extends Seed implements UtilityLike, Levels
 				continue;
 			}
 
-			if ( isset( $_backTrace[$_i]['method'] ) )
+			if ( isset( $_backTrace[ $_i ]['method'] ) )
 			{
-				$_method = $_backTrace[$_i]['method'];
+				$_method = $_backTrace[ $_i ]['method'];
 			}
-			else if ( isset( $_backTrace[$_i]['function'] ) )
+			else if ( isset( $_backTrace[ $_i ]['function'] ) )
 			{
-				$_method = $_backTrace[$_i]['function'];
+				$_method = $_backTrace[ $_i ]['function'];
 			}
 			else
 			{
 				$_method = 'Unknown';
 			}
 
-			$_type = $_backTrace[$_i]['type'];
+			$_type = $_backTrace[ $_i ]['type'];
 			break;
 		}
 
@@ -611,8 +647,7 @@ class Log extends Seed implements UtilityLike, Levels
 
 		static::$_defaultLog = static::$_logFilePath . '/' . trim( static::$_logFileName, '/' );
 
-		static::$_logger = new Logger( static::DEFAULT_CHANNEL_NAME );
-		static::$_logger->pushHandler( new StreamHandler( static::$_defaultLog ) );
+		static::$_logger = static::createLogger( static::DEFAULT_CHANNEL_NAME );
 
 		//	If we're in debug mode and these haven't been disabled, enable...
 		if ( \Kisma::get( CoreSettings::DEBUG ) )
