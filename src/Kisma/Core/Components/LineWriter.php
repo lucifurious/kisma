@@ -20,9 +20,9 @@
  */
 namespace Kisma\Core\Components;
 
+use Kisma\Core\Enums\EscapeStyle;
 use Kisma\Core\Enums\LineBreak;
 use Kisma\Core\Exceptions\FileSystemException;
-use Kisma\Core\Interfaces\EscapeStyle;
 use Kisma\Core\Interfaces\WriterLike;
 
 /**
@@ -118,7 +118,7 @@ class LineWriter extends ParsingLineReader implements WriterLike
 
 			foreach ( $this->_keys as $_key )
 			{
-				$_data[] = isset( $data[$_key] ) ? $data[$_key] : null;
+				$_data[] = isset( $data[ $_key ] ) ? $data[ $_key ] : null;
 			}
 		}
 

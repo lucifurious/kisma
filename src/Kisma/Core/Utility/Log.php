@@ -72,10 +72,11 @@ class Log extends Seed implements UtilityLike, Levels
 	/**
 	 * @var array The strings to watch for at the beginning of a log line to control the indenting
 	 */
-	protected static $_indentTokens = array(
-		true  => '<*',
-		false => '*>',
-	);
+	protected static $_indentTokens
+		= array(
+			true  => '<*',
+			false => '*>',
+		);
 	/**
 	 * @var Logger
 	 */
@@ -289,13 +290,11 @@ class Log extends Seed implements UtilityLike, Levels
 	{
 		if ( !static::$_fallbackLogger )
 		{
-			static::$_fallbackLogger =
-				static::createLogger(
-					static::DEFAULT_CHANNEL_NAME . '.fallback',
-					array(
-						new SyslogHandler( static::DEFAULT_CHANNEL_NAME . '.fallback' )
-					)
-				);
+			static::$_fallbackLogger
+				= static::createLogger( static::DEFAULT_CHANNEL_NAME . '.fallback',
+				array(
+					new SyslogHandler( static::DEFAULT_CHANNEL_NAME . '.fallback' )
+				) );
 		}
 
 		return static::$_fallbackLogger;
@@ -393,11 +392,7 @@ class Log extends Seed implements UtilityLike, Levels
 			$handlers = array( $_handler );
 		}
 
-		return new Logger(
-			$channel ? : static::DEFAULT_CHANNEL_NAME,
-			$handlers,
-			$processors
-		);
+		return new Logger( $channel ? : static::DEFAULT_CHANNEL_NAME, $handlers, $processors );
 	}
 
 	/**
@@ -511,9 +506,9 @@ class Log extends Seed implements UtilityLike, Levels
 
 		for ( $_i = 0, $_size = sizeof( $_backTrace ); $_i < $_size; $_i++ )
 		{
-			if ( isset( $_backTrace[ $_i ]['class'] ) )
+			if ( isset( $_backTrace[$_i]['class'] ) )
 			{
-				$_class = $_backTrace[ $_i ]['class'];
+				$_class = $_backTrace[$_i]['class'];
 			}
 
 			if ( $_class == $_thisClass )
@@ -521,20 +516,20 @@ class Log extends Seed implements UtilityLike, Levels
 				continue;
 			}
 
-			if ( isset( $_backTrace[ $_i ]['method'] ) )
+			if ( isset( $_backTrace[$_i]['method'] ) )
 			{
-				$_method = $_backTrace[ $_i ]['method'];
+				$_method = $_backTrace[$_i]['method'];
 			}
-			else if ( isset( $_backTrace[ $_i ]['function'] ) )
+			else if ( isset( $_backTrace[$_i]['function'] ) )
 			{
-				$_method = $_backTrace[ $_i ]['function'];
+				$_method = $_backTrace[$_i]['function'];
 			}
 			else
 			{
 				$_method = 'Unknown';
 			}
 
-			$_type = $_backTrace[ $_i ]['type'];
+			$_type = $_backTrace[$_i]['type'];
 			break;
 		}
 
@@ -599,17 +594,15 @@ class Log extends Seed implements UtilityLike, Levels
 			4 => $_blob,
 		);
 
-		return str_ireplace(
-				   array(
-					   '%%level%%',
-					   '%%date%%',
-					   '%%time%%',
-					   '%%message%%',
-					   '%%extra%%',
-				   ),
-				   $_replacements,
-				   static::$_logFormat
-			   ) . ( $newline ? PHP_EOL : null );
+		return str_ireplace( array(
+				'%%level%%',
+				'%%date%%',
+				'%%time%%',
+				'%%message%%',
+				'%%extra%%',
+			),
+			$_replacements,
+			static::$_logFormat ) . ( $newline ? PHP_EOL : null );
 	}
 
 	/**
