@@ -23,6 +23,8 @@ namespace Kisma\Core\Interfaces;
 /**
  * Levels
  * Individual log entry levels
+ *
+ * @deprecated in 0.2.27, to be removed in 0.3.0. {@see Kisma\Core\Enums\LogLevels}
  */
 interface Levels
 {

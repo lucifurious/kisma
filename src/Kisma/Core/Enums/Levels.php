@@ -20,12 +20,12 @@
  */
 namespace Kisma\Core\Enums;
 
+use Kisma\Core\Utility\Option;
+
 /**
- * Levels
- *
- * @deprecated in 0.2.27, to be removed in 0.3.0. {@see Kism\Core\Enums\LogLevels}
+ * Logging levels
  */
-abstract class Levels extends SeedEnum implements \Kisma\Core\Interfaces\Levels
+class Levels extends SeedEnum
 {
 	//*************************************************************************
 	//* Constants
@@ -34,7 +34,47 @@ abstract class Levels extends SeedEnum implements \Kisma\Core\Interfaces\Levels
 	/**
 	 * @var string
 	 */
-	const __default = self::Info;
+	const __default = self::INFO;
+	/**
+	 * @var int
+	 */
+	const Emergency = 600;
+	const EMERGENCY = 600;
+	/**
+	 * @var int
+	 */
+	const Alert = 550;
+	const ALERT = 550;
+	/**
+	 * @var int
+	 */
+	const Critical = 500;
+	const CRITICAL = 500;
+	/**
+	 * @var int
+	 */
+	const Error = 400;
+	const ERROR = 400;
+	/**
+	 * @var int
+	 */
+	const Warning = 300;
+	const WARNING = 300;
+	/**
+	 * @var int
+	 */
+	const Notice = 250;
+	const NOTICE = 250;
+	/**
+	 * @var int
+	 */
+	const Info = 200;
+	const INFO = 200;
+	/**
+	 * @var int
+	 */
+	const Debug = 100;
+	const DEBUG = 100;
 
 	//*************************************************************************
 	//* Members
@@ -43,16 +83,17 @@ abstract class Levels extends SeedEnum implements \Kisma\Core\Interfaces\Levels
 	/**
 	 * @var array
 	 */
-	protected static $_indicators = array(
-		self::Emergency => 'X',
-		self::Alert     => 'A',
-		self::Critical  => 'C',
-		self::Error     => 'E',
-		self::Warning   => 'W',
-		self::Notice    => 'N',
-		self::Info      => 'I',
-		self::Debug     => 'D',
-	);
+	protected static $_indicators
+		= array(
+			self::Emergency => 'X',
+			self::Alert     => 'A',
+			self::Critical  => 'C',
+			self::Error     => 'E',
+			self::Warning   => 'W',
+			self::Notice    => 'N',
+			self::Info      => 'I',
+			self::Debug     => 'D',
+		);
 
 	//*************************************************************************
 	//* Methods
@@ -67,6 +108,6 @@ abstract class Levels extends SeedEnum implements \Kisma\Core\Interfaces\Levels
 	 */
 	public static function getIndicator( $level )
 	{
-		return \Kisma\Core\Utility\Option::get( self::$_indicators, $level, self::__default );
+		return Option::get( static::$_indicators, $level, static::__default );
 	}
 }

@@ -22,9 +22,6 @@ namespace Kisma\Core\Utility;
 
 use Kisma\Core\Enums\CoreSettings;
 use Kisma\Core\Enums\LoggingLevels;
-use Kisma\Core\Interfaces\Levels;
-use Kisma\Core\Interfaces\UtilityLike;
-use Kisma\Core\Seed;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\ChromePHPHandler;
 use Monolog\Handler\FirePHPHandler;
@@ -36,7 +33,7 @@ use Monolog\Logger;
  * Log
  * A generic log helper
  */
-class Log extends Seed implements UtilityLike, Levels
+class Log
 {
 	//*************************************************************************
 	//* Constants
@@ -209,7 +206,7 @@ class Log extends Seed implements UtilityLike, Levels
 	 */
 	public static function error( $message, $context = array(), $extra = null )
 	{
-		return static::log( $message, static::Error, $context, $extra );
+		return static::log( $message, LoggingLevels::ERROR, $context, $extra );
 	}
 
 	/**
@@ -223,7 +220,7 @@ class Log extends Seed implements UtilityLike, Levels
 	 */
 	public static function warning( $message, $context = array(), $extra = null )
 	{
-		return static::log( $message, static::Warning, $context, $extra );
+		return static::log( $message, LoggingLevels::WARNING, $context, $extra );
 	}
 
 	/**
@@ -237,7 +234,7 @@ class Log extends Seed implements UtilityLike, Levels
 	 */
 	public static function notice( $message, $context = array(), $extra = null )
 	{
-		return static::log( $message, static::Notice, $context, $extra );
+		return static::log( $message, LoggingLevels::NOTICE, $context, $extra );
 	}
 
 	/**
@@ -251,7 +248,7 @@ class Log extends Seed implements UtilityLike, Levels
 	 */
 	public static function info( $message, $context = array(), $extra = null )
 	{
-		return static::log( $message, static::Info, $context, $extra );
+		return static::log( $message, LoggingLevels::INFO, $context, $extra );
 	}
 
 	/**
@@ -265,7 +262,7 @@ class Log extends Seed implements UtilityLike, Levels
 	 */
 	public static function debug( $message, $context = array(), $extra = null )
 	{
-		return static::log( $message, static::Debug, $context, $extra );
+		return static::log( $message, LoggingLevels::DEBUG, $context, $extra );
 	}
 
 	/**
@@ -382,7 +379,7 @@ class Log extends Seed implements UtilityLike, Levels
 	 *
 	 * @return \Monolog\Logger
 	 */
-	public static function createLogger( $channel, $handlers = null, $processors = null )
+	public static function createLogger( $channel, array $handlers = array(), array $processors = array() )
 	{
 		if ( !$handlers )
 		{
@@ -472,13 +469,13 @@ class Log extends Seed implements UtilityLike, Levels
 	 * @return string
 	 * @deprecated in v0.2.20. To be removed in v0.3.0. Replaced by Monolog
 	 */
-	protected static function _getLogLevel( $level = self::Info, $fullName = false )
+	protected static function _getLogLevel( $level = LoggingLevels::INFO, $fullName = false )
 	{
 		static $_logLevels = null;
 
 		if ( empty( $_logLevels ) )
 		{
-			$_logLevels = \Kisma\Core\Enums\Levels::getDefinedConstants();
+			$_logLevels = LoggingLevels::getDefinedConstants();
 		}
 
 		$_levels = ( is_string( $level ) ? $_logLevels : array_flip( $_logLevels ) );
