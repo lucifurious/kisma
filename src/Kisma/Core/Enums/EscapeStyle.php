@@ -18,16 +18,12 @@
  * You should have received a copy of the GNU General Public License
  * along with Kisma(tm).  If not, see <http://www.gnu.org/licenses/>.
  */
-namespace Kisma\Core\Interfaces;
+namespace Kisma\Core\Enums;
 
 /**
- * EscapeStyle.php
  * Defines the various ways characters can be escaped
- *
- * @deprecated in v0.2.44, to be removed in v0.3.0.
- * @see        \Kisma\Core\Enums\EscapeStyle
  */
-interface EscapeStyle
+class EscapeStyle extends SeedEnum
 {
 	//*************************************************************************
 	//* Constants

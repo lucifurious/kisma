@@ -22,9 +22,7 @@ namespace Kisma\Core\Utility;
 
 use Kisma\Core\Enums\CoreSettings;
 use Kisma\Core\Enums\LoggingLevels;
-use Kisma\Core\Interfaces\Levels;
-use Kisma\Core\Interfaces\UtilityLike;
-use Kisma\Core\Seed;
+use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\ChromePHPHandler;
 use Monolog\Handler\FirePHPHandler;
 use Monolog\Handler\StreamHandler;
@@ -35,7 +33,7 @@ use Monolog\Logger;
  * Log
  * A generic log helper
  */
-class Log extends Seed implements UtilityLike, Levels
+class Log
 {
 	//*************************************************************************
 	//* Constants
@@ -71,10 +69,11 @@ class Log extends Seed implements UtilityLike, Levels
 	/**
 	 * @var array The strings to watch for at the beginning of a log line to control the indenting
 	 */
-	protected static $_indentTokens = array(
-		true  => '<*',
-		false => '*>',
-	);
+	protected static $_indentTokens
+		= array(
+			true  => '<*',
+			false => '*>',
+		);
 	/**
 	 * @var Logger
 	 */
@@ -207,7 +206,7 @@ class Log extends Seed implements UtilityLike, Levels
 	 */
 	public static function error( $message, $context = array(), $extra = null )
 	{
-		return static::log( $message, static::Error, $context, $extra );
+		return static::log( $message, LoggingLevels::ERROR, $context, $extra );
 	}
 
 	/**
@@ -221,7 +220,7 @@ class Log extends Seed implements UtilityLike, Levels
 	 */
 	public static function warning( $message, $context = array(), $extra = null )
 	{
-		return static::log( $message, static::Warning, $context, $extra );
+		return static::log( $message, LoggingLevels::WARNING, $context, $extra );
 	}
 
 	/**
@@ -235,7 +234,7 @@ class Log extends Seed implements UtilityLike, Levels
 	 */
 	public static function notice( $message, $context = array(), $extra = null )
 	{
-		return static::log( $message, static::Notice, $context, $extra );
+		return static::log( $message, LoggingLevels::NOTICE, $context, $extra );
 	}
 
 	/**
@@ -249,7 +248,7 @@ class Log extends Seed implements UtilityLike, Levels
 	 */
 	public static function info( $message, $context = array(), $extra = null )
 	{
-		return static::log( $message, static::Info, $context, $extra );
+		return static::log( $message, LoggingLevels::INFO, $context, $extra );
 	}
 
 	/**
@@ -263,7 +262,7 @@ class Log extends Seed implements UtilityLike, Levels
 	 */
 	public static function debug( $message, $context = array(), $extra = null )
 	{
-		return static::log( $message, static::Debug, $context, $extra );
+		return static::log( $message, LoggingLevels::DEBUG, $context, $extra );
 	}
 
 	/**
@@ -286,12 +285,16 @@ class Log extends Seed implements UtilityLike, Levels
 	 */
 	public static function checkSystemLogPath()
 	{
-		if ( null === static::$_fallbackLogger )
+		if ( !static::$_fallbackLogger )
 		{
-			static::$_fallbackLogger = new Logger( static::DEFAULT_CHANNEL_NAME . '.fallback' );
+			static::$_fallbackLogger
+				= static::createLogger( static::DEFAULT_CHANNEL_NAME . '.fallback',
+				array(
+					new SyslogHandler( static::DEFAULT_CHANNEL_NAME . '.fallback' )
+				) );
 		}
 
-		static::$_fallbackLogger->pushHandler( new SyslogHandler( static::DEFAULT_CHANNEL_NAME . '.fallback' ) );
+		return static::$_fallbackLogger;
 	}
 
 	/**
@@ -370,6 +373,26 @@ class Log extends Seed implements UtilityLike, Levels
 	}
 
 	/**
+	 * @param string $channel
+	 * @param array  $handlers
+	 * @param array  $processors
+	 *
+	 * @return \Monolog\Logger
+	 */
+	public static function createLogger( $channel, array $handlers = array(), array $processors = array() )
+	{
+		if ( !$handlers )
+		{
+			$_handler = new StreamHandler( static::$_defaultLog );
+			$_handler->setFormatter( new LineFormatter( null, null, true ) );
+
+			$handlers = array( $_handler );
+		}
+
+		return new Logger( $channel ? : static::DEFAULT_CHANNEL_NAME, $handlers, $processors );
+	}
+
+	/**
 	 * @param \Monolog\Logger $logger
 	 */
 	public static function setLogger( $logger )
@@ -414,7 +437,12 @@ class Log extends Seed implements UtilityLike, Levels
 	 */
 	public static function setEnableFirePhp( $enableFirePhp )
 	{
-		static::$_enableFirePhp = $enableFirePhp;
+		if ( !( static::$_enableFirePhp = $enableFirePhp ) || !static::$_logger )
+		{
+			return;
+		}
+
+		static::$_logger->pushHandler( new FirePHPHandler() );
 	}
 
 	/**
@@ -441,13 +469,13 @@ class Log extends Seed implements UtilityLike, Levels
 	 * @return string
 	 * @deprecated in v0.2.20. To be removed in v0.3.0. Replaced by Monolog
 	 */
-	protected static function _getLogLevel( $level = self::Info, $fullName = false )
+	protected static function _getLogLevel( $level = LoggingLevels::INFO, $fullName = false )
 	{
 		static $_logLevels = null;
 
 		if ( empty( $_logLevels ) )
 		{
-			$_logLevels = \Kisma\Core\Enums\Levels::getDefinedConstants();
+			$_logLevels = LoggingLevels::getDefinedConstants();
 		}
 
 		$_levels = ( is_string( $level ) ? $_logLevels : array_flip( $_logLevels ) );
@@ -563,17 +591,15 @@ class Log extends Seed implements UtilityLike, Levels
 			4 => $_blob,
 		);
 
-		return str_ireplace(
-				   array(
-					   '%%level%%',
-					   '%%date%%',
-					   '%%time%%',
-					   '%%message%%',
-					   '%%extra%%',
-				   ),
-				   $_replacements,
-				   static::$_logFormat
-			   ) . ( $newline ? PHP_EOL : null );
+		return str_ireplace( array(
+				'%%level%%',
+				'%%date%%',
+				'%%time%%',
+				'%%message%%',
+				'%%extra%%',
+			),
+			$_replacements,
+			static::$_logFormat ) . ( $newline ? PHP_EOL : null );
 	}
 
 	/**
@@ -611,8 +637,7 @@ class Log extends Seed implements UtilityLike, Levels
 
 		static::$_defaultLog = static::$_logFilePath . '/' . trim( static::$_logFileName, '/' );
 
-		static::$_logger = new Logger( static::DEFAULT_CHANNEL_NAME );
-		static::$_logger->pushHandler( new StreamHandler( static::$_defaultLog ) );
+		static::$_logger = static::createLogger( static::DEFAULT_CHANNEL_NAME );
 
 		//	If we're in debug mode and these haven't been disabled, enable...
 		if ( \Kisma::get( CoreSettings::DEBUG ) )

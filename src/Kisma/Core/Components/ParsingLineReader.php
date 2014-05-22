@@ -22,8 +22,8 @@ namespace Kisma\Core\Components;
 
 use Kisma\Core\Enums\DataEnclosure;
 use Kisma\Core\Enums\DataSeparator;
+use Kisma\Core\Enums\EscapeStyle;
 use Kisma\Core\Exceptions\FileSystemException;
-use Kisma\Core\Interfaces\EscapeStyle;
 
 /**
  * ParsingLineReader.php
@@ -95,7 +95,7 @@ class ParsingLineReader extends LineReader
 				break;
 			}
 
-			$this->_currentLine[$_key['value']] = $_column;
+			$this->_currentLine[ $_key['value'] ] = $_column;
 		}
 
 		return $this->_currentLine;
