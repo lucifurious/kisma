@@ -20,6 +20,7 @@ class OptionTest extends \PHPUnit_Framework_TestCase
 			1                        => 'one',
 			8                        => 'eight',
 			0                        => 'zero',
+			'test-blank-value'       => '',
 		);
 	}
 
@@ -38,10 +39,10 @@ class OptionTest extends \PHPUnit_Framework_TestCase
 	 */
 	public function testGet()
 	{
-		$this->assertEquals(
-			'camel case',
-			Option::get( $this->object, 'ThisIsCamelCase' )
-		);
+		$this->assertEquals( 'camel case',
+			Option::get( $this->object, 'ThisIsCamelCase' ) );
+
+		$this->assertTrue( null === Option::get( $this->object, 'test-blank-value', '', false, true ) );
 	}
 
 	/**
