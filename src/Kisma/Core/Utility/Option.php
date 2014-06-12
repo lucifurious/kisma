@@ -67,17 +67,20 @@ class Option
 	}
 
 	/**
-	 * Retrieves an option from the given array. $defaultValue is set and returned if $_key is not 'set'.
-	 * Optionally will unset option in array.
+     * Retrieves an option from the given array.
 	 *
-	 * @param array|\ArrayAccess|object $options
-	 * @param string                    $key
-	 * @param mixed|null                $defaultValue
-	 * @param boolean                   $unsetValue
+     * $defaultValue is returned if $key is not found.
+     * Can optionally delete $key from $options.
 	 *
+     * @param array|\ArrayAccess|object $options           An array or object from which to get $key's value
+     * @param string                    $key               The array index or property to retrieve from $options
+     * @param mixed                     $defaultValue      The value to return if $key is not found
+     * @param boolean                   $unsetValue        If true, the $key will be removed from $options after retrieval
+     * @param bool                      $emptyStringIsNull If true, empty() values will always return as NULL
+     *
 	 * @return mixed
 	 */
-	public static function get( &$options = array(), $key, $defaultValue = null, $unsetValue = false )
+    public static function get( &$options = array(), $key, $defaultValue = null, $unsetValue = false, $emptyStringIsNull = false )
 	{
 		//	Get many?
 		if ( is_array( $key ) )
@@ -112,7 +115,7 @@ class Option
 					unset( $options[$key] );
 				}
 
-				return $_newValue;
+                return $emptyStringIsNull && empty( $_newValue ) ? null : $_newValue;
 			}
 		}
 
@@ -132,7 +135,7 @@ class Option
 					unset( $options->{$key} );
 				}
 
-				return $_newValue;
+                return $emptyStringIsNull && empty( $_newValue ) ? null : $_newValue;
 			}
 			else if ( method_exists( $options, 'get' . $key ) )
 			{
@@ -149,7 +152,7 @@ class Option
 		}
 
 		//	Return the default...
-		return $_newValue;
+        return $emptyStringIsNull && empty( $_newValue ) ? null : $_newValue;
 	}
 
 	/**
@@ -242,13 +245,14 @@ class Option
 	/**
 	 * Sets an value in the given array at key.
 	 *
-	 * @param array|\ArrayAccess|object $options
-	 * @param string|array              $key Pass a single key or an array of KVPs
-	 * @param mixed|null                $value
+     * @param array|\ArrayAccess|object $options           The array or object from which to set $key's $value
+     * @param string|array              $key               The array index or property to set
+     * @param mixed                     $value             The value to set
+     * @param bool                      $emptyStringIsNull If true, empty() values will always be set as NULL
 	 *
 	 * @return array|string
 	 */
-	public static function set( &$options = array(), $key, $value = null )
+    public static function set( &$options = array(), $key, $value = null, $emptyStringIsNull = false )
 	{
 		if ( is_array( $key ) )
 		{
@@ -269,7 +273,7 @@ class Option
 					$_key = $_cleanKey;
 				}
 
-				$options[$_key] = $_value;
+                $options[ $_key ] = $emptyStringIsNull && empty( $_value ) ? null : $_value;
 
 				continue;
 			}
@@ -281,7 +285,7 @@ class Option
 				//	Prefer setter, if one...
 				if ( method_exists( $options, $_setter ) )
 				{
-					$options->{$_setter}( $_value );
+                    $options->{$_setter}( $emptyStringIsNull && empty( $_value ) ? null : $_value );
 				}
 				else
 				{
@@ -291,7 +295,7 @@ class Option
 					}
 
 					//	Set it verbatim
-					$options->{$_key} = $_value;
+                    $options->{$_key} = $emptyStringIsNull && empty( $_value ) ? null : $_value;
 				}
 			}
 		}

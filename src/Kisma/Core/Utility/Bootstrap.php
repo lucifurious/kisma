@@ -36,7 +36,8 @@ class Bootstrap extends HtmlMarkup implements FormTypes, UtilityLike
 	/**
 	 * @var string The block pattern for forms
 	 */
-	const VerticalGroupPattern = <<<HTML
+	const VerticalGroupPattern
+		= <<<HTML
 	%%__LABEL__%%
 	%%__INPUT__%%
 	%%__HELP_BLOCK__%%
@@ -45,7 +46,8 @@ HTML;
 	/**
 	 * @var string The block pattern for horizontal forms
 	 */
-	const HorizontalGroupPattern = <<<HTML
+	const HorizontalGroupPattern
+		= <<<HTML
 <div class="control-group">
 	%%__LABEL__%%
 	<div class="controls">
@@ -119,7 +121,8 @@ HTML;
 			$_tokenName = \Yii::app()->getRequest()->csrfTokenName;
 			$_tokenValue = \Yii::app()->getRequest()->csrfToken;
 
-			$this->_csrf = <<<HTML
+			$this->_csrf
+				= <<<HTML
 <input type="hidden" name="{$_tokenName}" value="{$_tokenValue}" />
 HTML;
 		}
@@ -177,18 +180,14 @@ HTML;
 
 				$_contents = ( !isset( $_field['contents'] ) && isset( $_field['value'] )
 					? $_field['value']
-					: Option::get(
-						$_field,
+					: Option::get( $_field,
 						'contents',
 						null,
-						true
-					) );
+						true ) );
 
-				$_inner .= $this->field(
-					Option::get( $_field, 'type', 'text', true ),
+				$_inner .= $this->field( Option::get( $_field, 'type', 'text', true ),
 					$_field,
-					$_contents
-				);
+					$_contents );
 			}
 
 			$_html .= static::wrap( 'fieldset', $_inner );
@@ -282,24 +281,20 @@ HTML;
 		if ( false !== stripos( Option::get( $attributes, 'class' ), 'x-editable' ) )
 		{
 			//	Replace contents with the x-editable link...
-			$contents = static::tag(
-				'a',
+			$contents = static::tag( 'a',
 				array(
 					'class'               => 'x-editable',
 					'href'                => '#',
 					'id'                  => $_id,
 					'data-type'           => $_type,
 					'data-pk'             => Option::get( $this->_attributes, 'x-editable-pk', Option::get( $this->_formData, 'id' ) ),
-					'data-url'            => Option::get(
-							$this->_attributes,
-							'x-editable-url',
-							Option::get( $attributes, 'x-editable-url', null, true )
-						),
+					'data-url'            => Option::get( $this->_attributes,
+						'x-editable-url',
+						Option::get( $attributes, 'x-editable-url', null, true ) ),
 					'data-original-title' => $_labelText,
 					'data-inputclass'     => Option::get( $attributes, 'class', 'input-xlarge' ),
 				),
-				$contents
-			);
+				$contents );
 
 			//	New type of just HTML...
 			$_type = 'html';
@@ -314,11 +309,9 @@ HTML;
 			case 'textarea':
 				$attributes['class'] = static::addValue( Option::get( $attributes, 'class' ), 'input-xxlarge' );
 
-				$_input = static::wrap(
-					$_type,
+				$_input = static::wrap( $_type,
 					$contents,
-					$attributes
-				);
+					$attributes );
 				break;
 
 			case 'select':
@@ -327,10 +320,8 @@ HTML;
 					$attributes['value'] = $contents;
 				}
 
-				$_input = static::select(
-					Option::get( $attributes, 'data', array(), true ),
-					$attributes
-				);
+				$_input = static::select( Option::get( $attributes, 'data', array(), true ),
+					$attributes );
 				break;
 
 			case 'button':
@@ -347,7 +338,8 @@ HTML;
 			$_input = '<div class="' . $_inputWrap . '">' . $_inputPrepend . $_input . $_inputAppend . '</div>';
 		}
 
-		$_html = <<<HTML
+		$_html
+			= <<<HTML
 {$_blockStart}{$_inputStart}{$_label}{$_input}{$_labelEnd}{$_hint}{$_inputEnd}{$_blockEnd}
 HTML;
 
@@ -424,15 +416,14 @@ HTML;
 
 		if ( !empty( $submitButton ) )
 		{
-			$_submit = $this->button(
-				'submit',
+			$_submit = $this->button( 'submit',
 				array(
 					'text' => ( true === $submitButton ? 'Submit' : $submitButton ),
-				)
-			);
+				) );
 		}
 
-		$_html = <<<HTML
+		$_html
+			= <<<HTML
 <form {$_html}>
 	{$legend}
 	{$this->_contents}
@@ -468,13 +459,9 @@ HTML;
 
 		if ( null === ( $_label = Option::get( $attributes, 'label', null, true ) ) )
 		{
-			$_label = ucwords(
-				str_replace(
-					array( '_text', '_nbr', '_ind', '_blob', '_' ),
-					array( null, null, null, null, ' ' ),
-					$_savedName
-				)
-			);
+			$_label = ucwords( str_replace( array( '_text', '_nbr', '_ind', '_blob', '_' ),
+				array( null, null, null, null, ' ' ),
+				$_savedName ) );
 		}
 
 		if ( null !== $this->_prefix )
@@ -515,7 +502,8 @@ HTML;
 
 				$_class = $_menuItem['active'] ? 'active' : 'inactive';
 
-				$_liTags .= <<<HTML
+				$_liTags
+					.= <<<HTML
 <li class="{$_class}"><a href="{$_menuItem['href']}">{$_icon}{$_linkName}</a></li>
 HTML;
 			}
@@ -523,11 +511,12 @@ HTML;
 
 		if ( !empty( $logoutUrl ) )
 		{
-			$_token =
-				( class_exists( '\\Yii', false ) && false !== \Yii::app()->getRequest()->enableCsrfValidation ) ?
-					'?token=' . \Yii::app()->getRequest()->getCsrfToken() : null;
+			$_token
+				= ( class_exists( '\\Yii', false ) && false !== \Yii::app()->getRequest()->enableCsrfValidation ) ?
+				'?token=' . \Yii::app()->getRequest()->getCsrfToken() : null;
 
-			$_liTags .= <<<HTML
+			$_liTags
+				.= <<<HTML
 <li class="pull-right"><a href="{$logoutUrl}{$_token}">Logout</a></li>
 HTML;
 		}

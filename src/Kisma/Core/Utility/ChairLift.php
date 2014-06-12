@@ -103,11 +103,9 @@ class ChairLift implements HttpResponse, UtilityLike
 
 		if ( !isset( self::$_dms[$_key] ) )
 		{
-			self::$_dms[$_key] = \Doctrine\ODM\CouchDB\DocumentManager::create(
-				Option::get( $options, 'client', static::couchDbClient( $options ) ),
+			self::$_dms[$_key] = \Doctrine\ODM\CouchDB\DocumentManager::create( Option::get( $options, 'client', static::couchDbClient( $options ) ),
 				Option::get( $options, 'config' ),
-				Option::get( $options, 'manager' )
-			);
+				Option::get( $options, 'manager' ) );
 		}
 
 		return self::$_dms[$_key];
