@@ -20,13 +20,11 @@
  */
 namespace Kisma\Core\Utility;
 
-use Kisma\Core\Interfaces\UtilityLike;
-
 /**
  * FilterInput
  * Helpers for working with filter_input and filter_var
  */
-class FilterInput implements UtilityLike
+class FilterInput
 {
 	//*************************************************************************
 	//* Filter Getters
@@ -49,10 +47,11 @@ class FilterInput implements UtilityLike
 	 * Filter chooser based on number or string. Not very smart really.
 	 *
 	 * @param mixed $value
+	 * @param bool  $emptyValueIsNull If true, empty() values will be returned as NULL
 	 *
 	 * @return mixed
 	 */
-	public static function smart( $value )
+	public static function smart( $value, $emptyValueIsNull = false )
 	{
 		if ( is_array( $value ) )
 		{
@@ -79,7 +78,9 @@ class FilterInput implements UtilityLike
 				break;
 		}
 
-		return filter_var( $value, $_filter );
+		$_result = filter_var( $value, $_filter );
+
+		return $emptyValueIsNull && empty( $_result ) ? null : $_result;
 	}
 
 	/**
@@ -97,16 +98,19 @@ class FilterInput implements UtilityLike
 	 *                                                     flags can be provided in "flags" field of array. For the "callback" filter,
 	 *                                                     callback type should be passed. The callback must accept one argument,
 	 *                                                     the value to be filtered, and return the value after filtering/sanitizing it.
+	 * @param bool           $emptyValueIsNull             If true, empty() values will be returned as NULL
 	 *
 	 * @throws \InvalidArgumentException
 	 * @return mixed
 	 */
-	public static function get( $type, $key, $defaultValue = null, $filter = FILTER_DEFAULT, $filterOptions = null )
+	public static function get( $type, $key, $defaultValue = null, $filter = FILTER_DEFAULT, $filterOptions = null, $emptyValueIsNull = false )
 	{
 		//	Allow usage as filter_var()
 		if ( is_array( $type ) )
 		{
-			return filter_var( Option::get( $type, $key, $defaultValue ), $filter, $filterOptions );
+			$_result = filter_var( Option::get( $type, $key, $defaultValue ), $filter, $filterOptions );
+
+			return $emptyValueIsNull && empty( $_result ) ? null : $_result;
 		}
 
 		$_haystack = null;
@@ -140,14 +144,9 @@ class FilterInput implements UtilityLike
 				throw new \InvalidArgumentException( 'The filter type of "' . $type . '" is unknown or not supported.' );
 		}
 
-		if ( empty( $_haystack ) )
-		{
-			return $defaultValue;
-		}
+		$_value = empty( $_haystack ) ? $defaultValue : filter_var( Option::get( $_haystack, $key, $defaultValue ), $filter, $filterOptions );
 
-		$_value = filter_var( Option::get( $_haystack, $key, $defaultValue ), $filter, $filterOptions );
-
-		return $_value;
+		return $emptyValueIsNull && empty( $_value ) ? null : $_value;
 	}
 
 	/**
@@ -164,7 +163,7 @@ class FilterInput implements UtilityLike
 	 */
 	public static function post( $key, $defaultValue = null, $filter = FILTER_DEFAULT, $filterOptions = null )
 	{
-		return self::get( INPUT_POST, $key, $defaultValue, $filter, $filterOptions );
+		return static::get( INPUT_POST, $key, $defaultValue, $filter, $filterOptions );
 	}
 
 	/**
@@ -181,7 +180,7 @@ class FilterInput implements UtilityLike
 	 */
 	public static function cookie( $key, $defaultValue = null, $filter = FILTER_DEFAULT, $filterOptions = null )
 	{
-		return self::get( INPUT_COOKIE, $key, $defaultValue, $filter, $filterOptions );
+		return static::get( INPUT_COOKIE, $key, $defaultValue, $filter, $filterOptions );
 	}
 
 	/**
@@ -198,7 +197,7 @@ class FilterInput implements UtilityLike
 	 */
 	public static function server( $key, $defaultValue = null, $filter = FILTER_DEFAULT, $filterOptions = null )
 	{
-		return self::get( INPUT_SERVER, $key, $defaultValue, $filter, $filterOptions );
+		return static::get( INPUT_SERVER, $key, $defaultValue, $filter, $filterOptions );
 	}
 
 	/**
@@ -215,7 +214,7 @@ class FilterInput implements UtilityLike
 	 */
 	public static function env( $key, $defaultValue = null, $filter = FILTER_DEFAULT, $filterOptions = null )
 	{
-		return self::get( INPUT_ENV, $key, $defaultValue, $filter, $filterOptions );
+		return static::get( INPUT_ENV, $key, $defaultValue, $filter, $filterOptions );
 	}
 
 	/**
@@ -232,7 +231,7 @@ class FilterInput implements UtilityLike
 	 */
 	public static function session( $key, $defaultValue = null, $filter = FILTER_DEFAULT, $filterOptions = null )
 	{
-		return self::get( INPUT_SESSION, $key, $defaultValue, $filter, $filterOptions );
+		return static::get( INPUT_SESSION, $key, $defaultValue, $filter, $filterOptions );
 	}
 
 	/**
@@ -249,6 +248,6 @@ class FilterInput implements UtilityLike
 	 */
 	public static function request( $key, $defaultValue = null, $filter = FILTER_DEFAULT, $filterOptions = null )
 	{
-		return self::get( INPUT_REQUEST, $key, $defaultValue, $filter, $filterOptions );
+		return static::get( INPUT_REQUEST, $key, $defaultValue, $filter, $filterOptions );
 	}
 }

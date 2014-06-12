@@ -175,13 +175,11 @@ class Convert extends Seed implements UtilityLike
 
 		if ( is_array( $object ) )
 		{
-			return array_map(
-				array(
+			return array_map( array(
 					__CLASS__,
 					'toArray'
 				),
-				$object
-			);
+				$object );
 		}
 
 		// Return array

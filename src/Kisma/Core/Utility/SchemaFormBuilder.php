@@ -70,13 +70,11 @@ class SchemaFormBuilder implements UtilityLike
 			$_label = Option::get( $_settings, 'label', Inflector::display( $_field ) );
 			$_labelAttributes = Option::get( $_settings, 'label_attributes', array( 'for' => $_field ) );
 
-			$_attributes = array_merge(
-				array(
+			$_attributes = array_merge( array(
 					'name' => $_field,
 					'id'   => $_field,
 				),
-				Option::get( $_settings, 'attributes', array() )
-			);
+				Option::get( $_settings, 'attributes', array() ) );
 
 			if ( false !== ( $_required = Option::get( $_settings, 'required', false ) ) )
 			{
@@ -91,22 +89,18 @@ class SchemaFormBuilder implements UtilityLike
 				case 'text':
 					$_form .= HtmlMarkup::tag( 'textarea', $_attributes, $_value ) . PHP_EOL;
 
-					$_fields[$_field] = array_merge(
-						$_fields[$_field],
+					$_fields[$_field] = array_merge( $_fields[$_field],
 						array( 'type' => 'textarea', 'contents' => $_value ),
-						$_attributes
-					);
+						$_attributes );
 					break;
 
 				case 'select':
 					$_attributes['size'] = Option::get( $_settings, 'size', 1 );
 					$_attributes['value'] = $_value;
 
-					$_fields[$_field] = array_merge(
-						$_fields[$_field],
+					$_fields[$_field] = array_merge( $_fields[$_field],
 						array( 'type' => 'select', 'data' => Option::get( $_settings, 'options', array() ) ),
-						$_attributes
-					);
+						$_attributes );
 
 					$_form .= HtmlMarkup::select( $_fields[$_field]['data'], $_attributes ) . PHP_EOL;
 					break;
@@ -116,11 +110,9 @@ class SchemaFormBuilder implements UtilityLike
 					$_attributes['value'] = $_value;
 					$_attributes['type'] = 'text';
 
-					$_fields[$_field] = array_merge(
-						$_fields[$_field],
+					$_fields[$_field] = array_merge( $_fields[$_field],
 						array( 'type' => 'input', 'value' => $_value ),
-						$_attributes
-					);
+						$_attributes );
 
 					$_form .= HtmlMarkup::tag( 'input', $_attributes, null, true, true ) . PHP_EOL;
 					break;
@@ -130,4 +122,3 @@ class SchemaFormBuilder implements UtilityLike
 		return $returnHtml ? $_form : $_fields;
 	}
 }
-

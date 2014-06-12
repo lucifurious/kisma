@@ -248,24 +248,18 @@ class FileSystem extends Seed implements UtilityLike
 				//	Recurse directories
 				if ( ( $flags & GlobFlags::GLOB_RECURSE ) && is_dir( $_file ) && ( !in_array( $_file, array( '.', '..' ) ) ) )
 				{
-					$_glob = array_merge(
-						$_glob,
-						Scalar::array_prepend(
-							self::glob(
-								$_path . '/' . $_file . '/' . $_mask,
-								$flags
-							),
-							( $flags & GlobFlags::GLOB_PATH ? '' : $_file . '/' )
-						)
-					);
+					$_glob = array_merge( $_glob,
+						Scalar::array_prepend( self::glob( $_path . '/' . $_file . '/' . $_mask,
+								$flags ),
+							( $flags & GlobFlags::GLOB_PATH ? '' : $_file . '/' ) ) );
 				}
 
 				// Match file mask
 				if ( fnmatch( $_mask, $_file ) )
 				{
 					if ( ( ( !( $flags & GLOB_ONLYDIR ) ) || is_dir( "$_path/$_file" ) ) &&
-						 ( ( !( $flags & GlobFlags::GLOB_NODIR ) ) || ( !is_dir( $_path . '/' . $_file ) ) ) &&
-						 ( ( !( $flags & GlobFlags::GLOB_NODOTS ) ) || ( !in_array( $_file, array( '.', '..' ) ) ) )
+						( ( !( $flags & GlobFlags::GLOB_NODIR ) ) || ( !is_dir( $_path . '/' . $_file ) ) ) &&
+						( ( !( $flags & GlobFlags::GLOB_NODOTS ) ) || ( !in_array( $_file, array( '.', '..' ) ) ) )
 					)
 					{
 						$_glob[] = ( $flags & GlobFlags::GLOB_PATH ? $_path . '/' : '' ) . $_file . ( $flags & GLOB_MARK ? '/' : '' );
