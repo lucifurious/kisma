@@ -23,6 +23,7 @@ use Kisma\Core\Events\Enums\KismaEvents;
 use Kisma\Core\Utility\Detector;
 use Kisma\Core\Utility\EventManager;
 use Kisma\Core\Utility\Inflector;
+use Kisma\Core\Utility\Log;
 use Kisma\Core\Utility\Option;
 use Kisma\Core\Utility\Storage;
 
@@ -38,7 +39,7 @@ class Kisma
     /**
      * @var string The current version
      */
-    const KISMA_VERSION = '0.2.47';
+    const KISMA_VERSION = '0.2.48';
     /**
      * @var string The current version
      * @deprecated Deprecated in 0.2.19, to be removed in 0.3.x
@@ -107,6 +108,7 @@ class Kisma
 
             if ( null === static::get( CoreSettings::AUTO_LOADER ) && class_exists( '\\ComposerAutoloaderInit', false ) )
             {
+                /** @noinspection PhpUndefinedClassInspection */
                 static::set( CoreSettings::AUTO_LOADER, \ComposerAutoloaderInit::getLoader() );
             }
 
@@ -126,17 +128,17 @@ class Kisma
     public static function __sleep()
     {
         //	Save options out to session...
-        if ( static::$_awake && isset( $_SESSION ) )
+        if ( static::$_awake && isset( $_SESSION ) && '' !== session_id() )
         {
             //	Freeze the options and stow, but not the autoloader
-            $_SESSION[ CoreSettings::SESSION_KEY ] = static::$_options;
+            $_SESSION[CoreSettings::SESSION_KEY] = static::$_options;
             //	Remove the autoloader from the SESSION.
-            Option::remove( $_SESSION[ CoreSettings::SESSION_KEY ], CoreSettings::AUTO_LOADER );
+            Option::remove( $_SESSION[CoreSettings::SESSION_KEY], CoreSettings::AUTO_LOADER );
             //	Remove the autoloader at this key if there is one (some apps used the wrong key)
-            Option::remove( $_SESSION[ CoreSettings::SESSION_KEY ], 'app.autoloader' );
+            Option::remove( $_SESSION[CoreSettings::SESSION_KEY], 'app.autoloader' );
 
             //	Now store our options
-            $_SESSION[ CoreSettings::SESSION_KEY ] = Storage::freeze( $_SESSION[ CoreSettings::SESSION_KEY ] );
+            $_SESSION[CoreSettings::SESSION_KEY] = Storage::freeze( $_SESSION[CoreSettings::SESSION_KEY] );
         }
     }
 
@@ -146,7 +148,7 @@ class Kisma
     public static function __wakeup()
     {
         //	Load options from session...
-        if ( PHP_SESSION_DISABLED != session_status() && null !== ( $_frozen = Option::get( $_SESSION, CoreSettings::SESSION_KEY ) ) )
+        if ( isset( $_SESSION ) && '' !== session_id() && null !== ( $_frozen = Option::get( $_SESSION, CoreSettings::SESSION_KEY ) ) )
         {
             //	Merge them into the fold
             $_data = Storage::defrost( $_frozen );
@@ -155,12 +157,12 @@ class Kisma
             if ( $_data == $_frozen )
             {
                 Log::debug( '  - Retrieved data is not compressed or bogus. Removing. ' );
-                unset( $_SESSION[ CoreSettings::SESSION_KEY ] );
+                unset( $_SESSION[CoreSettings::SESSION_KEY] );
 
                 return;
             }
 
-            static::$_options = Options::merge( $_data, static::$_options );
+            static::$_options = Option::merge( $_data, static::$_options );
         }
 
         static::$_awake = true;
@@ -245,7 +247,7 @@ class Kisma
             {
                 array_unshift( $arguments, $_tag );
 
-                return call_user_func_array( array( get_called_class(), $_type ), $arguments );
+                return call_user_func_array( array(get_called_class(), $_type), $arguments );
             }
         }
 
@@ -282,7 +284,7 @@ class Kisma
 
             foreach ( $name as $_key => $_value )
             {
-                $_items[ $_key ] = $_value;
+                $_items[$_key] = $_value;
             }
 
             return $_items;
@@ -291,11 +293,6 @@ class Kisma
         if ( is_string( $name ) )
         {
             $_tag = Inflector::neutralize( $name );
-
-//            if ( false === strpos( $_tag, CoreSettings::OPTION_KEY_PREFIX, 0 ) )
-//            {
-//                $_tag = CoreSettings::OPTION_KEY_PREFIX . ltrim( $_tag, '.' );
-//            }
 
             return $_tag;
         }
