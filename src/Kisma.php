@@ -39,7 +39,7 @@ class Kisma
     /**
      * @var string The current version
      */
-    const KISMA_VERSION = '0.2.47';
+    const KISMA_VERSION = '0.2.48';
     /**
      * @var string The current version
      * @deprecated Deprecated in 0.2.19, to be removed in 0.3.x
