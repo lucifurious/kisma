@@ -137,6 +137,16 @@ class Flexistore
         {
             case CacheTypes::MEMCACHE:
             case CacheTypes::MEMCACHED:
+                if ( CacheTypes::MEMCACHE == $type && ( !class_exists( '\\Memcache', false ) || !extension_loaded( 'memcache' ) ) )
+                {
+                    throw new \RuntimeException( 'Memcache support is not available.' );
+                }
+
+                if ( CacheTypes::MEMCACHED == $type && ( !class_exists( '\\Memcached', false ) || !extension_loaded( 'memcached' ) ) )
+                {
+                    throw new \RuntimeException( 'Memcached support is not available.' );
+                }
+
                 $_cache = CacheTypes::MEMCACHE == $type
                     ? new \Memcache()
                     : new \Memcached(
