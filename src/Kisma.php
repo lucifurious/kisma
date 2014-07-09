@@ -18,14 +18,13 @@
  * You should have received a copy of the GNU General Public License
  * along with Kisma(tm).  If not, see <http://www.gnu.org/licenses/>.
  */
+use Kisma\Core\Components\Flexistore;
 use Kisma\Core\Enums\CoreSettings;
 use Kisma\Core\Events\Enums\KismaEvents;
 use Kisma\Core\Utility\Detector;
 use Kisma\Core\Utility\EventManager;
 use Kisma\Core\Utility\Inflector;
-use Kisma\Core\Utility\Log;
 use Kisma\Core\Utility\Option;
-use Kisma\Core\Utility\Storage;
 
 /**
  * Top-level bootstrap class with a few core functions
@@ -39,7 +38,7 @@ class Kisma
     /**
      * @var string The current version
      */
-    const KISMA_VERSION = '0.2.48';
+    const KISMA_VERSION = '0.2.49';
     /**
      * @var string The current version
      * @deprecated Deprecated in 0.2.19, to be removed in 0.3.x
@@ -54,18 +53,22 @@ class Kisma
      * @var array Kisma global settings
      */
     private static $_options = array(
-        CoreSettings::BASE_PATH   => __DIR__,
         CoreSettings::AUTO_LOADER => null,
+        CoreSettings::BASE_PATH   => __DIR__,
         CoreSettings::CONCEPTION  => false,
-        CoreSettings::VERSION     => self::KISMA_VERSION,
+        CoreSettings::FRAMEWORK   => null,
         CoreSettings::NAME        => 'App',
         CoreSettings::NAV_BAR     => null,
-        CoreSettings::FRAMEWORK   => null,
+        CoreSettings::VERSION     => self::KISMA_VERSION,
     );
     /**
      * @var bool Indicates if the object is awake yet
      */
     protected static $_awake = false;
+    /**
+     * @var Flexistore
+     */
+    protected static $_cache = null;
 
     //**************************************************************************
     //* Methods
@@ -85,6 +88,8 @@ class Kisma
         {
             $options = call_user_func( $options );
         }
+
+        static::_initializeCache();
 
         //	Set any application-level options passed in
         static::$_options = Option::merge( static::$_options, $options );
@@ -127,18 +132,14 @@ class Kisma
      */
     public static function __sleep()
     {
-        //	Save options out to session...
-        if ( static::$_awake && isset( $_SESSION ) && '' !== session_id() )
+        //	Save options out to cache...
+        if ( static::$_awake )
         {
-            //	Freeze the options and stow, but not the autoloader
-            $_SESSION[CoreSettings::SESSION_KEY] = static::$_options;
-            //	Remove the autoloader from the SESSION.
-            Option::remove( $_SESSION[CoreSettings::SESSION_KEY], CoreSettings::AUTO_LOADER );
-            //	Remove the autoloader at this key if there is one (some apps used the wrong key)
-            Option::remove( $_SESSION[CoreSettings::SESSION_KEY], 'app.autoloader' );
+            $_data = static::$_options;
+            unset( $_data['app.autoloader'], $_data[CoreSettings::AUTO_LOADER] );
 
-            //	Now store our options
-            $_SESSION[CoreSettings::SESSION_KEY] = Storage::freeze( $_SESSION[CoreSettings::SESSION_KEY] );
+            //	store
+            static::$_cache->set( CoreSettings::CACHE_KEY, $_data );
         }
     }
 
@@ -147,21 +148,10 @@ class Kisma
      */
     public static function __wakeup()
     {
-        //	Load options from session...
-        if ( isset( $_SESSION ) && '' !== session_id() && null !== ( $_frozen = Option::get( $_SESSION, CoreSettings::SESSION_KEY ) ) )
+        $_data = static::$_cache->get( CoreSettings::CACHE_KEY );
+
+        if ( !empty( $_data ) )
         {
-            //	Merge them into the fold
-            $_data = Storage::defrost( $_frozen );
-
-            //	If this object wasn't stored by me, don't use it.
-            if ( $_data == $_frozen )
-            {
-                Log::debug( '  - Retrieved data is not compressed or bogus. Removing. ' );
-                unset( $_SESSION[CoreSettings::SESSION_KEY] );
-
-                return;
-            }
-
             static::$_options = Option::merge( $_data, static::$_options );
         }
 
@@ -299,6 +289,35 @@ class Kisma
 
         //	Dunno, have it back the same I guess...
         return $name;
+    }
+
+    /**
+     * Initialize my settings cache...
+     */
+    protected static function _initializeCache()
+    {
+        //  Try memcached
+        try
+        {
+            return static::$_cache = Flexistore::createMemcachedStore( array('host' => 'localhost') );
+        }
+        catch ( \Exception $_ex )
+        {
+
+        }
+
+        //  Try memcache
+        try
+        {
+            return static::$_cache = Flexistore::createMemcacheStore( array('host' => 'localhost') );
+        }
+        catch ( \Exception $_ex )
+        {
+
+        }
+
+        //  Try files
+        return static::$_cache = Flexistore::createFileStore( sys_get_temp_dir() . '/.kc', '.kc' );
     }
 
 }

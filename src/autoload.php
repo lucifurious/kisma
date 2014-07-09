@@ -24,4 +24,3 @@
  */
 //	Initialize
 require_once __DIR__ . '/Kisma.php';
-\Kisma::conceive();
