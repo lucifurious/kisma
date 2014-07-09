@@ -25,48 +25,52 @@ namespace Kisma\Core\Enums;
  */
 class CoreSettings extends SeedEnum
 {
-	//*************************************************************************
-	//* Constants
-	//*************************************************************************
+    //*************************************************************************
+    //* Constants
+    //*************************************************************************
 
-	/**
-	 * @var string
-	 */
-	const SESSION_KEY = 'kisma.options';
-	/**
-	 * @var string Set to non-empty to enable debug logging
-	 */
-	const DEBUG = 'app.debug';
-	/**
-	 * @var string The base path of the Kisma library
-	 */
-	const BASE_PATH = 'app.base_path';
-	/**
-	 * @var string The Composer autoloader object
-	 */
-	const AUTO_LOADER = 'app.auto_loader';
-	/**
-	 * @var string Set to TRUE once Kisma is initialized
-	 */
-	const CONCEPTION = 'app.conception';
-	/**
-	 * @var string The version of Kisma
-	 */
-	const VERSION = 'app.version';
-	/**
-	 * @var string The name of the app
-	 */
-	const NAME = 'app.name';
-	/**
-	 * @var string The navbar items, if any
-	 */
-	const NAV_BAR = 'app.nav_bar';
-	/**
-	 * @var string The detected framework, if any
-	 */
-	const FRAMEWORK = 'app.framework';
-	/**
-	 * @var string The value to prepend to any keys at the top level
-	 */
-	const OPTION_KEY_PREFIX = 'app.';
+    /**
+     * @var string
+     */
+    const SESSION_KEY = 'kisma.options';
+    /**
+     * @var string Set to non-empty to enable debug logging
+     */
+    const DEBUG = 'app.debug';
+    /**
+     * @var string The base path of the Kisma library
+     */
+    const BASE_PATH = 'app.base_path';
+    /**
+     * @var string The Composer autoloader object
+     */
+    const AUTO_LOADER = 'app.auto_loader';
+    /**
+     * @var string Set to TRUE once Kisma is initialized
+     */
+    const CONCEPTION = 'app.conception';
+    /**
+     * @var string The version of Kisma
+     */
+    const VERSION = 'app.version';
+    /**
+     * @var string The name of the app
+     */
+    const NAME = 'app.name';
+    /**
+     * @var string The navbar items, if any
+     */
+    const NAV_BAR = 'app.nav_bar';
+    /**
+     * @var string The detected framework, if any
+     */
+    const FRAMEWORK = 'app.framework';
+    /**
+     * @var string The value to prepend to any keys at the top level
+     */
+    const OPTION_KEY_PREFIX = 'app.';
+    /**
+     * @type string
+     */
+    const CACHE_KEY = 'kisma.cache';
 }

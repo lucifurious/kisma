@@ -72,8 +72,8 @@ class ErrorHandler
 	 */
 	public static function register()
 	{
-		self::$_priorHandler = \set_error_handler( array( __CLASS__, 'onError' ) );
-		self::$_priorExceptionHandler = \set_exception_handler( array( __CLASS__, 'onException' ) );
+		static::$_priorHandler = \set_error_handler( array( __CLASS__, 'onError' ) );
+		static::$_priorExceptionHandler = \set_exception_handler( array( __CLASS__, 'onException' ) );
 	}
 
 	/**
@@ -81,14 +81,14 @@ class ErrorHandler
 	 */
 	public static function unregister()
 	{
-		if ( !empty( self::$_priorHandler ) )
+		if ( !empty( static::$_priorHandler ) )
 		{
-			\set_error_handler( self::$_priorHandler );
+			\set_error_handler( static::$_priorHandler );
 		}
 
-		if ( !empty( self::$_priorExceptionHandler ) )
+		if ( !empty( static::$_priorExceptionHandler ) )
 		{
-			\set_exception_handler( self::$_priorExceptionHandler );
+			\set_exception_handler( static::$_priorExceptionHandler );
 		}
 	}
 
@@ -104,14 +104,14 @@ class ErrorHandler
 	public static function onError( $code, $message, $file = null, $line = null, $context = null )
 	{
 		$_trace = \debug_backtrace();
-		$_traceText = self::_cleanTrace( $_trace, 3 );
+		$_traceText = static::_cleanTrace( $_trace, 3 );
 
 		if ( E_NOTICE == $code )
 		{
 			//return false;
 		}
 
-		self::$_error = array(
+		static::$_error = array(
 			'code'       => $code,
 			'type'       => null,
 			'message'    => $message,
@@ -119,13 +119,13 @@ class ErrorHandler
 			'line'       => $line,
 			'trace'      => $_traceText,
 			'traces'     => $_trace,
-			'source'     => self::_getCodeLines( $file, $line, self::$_sourceLines ),
-			'start_line' => self::$_startLine,
+			'source'     => static::_getCodeLines( $file, $line, static::$_sourceLines ),
+			'start_line' => static::$_startLine,
 		);
 
-		Log::error( self::$_error['message'] . ' (' . self::$_error['code'] . ')' );
+		Log::error( static::$_error['message'] . ' (' . static::$_error['code'] . ')' );
 
-		return self::renderError();
+		return static::renderError();
 	}
 
 	/**
@@ -136,14 +136,14 @@ class ErrorHandler
 	public static function onException( $exception )
 	{
 		$_trace = $exception->getTrace();
-		$_traceText = self::_cleanTrace( $_trace, 3 );
+		$_traceText = static::_cleanTrace( $_trace, 3 );
 
 		if ( E_NOTICE == $exception->getCode() )
 		{
 			return false;
 		}
 
-		self::$_error = array(
+		static::$_error = array(
 			'code'       => $exception->getCode(),
 			'type'       => '',
 			'message'    => $exception->getMessage(),
@@ -151,13 +151,13 @@ class ErrorHandler
 			'line'       => $exception->getLine(),
 			'trace'      => $_traceText,
 			'traces'     => $exception->getTrace(),
-			'source'     => self::_getCodeLines( $exception->getFile(), $exception->getLine(), self::$_sourceLines ),
-			'start_line' => self::$_startLine,
+			'source'     => static::_getCodeLines( $exception->getFile(), $exception->getLine(), static::$_sourceLines ),
+			'start_line' => static::$_startLine,
 		);
 
-		Log::error( self::$_error['message'] . ' (' . self::$_error['code'] . ')' );
+		Log::error( static::$_error['message'] . ' (' . static::$_error['code'] . ')' );
 
-		return self::renderError();
+		return static::renderError();
 	}
 
 	/**
@@ -177,7 +177,7 @@ class ErrorHandler
 					'base_path'         => \Kisma::get( 'app.base_path' ),
 					'app_root'          => \Kisma::get( 'app.root' ),
 					'page_title'        => 'Error',
-					'error'             => self::$_error,
+					'error'             => static::$_error,
 					'page_header'       => 'Something has gone awry...',
 					'page_header_small' => 'Not cool. :(',
 					'navbar'            => array(
@@ -198,7 +198,7 @@ class ErrorHandler
 		}
 		catch ( \Exception $_ex )
 		{
-			Log::error( 'Exception during rendering of error: ' . print_r( self::$_error, true ) );
+			Log::error( 'Exception during rendering of error: ' . print_r( static::$_error, true ) );
 		}
 
 		return false;
@@ -339,7 +339,7 @@ class ErrorHandler
 		/**
 		 * Set starting line to pass to syntax highlighter. If $maxLines is odd, we lose a half a line. The modulo corrects for that.
 		 */
-		self::$_startLine = $_start + ( $maxLines % 2 );
+		static::$_startLine = $_start + ( $maxLines % 2 );
 
 		while ( $_start <= ( $line + $_window ) )
 		{

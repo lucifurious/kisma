@@ -135,28 +135,29 @@ class Flexistore
     {
         switch ( $type )
         {
-            case CacheTypes::MEMCACHED:
-                $_memcached = new \Memcached( Option::get( $settings, 'persistent_id' ), Option::get( $settings, 'callback' ) );
-                $_servers = Option::get( $settings, 'servers', array() );
-
-                foreach ( $_servers as $_server )
-                {
-                    $_memcached->addServer( Option::get( $_server, 'host' ), Option::get( $_server, 'port', 11211 ), Option::get( $_server, 'weight', 0 ) );
-                }
-
-                $this->_store->setMemcached( $_memcached );
-                break;
-
             case CacheTypes::MEMCACHE:
-                $_memcache = new \Memcache();
+            case CacheTypes::MEMCACHED:
+                $_cache = CacheTypes::MEMCACHE == $type
+                    ? new \Memcache()
+                    : new \Memcached(
+                        Option::get( $settings, 'persistent_id' ), Option::get( $settings, 'callback' )
+                    );
+
                 $_servers = Option::get( $settings, 'servers', array() );
 
                 foreach ( $_servers as $_server )
                 {
-                    $_memcache->addServer( Option::get( $_server, 'host' ), Option::get( $_server, 'port', 11211 ), Option::get( $_server, 'weight', 0 ) );
+                    $_cache->addServer( Option::get( $_server, 'host' ), Option::get( $_server, 'port', 11211 ), Option::get( $_server, 'weight', 0 ) );
                 }
 
-                $this->_store->setMemcache( $_memcache );
+                if ( CacheTypes::MEMCACHED == $type )
+                {
+                    $this->_store->setMemcached( $_cache );
+                }
+                else
+                {
+                    $this->_store->setMemcache( $_cache );
+                }
                 break;
 
             case CacheTypes::REDIS:
@@ -219,7 +220,7 @@ class Flexistore
      * @param float  $timeout
      * @param string $namespace
      *
-     * @throws LogicException
+     * @throws \LogicException
      * @return Flexistore
      */
     public static function createRedisStore( $host = '127.0.0.1', $port = 6379, $timeout = 0.0, $namespace = null )
@@ -242,6 +243,48 @@ class Flexistore
         $_store->setRedis( $_redis );
 
         return $_store;
+    }
+
+    /**
+     * @param array    $servers An array of memcached servers i.e. array('host'=>'localhost','port'=>11211,'weight'=>0)
+     * @param string   $persistentId
+     * @param callable $callback
+     *
+     * @return Flexistore
+     */
+    public static function createMemcachedStore( array $servers = array(), $persistentId = null, $callback = null )
+    {
+        if ( !extension_loaded( 'memcached' ) )
+        {
+            throw new \LogicException( 'The PHP "Memcached" extension is required to use this store type.' );
+        }
+
+        return new static(
+            CacheTypes::MEMCACHED, array(
+                'servers'       => $servers,
+                'persistent_id' => $persistentId,
+                'callback'      => $callback,
+            )
+        );
+    }
+
+    /**
+     * @param array $servers An array of memcache servers i.e. array('host'=>'localhost','port'=>11211,'weight'=>0)
+     *
+     * @return Flexistore
+     */
+    public static function createMemcacheStore( array $servers = array() )
+    {
+        if ( !extension_loaded( 'memcache' ) )
+        {
+            throw new \LogicException( 'The PHP "Memcache" extension is required to use this store type.' );
+        }
+
+        return new static(
+            CacheTypes::MEMCACHE, array(
+                'servers' => $servers,
+            )
+        );
     }
 
     /**
@@ -271,6 +314,24 @@ class Flexistore
     }
 
     /**
+     * @param string $id
+     *
+     * @return bool
+     */
+    public function delete( $id )
+    {
+        return $this->_store->delete( $id );
+    }
+
+    /**
+     * @return bool
+     */
+    public function deleteAll()
+    {
+        return $this->_store->deleteAll();
+    }
+
+    /**
      * Puts data into the cache.
      *
      * $id can be specified as an array of key-value pairs: array( 'alpha' => 'xyz', 'beta' => 'qrs', 'gamma' => 'lmo', ... )
@@ -284,24 +345,20 @@ class Flexistore
      */
     public function set( $id, $data = null, $lifeTime = self::DEFAULT_CACHE_TTL )
     {
-        $_multi = false;
-        $_ids = null;
+        $_multi = true;
+        $_ids = $id;
 
-        if ( is_string( $id ) )
+        if ( !is_array( $id ) )
         {
+            $_multi = false;
             $_ids = array($id => $data);
-        }
-        else if ( is_array( $id ) )
-        {
-            $_ids = $id;
-            $_multi = true;
         }
 
         $_result = array();
 
         foreach ( $_ids as $_key => $_value )
         {
-            $_result[ $_key ] = $this->save( $id, $_value, $lifeTime );
+            $_result[$_key] = $this->save( $_key, $_value, $lifeTime );
         }
 
         return $_multi ? $_result : current( $_result );
