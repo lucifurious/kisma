@@ -36,7 +36,7 @@ class Option
 	 *
 	 * @return bool
 	 */
-	public static function contains( &$options = array(), $key )
+	public static function contains( $options = array(), $key )
 	{
 		$_key = static::_cleanKey( $key );
 
