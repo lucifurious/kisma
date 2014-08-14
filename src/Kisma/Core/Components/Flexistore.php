@@ -217,7 +217,8 @@ class Flexistore
         //  Get a unique temp directory
         do
         {
-            $_path = sys_get_temp_dir() . '/' . $prefix . '/kisma-' . \Kisma::KISMA_VERSION;
+				$_path = sys_get_temp_dir() . '/' . $prefix . '/kisma-' . \Kisma::KISMA_VERSION;
+		}
         while ( is_dir( $_path ) );
 
         return $_path;
