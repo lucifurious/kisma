@@ -117,7 +117,7 @@ class Flexistore
             case CacheTypes::PHP_FILE:
                 do
                 {
-                    $_directory = sys_get_temp_dir() . '/cache.' . uniqid();
+                    $_directory = sys_get_temp_dir() . '/kisma-' . uniqid();
                 }
                 while ( is_dir( $_directory ) );
 
@@ -204,7 +204,7 @@ class Flexistore
     {
         $_path = $path ?: static::_getUniqueTempPath();
 
-        return new Flexistore( CacheTypes::PHP_FILE, array('namespace' => $namespace, 'arguments' => array($_path, $extension)) );
+        return new Flexistore( CacheTypes::FILE_SYSTEM, array('namespace' => $namespace, 'arguments' => array($_path, $extension)) );
     }
 
     /**
@@ -212,13 +212,12 @@ class Flexistore
      *
      * @return string
      */
-    protected static function _getUniqueTempPath( $prefix = 'flex' )
+    protected static function _getUniqueTempPath( $prefix = '.dsp' )
     {
         //  Get a unique temp directory
         do
         {
-            $_path = sys_get_temp_dir() . '/' . $prefix . '.' . uniqid();
-        }
+            $_path = sys_get_temp_dir() . '/' . $prefix . '/kisma-' . \Kisma::KISMA_VERSION;
         while ( is_dir( $_path ) );
 
         return $_path;
