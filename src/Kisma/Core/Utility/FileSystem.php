@@ -180,7 +180,7 @@ class FileSystem extends Seed implements UtilityLike
 	 * @param bool $validate    If true, will check path with is_dir.
 	 * @param bool $forceCreate If true, and result path doesn't exist, it will be created
 	 *
-	 * @throws \Kisma\Core\Exceptions\UtilityException
+	 * @throws UtilityException
 	 * @return bool|null|string
 	 */
 	public static function makePath( $validate = true, $forceCreate = false )
@@ -268,8 +268,7 @@ class FileSystem extends Seed implements UtilityLike
 						( ( !( $flags & GlobFlags::GLOB_NODOTS ) ) || ( !in_array( $_file, array( '.', '..' ) ) ) )
 					)
 					{
-						$_glob[]
-							= ( $flags & GlobFlags::GLOB_PATH ? $_path . '/' : null ) . $_file . ( $flags & GLOB_MARK ? '/' : '' );
+						$_glob[] = ( $flags & GlobFlags::GLOB_PATH ? $_path . '/' : null ) . $_file . ( $flags & GLOB_MARK ? '/' : '' );
 					}
 				}
 			}
@@ -283,5 +282,45 @@ class FileSystem extends Seed implements UtilityLike
 		}
 
 		return $_glob;
+	}
+
+	/**
+	 * rmdir function with force
+	 *
+	 * @param string $dirPath
+	 * @param bool   $force If true, non-empty directories will be deleted
+	 *
+	 * @return bool
+	 * @throws \InvalidArgumentException
+	 */
+	public static function rmdir( $dirPath, $force = false )
+	{
+		$_path = rtrim( $dirPath ) . DIRECTORY_SEPARATOR;
+
+		if ( !$force )
+		{
+			return rmdir( $_path );
+		}
+
+		if ( !is_dir( $_path ) )
+		{
+			throw new \InvalidArgumentException( '"' . $_path . '" is not a directory or bogus in some other way.' );
+		}
+
+		$_files = glob( $_path . '*', GLOB_MARK );
+
+		foreach ( $_files as $_file )
+		{
+			if ( is_dir( $_file ) )
+			{
+				static::rmdir( $_file, true );
+			}
+			else
+			{
+				unlink( $_file );
+			}
+		}
+
+		return rmdir( $_path );
 	}
 }
