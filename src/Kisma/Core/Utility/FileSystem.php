@@ -235,6 +235,8 @@ class FileSystem extends Seed implements UtilityLike
 	 */
 	public static function glob( $pattern, $flags = 0 )
 	{
+		$pattern = static::normalizePath( $pattern );
+
 		$_split = explode( DIRECTORY_SEPARATOR,
 			str_replace( '\\', DIRECTORY_SEPARATOR, ltrim( $pattern, DIRECTORY_SEPARATOR ) ) );
 
@@ -322,5 +324,28 @@ class FileSystem extends Seed implements UtilityLike
 		}
 
 		return rmdir( $_path );
+	}
+
+	/**
+	 * Fixes up bogus paths that start out Windows then go linux (i.e. C:\MyDSP\public/storage/.private/scripts)
+	 *
+	 * @param string $path
+	 *
+	 * @return string
+	 */
+	public static function normalizePath( $path )
+	{
+		if ( '\\' == DIRECTORY_SEPARATOR )
+		{
+			if ( isset( $path, $path[1], $path[2] ) && ':' === $path[1] && '\\' === $path[2] )
+			{
+				if ( false !== strpos( $path, '/' ) )
+				{
+					$path = str_replace( '/', DIRECTORY_SEPARATOR, $path );
+				}
+			}
+		}
+
+		return $path;
 	}
 }
