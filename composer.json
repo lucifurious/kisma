@@ -11,7 +11,7 @@
 		}
 	],
 	"require":     {
-		"php":                      ">=5.3.18",
+		"php":                      ">=5.4.0",
 		"monolog/monolog":          "@stable",
 		"doctrine/cache":           "~1.3.0@stable",
 		"symfony/event-dispatcher": "~2.4@stable",
