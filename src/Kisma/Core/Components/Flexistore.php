@@ -51,7 +51,7 @@ class Flexistore
     /**
      * @type string The suffix for the cache files
      */
-    const DEFAULT_CACHE_EXTENSION = '.kfs.php';
+    const DEFAULT_CACHE_EXTENSION = '.kisma';
 
     //*************************************************************************
     //	Members
@@ -138,6 +138,8 @@ class Flexistore
         {
             case CacheTypes::MEMCACHE:
             case CacheTypes::MEMCACHED:
+                $_memcacheAvailable = false;
+
                 if ( CacheTypes::MEMCACHE == $type && ( !class_exists( '\\Memcache', false ) || !extension_loaded( 'memcache' ) ) )
                 {
                     throw new \RuntimeException( 'Memcache support is not available.' );
@@ -158,11 +160,11 @@ class Flexistore
 
                 foreach ( $_servers as $_server )
                 {
-                    $_cache->addServer(
-                        Option::get( $_server, 'host' ),
-                        Option::get( $_server, 'port', 11211 ),
-                        Option::get( $_server, 'weight', 0 )
-                    );
+                    $_host = isset( $_server, $_server['host'] ) ? $_server['host'] : 'localhost';
+                    $_port = isset( $_server, $_server['port'] ) ? $_server['port'] : 11211;
+                    $_weight = isset( $_server, $_server['weight'] ) ? $_server['weight'] : 0;
+
+                    $_cache->addServer( $_host, $_port, $_weight );
                 }
 
                 if ( CacheTypes::MEMCACHED == $type )
@@ -180,7 +182,7 @@ class Flexistore
 
                 if ( false === $_redis->pconnect( '127.0.0.1' ) )
                 {
-                    throw new \LogicException( 'Cannot connect to redis server @ 127.0.0.1' );
+                    throw new \RuntimeException( 'Cannot connect to redis server @ 127.0.0.1' );
                 }
 
                 $this->_store->setRedis( $_redis );

@@ -21,9 +21,11 @@
 use Kisma\Core\Components\Flexistore;
 use Kisma\Core\Enums\CoreSettings;
 use Kisma\Core\Events\Enums\KismaEvents;
+use Kisma\Core\Exceptions\FileSystemException;
 use Kisma\Core\Utility\Detector;
 use Kisma\Core\Utility\EventManager;
 use Kisma\Core\Utility\Inflector;
+use Kisma\Core\Utility\Log;
 use Kisma\Core\Utility\Option;
 
 /**
@@ -245,22 +247,6 @@ class Kisma
     }
 
     /**
-     * @param Composer\Script\Event $event
-     */
-    public static function postInstall( \Composer\Script\Event $event )
-    {
-        //	Nada
-    }
-
-    /**
-     * @param Composer\Script\Event $event
-     */
-    public static function postUpdate( \Composer\Script\Event $event )
-    {
-        //	Nada
-    }
-
-    /**
      * @param string $name Cleans up a user-supplied option key
      *
      * @return string
@@ -303,7 +289,6 @@ class Kisma
         }
         catch ( \Exception $_ex )
         {
-
         }
 
         //  Try memcache
@@ -313,11 +298,68 @@ class Kisma
         }
         catch ( \Exception $_ex )
         {
-
         }
 
+        //  Assuming I'm installed under /vendor/kisma/kisma, find project root and make temp directory...
+        $_path = static::_getCachePath();
+
         //  Try files
-        return static::$_cache = Flexistore::createFileStore( sys_get_temp_dir() . '/.kc', '.kc' );
+        return static::$_cache = Flexistore::createFileStore( $_path );
+    }
+
+    /**
+     * Determine the Kisma cache location (user home dir) in a cross-platform manner
+     *
+     * @return string
+     * @throws FileSystemException
+     */
+    protected static function _getCachePath()
+    {
+        //  Check for this variable first
+        $_path = getenv( 'KISMA_CACHE_PATH' );
+
+        if ( empty( $_path ) )
+        {
+            //  Then try HOME directory
+            $_path = getenv( 'HOME' );
+        }
+
+        //  Nada? We're going in...
+        if ( empty( $_path ) )
+        {
+            $_user = posix_getpwuid( posix_getuid() );
+            $_path = ( isset( $_user, $_user['dir'] ) ? $_user['dir'] : getcwd() );
+        }
+
+        if ( !is_dir( $_path ) )
+        {
+            Log::debug( 'User home directory "' . $_path . '" is not valid. Using system temp directory.' );
+            $_path = sys_get_temp_dir();
+        }
+
+        $_path .= DIRECTORY_SEPARATOR . '.kisma' . DIRECTORY_SEPARATOR . 'cache';
+
+        if ( !is_dir( $_path ) && false === @mkdir( $_path, 0777, true ) )
+        {
+            //  Try project root
+            $_path = dirname( getcwd() ) . DIRECTORY_SEPARATOR . '.kisma' . DIRECTORY_SEPARATOR . 'cache';
+
+            if ( !is_dir( $_path ) && false === @mkdir( $_path, 0777, true ) )
+            {
+                //  Try current directory
+                $_path = getcwd() . DIRECTORY_SEPARATOR . '.kisma' . DIRECTORY_SEPARATOR . 'cache';
+
+                if ( !is_dir( $_path ) && false === @mkdir( $_path, 0777, true ) )
+                {
+                    //  No love...
+                    throw new FileSystemException( 'Unable to create cache directory: ' . $_path );
+                }
+            }
+        }
+
+        putenv( 'KISMA_CACHE_PATH=' . $_path );
+
+        return $_path;
     }
 
 }
