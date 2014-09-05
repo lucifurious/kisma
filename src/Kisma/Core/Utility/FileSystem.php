@@ -354,4 +354,24 @@ class FileSystem extends Seed implements UtilityLike
 
         return $path;
     }
+
+    /**
+     * Ensures that a path exists
+     * If path does not exist, it is created. If creation fails, FALSE is returned.
+     *
+     * NOTE: Output of mkdir is squelched.
+     *
+     * @param string $path
+     *
+     * @return bool FALSE if the directory does not exist nor can be created
+     */
+    public static function ensurePath( $path )
+    {
+        if ( !is_dir( $path ) && !@mkdir( $path, 0777, true ) )
+        {
+            return false;
+        }
+
+        return true;
+    }
 }

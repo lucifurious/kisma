@@ -90,14 +90,13 @@ class Option
             return static::getMany( $options, $key, $defaultValue, $unsetValue );
         }
 
-        //	Now a deep search
         $_originalKey = $key;
-
-        //	Inflect pain!
-        $key = static::_cleanKey( $key );
 
         //	Set the default value
         $_newValue = $defaultValue;
+
+        //	Now a deeper search
+        $key = static::_cleanKey( $key );
 
         //	Get array value if it exists
         if ( is_array( $options ) || $options instanceof \ArrayAccess )

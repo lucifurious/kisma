@@ -4,3 +4,4 @@ vendor
 tests/log/
 tests/metrics/
 build/
+.cache/

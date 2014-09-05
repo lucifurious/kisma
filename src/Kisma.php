@@ -24,8 +24,8 @@ use Kisma\Core\Events\Enums\KismaEvents;
 use Kisma\Core\Exceptions\FileSystemException;
 use Kisma\Core\Utility\Detector;
 use Kisma\Core\Utility\EventManager;
+use Kisma\Core\Utility\FileSystem;
 use Kisma\Core\Utility\Inflector;
-use Kisma\Core\Utility\Log;
 use Kisma\Core\Utility\Option;
 
 /**
@@ -55,13 +55,14 @@ class Kisma
      * @var array Kisma global settings
      */
     private static $_options = array(
-        CoreSettings::AUTO_LOADER => null,
-        CoreSettings::BASE_PATH   => __DIR__,
-        CoreSettings::CONCEPTION  => false,
-        CoreSettings::FRAMEWORK   => null,
-        CoreSettings::NAME        => 'App',
-        CoreSettings::NAV_BAR     => null,
-        CoreSettings::VERSION     => self::KISMA_VERSION,
+        CoreSettings::AUTO_LOADER  => null,
+        CoreSettings::BASE_PATH    => __DIR__,
+        CoreSettings::CONCEPTION   => false,
+        CoreSettings::FRAMEWORK    => null,
+        CoreSettings::NAME         => 'App',
+        CoreSettings::NAV_BAR      => null,
+        CoreSettings::VERSION      => self::KISMA_VERSION,
+        CoreSettings::ENABLE_CACHE => true,
     );
     /**
      * @var bool Indicates if the object is awake yet
@@ -134,14 +135,17 @@ class Kisma
      */
     public static function __sleep()
     {
-        //	Save options out to cache...
         if ( static::$_awake )
         {
+            //	Save options out to cache...
             $_data = static::$_options;
             unset( $_data['app.autoloader'], $_data[CoreSettings::AUTO_LOADER] );
 
             //	store
-            static::$_cache->set( CoreSettings::CACHE_KEY, $_data );
+            if ( !empty( static::$_cache ) )
+            {
+                static::$_cache->set( CoreSettings::CACHE_KEY, $_data );
+            }
         }
     }
 
@@ -150,11 +154,14 @@ class Kisma
      */
     public static function __wakeup()
     {
-        $_data = static::$_cache->get( CoreSettings::CACHE_KEY );
-
-        if ( !empty( $_data ) )
+        if ( !empty( static::$_cache ) )
         {
-            static::$_options = Option::merge( $_data, static::$_options );
+            $_data = static::$_cache->get( CoreSettings::CACHE_KEY );
+
+            if ( !empty( $_data ) )
+            {
+                static::$_options = Option::merge( $_data, static::$_options );
+            }
         }
 
         static::$_awake = true;
@@ -282,6 +289,11 @@ class Kisma
      */
     protected static function _initializeCache()
     {
+        if ( !static::$_options[CoreSettings::ENABLE_CACHE] )
+        {
+            return false;
+        }
+
         //  Try memcached
         try
         {
@@ -300,8 +312,11 @@ class Kisma
         {
         }
 
-        //  Assuming I'm installed under /vendor/kisma/kisma, find project root and make temp directory...
-        $_path = static::_getCachePath();
+        //  Find me a cache path!
+        if ( false === ( $_path = static::_getCachePath() ) )
+        {
+            return false;
+        }
 
         //  Try files
         return static::$_cache = Flexistore::createFileStore( $_path );
@@ -310,54 +325,47 @@ class Kisma
     /**
      * Determine the Kisma cache location (user home dir) in a cross-platform manner
      *
-     * @return string
+     * @return string|bool FALSE if no cache path can be located
      * @throws FileSystemException
      */
     protected static function _getCachePath()
     {
-        //  Check for this variable first
-        $_path = getenv( 'KISMA_CACHE_PATH' );
+        $_user = posix_getpwuid( posix_getuid() );
+        $_cachePath = DIRECTORY_SEPARATOR . '.kisma' . DIRECTORY_SEPARATOR . 'cache';
+        $_path = null;
 
-        if ( empty( $_path ) )
+        $_paths = array(
+            //  /path/to/kisma/cache... user set
+            getenv( 'KISMA_CACHE_PATH' ),
+            //  ~/.kisma/cache (linux $HOME)
+            getenv( 'HOME' ) . $_cachePath,
+            //  ~/.kisma/cache (Windows $HOME)
+            ( isset( $_user, $_user['dir'] ) ? $_user['dir'] . $_cachePath : false ),
+            //  /path/to/kisma/.cache
+            dirname( __DIR__ ) . DIRECTORY_SEPARATOR . '.cache',
+            //  defaults to /tmp/.kisma/cache
+            sys_get_temp_dir() . $_cachePath,
+            //  Fail!
+            false,
+        );
+
+        foreach ( $_paths as $_path )
         {
-            //  Then try HOME directory
-            $_path = getenv( 'HOME' );
-        }
-
-        //  Nada? We're going in...
-        if ( empty( $_path ) )
-        {
-            $_user = posix_getpwuid( posix_getuid() );
-            $_path = ( isset( $_user, $_user['dir'] ) ? $_user['dir'] : getcwd() );
-        }
-
-        if ( !is_dir( $_path ) )
-        {
-            Log::debug( 'User home directory "' . $_path . '" is not valid. Using system temp directory.' );
-            $_path = sys_get_temp_dir();
-        }
-
-        $_path .= DIRECTORY_SEPARATOR . '.kisma' . DIRECTORY_SEPARATOR . 'cache';
-
-        if ( !is_dir( $_path ) && false === @mkdir( $_path, 0777, true ) )
-        {
-            //  Try project root
-            $_path = dirname( getcwd() ) . DIRECTORY_SEPARATOR . '.kisma' . DIRECTORY_SEPARATOR . 'cache';
-
-            if ( !is_dir( $_path ) && false === @mkdir( $_path, 0777, true ) )
+            if ( !empty( $_path ) )
             {
-                //  Try current directory
-                $_path = getcwd() . DIRECTORY_SEPARATOR . '.kisma' . DIRECTORY_SEPARATOR . 'cache';
-
-                if ( !is_dir( $_path ) && false === @mkdir( $_path, 0777, true ) )
+                if ( FileSystem::ensurePath( $_path ) )
                 {
-                    //  No love...
-                    throw new FileSystemException( 'Unable to create cache directory: ' . $_path );
+                    break;
                 }
+
+                $_path = false;
             }
         }
 
-        putenv( 'KISMA_CACHE_PATH=' . $_path );
+        if ( empty( $_path ) )
+        {
+            return false;
+        }
 
         return $_path;
     }
