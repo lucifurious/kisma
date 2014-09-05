@@ -27,30 +27,30 @@ use Kisma\Core\Events\SeedEvent;
  */
 interface PublisherLike
 {
-	//*************************************************************************
-	//* Constants
-	//*************************************************************************
+    //*************************************************************************
+    //* Constants
+    //*************************************************************************
 
-	/**
-	 * @var string The default event manager for an object
-	 * @deprecated Deprecated in  v0.2.19, to be removed in v0.3.0
-	 * @see        PublisherLike::DEFAULT_EVENT_MANAGER
-	 */
-	const DefaultEventManager = 'Kisma\\Core\\Utility\\EventManager';
-	/**
-	 * @var string The default event manager for the publisher
-	 */
-	const DEFAULT_EVENT_MANAGER = 'Kisma\\Core\\Utility\\EventManager';
+    /**
+     * @var string The default event manager for an object
+     * @deprecated Deprecated in  v0.2.19, to be removed in v0.3.0
+     * @see        PublisherLike::DEFAULT_EVENT_MANAGER
+     */
+    const DefaultEventManager = 'Kisma\\Core\\Utility\\EventManager';
+    /**
+     * @var string The default event manager for the publisher
+     */
+    const DEFAULT_EVENT_MANAGER = 'Kisma\\Core\\Utility\\EventManager';
 
-	//*************************************************************************
-	//	Methods
-	//*************************************************************************
+    //*************************************************************************
+    //	Methods
+    //*************************************************************************
 
-	/**
-	 * @param string    $eventName
-	 * @param SeedEvent $event
-	 *
-	 * @return SeedEvent
-	 */
-	public function trigger( $eventName, $event = null );
+    /**
+     * @param string    $eventName
+     * @param SeedEvent $event
+     *
+     * @return SeedEvent
+     */
+    public function trigger( $eventName, $event = null );
 }

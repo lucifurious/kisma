@@ -26,287 +26,287 @@ namespace Kisma\Core\Utility;
  */
 class HtmlMarkup extends Markup
 {
-	//*************************************************************************
-	//* Methods
-	//*************************************************************************
+    //*************************************************************************
+    //* Methods
+    //*************************************************************************
 
-	/**
-	 * Makes a <DIV>
-	 *
-	 * @param array  $attributes
-	 * @param string $value
-	 * @param bool   $close
-	 *
-	 * @return string
-	 */
-	public static function div( array $attributes = array(), $value = null, $close = true )
-	{
-		return static::tag( 'div', $attributes, $value, $close );
-	}
+    /**
+     * Makes a <DIV>
+     *
+     * @param array  $attributes
+     * @param string $value
+     * @param bool   $close
+     *
+     * @return string
+     */
+    public static function div( array $attributes = array(), $value = null, $close = true )
+    {
+        return static::tag( 'div', $attributes, $value, $close );
+    }
 
-	/**
-	 * Makes a <SPAN>
-	 *
-	 * @param array  $attributes
-	 * @param string $value
-	 * @param bool   $close
-	 *
-	 * @return string
-	 */
-	public static function span( array $attributes = array(), $value = null, $close = true )
-	{
-		return static::tag( 'span', $attributes, $value, $close );
-	}
+    /**
+     * Makes a <SPAN>
+     *
+     * @param array  $attributes
+     * @param string $value
+     * @param bool   $close
+     *
+     * @return string
+     */
+    public static function span( array $attributes = array(), $value = null, $close = true )
+    {
+        return static::tag( 'span', $attributes, $value, $close );
+    }
 
-	/**
-	 * Makes an <INPUT>
-	 *
-	 * @param array  $attributes
-	 * @param string $value
-	 *
-	 * @param null   $wrapper
-	 *
-	 * @return string
-	 */
-	public static function input( array $attributes = array(), $value = null, $wrapper = null )
-	{
-		$_html = static::tag( 'input', $attributes, $value, true, true );
+    /**
+     * Makes an <INPUT>
+     *
+     * @param array  $attributes
+     * @param string $value
+     *
+     * @param null   $wrapper
+     *
+     * @return string
+     */
+    public static function input( array $attributes = array(), $value = null, $wrapper = null )
+    {
+        $_html = static::tag( 'input', $attributes, $value, true, true );
 
-		if ( null !== $wrapper )
-		{
-			$_html = static::div( array( 'class' => $wrapper ), $_html );
-		}
+        if ( null !== $wrapper )
+        {
+            $_html = static::div( array('class' => $wrapper), $_html );
+        }
 
-		return $_html;
-	}
+        return $_html;
+    }
 
-	/**
-	 * Makes a <SELECT>
-	 *
-	 * @param array $options    An array of options for the select box
-	 * @param array $attributes Attributes for the SELECT
-	 *
-	 * @return string
-	 */
-	public static function select( array $options = array(), array $attributes = array(), $wrapper = null )
-	{
-		$_html = null;
-		$_selectedValue = Option::get( $attributes, 'value', null, true );
+    /**
+     * Makes a <SELECT>
+     *
+     * @param array $options    An array of options for the select box
+     * @param array $attributes Attributes for the SELECT
+     *
+     * @return string
+     */
+    public static function select( array $options = array(), array $attributes = array(), $wrapper = null )
+    {
+        $_html = null;
+        $_selectedValue = Option::get( $attributes, 'value', null, true );
 
-		foreach ( $options as $_key => $_value )
-		{
-			$_attributes = array( 'value' => $_key );
+        foreach ( $options as $_key => $_value )
+        {
+            $_attributes = array('value' => $_key);
 
-			if ( $_key == $_selectedValue )
-			{
-				$_attributes['selected'] = 'selected';
-			}
+            if ( $_key == $_selectedValue )
+            {
+                $_attributes['selected'] = 'selected';
+            }
 
-			$_html .= static::tag( 'option', $_attributes, $_value );
-			unset( $_attributes );
-		}
+            $_html .= static::tag( 'option', $_attributes, $_value );
+            unset( $_attributes );
+        }
 
-		return static::tag( 'select', $attributes, $_html, $wrapper );
-	}
+        return static::tag( 'select', $attributes, $_html, $wrapper );
+    }
 
-	/**
-	 * Makes an <A> tag
-	 *
-	 * @param array  $attributes
-	 * @param string $value
-	 *
-	 * @return string
-	 */
-	public static function a( array $attributes = array(), $value = null )
-	{
-		return static::tag( 'a', $attributes, $value );
-	}
+    /**
+     * Makes an <A> tag
+     *
+     * @param array  $attributes
+     * @param string $value
+     *
+     * @return string
+     */
+    public static function a( array $attributes = array(), $value = null )
+    {
+        return static::tag( 'a', $attributes, $value );
+    }
 
-	/**
-	 * @param array  $attributes
-	 * @param string $value
-	 *
-	 * @return string
-	 */
-	public static function radioButton( array $attributes = array(), $value = null )
-	{
-		$attributes['type'] = 'radio';
+    /**
+     * @param array  $attributes
+     * @param string $value
+     *
+     * @return string
+     */
+    public static function radioButton( array $attributes = array(), $value = null )
+    {
+        $attributes['type'] = 'radio';
 
-		return static::tag( 'input', $attributes, $value );
-	}
+        return static::tag( 'input', $attributes, $value );
+    }
 
-	/**
-	 * @param array  $attributes
-	 * @param string $value
-	 *
-	 * @return string
-	 */
-	public static function checkbox( array $attributes = array(), $value = null )
-	{
-		$attributes['type'] = 'checkbox';
+    /**
+     * @param array  $attributes
+     * @param string $value
+     *
+     * @return string
+     */
+    public static function checkbox( array $attributes = array(), $value = null )
+    {
+        $attributes['type'] = 'checkbox';
 
-		return static::tag( 'input', $attributes, $value );
-	}
+        return static::tag( 'input', $attributes, $value );
+    }
 
-	/**
-	 * Makes a <STYLE> tag
-	 *
-	 * @param array  $attributes
-	 * @param string $value
-	 *
-	 * @return string
-	 */
-	public static function style( array $attributes = array(), $value = null )
-	{
-		$attributes['type'] = 'text/css';
+    /**
+     * Makes a <STYLE> tag
+     *
+     * @param array  $attributes
+     * @param string $value
+     *
+     * @return string
+     */
+    public static function style( array $attributes = array(), $value = null )
+    {
+        $attributes['type'] = 'text/css';
 
-		return static::tag( 'style', $attributes, $value );
-	}
+        return static::tag( 'style', $attributes, $value );
+    }
 
-	/**
-	 * Makes a <LINK> tag
-	 *
-	 * @param array  $attributes
-	 * @param string $value
-	 *
-	 * @return string
-	 */
-	public static function link( array $attributes = array(), $value = null )
-	{
-		$attributes['rel'] = 'stylesheet';
-		$attributes['type'] = 'text/css';
+    /**
+     * Makes a <LINK> tag
+     *
+     * @param array  $attributes
+     * @param string $value
+     *
+     * @return string
+     */
+    public static function link( array $attributes = array(), $value = null )
+    {
+        $attributes['rel'] = 'stylesheet';
+        $attributes['type'] = 'text/css';
 
-		return static::tag( 'link', $attributes, $value, true, true );
-	}
+        return static::tag( 'link', $attributes, $value, true, true );
+    }
 
-	/**
-	 * Makes a <SCRIPT> tag
-	 *
-	 * @param array  $attributes
-	 * @param string $value
-	 *
-	 * @return string the enclosed JavaScript
-	 */
-	public static function script( array $attributes = array(), $value = null )
-	{
-		$attributes['type'] = 'text/javascript';
+    /**
+     * Makes a <SCRIPT> tag
+     *
+     * @param array  $attributes
+     * @param string $value
+     *
+     * @return string the enclosed JavaScript
+     */
+    public static function script( array $attributes = array(), $value = null )
+    {
+        $attributes['type'] = 'text/javascript';
 
-		return static::tag( 'script', $attributes, $value );
-	}
+        return static::tag( 'script', $attributes, $value );
+    }
 
-	/**
-	 * Makes a <FORM> tag
-	 *
-	 * @param array  $attributes
-	 * @param string $value
-	 * @param bool   $close If true, tag will be closed
-	 *
-	 * @return string
-	 */
-	public static function form( array $attributes = array(), $value = null, $close = false )
-	{
-		return static::tag( 'form', $attributes, $value, $close );
-	}
+    /**
+     * Makes a <FORM> tag
+     *
+     * @param array  $attributes
+     * @param string $value
+     * @param bool   $close If true, tag will be closed
+     *
+     * @return string
+     */
+    public static function form( array $attributes = array(), $value = null, $close = false )
+    {
+        return static::tag( 'form', $attributes, $value, $close );
+    }
 
-	/**
-	 * Makes a <LEGEND> tag
-	 *
-	 * @param array  $attributes
-	 * @param string $value
-	 *
-	 * @param null   $wrapper
-	 *
-	 * @return string
-	 */
-	public static function legend( array $attributes = array(), $value = null )
-	{
-		return static::tag( 'legend', $attributes, $value );
-	}
+    /**
+     * Makes a <LEGEND> tag
+     *
+     * @param array  $attributes
+     * @param string $value
+     *
+     * @param null   $wrapper
+     *
+     * @return string
+     */
+    public static function legend( array $attributes = array(), $value = null )
+    {
+        return static::tag( 'legend', $attributes, $value );
+    }
 
-	/**
-	 * Makes an <IMG> tag
-	 *
-	 * @param array $attributes
-	 *
-	 * @param null  $wrapper
-	 *
-	 * @return string
-	 */
-	public static function img( array $attributes = array() )
-	{
-		return static::tag( 'img', $attributes );
-	}
+    /**
+     * Makes an <IMG> tag
+     *
+     * @param array $attributes
+     *
+     * @param null  $wrapper
+     *
+     * @return string
+     */
+    public static function img( array $attributes = array() )
+    {
+        return static::tag( 'img', $attributes );
+    }
 
-	/**
-	 * Makes a <BUTTON> tag
-	 */
-	public static function button( array $attributes = array(), $value = null )
-	{
-		return static::tag( 'button', $attributes, $value );
-	}
+    /**
+     * Makes a <BUTTON> tag
+     */
+    public static function button( array $attributes = array(), $value = null )
+    {
+        return static::tag( 'button', $attributes, $value );
+    }
 
-	/**
-	 * Makes a <LABEL> tag
-	 */
-	public static function label( array $attributes = array(), $value = null, $close = true )
-	{
-		return static::tag( 'label', $attributes, $value, $close );
-	}
+    /**
+     * Makes a <LABEL> tag
+     */
+    public static function label( array $attributes = array(), $value = null, $close = true )
+    {
+        return static::tag( 'label', $attributes, $value, $close );
+    }
 
-	/**
-	 * Makes a <INPUT type="TEXT"> tag
-	 *
-	 * @return string
-	 */
-	public static function text( array $attributes = array(), $value = null, $wrapper = null )
-	{
-		$attributes['type'] = 'text';
+    /**
+     * Makes a <INPUT type="TEXT"> tag
+     *
+     * @return string
+     */
+    public static function text( array $attributes = array(), $value = null, $wrapper = null )
+    {
+        $attributes['type'] = 'text';
 
-		return static::input( $attributes, $value, $wrapper );
-	}
+        return static::input( $attributes, $value, $wrapper );
+    }
 
-	/**
-	 * Makes a <INPUT type="HIDDEN"> tag
-	 */
-	public static function hidden( array $attributes = array(), $value = null, $wrapper = null )
-	{
-		$attributes['type'] = 'hidden';
+    /**
+     * Makes a <INPUT type="HIDDEN"> tag
+     */
+    public static function hidden( array $attributes = array(), $value = null, $wrapper = null )
+    {
+        $attributes['type'] = 'hidden';
 
-		return static::input( $attributes, $value, $wrapper );
-	}
+        return static::input( $attributes, $value, $wrapper );
+    }
 
-	/**
-	 * Makes a <INPUT type="PASSWORD"> tag
-	 */
-	public static function password( array $attributes = array(), $value = null, $wrapper = null )
-	{
-		$attributes['type'] = 'password';
+    /**
+     * Makes a <INPUT type="PASSWORD"> tag
+     */
+    public static function password( array $attributes = array(), $value = null, $wrapper = null )
+    {
+        $attributes['type'] = 'password';
 
-		return static::input( $attributes, $value, $wrapper );
-	}
+        return static::input( $attributes, $value, $wrapper );
+    }
 
-	/**
-	 * Makes a <INPUT type="FILE"> tag
-	 */
-	public static function file( array $attributes = array(), $value = null, $wrapper = null )
-	{
-		$attributes['type'] = 'file';
+    /**
+     * Makes a <INPUT type="FILE"> tag
+     */
+    public static function file( array $attributes = array(), $value = null, $wrapper = null )
+    {
+        $attributes['type'] = 'file';
 
-		return static::input( $attributes, $value, $wrapper );
-	}
+        return static::input( $attributes, $value, $wrapper );
+    }
 
-	/**
-	 * Makes a <TEXTAREA> tag
-	 */
-	public static function textarea( array $attributes = array(), $value = null, $wrapper = null )
-	{
-		$_html = static::tag( 'textarea', $attributes, $value );
+    /**
+     * Makes a <TEXTAREA> tag
+     */
+    public static function textarea( array $attributes = array(), $value = null, $wrapper = null )
+    {
+        $_html = static::tag( 'textarea', $attributes, $value );
 
-		if ( null !== $wrapper )
-		{
-			$_html = static::div( array( 'class' => $wrapper ), $_html );
-		}
+        if ( null !== $wrapper )
+        {
+            $_html = static::div( array('class' => $wrapper), $_html );
+        }
 
-		return $_html;
-	}
+        return $_html;
+    }
 }

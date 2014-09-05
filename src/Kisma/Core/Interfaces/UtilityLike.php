@@ -26,5 +26,5 @@ namespace Kisma\Core\Interfaces;
  */
 interface UtilityLike
 {
-	//	Does nothing, like the goggles
+    //	Does nothing, like the goggles
 }

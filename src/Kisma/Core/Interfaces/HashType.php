@@ -25,20 +25,20 @@ namespace Kisma\Core\Interfaces;
  */
 interface HashType
 {
-	//*************************************************************************
-	//* Constants
-	//*************************************************************************
+    //*************************************************************************
+    //* Constants
+    //*************************************************************************
 
-	/**
-	 * @const int Supported hash algorithms
-	 */
-	const MD5 = 1;
-	/**
-	 * @const int Supported hash algorithms
-	 */
-	const SHA1 = 2;
-	/**
-	 * @const int Supported hash algorithms
-	 */
-	const CRC32 = 18;
+    /**
+     * @const int Supported hash algorithms
+     */
+    const MD5 = 1;
+    /**
+     * @const int Supported hash algorithms
+     */
+    const SHA1 = 2;
+    /**
+     * @const int Supported hash algorithms
+     */
+    const CRC32 = 18;
 }

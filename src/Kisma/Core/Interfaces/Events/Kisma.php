@@ -26,16 +26,16 @@ namespace Kisma\Core\Interfaces\Events;
  */
 interface Kisma
 {
-	//*************************************************************************
-	//* Constants
-	//*************************************************************************
+    //*************************************************************************
+    //* Constants
+    //*************************************************************************
 
-	/**
-	 * @var string
-	 */
-	const Birth = 'kisma.birth';
-	/**
-	 * @var string
-	 */
-	const Death = 'kisma.death';
+    /**
+     * @var string
+     */
+    const Birth = 'kisma.birth';
+    /**
+     * @var string
+     */
+    const Death = 'kisma.death';
 }

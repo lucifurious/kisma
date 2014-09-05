@@ -142,7 +142,7 @@ class Log
         }
 
         //	Get the indent, if any
-        $_unindent = ( ( $_newIndent = static ::_processMessage( $message ) ) > 0 );
+        $_unindent = ( ( $_newIndent = static::_processMessage( $message ) ) > 0 );
 
         //	Indent...
         if ( 0 > ( $_tempIndent = static::$_currentIndent - ( $_unindent ? 1 : 0 ) ) )
@@ -592,16 +592,16 @@ class Log
         );
 
         return str_ireplace(
-                   array(
-                       '%%level%%',
-                       '%%date%%',
-                       '%%time%%',
-                       '%%message%%',
-                       '%%extra%%',
-                   ),
-                   $_replacements,
-                   static::$_logFormat
-               ) . ( $newline ? PHP_EOL : null );
+            array(
+                '%%level%%',
+                '%%date%%',
+                '%%time%%',
+                '%%message%%',
+                '%%extra%%',
+            ),
+            $_replacements,
+            static::$_logFormat
+        ) . ( $newline ? PHP_EOL : null );
     }
 
     /**

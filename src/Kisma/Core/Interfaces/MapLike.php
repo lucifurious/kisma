@@ -26,26 +26,26 @@ namespace Kisma\Core\Interfaces;
  */
 interface MapLike extends BagLike
 {
-	//*************************************************************************
-	//* Methods
-	//*************************************************************************
+    //*************************************************************************
+    //* Methods
+    //*************************************************************************
 
-	/**
-	 * Adds a mapping
-	 *
-	 * @param string|int $key
-	 * @param mixed      $value
-	 *
-	 * @return $this
-	 */
-	public function map( $key, $value = null );
+    /**
+     * Adds a mapping
+     *
+     * @param string|int $key
+     * @param mixed      $value
+     *
+     * @return $this
+     */
+    public function map( $key, $value = null );
 
-	/**
-	 * Removes a mapping
-	 *
-	 * @param string|int $key
-	 *
-	 * @return $this
-	 */
-	public function unmap( $key );
+    /**
+     * Removes a mapping
+     *
+     * @param string|int $key
+     *
+     * @return $this
+     */
+    public function unmap( $key );
 }

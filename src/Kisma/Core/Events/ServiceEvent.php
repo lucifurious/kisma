@@ -31,18 +31,18 @@ use Kisma\Core\Interfaces\RequestLike;
  */
 class ServiceEvent extends SeedEvent
 {
-	//**************************************************************************
-	//* Public Methods
-	//**************************************************************************
+    //**************************************************************************
+    //* Public Methods
+    //**************************************************************************
 
-	/**
-	 * Enforces types...
-	 *
-	 * @param ConsumerLike $source
-	 * @param RequestLike  $request
-	 */
-	public function __construct( ConsumerLike $source, RequestLike $request = null )
-	{
-		parent::__construct( $source, $request );
-	}
+    /**
+     * Enforces types...
+     *
+     * @param ConsumerLike $source
+     * @param RequestLike  $request
+     */
+    public function __construct( ConsumerLike $source, RequestLike $request = null )
+    {
+        parent::__construct( $source, $request );
+    }
 }

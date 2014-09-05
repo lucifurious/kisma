@@ -38,107 +38,107 @@ use Kisma\Core\SeedBag;
  */
 abstract class SeedService extends SeedBag implements ServiceLike, ServiceState
 {
-	//*************************************************************************
-	//* Members
-	//*************************************************************************
+    //*************************************************************************
+    //* Members
+    //*************************************************************************
 
-	/**
-	 * @var ConsumerLike
-	 */
-	protected $_consumer = null;
-	/**
-	 * @var bool|int The current state of the service
-	 */
-	protected $_state = self::Uninitialized;
-	/**
-	 * @var RequestLike
-	 */
-	protected $_request = null;
+    /**
+     * @var ConsumerLike
+     */
+    protected $_consumer = null;
+    /**
+     * @var bool|int The current state of the service
+     */
+    protected $_state = self::Uninitialized;
+    /**
+     * @var RequestLike
+     */
+    protected $_request = null;
 
-	//*************************************************************************
-	//* Methods
-	//*************************************************************************
+    //*************************************************************************
+    //* Methods
+    //*************************************************************************
 
-	/**
-	 * Create the service
-	 *
-	 * @param ConsumerLike $consumer
-	 * @param array        $settings
-	 */
-	public function __construct( ConsumerLike $consumer, $settings = array() )
-	{
-		parent::__construct( $settings );
+    /**
+     * Create the service
+     *
+     * @param ConsumerLike $consumer
+     * @param array        $settings
+     */
+    public function __construct( ConsumerLike $consumer, $settings = array() )
+    {
+        parent::__construct( $settings );
 
-		$this->_consumer = $consumer;
-		$this->_state = self::Initialized;
-	}
+        $this->_consumer = $consumer;
+        $this->_state = self::Initialized;
+    }
 
-	/**
-	 * Default implementation
-	 */
-	public function perform()
-	{
-		//	Service complete
-		$this->publish( self::Complete );
-	}
+    /**
+     * Default implementation
+     */
+    public function perform()
+    {
+        //	Service complete
+        $this->publish( self::Complete );
+    }
 
-	/**
-	 * @param ConsumerLike $consumer
-	 *
-	 * @return \Kisma\Core\Services\SeedService
-	 */
-	public function setConsumer( $consumer )
-	{
-		$this->_consumer = $consumer;
+    /**
+     * @param ConsumerLike $consumer
+     *
+     * @return \Kisma\Core\Services\SeedService
+     */
+    public function setConsumer( $consumer )
+    {
+        $this->_consumer = $consumer;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * @return ConsumerLike
-	 */
-	public function getConsumer()
-	{
-		return $this->_consumer;
-	}
+    /**
+     * @return ConsumerLike
+     */
+    public function getConsumer()
+    {
+        return $this->_consumer;
+    }
 
-	/**
-	 * @param bool|int $state
-	 *
-	 * @return \Kisma\Core\Services\SeedService
-	 */
-	public function setState( $state )
-	{
-		$this->_state = $state;
+    /**
+     * @param bool|int $state
+     *
+     * @return \Kisma\Core\Services\SeedService
+     */
+    public function setState( $state )
+    {
+        $this->_state = $state;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * @return bool|int
-	 */
-	public function getState()
-	{
-		return $this->_state;
-	}
+    /**
+     * @return bool|int
+     */
+    public function getState()
+    {
+        return $this->_state;
+    }
 
-	/**
-	 * @param RequestLike $request
-	 *
-	 * @return \Kisma\Core\Services\SeedService
-	 */
-	public function setRequest( $request )
-	{
-		$this->_request = $request;
+    /**
+     * @param RequestLike $request
+     *
+     * @return \Kisma\Core\Services\SeedService
+     */
+    public function setRequest( $request )
+    {
+        $this->_request = $request;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * @return RequestLike
-	 */
-	public function getRequest()
-	{
-		return $this->_request;
-	}
+    /**
+     * @return RequestLike
+     */
+    public function getRequest()
+    {
+        return $this->_request;
+    }
 }

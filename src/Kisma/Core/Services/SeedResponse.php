@@ -29,26 +29,26 @@ use Kisma\Core\SeedBag;
  */
 class SeedResponse extends SeedBag implements ResponseLike
 {
-	//*************************************************************************
-	//* Members
-	//*************************************************************************
+    //*************************************************************************
+    //* Members
+    //*************************************************************************
 
-	/**
-	 * @var int The service status
-	 */
-	protected $_status = null;
+    /**
+     * @var int The service status
+     */
+    protected $_status = null;
 
-	//*************************************************************************
-	//* Methods
-	//*************************************************************************
+    //*************************************************************************
+    //* Methods
+    //*************************************************************************
 
-	/**
-	 * Returns true if the service call was successful
-	 *
-	 * @return bool
-	 */
-	public function success()
-	{
-		return $this->_status == static::Success;
-	}
+    /**
+     * Returns true if the service call was successful
+     *
+     * @return bool
+     */
+    public function success()
+    {
+        return $this->_status == static::Success;
+    }
 }

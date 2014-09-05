@@ -25,20 +25,20 @@ namespace Kisma\Core\Enums;
  */
 class EscapeStyle extends SeedEnum
 {
-	//*************************************************************************
-	//* Constants
-	//*************************************************************************
+    //*************************************************************************
+    //* Constants
+    //*************************************************************************
 
-	/**
-	 * @var int No escape (AARRGH!)
-	 */
-	const NONE = 0;
-	/**
-	 * @var int Escaped with a double character (i.e. '')
-	 */
-	const DOUBLED = 1;
-	/**
-	 * @var int Escaped with a backslash (i.e. \')
-	 */
-	const SLASHED = 2;
+    /**
+     * @var int No escape (AARRGH!)
+     */
+    const NONE = 0;
+    /**
+     * @var int Escaped with a double character (i.e. '')
+     */
+    const DOUBLED = 1;
+    /**
+     * @var int Escaped with a backslash (i.e. \')
+     */
+    const SLASHED = 2;
 }

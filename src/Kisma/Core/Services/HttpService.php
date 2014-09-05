@@ -35,181 +35,181 @@ use Kisma\Core\Utility\Curl;
  */
 abstract class HttpService extends SeedService implements HttpMethod
 {
-	//*************************************************************************
-	//* Constants
-	//*************************************************************************
+    //*************************************************************************
+    //* Constants
+    //*************************************************************************
 
-	/**
-	 * @var int When an error occurs, boolean false is returned.
-	 */
-	const ReturnFalse = 0;
-	/**
-	 * @var int When an error occurs, an exception is thrown
-	 */
-	const ThrowException = 1;
+    /**
+     * @var int When an error occurs, boolean false is returned.
+     */
+    const ReturnFalse = 0;
+    /**
+     * @var int When an error occurs, an exception is thrown
+     */
+    const ThrowException = 1;
 
-	//********************************************************************************
-	//* Members
-	//********************************************************************************
+    //********************************************************************************
+    //* Members
+    //********************************************************************************
 
-	/**
-	 * @var int
-	 */
-	protected $_errorHandling = self::ReturnFalse;
-	/**
-	 * @var int
-	 */
-	protected $_hostPort = null;
-	/**
-	 * @var string
-	 */
-	protected $_userName = null;
-	/**
-	 * @var string
-	 */
-	protected $_password = null;
+    /**
+     * @var int
+     */
+    protected $_errorHandling = self::ReturnFalse;
+    /**
+     * @var int
+     */
+    protected $_hostPort = null;
+    /**
+     * @var string
+     */
+    protected $_userName = null;
+    /**
+     * @var string
+     */
+    protected $_password = null;
 
-	//*************************************************************************
-	//* Methods
-	//*************************************************************************
+    //*************************************************************************
+    //* Methods
+    //*************************************************************************
 
-	/**
-	 * Makes a service request
-	 *
-	 * @param string      $url
-	 * @param array|mixed $payload
-	 * @param array       $curlOptions
-	 * @param string      $method
-	 *
-	 * @return string
-	 */
-	public function request( $url, $payload = array(), $curlOptions = array(), $method = Curl::Get )
-	{
-		$_response = null;
+    /**
+     * Makes a service request
+     *
+     * @param string      $url
+     * @param array|mixed $payload
+     * @param array       $curlOptions
+     * @param string      $method
+     *
+     * @return string
+     */
+    public function request( $url, $payload = array(), $curlOptions = array(), $method = Curl::Get )
+    {
+        $_response = null;
 
-		if ( $this->_hostPort )
-		{
-			Curl::setHostPort( $this->_hostPort );
-		}
+        if ( $this->_hostPort )
+        {
+            Curl::setHostPort( $this->_hostPort );
+        }
 
-		if ( $this->_userName )
-		{
-			Curl::setUserName( $this->_userName );
+        if ( $this->_userName )
+        {
+            Curl::setUserName( $this->_userName );
 
-			if ( $this->_password )
-			{
-				Curl::setPassword( $this->_password );
-			}
-		}
+            if ( $this->_password )
+            {
+                Curl::setPassword( $this->_password );
+            }
+        }
 
-		return Curl::request( $method, $url, $payload, $curlOptions );
-	}
+        return Curl::request( $method, $url, $payload, $curlOptions );
+    }
 
-	/**
-	 * @return array
-	 */
-	public function getCallInfo()
-	{
-		return Curl::getInfo();
-	}
+    /**
+     * @return array
+     */
+    public function getCallInfo()
+    {
+        return Curl::getInfo();
+    }
 
-	/**
-	 * @return array
-	 */
-	public function getLastError()
-	{
-		return Curl::getError();
-	}
+    /**
+     * @return array
+     */
+    public function getLastError()
+    {
+        return Curl::getError();
+    }
 
-	/**
-	 * @return int
-	 */
-	public function getLastHttpCode()
-	{
-		return Curl::getLastHttpCode();
-	}
+    /**
+     * @return int
+     */
+    public function getLastHttpCode()
+    {
+        return Curl::getLastHttpCode();
+    }
 
-	//*************************************************************************
-	//* Properties
-	//*************************************************************************
+    //*************************************************************************
+    //* Properties
+    //*************************************************************************
 
-	/**
-	 * @param int $hostPort
-	 *
-	 * @return \Kisma\Core\Services\HttpService
-	 */
-	public function setHostPort( $hostPort )
-	{
-		$this->_hostPort = $hostPort;
+    /**
+     * @param int $hostPort
+     *
+     * @return \Kisma\Core\Services\HttpService
+     */
+    public function setHostPort( $hostPort )
+    {
+        $this->_hostPort = $hostPort;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * @return int
-	 */
-	public function getHostPort()
-	{
-		return $this->_hostPort;
-	}
+    /**
+     * @return int
+     */
+    public function getHostPort()
+    {
+        return $this->_hostPort;
+    }
 
-	/**
-	 * @param string $password
-	 *
-	 * @return \Kisma\Core\Services\HttpService
-	 */
-	public function setPassword( $password )
-	{
-		$this->_password = $password;
+    /**
+     * @param string $password
+     *
+     * @return \Kisma\Core\Services\HttpService
+     */
+    public function setPassword( $password )
+    {
+        $this->_password = $password;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * @return string
-	 */
-	public function getPassword()
-	{
-		return $this->_password;
-	}
+    /**
+     * @return string
+     */
+    public function getPassword()
+    {
+        return $this->_password;
+    }
 
-	/**
-	 * @param string $userName
-	 *
-	 * @return \Kisma\Core\Services\HttpService
-	 */
-	public function setUserName( $userName )
-	{
-		$this->_userName = $userName;
+    /**
+     * @param string $userName
+     *
+     * @return \Kisma\Core\Services\HttpService
+     */
+    public function setUserName( $userName )
+    {
+        $this->_userName = $userName;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * @return string
-	 */
-	public function getUserName()
-	{
-		return $this->_userName;
-	}
+    /**
+     * @return string
+     */
+    public function getUserName()
+    {
+        return $this->_userName;
+    }
 
-	/**
-	 * @param $errorHandling
-	 *
-	 * @return \Kisma\Core\Services\HttpService
-	 */
-	public function setErrorHandling( $errorHandling )
-	{
-		$this->_errorHandling = $errorHandling;
+    /**
+     * @param $errorHandling
+     *
+     * @return \Kisma\Core\Services\HttpService
+     */
+    public function setErrorHandling( $errorHandling )
+    {
+        $this->_errorHandling = $errorHandling;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * @return int
-	 */
-	public function getErrorHandling()
-	{
-		return $this->_errorHandling;
-	}
+    /**
+     * @return int
+     */
+    public function getErrorHandling()
+    {
+        return $this->_errorHandling;
+    }
 }

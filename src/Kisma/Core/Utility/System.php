@@ -37,7 +37,7 @@ class System extends SeedUtility
      */
     public static function memory( $size = 'k' )
     {
-        static $_validSizes = array( 'b', 'k', 'm', 'g', 't' );
+        static $_validSizes = array('b', 'k', 'm', 'g', 't');
         static $_stats = array(
             'timestamp' => false,
             'total'     => 0,
@@ -75,10 +75,10 @@ class System extends SeedUtility
             return false;
         }
 
-        $_stats[ Cache::STATS_MEMORY_USAGE ] = $_memory[1];
-        $_stats[ Cache::STATS_MEMORY_AVAILABLE ] = $_memory[2];
-        $_stats[ Cache::STATS_UPTIME ] =
-            DateTime::prettySeconds( ( $_stats['updated_at'] = microtime( true ) ) - $_stats['created_at'] + $_stats[ Cache::STATS_UPTIME ] );
+        $_stats[Cache::STATS_MEMORY_USAGE] = $_memory[1];
+        $_stats[Cache::STATS_MEMORY_AVAILABLE] = $_memory[2];
+        $_stats[Cache::STATS_UPTIME] =
+            DateTime::prettySeconds( ( $_stats['updated_at'] = microtime( true ) ) - $_stats['created_at'] + $_stats[Cache::STATS_UPTIME] );
 
         $_stats['source_data'] = $_memory;
         $_stats['php.memory_limit'] = ini_get( 'memory_limit' );

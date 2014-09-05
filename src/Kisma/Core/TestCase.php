@@ -25,5 +25,5 @@ namespace Kisma\Core;
  */
 class TestCase extends \PHPUnit_Framework_TestCase
 {
-	//	Our base test case for PHPUnit
+    //	Our base test case for PHPUnit
 }

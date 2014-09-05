@@ -26,31 +26,31 @@ namespace Kisma\Core\Interfaces;
  */
 interface FormTemplates
 {
-	//*************************************************************************
-	//* Constants
-	//*************************************************************************
+    //*************************************************************************
+    //* Constants
+    //*************************************************************************
 
-	/**
-	 * @var int
-	 */
-	const PlainInput = <<<HTML
+    /**
+     * @var int
+     */
+    const PlainInput = <<<HTML
 %%label%%
 %%input%%
 HTML;
 
-	/**
-	 * @var int
-	 */
-	const HorizontalInput = <<<HTML
+    /**
+     * @var int
+     */
+    const HorizontalInput = <<<HTML
 %%label%%
 %%input%%
 HTML;
-	/**
-	 * @var int
-	 */
-	const Inline = '-inline';
-	/**
-	 * @var int
-	 */
-	const Search = '-search';
+    /**
+     * @var int
+     */
+    const Inline = '-inline';
+    /**
+     * @var int
+     */
+    const Search = '-search';
 }

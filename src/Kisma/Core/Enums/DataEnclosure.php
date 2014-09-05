@@ -26,20 +26,20 @@ namespace Kisma\Core\Enums;
  */
 class DataEnclosure extends SeedEnum
 {
-	//*************************************************************************
-	//* Constants
-	//*************************************************************************
+    //*************************************************************************
+    //* Constants
+    //*************************************************************************
 
-	/**
-	 * @var string
-	 */
-	const NONE = '';
-	/**
-	 * @var string
-	 */
-	const DOUBLE_QUOTE = '"';
-	/**
-	 * @var string
-	 */
-	const SINGLE_QUOTE = "'";
+    /**
+     * @var string
+     */
+    const NONE = '';
+    /**
+     * @var string
+     */
+    const DOUBLE_QUOTE = '"';
+    /**
+     * @var string
+     */
+    const SINGLE_QUOTE = "'";
 }

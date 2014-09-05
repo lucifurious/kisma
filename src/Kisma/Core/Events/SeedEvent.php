@@ -35,139 +35,139 @@ use Symfony\Component\EventDispatcher\Event;
  */
 class SeedEvent extends Event
 {
-	//**************************************************************************
-	//* Members
-	//**************************************************************************
+    //**************************************************************************
+    //* Members
+    //**************************************************************************
 
-	/**
-	 * @var boolean Set to true to stop the bubbling of events at any point
-	 * @deprecated in 0.2.31, to be removed in 0.3.0 {@see Event::stopPropagation}
-	 */
-	protected $_kill = false;
-	/**
-	 * @var mixed Any event data the sender wants to convey
-	 */
-	protected $_data;
-	/**
-	 * @var string A user-defined event ID
-	 */
-	private $_eventId = null;
+    /**
+     * @var boolean Set to true to stop the bubbling of events at any point
+     * @deprecated in 0.2.31, to be removed in 0.3.0 {@see Event::stopPropagation}
+     */
+    protected $_kill = false;
+    /**
+     * @var mixed Any event data the sender wants to convey
+     */
+    protected $_data;
+    /**
+     * @var string A user-defined event ID
+     */
+    private $_eventId = null;
 
-	//**************************************************************************
-	//* Methods
-	//**************************************************************************
+    //**************************************************************************
+    //* Methods
+    //**************************************************************************
 
-	/**
-	 * Constructor.
-	 *
-	 * @param mixed $data
-	 */
-	public function __construct( $data = null )
-	{
-		$this->_eventId = hash( 'sha256', spl_object_hash( $this ) . get_class( $this ) );
-		$this->_data = $data;
-	}
+    /**
+     * Constructor.
+     *
+     * @param mixed $data
+     */
+    public function __construct( $data = null )
+    {
+        $this->_eventId = hash( 'sha256', spl_object_hash( $this ) . get_class( $this ) );
+        $this->_data = $data;
+    }
 
-	/**
-	 * @param mixed $data
-	 *
-	 * @return SeedEvent
-	 */
-	public function setData( $data )
-	{
-		$this->_data = $data;
+    /**
+     * @param mixed $data
+     *
+     * @return SeedEvent
+     */
+    public function setData( $data )
+    {
+        $this->_data = $data;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * @return mixed
-	 */
-	public function getData()
-	{
-		return $this->_data;
-	}
+    /**
+     * @return mixed
+     */
+    public function getData()
+    {
+        return $this->_data;
+    }
 
-	/**
-	 * @return string
-	 */
-	public function getEventId()
-	{
-		return $this->_eventId;
-	}
+    /**
+     * @return string
+     */
+    public function getEventId()
+    {
+        return $this->_eventId;
+    }
 
-	/**
-	 * @param array $excludes The list of elements to exclude
-	 *
-	 * @return array
-	 */
-	public function toArray( $excludes = null )
-	{
-		$_me = array(
-			'stop_propagation' => $this->isPropagationStopped(),
-		);
+    /**
+     * @param array $excludes The list of elements to exclude
+     *
+     * @return array
+     */
+    public function toArray( $excludes = null )
+    {
+        $_me = array(
+            'stop_propagation' => $this->isPropagationStopped(),
+        );
 
-		$_excludes = Option::clean( $excludes );
+        $_excludes = Option::clean( $excludes );
 
-		foreach ( get_object_vars( $this ) as $_key => $_value )
-		{
-			if ( method_exists( $this, 'get' . ( $_cleanKey = ltrim( $_key, '_' ) ) ) && !in_array( $_cleanKey, $_excludes ) )
-			{
-				$_me[Inflector::neutralize( $_cleanKey )] = $_value;
-			}
-		}
+        foreach ( get_object_vars( $this ) as $_key => $_value )
+        {
+            if ( method_exists( $this, 'get' . ( $_cleanKey = ltrim( $_key, '_' ) ) ) && !in_array( $_cleanKey, $_excludes ) )
+            {
+                $_me[Inflector::neutralize( $_cleanKey )] = $_value;
+            }
+        }
 
-		return $_me;
-	}
+        return $_me;
+    }
 
-	/**
-	 * @param array $data
-	 *
-	 * @return $this
-	 */
-	public function fromArray( $data = array() )
-	{
-		foreach ( $data as $_key => $_value )
-		{
-			//  Event ID cannot be changed
-			if ( 'event_id' != $_key )
-			{
-				if ( method_exists( $this, 'set' . ( $_key = Inflector::deneutralize( $_key ) ) ) )
-				{
-					$this->{'set' . $_key}( $_value );
-				}
-			}
-		}
+    /**
+     * @param array $data
+     *
+     * @return $this
+     */
+    public function fromArray( $data = array() )
+    {
+        foreach ( $data as $_key => $_value )
+        {
+            //  Event ID cannot be changed
+            if ( 'event_id' != $_key )
+            {
+                if ( method_exists( $this, 'set' . ( $_key = Inflector::deneutralize( $_key ) ) ) )
+                {
+                    $this->{'set' . $_key}( $_value );
+                }
+            }
+        }
 
-		//  Special propagation stopper
-		if ( isset( $data['stop_propagation'] ) && false !== $data['stop_propagation'] )
-		{
-			$this->stopPropagation();
-		}
+        //  Special propagation stopper
+        if ( isset( $data['stop_propagation'] ) && false !== $data['stop_propagation'] )
+        {
+            $this->stopPropagation();
+        }
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * Kills propagation immediately
-	 *
-	 * @return SeedEvent
-	 * @deprecated in 0.2.41, to be removed in 0.3.0 {@see Event::stopPropagation}
-	 */
-	public function kill()
-	{
-		$this->stopPropagation();
+    /**
+     * Kills propagation immediately
+     *
+     * @return SeedEvent
+     * @deprecated in 0.2.41, to be removed in 0.3.0 {@see Event::stopPropagation}
+     */
+    public function kill()
+    {
+        $this->stopPropagation();
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * @return bool
-	 * @deprecated in 0.2.31, to be removed in 0.3.0 {@see Event::isPropagationStopped}
-	 */
-	public function wasKilled()
-	{
-		return $this->isPropagationStopped();
-	}
+    /**
+     * @return bool
+     * @deprecated in 0.2.31, to be removed in 0.3.0 {@see Event::isPropagationStopped}
+     */
+    public function wasKilled()
+    {
+        return $this->isPropagationStopped();
+    }
 
 }

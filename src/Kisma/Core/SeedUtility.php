@@ -26,32 +26,32 @@ namespace Kisma\Core;
  */
 class SeedUtility implements Interfaces\UtilityLike
 {
-	//*************************************************************************
-	//* Members
-	//*************************************************************************
+    //*************************************************************************
+    //* Members
+    //*************************************************************************
 
-	/**
-	 * @var bool If true, events will be logged
-	 */
-	protected static $_debug = true;
+    /**
+     * @var bool If true, events will be logged
+     */
+    protected static $_debug = true;
 
-	//*************************************************************************
-	//* Methods
-	//*************************************************************************
+    //*************************************************************************
+    //* Methods
+    //*************************************************************************
 
-	/**
-	 * @param boolean $debug
-	 */
-	public static function setDebug( $debug )
-	{
-		self::$_debug = $debug;
-	}
+    /**
+     * @param boolean $debug
+     */
+    public static function setDebug( $debug )
+    {
+        self::$_debug = $debug;
+    }
 
-	/**
-	 * @return boolean
-	 */
-	public static function getDebug()
-	{
-		return self::$_debug;
-	}
+    /**
+     * @return boolean
+     */
+    public static function getDebug()
+    {
+        return self::$_debug;
+    }
 }

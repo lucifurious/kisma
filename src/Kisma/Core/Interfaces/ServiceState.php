@@ -26,24 +26,24 @@ namespace Kisma\Core\Interfaces;
  */
 interface ServiceState
 {
-	//*************************************************************************
-	//* Constants
-	//*************************************************************************
+    //*************************************************************************
+    //* Constants
+    //*************************************************************************
 
-	/**
-	 * @var bool The beginning state
-	 */
-	const Uninitialized = false;
-	/**
-	 * @var bool After initialization
-	 */
-	const Initialized = true;
-	/**
-	 * @var int
-	 */
-	const Running = 1;
-	/**
-	 * @var int
-	 */
-	const Completed = 2;
+    /**
+     * @var bool The beginning state
+     */
+    const Uninitialized = false;
+    /**
+     * @var bool After initialization
+     */
+    const Initialized = true;
+    /**
+     * @var int
+     */
+    const Running = 1;
+    /**
+     * @var int
+     */
+    const Completed = 2;
 }

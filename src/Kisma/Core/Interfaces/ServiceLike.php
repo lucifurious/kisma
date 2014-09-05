@@ -26,14 +26,14 @@ namespace Kisma\Core\Interfaces;
  */
 interface ServiceLike extends Events\ServiceLike
 {
-	//*************************************************************************
-	//* Public Methods
-	//*************************************************************************
+    //*************************************************************************
+    //* Public Methods
+    //*************************************************************************
 
-	/**
-	 * Perform the service requested
-	 *
-	 * @return mixed
-	 */
-	public function perform();
+    /**
+     * Perform the service requested
+     *
+     * @return mixed
+     */
+    public function perform();
 }
