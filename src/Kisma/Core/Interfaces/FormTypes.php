@@ -26,24 +26,24 @@ namespace Kisma\Core\Interfaces;
  */
 interface FormTypes
 {
-	//*************************************************************************
-	//* Constants
-	//*************************************************************************
+    //*************************************************************************
+    //* Constants
+    //*************************************************************************
 
-	/**
-	 * @var string
-	 */
-	const Vertical = null;
-	/**
-	 * @var string
-	 */
-	const Horizontal = '-horizontal';
-	/**
-	 * @var string
-	 */
-	const Inline = '-inline';
-	/**
-	 * @var string
-	 */
-	const Search = '-search';
+    /**
+     * @var string
+     */
+    const Vertical = null;
+    /**
+     * @var string
+     */
+    const Horizontal = '-horizontal';
+    /**
+     * @var string
+     */
+    const Inline = '-inline';
+    /**
+     * @var string
+     */
+    const Search = '-search';
 }

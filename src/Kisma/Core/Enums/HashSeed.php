@@ -26,12 +26,12 @@ namespace Kisma\Core\Enums;
  */
 class HashSeed extends SeedEnum implements \Kisma\Core\Interfaces\HashSeed
 {
-	//*************************************************************************
-	//* Constants
-	//*************************************************************************
+    //*************************************************************************
+    //* Constants
+    //*************************************************************************
 
-	/**
-	 * @var int Default value
-	 */
-	const __default = self::All;
+    /**
+     * @var int Default value
+     */
+    const __default = self::All;
 }

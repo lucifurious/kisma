@@ -26,12 +26,12 @@ namespace Kisma\Core\Interfaces\Events;
  */
 interface Http
 {
-	//*************************************************************************
-	//* Constants
-	//*************************************************************************
+    //*************************************************************************
+    //* Constants
+    //*************************************************************************
 
-	/**
-	 * @var string
-	 */
-	const RequestReceived = 'kisma.core.services.network.http.request_received';
+    /**
+     * @var string
+     */
+    const RequestReceived = 'kisma.core.services.network.http.request_received';
 }

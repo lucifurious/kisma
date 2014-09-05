@@ -26,36 +26,36 @@ namespace Kisma\Core\Interfaces;
  */
 interface OutputFormat
 {
-	//*************************************************************************
-	//* Constants
-	//*************************************************************************
+    //*************************************************************************
+    //* Constants
+    //*************************************************************************
 
-	/**
-	 * @var int
-	 */
-	const Raw = 0;
-	/**
-	 * @var int
-	 */
-	const JSON = 1;
-	/**
-	 * @var int
-	 */
-	const XML = 2;
-	/**
-	 * @var int
-	 */
-	const HTTP = 3;
-	/**
-	 * @var int Comma-separated values
-	 */
-	const CSV = 4;
-	/**
-	 * @var int Pipe-separated values
-	 */
-	const PSV = 5;
-	/**
-	 * @var int Tab-separated values
-	 */
-	const TSV = 6;
+    /**
+     * @var int
+     */
+    const Raw = 0;
+    /**
+     * @var int
+     */
+    const JSON = 1;
+    /**
+     * @var int
+     */
+    const XML = 2;
+    /**
+     * @var int
+     */
+    const HTTP = 3;
+    /**
+     * @var int Comma-separated values
+     */
+    const CSV = 4;
+    /**
+     * @var int Pipe-separated values
+     */
+    const PSV = 5;
+    /**
+     * @var int Tab-separated values
+     */
+    const TSV = 6;
 }

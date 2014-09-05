@@ -28,15 +28,15 @@ use Kisma\Core\Services\DeliveryService;
  */
 class WebDav extends DeliveryService
 {
-	//*************************************************************************
-	//* Methods
-	//*************************************************************************
+    //*************************************************************************
+    //* Methods
+    //*************************************************************************
 
-	/**
-	 * {@InheritDoc}
-	 */
-	public function deliver()
-	{
-		throw new NotImplementedException();
-	}
+    /**
+     * {@InheritDoc}
+     */
+    public function deliver()
+    {
+        throw new NotImplementedException();
+    }
 }

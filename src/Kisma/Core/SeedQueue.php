@@ -26,38 +26,38 @@ namespace Kisma\Core;
  */
 class SeedQueue extends Seed
 {
-	//**************************************************************************
-	//* Private Members
-	//**************************************************************************
+    //**************************************************************************
+    //* Private Members
+    //**************************************************************************
 
-	/**
-	 * @var array The keeper of the cheese
-	 */
-	protected $_queue = array();
+    /**
+     * @var array The keeper of the cheese
+     */
+    protected $_queue = array();
 
-	//**************************************************************************
-	//* Public Methods
-	//**************************************************************************
+    //**************************************************************************
+    //* Public Methods
+    //**************************************************************************
 
-	/**
-	 * Pushes the thing on to the end of the queue
-	 *
-	 * @param mixed $queueItem
-	 *
-	 * @return int The NEW number of requests in the queue
-	 */
-	public function push( $queueItem )
-	{
-		return array_push( $this->_queue, $queueItem );
-	}
+    /**
+     * Pushes the thing on to the end of the queue
+     *
+     * @param mixed $queueItem
+     *
+     * @return int The NEW number of requests in the queue
+     */
+    public function push( $queueItem )
+    {
+        return array_push( $this->_queue, $queueItem );
+    }
 
-	/**
-	 * Pop the thing off of the end of the queue
-	 *
-	 * @return mixed Returns null if the queue is empty
-	 */
-	public function pop()
-	{
-		return array_pop( $this->_queue );
-	}
+    /**
+     * Pop the thing off of the end of the queue
+     *
+     * @return mixed Returns null if the queue is empty
+     */
+    public function pop()
+    {
+        return array_pop( $this->_queue );
+    }
 }

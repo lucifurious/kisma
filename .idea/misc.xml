@@ -25,6 +25,7 @@
     <autoscroll-to-editor value="false" />
     <autoscroll-from-editor value="true" />
     <show-object-properties value="true" />
+    <loaded-nodes />
   </component>
   <component name="DBNavigator.Project.MethodExecutionManager">
     <method-browser />
@@ -356,6 +357,8 @@
         <statement-postfix value="/" />
         <lookup-ddl-files value="true" />
         <create-ddl-files value="false" />
+        <use-qualified-names value="false" />
+        <make-scripts-rerunnable value="true" />
       </general>
     </ddl-file-settings>
   </component>

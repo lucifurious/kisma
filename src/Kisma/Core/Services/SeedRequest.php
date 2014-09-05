@@ -30,51 +30,51 @@ use Kisma\Core\SeedBag;
  */
 abstract class SeedRequest extends SeedBag implements RequestLike, RequestSource
 {
-	//*************************************************************************
-	//* Members
-	//*************************************************************************
+    //*************************************************************************
+    //* Members
+    //*************************************************************************
 
-	/**
-	 * @var int
-	 */
-	protected $_source = self::Http;
+    /**
+     * @var int
+     */
+    protected $_source = self::Http;
 
-	//*************************************************************************
-	//* Methods
-	//*************************************************************************
+    //*************************************************************************
+    //* Methods
+    //*************************************************************************
 
-	/**
-	 * @param array         $contents
-	 * @param RequestSource $source
-	 */
-	public function __construct( $contents = array(), $source = null )
-	{
-		//	Set the request type properly...
-		if ( null === $source && PHP_SAPI == 'cli' )
-		{
-			$this->_source = static::Cli;
-		}
+    /**
+     * @param array         $contents
+     * @param RequestSource $source
+     */
+    public function __construct( $contents = array(), $source = null )
+    {
+        //	Set the request type properly...
+        if ( null === $source && PHP_SAPI == 'cli' )
+        {
+            $this->_source = static::Cli;
+        }
 
-		parent::__construct( $contents );
-	}
+        parent::__construct( $contents );
+    }
 
-	/**
-	 * @return int
-	 */
-	public function getSource()
-	{
-		return $this->_source;
-	}
+    /**
+     * @return int
+     */
+    public function getSource()
+    {
+        return $this->_source;
+    }
 
-	/**
-	 * @param int $source
-	 *
-	 * @return SeedRequest
-	 */
-	public function setSource( $source )
-	{
-		$this->_source = $source;
+    /**
+     * @param int $source
+     *
+     * @return SeedRequest
+     */
+    public function setSource( $source )
+    {
+        $this->_source = $source;
 
-		return $this;
-	}
+        return $this;
+    }
 }

@@ -19,9 +19,13 @@
 <script type="text/javascript" src="/public/vendor/ckeditor/ckeditor.js"></script>
 <script type="text/javascript" src="/public/vendor/ckeditor/adapters/jquery.js"></script>
 <script type="text/javascript">
-$(function() {
-	CKEDITOR.replace('BlogPost_body', {
-		toolbar: 'Basic'
-	});
-});
+$(
+		function() {
+			CKEDITOR.replace(
+					'BlogPost_body', {
+						toolbar: 'Basic'
+					}
+			);
+		}
+);
 </script>

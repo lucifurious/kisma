@@ -27,16 +27,16 @@ use Kisma\Core\Enums\SeedEnum;
  */
 class LifeEvents extends SeedEnum
 {
-	//*************************************************************************
-	//* Constants
-	//*************************************************************************
+    //*************************************************************************
+    //* Constants
+    //*************************************************************************
 
-	/**
-	 * @var string
-	 */
-	const AFTER_CONSTRUCT = 'after_construct';
-	/**
-	 * @var string
-	 */
-	const BEFORE_DESTRUCT = 'before_destruct';
+    /**
+     * @var string
+     */
+    const AFTER_CONSTRUCT = 'after_construct';
+    /**
+     * @var string
+     */
+    const BEFORE_DESTRUCT = 'before_destruct';
 }

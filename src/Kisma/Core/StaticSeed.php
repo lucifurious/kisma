@@ -154,7 +154,7 @@ class StaticSeed extends Seed
     {
         if ( null !== static::getInstance() && method_exists( static::$_instance, $name ) )
         {
-            return call_user_func_array( array( static::$_instance, $name ), $arguments );
+            return call_user_func_array( array(static::$_instance, $name), $arguments );
         }
     }
 

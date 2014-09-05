@@ -26,25 +26,25 @@ namespace Kisma\Core\Services;
  */
 abstract class DeliveryService extends SeedService
 {
-	//*************************************************************************
-	//* Methods
-	//*************************************************************************
+    //*************************************************************************
+    //* Methods
+    //*************************************************************************
 
-	/**
-	 * @return mixed|void
-	 */
-	public function perform()
-	{
-		$_result = $this->deliver();
+    /**
+     * @return mixed|void
+     */
+    public function perform()
+    {
+        $_result = $this->deliver();
 
-		$this->publish( ( $_result->success() ? static::Success : static::Failure ), $_result );
+        $this->publish( ( $_result->success() ? static::Success : static::Failure ), $_result );
 
-		//	Call parent implementation to raise complete event
-		parent::perform();
-	}
+        //	Call parent implementation to raise complete event
+        parent::perform();
+    }
 
-	/**
-	 * @return \Kisma\Core\Interfaces\ResponseLike
-	 */
-	abstract public function deliver();
+    /**
+     * @return \Kisma\Core\Interfaces\ResponseLike
+     */
+    abstract public function deliver();
 }

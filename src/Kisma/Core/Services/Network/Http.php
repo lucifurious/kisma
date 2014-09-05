@@ -34,29 +34,29 @@ use Kisma\Core\Services\SeedService;
  */
 abstract class Http extends SeedService implements Interfaces\HttpMethod, Interfaces\Events\Http
 {
-	//*************************************************************************
-	//* Methods
-	//*************************************************************************
+    //*************************************************************************
+    //* Methods
+    //*************************************************************************
 
-	/**
-	 * {@InheritDoc}
-	 */
-	public function initialize( $consumer, $request = null )
-	{
-		if ( !parent::initialize( $consumer, $request ) )
-		{
-			return false;
-		}
+    /**
+     * {@InheritDoc}
+     */
+    public function initialize( $consumer, $request = null )
+    {
+        if ( !parent::initialize( $consumer, $request ) )
+        {
+            return false;
+        }
 
-		if ( null === $this->_request )
-		{
-			$this->_request = new HttpRequest();
-		}
+        if ( null === $this->_request )
+        {
+            $this->_request = new HttpRequest();
+        }
 
-		//	Trigger the event
-		return $this->publish(
-			self::RequestReceived,
-			$this->_request
-		);
-	}
+        //	Trigger the event
+        return $this->publish(
+            self::RequestReceived,
+            $this->_request
+        );
+    }
 }

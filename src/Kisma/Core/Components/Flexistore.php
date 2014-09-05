@@ -51,7 +51,7 @@ class Flexistore
     /**
      * @type string The suffix for the cache files
      */
-    const DEFAULT_CACHE_EXTENSION = '.kfs.php';
+    const DEFAULT_CACHE_EXTENSION = '.kisma';
 
     //*************************************************************************
     //	Members
@@ -91,7 +91,8 @@ class Flexistore
         $_arguments = Option::get( $settings, 'arguments' );
 
         $this->_store =
-            $_mirror->getConstructor() ? ( $_mirror->newInstanceArgs( $_arguments ?: $this->_getCacheTypeArguments( $type ) ) ) : $_mirror->newInstance();
+            $_mirror->getConstructor() ? ( $_mirror->newInstanceArgs( $_arguments ?: $this->_getCacheTypeArguments( $type ) ) )
+                : $_mirror->newInstance();
 
         if ( null !== ( $_namespace = Option::get( $settings, 'namespace' ) ) )
         {
@@ -137,6 +138,8 @@ class Flexistore
         {
             case CacheTypes::MEMCACHE:
             case CacheTypes::MEMCACHED:
+                $_memcacheAvailable = false;
+
                 if ( CacheTypes::MEMCACHE == $type && ( !class_exists( '\\Memcache', false ) || !extension_loaded( 'memcache' ) ) )
                 {
                     throw new \RuntimeException( 'Memcache support is not available.' );
@@ -157,7 +160,11 @@ class Flexistore
 
                 foreach ( $_servers as $_server )
                 {
-                    $_cache->addServer( Option::get( $_server, 'host' ), Option::get( $_server, 'port', 11211 ), Option::get( $_server, 'weight', 0 ) );
+                    $_host = isset( $_server, $_server['host'] ) ? $_server['host'] : 'localhost';
+                    $_port = isset( $_server, $_server['port'] ) ? $_server['port'] : 11211;
+                    $_weight = isset( $_server, $_server['weight'] ) ? $_server['weight'] : 0;
+
+                    $_cache->addServer( $_host, $_port, $_weight );
                 }
 
                 if ( CacheTypes::MEMCACHED == $type )
@@ -175,7 +182,7 @@ class Flexistore
 
                 if ( false === $_redis->pconnect( '127.0.0.1' ) )
                 {
-                    throw new \LogicException( 'Cannot connect to redis server @ 127.0.0.1' );
+                    throw new \RuntimeException( 'Cannot connect to redis server @ 127.0.0.1' );
                 }
 
                 $this->_store->setRedis( $_redis );
@@ -212,13 +219,13 @@ class Flexistore
      *
      * @return string
      */
-    protected static function _getUniqueTempPath( $prefix = '.dsp' )
+    protected static function _getUniqueTempPath( $prefix = '.flexistore' )
     {
         //  Get a unique temp directory
         do
         {
-				$_path = sys_get_temp_dir() . '/' . $prefix . '/kisma-' . \Kisma::KISMA_VERSION;
-		}
+            $_path = sys_get_temp_dir() . '/' . $prefix . '/kisma-' . \Kisma::KISMA_VERSION;
+        }
         while ( is_dir( $_path ) );
 
         return $_path;

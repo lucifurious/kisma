@@ -26,19 +26,19 @@ namespace Kisma\Core\Exceptions;
  */
 class NotImplementedException extends SeedException
 {
-	/**
-	 * @param string|null $message
-	 * @param int|null    $code
-	 * @param mixed|null  $previous
-	 * @param mixed|null  $context
-	 */
-	public function __construct( $message = null, $code = null, $previous = null, $context = null )
-	{
-		if ( null === $message )
-		{
-			$message = 'This feature has not been implemented.';
-		}
+    /**
+     * @param string|null $message
+     * @param int|null    $code
+     * @param mixed|null  $previous
+     * @param mixed|null  $context
+     */
+    public function __construct( $message = null, $code = null, $previous = null, $context = null )
+    {
+        if ( null === $message )
+        {
+            $message = 'This feature has not been implemented.';
+        }
 
-		parent::__construct( $message, $code, $previous, $context );
-	}
+        parent::__construct( $message, $code, $previous, $context );
+    }
 }

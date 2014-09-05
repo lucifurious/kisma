@@ -26,16 +26,16 @@ namespace Kisma\Core\Interfaces\Events;
  */
 interface SeedLike
 {
-	//*************************************************************************
-	//* Constants
-	//*************************************************************************
+    //*************************************************************************
+    //* Constants
+    //*************************************************************************
 
-	/**
-	 * @var string
-	 */
-	const AfterConstruct = 'kisma.core.seed_like.after_construct';
-	/**
-	 * @var string
-	 */
-	const BeforeDestruct = 'kisma.core.seed_like.before_destruct';
+    /**
+     * @var string
+     */
+    const AfterConstruct = 'kisma.core.seed_like.after_construct';
+    /**
+     * @var string
+     */
+    const BeforeDestruct = 'kisma.core.seed_like.before_destruct';
 }

@@ -26,20 +26,20 @@ namespace Kisma\Core\Interfaces;
  */
 interface AccessLevels
 {
-	//*************************************************************************
-	//* Constants
-	//*************************************************************************
+    //*************************************************************************
+    //* Constants
+    //*************************************************************************
 
-	/**
-	 * @var string
-	 */
-	const Any = '*';
-	/**
-	 * @var string
-	 */
-	const Guest = '?';
-	/**
-	 * @var string
-	 */
-	const Authenticated = '@';
+    /**
+     * @var string
+     */
+    const Any = '*';
+    /**
+     * @var string
+     */
+    const Guest = '?';
+    /**
+     * @var string
+     */
+    const Authenticated = '@';
 }

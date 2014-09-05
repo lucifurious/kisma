@@ -26,69 +26,69 @@ namespace Kisma\Core\Enums;
  */
 class DateTime extends SeedEnum
 {
-	//*************************************************************************
-	//* Constants
-	//*************************************************************************
+    //*************************************************************************
+    //* Constants
+    //*************************************************************************
 
-	/**
-	 * @var int
-	 */
-	const __default = self::SecondsPerMinute;
+    /**
+     * @var int
+     */
+    const __default = self::SecondsPerMinute;
 
-	/**
-	 * @var int Microseconds per hour
-	 */
-	const US_PER_HOUR = 3600000;
-	/**
-	 * @var int Microseconds per minute
-	 */
-	const US_PER_MINUTE = 60000;
-	/**
-	 * @var int Microseconds per second
-	 */
-	const US_PER_SECOND = 1000;
-	/**
-	 * @var int circa 01/01/1980 (Ahh... my TRS-80... good times)
-	 */
-	const TheBeginning = 315550800;
-	/**
-	 * @var int
-	 */
-	const MicroSecondsPerSecond = 1000000;
-	/**
-	 * @var int
-	 */
-	const MilliSecondsPerSecond = 1000;
-	/**
-	 * @var int
-	 */
-	const SecondsPerMinute = 60;
-	/**
-	 * @var int
-	 */
-	const SecondsPerHour = 3600;
-	/**
-	 * @var int
-	 */
-	const SecondsPerEighthDay = 10800;
-	/**
-	 * @var int
-	 */
-	const SecondsPerQuarterDay = 21600;
-	/**
-	 * @var int
-	 */
-	const SecondsPerHalfDate = 43200;
-	/**
-	 * @var int
-	 */
-	const SecondsPerDay = 86400;
-	/**
-	 * @var int
-	 */
-	const SecondsPerWeek = 604800;
-	/**
-	 * @var int circa 01/01/2038 (despite the Mayan calendar or John Titor...)
-	 */
-	const TheEnd = 2145934800;
+    /**
+     * @var int Microseconds per hour
+     */
+    const US_PER_HOUR = 3600000;
+    /**
+     * @var int Microseconds per minute
+     */
+    const US_PER_MINUTE = 60000;
+    /**
+     * @var int Microseconds per second
+     */
+    const US_PER_SECOND = 1000;
+    /**
+     * @var int circa 01/01/1980 (Ahh... my TRS-80... good times)
+     */
+    const TheBeginning = 315550800;
+    /**
+     * @var int
+     */
+    const MicroSecondsPerSecond = 1000000;
+    /**
+     * @var int
+     */
+    const MilliSecondsPerSecond = 1000;
+    /**
+     * @var int
+     */
+    const SecondsPerMinute = 60;
+    /**
+     * @var int
+     */
+    const SecondsPerHour = 3600;
+    /**
+     * @var int
+     */
+    const SecondsPerEighthDay = 10800;
+    /**
+     * @var int
+     */
+    const SecondsPerQuarterDay = 21600;
+    /**
+     * @var int
+     */
+    const SecondsPerHalfDate = 43200;
+    /**
+     * @var int
+     */
+    const SecondsPerDay = 86400;
+    /**
+     * @var int
+     */
+    const SecondsPerWeek = 604800;
+    /**
+     * @var int circa 01/01/2038 (despite the Mayan calendar or John Titor...)
+     */
+    const TheEnd = 2145934800;
 }

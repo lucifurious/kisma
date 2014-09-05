@@ -31,235 +31,235 @@ use Kisma\Core\Exceptions\FileSystemException;
  */
 class ParsingLineReader extends LineReader
 {
-	//*************************************************************************
-	//	Constants
-	//*************************************************************************
+    //*************************************************************************
+    //	Constants
+    //*************************************************************************
 
-	/**
-	 * @var string
-	 */
-	protected $_separator = DataSeparator::COMMA;
-	/**
-	 * @var string
-	 */
-	protected $_enclosure = DataEnclosure::DOUBLE_QUOTE;
-	/**
-	 * @var int
-	 */
-	protected $_escapeStyle = EscapeStyle::SLASHED;
-	/**
-	 * @var array
-	 */
-	protected $_keys = array();
-	/**
-	 * @var bool
-	 */
-	protected $_overrideKeys = false;
-	/**
-	 * @var bool
-	 */
-	protected $_header = true;
+    /**
+     * @var string
+     */
+    protected $_separator = DataSeparator::COMMA;
+    /**
+     * @var string
+     */
+    protected $_enclosure = DataEnclosure::DOUBLE_QUOTE;
+    /**
+     * @var int
+     */
+    protected $_escapeStyle = EscapeStyle::SLASHED;
+    /**
+     * @var array
+     */
+    protected $_keys = array();
+    /**
+     * @var bool
+     */
+    protected $_overrideKeys = false;
+    /**
+     * @var bool
+     */
+    protected $_header = true;
 
-	//*************************************************************************
-	//	Methods
-	//*************************************************************************
+    //*************************************************************************
+    //	Methods
+    //*************************************************************************
 
-	/**
-	 * @return array|bool|mixed|null
-	 */
-	public function current()
-	{
-		if ( null !== $this->_currentLine )
-		{
-			return $this->_currentLine;
-		}
+    /**
+     * @return array|bool|mixed|null
+     */
+    public function current()
+    {
+        if ( null !== $this->_currentLine )
+        {
+            return $this->_currentLine;
+        }
 
-		if ( false === ( $_line = $this->_readLine() ) )
-		{
-			return null;
-		}
+        if ( false === ( $_line = $this->_readLine() ) )
+        {
+            return null;
+        }
 
-		if ( null === $this->_keys )
-		{
-			return $this->_currentLine = $_line;
-		}
+        if ( null === $this->_keys )
+        {
+            return $this->_currentLine = $_line;
+        }
 
-		$this->_currentLine = array();
+        $this->_currentLine = array();
 
-		reset( $this->_keys );
+        reset( $this->_keys );
 
-		foreach ( $_line as $_column )
-		{
-			if ( false === ( $_key = each( $this->_keys ) ) )
-			{
-				break;
-			}
+        foreach ( $_line as $_column )
+        {
+            if ( false === ( $_key = each( $this->_keys ) ) )
+            {
+                break;
+            }
 
-			$this->_currentLine[ $_key['value'] ] = $_column;
-		}
+            $this->_currentLine[$_key['value']] = $_column;
+        }
 
-		return $this->_currentLine;
-	}
+        return $this->_currentLine;
+    }
 
-	/**
-	 * @throws \Kisma\Core\Exceptions\FileSystemException
-	 */
-	public function rewind()
-	{
-		parent::rewind();
+    /**
+     * @throws \Kisma\Core\Exceptions\FileSystemException
+     */
+    public function rewind()
+    {
+        parent::rewind();
 
-		if ( $this->_header )
-		{
-			if ( false === ( $_header = $this->_readLine( true ) ) )
-			{
-				throw new FileSystemException( 'Error reading header row from file: ' . $this->_fileName );
-			}
+        if ( $this->_header )
+        {
+            if ( false === ( $_header = $this->_readLine( true ) ) )
+            {
+                throw new FileSystemException( 'Error reading header row from file: ' . $this->_fileName );
+            }
 
-			if ( !$this->_overrideKeys )
-			{
-				$this->_keys = $_header;
-			}
-		}
-	}
+            if ( !$this->_overrideKeys )
+            {
+                $this->_keys = $_header;
+            }
+        }
+    }
 
-	/**
-	 * @param string $line
-	 *
-	 * @throws \Kisma\Core\Exceptions\FileSystemException
-	 * @return array|bool
-	 */
-	protected function _parseLine( $line )
-	{
-		$_result = str_getcsv(
-			$line,
-			$this->_separator,
-			$this->_enclosure,
-			EscapeStyle::SLASHED == $this->_escapeStyle ? '\\' : EscapeStyle::DOUBLED == $this->_escapeStyle ? '"' : ''
-		);
+    /**
+     * @param string $line
+     *
+     * @throws \Kisma\Core\Exceptions\FileSystemException
+     * @return array|bool
+     */
+    protected function _parseLine( $line )
+    {
+        $_result = str_getcsv(
+            $line,
+            $this->_separator,
+            $this->_enclosure,
+            EscapeStyle::SLASHED == $this->_escapeStyle ? '\\' : EscapeStyle::DOUBLED == $this->_escapeStyle ? '"' : ''
+        );
 
-		return $_result;
-	}
+        return $_result;
+    }
 
-	/**
-	 * @param array $keys
-	 */
-	public function setKeys( $keys )
-	{
-		$this->_keys = $keys;
-		$this->_overrideKeys = true;
-	}
+    /**
+     * @param array $keys
+     */
+    public function setKeys( $keys )
+    {
+        $this->_keys = $keys;
+        $this->_overrideKeys = true;
+    }
 
-	/**
-	 * @return array
-	 */
-	public function getKeys()
-	{
-		if ( !$this->_rewound )
-		{
-			$this->rewind();
-		}
+    /**
+     * @return array
+     */
+    public function getKeys()
+    {
+        if ( !$this->_rewound )
+        {
+            $this->rewind();
+        }
 
-		return $this->_keys;
-	}
+        return $this->_keys;
+    }
 
-	/**
-	 * @param string $enclosure
-	 *
-	 * @return ParsingLineReader
-	 */
-	public function setEnclosure( $enclosure )
-	{
-		$this->_enclosure = $enclosure;
+    /**
+     * @param string $enclosure
+     *
+     * @return ParsingLineReader
+     */
+    public function setEnclosure( $enclosure )
+    {
+        $this->_enclosure = $enclosure;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * @return string
-	 */
-	public function getEnclosure()
-	{
-		return $this->_enclosure;
-	}
+    /**
+     * @return string
+     */
+    public function getEnclosure()
+    {
+        return $this->_enclosure;
+    }
 
-	/**
-	 * @param int $escapeStyle
-	 *
-	 * @return ParsingLineReader
-	 */
-	public function setEscapeStyle( $escapeStyle )
-	{
-		$this->_escapeStyle = $escapeStyle;
+    /**
+     * @param int $escapeStyle
+     *
+     * @return ParsingLineReader
+     */
+    public function setEscapeStyle( $escapeStyle )
+    {
+        $this->_escapeStyle = $escapeStyle;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * @return int
-	 */
-	public function getEscapeStyle()
-	{
-		return $this->_escapeStyle;
-	}
+    /**
+     * @return int
+     */
+    public function getEscapeStyle()
+    {
+        return $this->_escapeStyle;
+    }
 
-	/**
-	 * @param boolean $header
-	 *
-	 * @return ParsingLineReader
-	 */
-	public function setHeader( $header )
-	{
-		$this->_header = $header;
+    /**
+     * @param boolean $header
+     *
+     * @return ParsingLineReader
+     */
+    public function setHeader( $header )
+    {
+        $this->_header = $header;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * @return boolean
-	 */
-	public function getHeader()
-	{
-		return $this->_header;
-	}
+    /**
+     * @return boolean
+     */
+    public function getHeader()
+    {
+        return $this->_header;
+    }
 
-	/**
-	 * @param boolean $overrideKeys
-	 *
-	 * @return ParsingLineReader
-	 */
-	public function setOverrideKeys( $overrideKeys )
-	{
-		$this->_overrideKeys = $overrideKeys;
+    /**
+     * @param boolean $overrideKeys
+     *
+     * @return ParsingLineReader
+     */
+    public function setOverrideKeys( $overrideKeys )
+    {
+        $this->_overrideKeys = $overrideKeys;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * @return boolean
-	 */
-	public function getOverrideKeys()
-	{
-		return $this->_overrideKeys;
-	}
+    /**
+     * @return boolean
+     */
+    public function getOverrideKeys()
+    {
+        return $this->_overrideKeys;
+    }
 
-	/**
-	 * @param string $separator
-	 *
-	 * @return ParsingLineReader
-	 */
-	public function setSeparator( $separator )
-	{
-		$this->_separator = $separator;
+    /**
+     * @param string $separator
+     *
+     * @return ParsingLineReader
+     */
+    public function setSeparator( $separator )
+    {
+        $this->_separator = $separator;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * @return string
-	 */
-	public function getSeparator()
-	{
-		return $this->_separator;
-	}
+    /**
+     * @return string
+     */
+    public function getSeparator()
+    {
+        return $this->_separator;
+    }
 
 }

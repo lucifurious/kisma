@@ -25,12 +25,12 @@ namespace Kisma\Core\Interfaces;
  */
 interface KismaLike
 {
-	//*************************************************************************
-	//	Methods
-	//*************************************************************************
+    //*************************************************************************
+    //	Methods
+    //*************************************************************************
 
-	/**
-	 * @return string Returns the object's unique ID
-	 */
-	public function getId();
+    /**
+     * @return string Returns the object's unique ID
+     */
+    public function getId();
 }

@@ -26,12 +26,12 @@ namespace Kisma\Core\Enums;
  */
 class HttpResponse extends SeedEnum implements \Kisma\Core\Interfaces\HttpResponse
 {
-	//*************************************************************************
-	//* Constants
-	//*************************************************************************
+    //*************************************************************************
+    //* Constants
+    //*************************************************************************
 
-	/**
-	 * @var string The default: 200 OK
-	 */
-	const __default = self::Ok;
+    /**
+     * @var string The default: 200 OK
+     */
+    const __default = self::Ok;
 }

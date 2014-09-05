@@ -26,12 +26,12 @@ namespace Kisma\Core\Enums;
  */
 class AccessLevels extends SeedEnum implements \Kisma\Core\Interfaces\AccessLevels
 {
-	//*************************************************************************
-	//* Constants
-	//*************************************************************************
+    //*************************************************************************
+    //* Constants
+    //*************************************************************************
 
-	/**
-	 * @var int The default access level
-	 */
-	const __default = self::Guest;
+    /**
+     * @var int The default access level
+     */
+    const __default = self::Guest;
 }

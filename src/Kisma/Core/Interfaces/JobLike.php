@@ -25,14 +25,14 @@ namespace Kisma\Core\Interfaces;
  */
 interface JobLike extends ServiceLike
 {
-	//*************************************************************************
-	//* Methods
-	//*************************************************************************
+    //*************************************************************************
+    //* Methods
+    //*************************************************************************
 
-	/**
-	 * Performs the job
-	 *
-	 * @return mixed
-	 */
-	public function perform();
+    /**
+     * Performs the job
+     *
+     * @return mixed
+     */
+    public function perform();
 }
