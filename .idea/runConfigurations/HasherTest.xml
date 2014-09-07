@@ -1,8 +1,0 @@
-<component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="HasherTest" type="PHPUnitRunConfigurationType" factoryName="PHPUnit" singleton="true">
-    <TestRunner class="Kisma\Core\Utility\HasherTest" file="$PROJECT_DIR$/tests/Kisma/Core/Utility/HasherTest.php" scope="Class" />
-    <RunnerSettings RunnerId="PhpRunner" />
-    <ConfigurationWrapper RunnerId="PhpRunner" />
-    <method />
-  </configuration>
-</component>
