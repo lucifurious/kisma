@@ -25,6 +25,7 @@
     <autoscroll-to-editor value="false" />
     <autoscroll-from-editor value="true" />
     <show-object-properties value="true" />
+    <loaded-nodes />
   </component>
   <component name="DBNavigator.Project.MethodExecutionManager">
     <method-browser />
@@ -172,9 +173,6 @@
           <content-type name="PL/SQL" enabled="true" />
           <content-type name="JavaScript" enabled="true" />
           <content-type name="PHP" enabled="true" />
-          <content-type name="JSP" enabled="true" />
-          <content-type name="JSPx" enabled="true" />
-          <content-type name="ASP" enabled="true" />
           <content-type name="YAML" enabled="true" />
           <content-type name="Bash" enabled="true" />
         </content-types>
@@ -356,6 +354,8 @@
         <statement-postfix value="/" />
         <lookup-ddl-files value="true" />
         <create-ddl-files value="false" />
+        <use-qualified-names value="false" />
+        <make-scripts-rerunnable value="true" />
       </general>
     </ddl-file-settings>
   </component>
