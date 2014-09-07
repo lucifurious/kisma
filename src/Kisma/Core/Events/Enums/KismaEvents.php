@@ -26,16 +26,16 @@ namespace Kisma\Core\Events\Enums;
  */
 class KismaEvents extends LifeEvents
 {
-	//*************************************************************************
-	//* Constants
-	//*************************************************************************
+    //*************************************************************************
+    //* Constants
+    //*************************************************************************
 
-	/**
-	 * @var string
-	 */
-	const BIRTH = 'kisma.birth';
-	/**
-	 * @var string
-	 */
-	const DEATH = 'kisma.death';
+    /**
+     * @var string
+     */
+    const BIRTH = 'kisma.birth';
+    /**
+     * @var string
+     */
+    const DEATH = 'kisma.death';
 }

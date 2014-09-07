@@ -26,12 +26,12 @@ namespace Kisma\Core\Enums;
  */
 class OutputFormat extends SeedEnum implements \Kisma\Core\Interfaces\OutputFormat
 {
-	//*************************************************************************
-	//* Constants
-	//*************************************************************************
+    //*************************************************************************
+    //* Constants
+    //*************************************************************************
 
-	/**
-	 * @var int
-	 */
-	const __default = self::JSON;
+    /**
+     * @var int
+     */
+    const __default = self::JSON;
 }

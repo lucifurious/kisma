@@ -26,16 +26,16 @@ namespace Kisma\Core\Interfaces;
  */
 interface ProviderLike
 {
-	//*************************************************************************
-	//* Methods
-	//*************************************************************************
+    //*************************************************************************
+    //* Methods
+    //*************************************************************************
 
-	/**
-	 * Provides the service requested.
-	 *
-	 * @param mixed $request
-	 *
-	 * @return mixed
-	 */
-	public function provide( $request );
+    /**
+     * Provides the service requested.
+     *
+     * @param mixed $request
+     *
+     * @return mixed
+     */
+    public function provide( $request );
 }

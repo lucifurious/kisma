@@ -26,59 +26,59 @@ namespace Kisma\Core\Exceptions;
  */
 class SeedException extends \Exception
 {
-	//*************************************************************************
-	//* Members
-	//*************************************************************************
+    //*************************************************************************
+    //* Members
+    //*************************************************************************
 
-	/**
-	 * @var mixed
-	 */
-	protected $_context = null;
+    /**
+     * @var mixed
+     */
+    protected $_context = null;
 
-	//*************************************************************************
-	//* Methods
-	//*************************************************************************
+    //*************************************************************************
+    //* Methods
+    //*************************************************************************
 
-	/**
-	 * Constructs a Kisma exception.
-	 *
-	 * @param mixed $message
-	 * @param int   $code
-	 * @param mixed $previous
-	 * @param mixed $context Additional information for downstream consumers
-	 */
-	public function __construct( $message = null, $code = null, $previous = null, $context = null )
-	{
-		//	If an exception is passed in, translate...
-		if ( null === $code && $message instanceof \Exception )
-		{
-			$context = $code;
+    /**
+     * Constructs a Kisma exception.
+     *
+     * @param mixed $message
+     * @param int   $code
+     * @param mixed $previous
+     * @param mixed $context Additional information for downstream consumers
+     */
+    public function __construct( $message = null, $code = null, $previous = null, $context = null )
+    {
+        //	If an exception is passed in, translate...
+        if ( null === $code && $message instanceof \Exception )
+        {
+            $context = $code;
 
-			$_exception = $message;
-			$message = $_exception->getMessage();
-			$code = $_exception->getCode();
-			$previous = $_exception->getPrevious();
-		}
+            $_exception = $message;
+            $message = $_exception->getMessage();
+            $code = $_exception->getCode();
+            $previous = $_exception->getPrevious();
+        }
 
-		$this->_context = $context;
-		parent::__construct( $message, $code, $previous );
-	}
+        $this->_context = $context;
+        parent::__construct( $message, $code, $previous );
+    }
 
-	/**
-	 * Return a code/message combo when printed.
-	 *
-	 * @return string
-	 */
-	public function __toString()
-	{
-		return '[' . $this->getCode() . '] ' . $this->getMessage();
-	}
+    /**
+     * Return a code/message combo when printed.
+     *
+     * @return string
+     */
+    public function __toString()
+    {
+        return '[' . $this->getCode() . '] ' . $this->getMessage();
+    }
 
-	/**
-	 * @return mixed
-	 */
-	public function getContext()
-	{
-		return $this->_context;
-	}
+    /**
+     * @return mixed
+     */
+    public function getContext()
+    {
+        return $this->_context;
+    }
 }

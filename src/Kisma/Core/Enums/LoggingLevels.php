@@ -26,114 +26,114 @@ namespace Kisma\Core\Enums;
  */
 class LoggingLevels extends SeedEnum
 {
-	//*************************************************************************
-	//	Constants
-	//*************************************************************************
+    //*************************************************************************
+    //	Constants
+    //*************************************************************************
 
-	/**
-	 * @var int
-	 */
-	const EMERGENCY = 600;
-	/**
-	 * @var int
-	 */
-	const ALERT = 550;
-	/**
-	 * @var int
-	 */
-	const CRITICAL = 500;
-	/**
-	 * @var int
-	 */
-	const ERROR = 400;
-	/**
-	 * @var int
-	 */
-	const WARNING = 300;
-	/**
-	 * @var int
-	 */
-	const NOTICE = 250;
-	/**
-	 * @var int
-	 */
-	const INFO = 200;
-	/**
-	 * @var int
-	 */
-	const DEBUG = 100;
-	/**
-	 * @var int Trace information gets routed to debug
-	 */
-	const TRACE = self::DEBUG;
-	/**
-	 * @var int Profile information gets routed to debug
-	 */
-	const PROFILE = self::DEBUG;
+    /**
+     * @var int
+     */
+    const EMERGENCY = 600;
+    /**
+     * @var int
+     */
+    const ALERT = 550;
+    /**
+     * @var int
+     */
+    const CRITICAL = 500;
+    /**
+     * @var int
+     */
+    const ERROR = 400;
+    /**
+     * @var int
+     */
+    const WARNING = 300;
+    /**
+     * @var int
+     */
+    const NOTICE = 250;
+    /**
+     * @var int
+     */
+    const INFO = 200;
+    /**
+     * @var int
+     */
+    const DEBUG = 100;
+    /**
+     * @var int Trace information gets routed to debug
+     */
+    const TRACE = self::DEBUG;
+    /**
+     * @var int Profile information gets routed to debug
+     */
+    const PROFILE = self::DEBUG;
 
-	//*************************************************************************
-	//* Members
-	//*************************************************************************
+    //*************************************************************************
+    //* Members
+    //*************************************************************************
 
-	/**
-	 * @var array A hash of level names against Monolog levels
-	 */
-	protected static $_strings = array(
-		'debug'     => self::DEBUG,
-		'trace'     => self::DEBUG,
-		'profile'   => self::DEBUG,
-		'info'      => self::INFO,
-		'warning'   => self::WARNING,
-		'notice'    => self::NOTICE,
-		'error'     => self::ERROR,
-		'critical'  => self::CRITICAL,
-		'alert'     => self::ALERT,
-		'emergency' => self::EMERGENCY,
-	);
+    /**
+     * @var array A hash of level names against Monolog levels
+     */
+    protected static $_strings = array(
+        'debug'     => self::DEBUG,
+        'trace'     => self::DEBUG,
+        'profile'   => self::DEBUG,
+        'info'      => self::INFO,
+        'warning'   => self::WARNING,
+        'notice'    => self::NOTICE,
+        'error'     => self::ERROR,
+        'critical'  => self::CRITICAL,
+        'alert'     => self::ALERT,
+        'emergency' => self::EMERGENCY,
+    );
 
-	//*************************************************************************
-	//* Methods
-	//*************************************************************************
+    //*************************************************************************
+    //* Methods
+    //*************************************************************************
 
-	/**
-	 * @param string $stringLevel
-	 *
-	 * @return bool
-	 * @throws \InvalidArgumentException
-	 */
-	public static function toNumeric( $stringLevel )
-	{
-		if ( !is_string( $_level = strtolower( $stringLevel ) ) )
-		{
-			throw new \InvalidArgumentException( 'The level "' . $stringLevel . '" is not a string.' );
-		}
+    /**
+     * @param string $stringLevel
+     *
+     * @return bool
+     * @throws \InvalidArgumentException
+     */
+    public static function toNumeric( $stringLevel )
+    {
+        if ( !is_string( $_level = strtolower( $stringLevel ) ) )
+        {
+            throw new \InvalidArgumentException( 'The level "' . $stringLevel . '" is not a string.' );
+        }
 
-		if ( !in_array( $_level, array_keys( static::$_strings ) ) )
-		{
-			throw new \InvalidArgumentException( 'The level "' . $stringLevel . '" is undefined.' );
-		}
+        if ( !in_array( $_level, array_keys( static::$_strings ) ) )
+        {
+            throw new \InvalidArgumentException( 'The level "' . $stringLevel . '" is undefined.' );
+        }
 
-		return static::$_strings[$_level];
-	}
+        return static::$_strings[$_level];
+    }
 
-	/**
-	 * @param int $numericLevel
-	 *
-	 * @return string
-	 * @throws \InvalidArgumentException
-	 */
-	public static function toString( $numericLevel )
-	{
-		if ( !is_numeric( $numericLevel ) )
-		{
-			throw new \InvalidArgumentException( 'The level "' . $numericLevel . '" is not numeric.' );
-		}
+    /**
+     * @param int $numericLevel
+     *
+     * @return string
+     * @throws \InvalidArgumentException
+     */
+    public static function toString( $numericLevel )
+    {
+        if ( !is_numeric( $numericLevel ) )
+        {
+            throw new \InvalidArgumentException( 'The level "' . $numericLevel . '" is not numeric.' );
+        }
 
-		if ( !in_array( $numericLevel, array_flip( static::$_strings ) ) )
-		{
-			throw new \InvalidArgumentException( 'The level "' . $numericLevel . '" is undefined.' );
-		}
+        if ( !in_array( $numericLevel, array_flip( static::$_strings ) ) )
+        {
+            throw new \InvalidArgumentException( 'The level "' . $numericLevel . '" is undefined.' );
+        }
 
-		return static::nameOf( $numericLevel );
-	}
+        return static::nameOf( $numericLevel );
+    }
 }

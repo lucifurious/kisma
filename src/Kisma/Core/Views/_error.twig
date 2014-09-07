@@ -23,6 +23,7 @@
 
 
 
+
 			</script>
 		</div>
 	{% endif %}
@@ -53,9 +54,11 @@
 
 {% block page_scripts %}
 	<script type="text/javascript">
-	$(function() {
-		SyntaxHighlighter.config.stripBrs = true;
-		SyntaxHighlighter.all();
-	});
+	$(
+			function() {
+				SyntaxHighlighter.config.stripBrs = true;
+				SyntaxHighlighter.all();
+			}
+	);
 	</script>
 {% endblock %}

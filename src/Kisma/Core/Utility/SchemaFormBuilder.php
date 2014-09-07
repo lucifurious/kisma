@@ -28,97 +28,105 @@ use Kisma\Core\Interfaces\UtilityLike;
  */
 class SchemaFormBuilder implements UtilityLike
 {
-	/**
-	 * @param array|string $schema
-	 * @param bool         $returnHtml If true, HTML is returned, otherwise an array of fields
-	 *
-	 * @throws \InvalidArgumentException
-	 * @return string
-	 */
-	public static function create( $schema, $returnHtml = true )
-	{
-		$_schema = $schema;
+    /**
+     * @param array|string $schema
+     * @param bool         $returnHtml If true, HTML is returned, otherwise an array of fields
+     *
+     * @throws \InvalidArgumentException
+     * @return string
+     */
+    public static function create( $schema, $returnHtml = true )
+    {
+        $_schema = $schema;
 
-		if ( !is_array( $_schema ) || ( is_string( $_schema ) && false === ( $_schema = json_decode( $schema, true ) ) ) )
-		{
-			throw new \InvalidArgumentException( 'You must provide a schema in either an array or a JSON string.' );
-		}
+        if ( !is_array( $_schema ) || ( is_string( $_schema ) && false === ( $_schema = json_decode( $schema, true ) ) ) )
+        {
+            throw new \InvalidArgumentException( 'You must provide a schema in either an array or a JSON string.' );
+        }
 
-		return static::_buildFormFields( $_schema, $returnHtml );
-	}
+        return static::_buildFormFields( $_schema, $returnHtml );
+    }
 
-	/**
-	 * @param array $schema
-	 * @param bool  $returnHtml If true, HTML is returned, otherwise an array of fields
-	 *
-	 * @return string
-	 */
-	protected static function _buildFormFields( $schema, $returnHtml = true )
-	{
-		$_form = null;
-		$_fields = array();
+    /**
+     * @param array $schema
+     * @param bool  $returnHtml If true, HTML is returned, otherwise an array of fields
+     *
+     * @return string
+     */
+    protected static function _buildFormFields( $schema, $returnHtml = true )
+    {
+        $_form = null;
+        $_fields = array();
 
-		foreach ( $schema as $_field => $_settings )
-		{
-			//	No private fields are ever rendered
-			if ( false !== Option::get( $_settings, 'private', false ) )
-			{
-				continue;
-			}
+        foreach ( $schema as $_field => $_settings )
+        {
+            //	No private fields are ever rendered
+            if ( false !== Option::get( $_settings, 'private', false ) )
+            {
+                continue;
+            }
 
-			$_value = Option::get( $_settings, 'value', Option::get( $_settings, 'default' ) );
-			$_label = Option::get( $_settings, 'label', Inflector::display( $_field ) );
-			$_labelAttributes = Option::get( $_settings, 'label_attributes', array( 'for' => $_field ) );
+            $_value = Option::get( $_settings, 'value', Option::get( $_settings, 'default' ) );
+            $_label = Option::get( $_settings, 'label', Inflector::display( $_field ) );
+            $_labelAttributes = Option::get( $_settings, 'label_attributes', array('for' => $_field) );
 
-			$_attributes = array_merge( array(
-					'name' => $_field,
-					'id'   => $_field,
-				),
-				Option::get( $_settings, 'attributes', array() ) );
+            $_attributes = array_merge(
+                array(
+                    'name' => $_field,
+                    'id'   => $_field,
+                ),
+                Option::get( $_settings, 'attributes', array() )
+            );
 
-			if ( false !== ( $_required = Option::get( $_settings, 'required', false ) ) )
-			{
-				$_attributes['class'] = HtmlMarkup::addValue( Option::get( $_attributes, 'class' ), 'required' );
-			}
+            if ( false !== ( $_required = Option::get( $_settings, 'required', false ) ) )
+            {
+                $_attributes['class'] = HtmlMarkup::addValue( Option::get( $_attributes, 'class' ), 'required' );
+            }
 
-			$_form .= HtmlMarkup::label( $_labelAttributes, $_label );
-			$_fields[$_field]['label'] = array( 'value' => $_label, 'attributes' => $_labelAttributes );
+            $_form .= HtmlMarkup::label( $_labelAttributes, $_label );
+            $_fields[$_field]['label'] = array('value' => $_label, 'attributes' => $_labelAttributes);
 
-			switch ( $_settings['type'] )
-			{
-				case 'text':
-					$_form .= HtmlMarkup::tag( 'textarea', $_attributes, $_value ) . PHP_EOL;
+            switch ( $_settings['type'] )
+            {
+                case 'text':
+                    $_form .= HtmlMarkup::tag( 'textarea', $_attributes, $_value ) . PHP_EOL;
 
-					$_fields[$_field] = array_merge( $_fields[$_field],
-						array( 'type' => 'textarea', 'contents' => $_value ),
-						$_attributes );
-					break;
+                    $_fields[$_field] = array_merge(
+                        $_fields[$_field],
+                        array('type' => 'textarea', 'contents' => $_value),
+                        $_attributes
+                    );
+                    break;
 
-				case 'select':
-					$_attributes['size'] = Option::get( $_settings, 'size', 1 );
-					$_attributes['value'] = $_value;
+                case 'select':
+                    $_attributes['size'] = Option::get( $_settings, 'size', 1 );
+                    $_attributes['value'] = $_value;
 
-					$_fields[$_field] = array_merge( $_fields[$_field],
-						array( 'type' => 'select', 'data' => Option::get( $_settings, 'options', array() ) ),
-						$_attributes );
+                    $_fields[$_field] = array_merge(
+                        $_fields[$_field],
+                        array('type' => 'select', 'data' => Option::get( $_settings, 'options', array() )),
+                        $_attributes
+                    );
 
-					$_form .= HtmlMarkup::select( $_fields[$_field]['data'], $_attributes ) . PHP_EOL;
-					break;
+                    $_form .= HtmlMarkup::select( $_fields[$_field]['data'], $_attributes ) . PHP_EOL;
+                    break;
 
-				default:
-					$_attributes['maxlength'] = Option::get( $_settings, 'length' );
-					$_attributes['value'] = $_value;
-					$_attributes['type'] = 'text';
+                default:
+                    $_attributes['maxlength'] = Option::get( $_settings, 'length' );
+                    $_attributes['value'] = $_value;
+                    $_attributes['type'] = 'text';
 
-					$_fields[$_field] = array_merge( $_fields[$_field],
-						array( 'type' => 'input', 'value' => $_value ),
-						$_attributes );
+                    $_fields[$_field] = array_merge(
+                        $_fields[$_field],
+                        array('type' => 'input', 'value' => $_value),
+                        $_attributes
+                    );
 
-					$_form .= HtmlMarkup::tag( 'input', $_attributes, null, true, true ) . PHP_EOL;
-					break;
-			}
-		}
+                    $_form .= HtmlMarkup::tag( 'input', $_attributes, null, true, true ) . PHP_EOL;
+                    break;
+            }
+        }
 
-		return $returnHtml ? $_form : $_fields;
-	}
+        return $returnHtml ? $_form : $_fields;
+    }
 }

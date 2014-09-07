@@ -24,36 +24,36 @@ namespace Kisma\Core\Enums;
  */
 class DebugLevel extends SeedEnum
 {
-	//*************************************************************************
-	//* Constants
-	//*************************************************************************
+    //*************************************************************************
+    //* Constants
+    //*************************************************************************
 
-	/**
-	 * @var int Default value
-	 */
-	const __default = self::Normal;
-	/**
-	 * @var int
-	 */
-	const Normal = 0;
-	/**
-	 * @var int
-	 */
-	const Verbose = 1;
-	/**
-	 * @var int
-	 */
-	const VeryChatty = 2;
-	/**
-	 * @var int
-	 */
-	const WillNotShutUp = 3;
-	/**
-	 * @var int
-	 */
-	const Nutty = 4;
-	/**
-	 * @var int
-	 */
-	const Satanic = 666;
+    /**
+     * @var int Default value
+     */
+    const __default = self::Normal;
+    /**
+     * @var int
+     */
+    const Normal = 0;
+    /**
+     * @var int
+     */
+    const Verbose = 1;
+    /**
+     * @var int
+     */
+    const VeryChatty = 2;
+    /**
+     * @var int
+     */
+    const WillNotShutUp = 3;
+    /**
+     * @var int
+     */
+    const Nutty = 4;
+    /**
+     * @var int
+     */
+    const Satanic = 666;
 }

@@ -26,12 +26,12 @@ namespace Kisma\Core\Enums;
  */
 class HttpMethod extends SeedEnum implements \Kisma\Core\Interfaces\HttpMethod
 {
-	//*************************************************************************
-	//* Constants
-	//*************************************************************************
+    //*************************************************************************
+    //* Constants
+    //*************************************************************************
 
-	/**
-	 * @var string
-	 */
-	const __default = self::Get;
+    /**
+     * @var string
+     */
+    const __default = self::Get;
 }

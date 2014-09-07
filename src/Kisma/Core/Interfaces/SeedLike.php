@@ -26,22 +26,22 @@ namespace Kisma\Core\Interfaces;
  */
 interface SeedLike extends Events\SeedLike
 {
-	//*************************************************************************
-	//* Public Methods
-	//*************************************************************************
+    //*************************************************************************
+    //* Public Methods
+    //*************************************************************************
 
-	/**
-	 * @return string
-	 */
-	public function getId();
+    /**
+     * @return string
+     */
+    public function getId();
 
-	/**
-	 * @return string
-	 */
-	public function getTag();
+    /**
+     * @return string
+     */
+    public function getTag();
 
-	/**
-	 * @return string
-	 */
-	public function getName();
+    /**
+     * @return string
+     */
+    public function getName();
 }

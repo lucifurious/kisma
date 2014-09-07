@@ -73,4 +73,8 @@ class CoreSettings extends SeedEnum
      * @type string
      */
     const CACHE_KEY = 'kisma.cache';
+    /**
+     * @type string If true, Kisma will try to cache its settings
+     */
+    const ENABLE_CACHE = 'kisma.enable_cache';
 }

@@ -99,7 +99,7 @@ class EventManager extends SeedUtility implements EventDispatcherLike
     public static function discoverListeners( $object, $listeners = null, $pattern = self::LISTENER_DISCOVERY_PATTERN )
     {
         //	Allow for passed in listeners
-        $_listeners = $listeners ? : static::_discoverObjectListeners( $object, $pattern );
+        $_listeners = $listeners ?: static::_discoverObjectListeners( $object, $pattern );
 
         //	And wire them up...
         if ( empty( $_listeners ) || !is_array( $_listeners ) )
@@ -122,9 +122,9 @@ class EventManager extends SeedUtility implements EventDispatcherLike
      *
      * @param \Kisma\Core\Interfaces\SubscriberLike|string $object     The object or class to scan
      * @param string                                       $pattern    The method listener pattern to scan for
-     * @param bool                                         $rediscover By default, the discoverer will not wire up the same object's events more than once.
-     *                                                                 Setting $rediscover to TRUE will force the rediscovery of the listeners, if any.
-     *                                                                 The default is false.
+     * @param bool                                         $rediscover By default, the discoverer will not wire up the same object's events more than
+     *                                                                 once. Setting $rediscover to TRUE will force the rediscovery of the listeners,
+     *                                                                 if any. The default is false.
      *
      * @return array|bool The listeners discovered. True if already discovered, False on error
      */
@@ -164,7 +164,7 @@ class EventManager extends SeedUtility implements EventDispatcherLike
                 }
 
                 //	Save off a callable
-                $_listeners[$_eventName][] = array( $object, $_method->name );
+                $_listeners[$_eventName][] = array($object, $_method->name);
 
                 //	Clean up
                 unset( $_matches, $_method );

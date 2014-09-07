@@ -125,8 +125,8 @@ class Seed implements SeedLike, PublisherLike, SubscriberLike
         $this->_id = hash( 'sha256', spl_object_hash( $this ) . getmypid() . microtime( true ) );
 
         //	Auto-set tag and name if empty
-        $this->_tag = $this->_tag ? : Inflector::neutralize( get_called_class() );
-        $this->_name = $this->_name ? : $this->_tag;
+        $this->_tag = $this->_tag ?: Inflector::neutralize( get_called_class() );
+        $this->_name = $this->_name ?: $this->_tag;
 
         if ( $this instanceof SubscriberLike )
         {

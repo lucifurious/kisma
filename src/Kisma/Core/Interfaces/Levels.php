@@ -28,48 +28,48 @@ namespace Kisma\Core\Interfaces;
  */
 interface Levels
 {
-	//*************************************************************************
-	//* Constants
-	//*************************************************************************
+    //*************************************************************************
+    //* Constants
+    //*************************************************************************
 
-	/**
-	 * @var int
-	 */
-	const Emergency = 600;
-	const EMERGENCY = 600;
-	/**
-	 * @var int
-	 */
-	const Alert = 550;
-	const ALERT = 550;
-	/**
-	 * @var int
-	 */
-	const Critical = 500;
-	const CRITICAL = 500;
-	/**
-	 * @var int
-	 */
-	const Error = 400;
-	const ERROR = 400;
-	/**
-	 * @var int
-	 */
-	const Warning = 300;
-	const WARNING = 300;
-	/**
-	 * @var int
-	 */
-	const Notice = 250;
-	const NOTICE = 250;
-	/**
-	 * @var int
-	 */
-	const Info = 200;
-	const INFO = 200;
-	/**
-	 * @var int
-	 */
-	const Debug = 100;
-	const DEBUG = 100;
+    /**
+     * @var int
+     */
+    const Emergency = 600;
+    const EMERGENCY = 600;
+    /**
+     * @var int
+     */
+    const Alert = 550;
+    const ALERT = 550;
+    /**
+     * @var int
+     */
+    const Critical = 500;
+    const CRITICAL = 500;
+    /**
+     * @var int
+     */
+    const Error = 400;
+    const ERROR = 400;
+    /**
+     * @var int
+     */
+    const Warning = 300;
+    const WARNING = 300;
+    /**
+     * @var int
+     */
+    const Notice = 250;
+    const NOTICE = 250;
+    /**
+     * @var int
+     */
+    const Info = 200;
+    const INFO = 200;
+    /**
+     * @var int
+     */
+    const Debug = 100;
+    const DEBUG = 100;
 }

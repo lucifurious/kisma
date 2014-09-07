@@ -26,109 +26,109 @@ namespace Kisma\Core\Interfaces;
  */
 interface HttpMethod
 {
-	//*************************************************************************
-	//* Constants
-	//*************************************************************************
+    //*************************************************************************
+    //* Constants
+    //*************************************************************************
 
-	/**
-	 * @var string
-	 */
-	const GET = 'GET';
-	/**
-	 * @var string
-	 */
-	const PUT = 'PUT';
-	/**
-	 * @var string
-	 */
-	const HEAD = 'HEAD';
-	/**
-	 * @var string
-	 */
-	const POST = 'POST';
-	/**
-	 * @var string
-	 */
-	const DELETE = 'DELETE';
-	/**
-	 * @var string
-	 */
-	const OPTIONS = 'OPTIONS';
-	/**
-	 * @var string
-	 */
-	const COPY = 'COPY';
-	/**
-	 * @var string
-	 */
-	const PATCH = 'PATCH';
-	/**
-	 * @var string
-	 */
-	const MERGE = 'MERGE';
-	/**
-	 * @var string
-	 */
-	const TRACE = 'TRACE';
-	/**
-	 * @var string
-	 */
-	const CONNECT = 'CONNECT';
+    /**
+     * @var string
+     */
+    const GET = 'GET';
+    /**
+     * @var string
+     */
+    const PUT = 'PUT';
+    /**
+     * @var string
+     */
+    const HEAD = 'HEAD';
+    /**
+     * @var string
+     */
+    const POST = 'POST';
+    /**
+     * @var string
+     */
+    const DELETE = 'DELETE';
+    /**
+     * @var string
+     */
+    const OPTIONS = 'OPTIONS';
+    /**
+     * @var string
+     */
+    const COPY = 'COPY';
+    /**
+     * @var string
+     */
+    const PATCH = 'PATCH';
+    /**
+     * @var string
+     */
+    const MERGE = 'MERGE';
+    /**
+     * @var string
+     */
+    const TRACE = 'TRACE';
+    /**
+     * @var string
+     */
+    const CONNECT = 'CONNECT';
 
-	/**
-	 * @deprecated in v0.2.21, removal in v0.3.0
-	 * @var string
-	 */
-	const Get = 'GET';
-	/**
-	 * @deprecated in v0.2.21, removal in v0.3.0
-	 * @var string
-	 */
-	const Put = 'PUT';
-	/**
-	 * @deprecated in v0.2.21, removal in v0.3.0
-	 * @var string
-	 */
-	const Head = 'HEAD';
-	/**
-	 * @deprecated in v0.2.21, removal in v0.3.0
-	 * @var string
-	 */
-	const Post = 'POST';
-	/**
-	 * @deprecated in v0.2.21, removal in v0.3.0
-	 * @var string
-	 */
-	const Delete = 'DELETE';
-	/**
-	 * @deprecated in v0.2.21, removal in v0.3.0
-	 * @var string
-	 */
-	const Options = 'OPTIONS';
-	/**
-	 * @deprecated in v0.2.21, removal in v0.3.0
-	 * @var string
-	 */
-	const Copy = 'COPY';
-	/**
-	 * @deprecated in v0.2.21, removal in v0.3.0
-	 * @var string
-	 */
-	const Patch = 'PATCH';
-	/**
-	 * @deprecated in v0.2.21, removal in v0.3.0
-	 * @var string
-	 */
-	const Merge = 'MERGE';
-	/**
-	 * @deprecated in v0.2.21, removal in v0.3.0
-	 * @var string
-	 */
-	const Trace = 'TRACE';
-	/**
-	 * @deprecated in v0.2.21, removal in v0.3.0
-	 * @var string
-	 */
-	const Connect = 'CONNECT';
+    /**
+     * @deprecated in v0.2.21, removal in v0.3.0
+     * @var string
+     */
+    const Get = 'GET';
+    /**
+     * @deprecated in v0.2.21, removal in v0.3.0
+     * @var string
+     */
+    const Put = 'PUT';
+    /**
+     * @deprecated in v0.2.21, removal in v0.3.0
+     * @var string
+     */
+    const Head = 'HEAD';
+    /**
+     * @deprecated in v0.2.21, removal in v0.3.0
+     * @var string
+     */
+    const Post = 'POST';
+    /**
+     * @deprecated in v0.2.21, removal in v0.3.0
+     * @var string
+     */
+    const Delete = 'DELETE';
+    /**
+     * @deprecated in v0.2.21, removal in v0.3.0
+     * @var string
+     */
+    const Options = 'OPTIONS';
+    /**
+     * @deprecated in v0.2.21, removal in v0.3.0
+     * @var string
+     */
+    const Copy = 'COPY';
+    /**
+     * @deprecated in v0.2.21, removal in v0.3.0
+     * @var string
+     */
+    const Patch = 'PATCH';
+    /**
+     * @deprecated in v0.2.21, removal in v0.3.0
+     * @var string
+     */
+    const Merge = 'MERGE';
+    /**
+     * @deprecated in v0.2.21, removal in v0.3.0
+     * @var string
+     */
+    const Trace = 'TRACE';
+    /**
+     * @deprecated in v0.2.21, removal in v0.3.0
+     * @var string
+     */
+    const Connect = 'CONNECT';
 }
 
