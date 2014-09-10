@@ -381,4 +381,90 @@ class Scalar implements UtilityLike
 
         return \array_multisort( $_sortColumn, $sortDirection, $sourceArray );
     }
+
+    /**
+     * Multibyte-aware strlen
+     * Originally swiped from Symfony2 Console Application class private functions. Modified for Kisma use.
+     *
+     * @param string $string
+     *
+     * @return int
+     */
+    public static function strlen( $string )
+    {
+        if ( false === ( $_encoding = static::mbSupported( $string ) ) )
+        {
+            return strlen( $string );
+        }
+
+        return mb_strwidth( $string, $_encoding );
+    }
+
+    /**
+     * Multibyte-aware string split into array of $width length (max) sections.
+     *
+     * Originally swiped from Symfony2 Console Application class private functions. Modified for Kisma use.
+     *
+     * @param string $string
+     * @param int    $width
+     *
+     * @return array
+     */
+    public static function split( $string, $width )
+    {
+        // str_split is not suitable for multi-byte characters, we should use preg_split to get char array properly.
+        // additionally, array_slice() is not enough as some character has doubled width.
+        // we need a function to split string not by character count but by string width
+
+        if ( false === ( $_encoding = static::mbSupported( $string ) ) )
+        {
+            return str_split( $string, $width );
+        }
+
+        $_utf8 = mb_convert_encoding( $string, 'utf8', $_encoding );
+        $_lines = array();
+        $_line = null;
+
+        foreach ( preg_split( '//u', $_utf8 ) as $_character )
+        {
+            //  Test if $_character could be appended to current line
+            if ( mb_strwidth( $_line . $_character, 'utf8' ) <= $width )
+            {
+                $_line .= $_character;
+                continue;
+            }
+
+            //  If not, push current line to array and make new line
+            $_lines[] = str_pad( $_line, $width );
+            $_line = $_character;
+        }
+
+        if ( strlen( $_line ) )
+        {
+            $_lines[] = count( $_lines ) ? str_pad( $_line, $width ) : $_line;
+        }
+
+        mb_convert_variables( $_encoding, 'utf8', $_lines );
+
+        return $_lines;
+    }
+
+    /**
+     * Checks if multi-byte is available and returns encoding of optional string. False otherwise.
+     *
+     * @param string $string
+     *
+     * @return bool|string
+     */
+    public static function mbSupported( $string = null )
+    {
+        $_encoding = false;
+
+        if ( !function_exists( 'mb_strwidth' ) || ( $string && false === ( $_encoding = mb_detect_encoding( $string ) ) ) )
+        {
+            return false;
+        }
+
+        return $_encoding;
+    }
 }
