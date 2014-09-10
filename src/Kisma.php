@@ -330,24 +330,32 @@ class Kisma
      */
     protected static function _getCachePath()
     {
-        $_user = posix_getpwuid( posix_getuid() );
         $_cachePath = DIRECTORY_SEPARATOR . '.kisma' . DIRECTORY_SEPARATOR . 'cache';
         $_path = null;
 
+        //  Build a list of potential paths
         $_paths = array(
             //  /path/to/kisma/cache... user set
             getenv( 'KISMA_CACHE_PATH' ),
             //  ~/.kisma/cache (linux $HOME)
             getenv( 'HOME' ) . $_cachePath,
-            //  ~/.kisma/cache (Windows $HOME)
-            ( isset( $_user, $_user['dir'] ) ? $_user['dir'] . $_cachePath : false ),
             //  /path/to/kisma/.cache
             dirname( __DIR__ ) . DIRECTORY_SEPARATOR . '.cache',
-            //  defaults to /tmp/.kisma/cache
-            sys_get_temp_dir() . $_cachePath,
-            //  Fail!
-            false,
         );
+
+        //  ~/.kisma/cache (Windows $HOME) if posix_*
+        if ( function_exists( 'posix_getpwuid' ) && function_exists( 'posix_getuid' ) )
+        {
+            $_user = posix_getpwuid( posix_getuid() );
+
+            if ( $_user && isset( $_user['dir'] ) )
+            {
+                $_paths[] = $_user['dir'] . $_cachePath;
+            }
+        }
+
+            //  defaults to /tmp/.kisma/cache
+        $_paths[] = sys_get_temp_dir() . $_cachePath;
 
         foreach ( $_paths as $_path )
         {
