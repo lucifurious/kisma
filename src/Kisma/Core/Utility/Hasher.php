@@ -397,15 +397,15 @@ class Hasher extends Seed implements UtilityLike, HashSeed, HashType
     public static function generate( $hashLength = self::MAX_HASH_LENGTH, $hashSeed = self::All )
     {
         //	If we ain't got what you're looking for, return simple md5 hash...
-        if ( !isset( self::$_hashSeeds, self::$_hashSeeds[$hashSeed] ) || !is_array( self::$_hashSeeds[$hashSeed] ) )
+        if ( !isset( static::$_hashSeeds, static::$_hashSeeds[$hashSeed] ) || !is_array( static::$_hashSeeds[$hashSeed] ) )
         {
             return md5( time() . mt_rand() . time() );
         }
 
         //	Randomly pick elements from the array of seeds
-        for ( $_i = 0, $_hash = null, $_size = count( self::$_hashSeeds[$hashSeed] ) - 1; $_i < $hashLength; $_i++ )
+        for ( $_i = 0, $_hash = null, $_size = count( static::$_hashSeeds[$hashSeed] ) - 1; $_i < $hashLength; $_i++ )
         {
-            $_hash .= self::$_hashSeeds[$hashSeed][mt_rand( 0, $_size )];
+            $_hash .= static::$_hashSeeds[$hashSeed][mt_rand( 0, $_size )];
         }
 
         return $_hash;
@@ -461,19 +461,19 @@ class Hasher extends Seed implements UtilityLike, HashSeed, HashType
      */
     public static function hash( $hashTarget = null, $hashType = self::SHA1, $hashLength = self::MAX_HASH_LENGTH, $rawOutput = false )
     {
-        $_value = ( null === $hashTarget ) ? self::generate( $hashLength ) : $hashTarget;
+        $_value = ( null === $hashTarget ) ? static::generate( $hashLength ) : $hashTarget;
 
         switch ( $hashType )
         {
-            case self::MD5:
+            case static::MD5:
                 $_hash = md5( $_value, $rawOutput );
                 break;
 
-            case self::SHA1:
+            case static::SHA1:
                 $_hash = sha1( $_value, $rawOutput );
                 break;
 
-            case self::CRC32:
+            case static::CRC32:
                 $_hash = crc32( $_value );
                 break;
 
