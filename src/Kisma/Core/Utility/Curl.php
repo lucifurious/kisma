@@ -3,7 +3,7 @@
  * This file is part of Kisma(tm).
  *
  * Kisma(tm) <https://github.com/kisma/kisma>
- * Copyright 2009-2013 Jerry Ablan <jerryablan@gmail.com>
+ * Copyright 2009-2014 Jerry Ablan <jerryablan@gmail.com>
  *
  * Kisma(tm) is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -98,7 +98,7 @@ class Curl extends HttpMethod
      */
     public static function get( $url, $payload = array(), $curlOptions = array() )
     {
-        return static::_httpRequest( static::Get, $url, $payload, $curlOptions );
+        return static::_httpRequest( static::GET, $url, $payload, $curlOptions );
     }
 
     /**
@@ -110,7 +110,7 @@ class Curl extends HttpMethod
      */
     public static function put( $url, $payload = array(), $curlOptions = array() )
     {
-        return static::_httpRequest( static::Put, $url, $payload, $curlOptions );
+        return static::_httpRequest( static::PUT, $url, $payload, $curlOptions );
     }
 
     /**
@@ -122,7 +122,7 @@ class Curl extends HttpMethod
      */
     public static function post( $url, $payload = array(), $curlOptions = array() )
     {
-        return static::_httpRequest( static::Post, $url, $payload, $curlOptions );
+        return static::_httpRequest( static::POST, $url, $payload, $curlOptions );
     }
 
     /**
@@ -134,7 +134,7 @@ class Curl extends HttpMethod
      */
     public static function delete( $url, $payload = array(), $curlOptions = array() )
     {
-        return static::_httpRequest( static::Delete, $url, $payload, $curlOptions );
+        return static::_httpRequest( static::DELETE, $url, $payload, $curlOptions );
     }
 
     /**
@@ -146,7 +146,7 @@ class Curl extends HttpMethod
      */
     public static function head( $url, $payload = array(), $curlOptions = array() )
     {
-        return static::_httpRequest( static::Head, $url, $payload, $curlOptions );
+        return static::_httpRequest( static::HEAD, $url, $payload, $curlOptions );
     }
 
     /**
@@ -158,7 +158,7 @@ class Curl extends HttpMethod
      */
     public static function options( $url, $payload = array(), $curlOptions = array() )
     {
-        return static::_httpRequest( static::Options, $url, $payload, $curlOptions );
+        return static::_httpRequest( static::OPTIONS, $url, $payload, $curlOptions );
     }
 
     /**
@@ -170,7 +170,7 @@ class Curl extends HttpMethod
      */
     public static function copy( $url, $payload = array(), $curlOptions = array() )
     {
-        return static::_httpRequest( static::Copy, $url, $payload, $curlOptions );
+        return static::_httpRequest( static::COPY, $url, $payload, $curlOptions );
     }
 
     /**
@@ -182,7 +182,7 @@ class Curl extends HttpMethod
      */
     public static function merge( $url, $payload = array(), $curlOptions = array() )
     {
-        return static::_httpRequest( static::Merge, $url, $payload, $curlOptions );
+        return static::_httpRequest( static::MERGE, $url, $payload, $curlOptions );
     }
 
     /**
@@ -194,7 +194,7 @@ class Curl extends HttpMethod
      */
     public static function patch( $url, $payload = array(), $curlOptions = array() )
     {
-        return static::_httpRequest( static::Patch, $url, $payload, $curlOptions );
+        return static::_httpRequest( static::PATCH, $url, $payload, $curlOptions );
     }
 
     /**
@@ -219,7 +219,7 @@ class Curl extends HttpMethod
      * @throws \InvalidArgumentException
      * @return bool|mixed|\stdClass
      */
-    protected static function _httpRequest( $method = self::Get, $url, $payload = array(), $curlOptions = array() )
+    protected static function _httpRequest( $method = self::GET, $url, $payload = array(), $curlOptions = array() )
     {
         if ( !static::contains( $method ) )
         {
@@ -267,11 +267,11 @@ class Curl extends HttpMethod
 
         switch ( $method )
         {
-            case static::Get:
+            case static::GET:
                 //	Do nothing, like the goggles...
                 break;
 
-            case static::Put:
+            case static::PUT:
                 $_payload = json_encode( !empty( $payload ) ? $payload : array() );
 
                 $_tmpFile = tmpfile();
@@ -283,27 +283,27 @@ class Curl extends HttpMethod
                 $_curlOptions[CURLOPT_INFILESIZE] = mb_strlen( $_payload );
                 break;
 
-            case static::Post:
+            case static::POST:
                 $_curlOptions[CURLOPT_POST] = true;
                 $_curlOptions[CURLOPT_POSTFIELDS] = $payload;
                 break;
 
-            case static::Head:
+            case static::HEAD:
                 $_curlOptions[CURLOPT_NOBODY] = true;
                 break;
 
-            case static::Patch:
-                $_curlOptions[CURLOPT_CUSTOMREQUEST] = static::Patch;
+            case static::PATCH:
+                $_curlOptions[CURLOPT_CUSTOMREQUEST] = static::PATCH;
                 $_curlOptions[CURLOPT_POSTFIELDS] = $payload;
                 break;
 
-            case static::Merge:
-            case static::Delete:
+            case static::MERGE:
+            case static::DELETE:
                 /** Merge && Delete have payloads, but they and Options/Copy need CURLOPT_CUSTOMREQUEST set so just fall through... */
                 $_curlOptions[CURLOPT_POSTFIELDS] = $payload;
-
-            case static::Options:
-            case static::Copy:
+            //  intentional drop through...
+            case static::OPTIONS:
+            case static::COPY:
                 $_curlOptions[CURLOPT_CUSTOMREQUEST] = $method;
                 break;
         }
