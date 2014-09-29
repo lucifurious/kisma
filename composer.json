@@ -13,8 +13,7 @@
 	"require":     {
 		"php":                      "~5.3",
 		"monolog/monolog":          "*",
-		"doctrine/cache":           "~1.3",
-		"doctrine/couchdb":         "~1.3",
+		"doctrine/cache":           "*",
 		"symfony/event-dispatcher": "~2.4",
 		"symfony/http-foundation":  "~2.4"
 	},
