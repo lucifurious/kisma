@@ -156,18 +156,11 @@ class Kisma
     {
         if ( !empty( static::$_cache ) )
         {
-            try
-            {
-                $_data = static::$_cache->get( CoreSettings::CACHE_KEY );
+            $_data = static::$_cache->get( CoreSettings::CACHE_KEY );
 
-                if ( !empty( $_data ) )
-                {
-                    static::$_options = Option::merge( $_data, static::$_options );
-                }
-            }
-            catch ( \Exception $_ex )
+            if ( !empty( $_data ) )
             {
-                //  Nothing there, or problem with de-serialization
+                static::$_options = Option::merge( $_data, static::$_options );
             }
         }
 
@@ -361,7 +354,7 @@ class Kisma
             }
         }
 
-        //  defaults to /tmp/.kisma/cache
+            //  defaults to /tmp/.kisma/cache
         $_paths[] = sys_get_temp_dir() . $_cachePath;
 
         foreach ( $_paths as $_path )
