@@ -149,10 +149,7 @@ class SeedBag extends Seed implements \ArrayAccess, \Countable, \IteratorAggrega
 
         $_exists = Utility\Option::contains( $this->_bag, $key );
 
-        if ( false === $overwrite &&
-            $_exists &&
-            ( null !== ( $_oldValue = Utility\Option::get( $this->_bag, $key ) ) )
-        )
+        if ( false === $overwrite && $_exists && ( null !== ( $_oldValue = Utility\Option::get( $this->_bag, $key ) ) ) )
         {
             throw new Exceptions\BagException( 'The property "' . $key . '" is read-only.' );
         }
@@ -202,8 +199,7 @@ class SeedBag extends Seed implements \ArrayAccess, \Countable, \IteratorAggrega
 
     /**
      * @param array|\Traversable $source
-     * @param bool               $noNullOverwrite If true (default), inbound NULL values will not replace NON-NULL
-     *                                            values in the bag
+     * @param bool               $noNullOverwrite If true (default), inbound NULL values will not replace NON-NULL values in the bag
      *
      * @throws \InvalidArgumentException
      * @return SeedBag
