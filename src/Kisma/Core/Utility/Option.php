@@ -26,6 +26,21 @@ namespace Kisma\Core\Utility;
  */
 class Option
 {
+    //******************************************************************************
+    //* Members
+    //******************************************************************************
+
+    /**
+     * @type bool If true, all keys will be neutralized before accessed.
+     *            Neutralization will convert camel-cased or dashed keys to lowercase
+     *            underscore separation.
+     */
+    protected static $_neutralizeKeys = true;
+    /**
+     * @type bool If true, string values retrieved that are empty() return null instead of an empty string
+     */
+    protected static $_emptyStringEqualsNull = false;
+
     //*************************************************************************
     //* Methods
     //*************************************************************************
@@ -77,7 +92,8 @@ class Option
      * @param array|\ArrayAccess|object $options           An array or object from which to get $key's value
      * @param string                    $key               The array index or property to retrieve from $options
      * @param mixed                     $defaultValue      The value to return if $key is not found
-     * @param boolean                   $unsetValue        If true, the $key will be removed from $options after retrieval
+     * @param boolean                   $unsetValue        If true, the $key will be removed from $options after
+     *                                                     retrieval
      * @param bool                      $emptyStringIsNull If true, empty() values will always return as NULL
      *
      * @return mixed
@@ -161,7 +177,8 @@ class Option
      * @param string                    $key
      * @param string                    $subKey
      * @param mixed                     $defaultValue      Only applies to target value
-     * @param boolean                   $unsetValue        If true, the $key will be removed from $options after retrieval
+     * @param boolean                   $unsetValue        If true, the $key will be removed from $options after
+     *                                                     retrieval
      * @param bool                      $emptyStringIsNull If true, empty() values will always return as NULL
      *
      * @return mixed
@@ -236,7 +253,7 @@ class Option
      */
     public static function setMany( &$target = array(), $data )
     {
-        foreach ( Option::clean( $data ) as $_key => $_value )
+        foreach ( $data as $_key => $_value )
         {
             static::set( $target, $_key, $_value );
         }
@@ -247,60 +264,64 @@ class Option
     /**
      * Sets an value in the given array at key.
      *
-     * @param array|\ArrayAccess|object $options           The array or object from which to set $key's $value
-     * @param string|array              $key               The array index or property to set
-     * @param mixed                     $value             The value to set
-     * @param bool                      $emptyStringIsNull If true, empty() values will always be set as NULL
+     * @param array|\ArrayAccess|object $options The array or object from which to set $key's $value
+     * @param string|array              $key     The array index or property to set
+     * @param mixed                     $value   The value to set
      *
-     * @return array|string
+     * @return bool|bool[]
      */
-    public static function set( &$options = array(), $key, $value = null, $emptyStringIsNull = false )
+    public static function set( &$options = array(), $key, $value = null )
     {
         if ( is_array( $key ) )
         {
             return static::setMany( $options, $key );
         }
 
-        $_options = static::collapse( $key, $value );
+        $_cleanKey = static::_cleanKey( $key );
 
-        foreach ( $_options as $_key => $_value )
+        if ( is_array( $options ) )
         {
-            $_cleanKey = static::_cleanKey( $_key );
-
-            if ( is_array( $options ) )
+            //	Check for the original key too
+            if ( !array_key_exists( $key, $options ) && array_key_exists( $_cleanKey, $options ) )
             {
-                //	Check for the original key too
-                if ( !array_key_exists( $_key, $options ) && array_key_exists( $_cleanKey, $options ) )
-                {
-                    $_key = $_cleanKey;
-                }
-
-                $options[$_key] = $emptyStringIsNull && empty( $_value ) ? null : $_value;
-
-                continue;
+                $key = $_cleanKey;
             }
 
-            if ( is_object( $options ) )
-            {
-                $_setter = 'set' . Inflector::deneutralize( $_key );
+            $options[$key] = $value;
 
-                //	Prefer setter, if one...
-                if ( method_exists( $options, $_setter ) )
-                {
-                    $options->{$_setter}( $emptyStringIsNull && empty( $_value ) ? null : $_value );
-                }
-                else
-                {
-                    if ( !property_exists( $options, $_key ) && property_exists( $options, $_cleanKey ) )
-                    {
-                        $_key = $_cleanKey;
-                    }
-
-                    //	Set it verbatim
-                    $options->{$_key} = $emptyStringIsNull && empty( $_value ) ? null : $_value;
-                }
-            }
+            return true;
         }
+
+        if ( is_object( $options ) )
+        {
+            $_setter = 'set' . Inflector::deneutralize( $key );
+
+            //	Prefer setter, if one...
+            if ( method_exists( $options, $_setter ) )
+            {
+                $options->{$_setter}( $value );
+
+                return true;
+            }
+
+            if ( property_exists( $options, $key ) )
+            {
+                $options->{$key} = $value;
+
+                return true;
+            }
+
+            if ( property_exists( $options, $_cleanKey ) )
+            {
+                $options->{$_cleanKey} = $value;
+
+                return true;
+            }
+
+            return false;
+        }
+
+        return false;
     }
 
     /**
@@ -438,7 +459,7 @@ class Option
      */
     public static function server( $key, $defaultValue = null, $unsetValue = false )
     {
-        return static::get( $_SERVER, $key, $defaultValue, $unsetValue );
+        return isset( $_SERVER ) ? static::get( $_SERVER, $key, $defaultValue, $unsetValue ) : $defaultValue;
     }
 
     /**
@@ -452,7 +473,7 @@ class Option
      */
     public static function request( $key, $defaultValue = null, $unsetValue = false )
     {
-        return static::get( $_REQUEST, $key, $defaultValue, $unsetValue );
+        return isset( $_REQUEST ) ? static::get( $_REQUEST, $key, $defaultValue, $unsetValue ) : $defaultValue;
     }
 
     /**
@@ -478,27 +499,6 @@ class Option
                 static::set( $options, $_key, $_value );
             }
         }
-    }
-
-    /**
-     * Converts key to a neutral format if not already...
-     *
-     * @param string $key
-     * @param bool   $opposite If true, the key is switched back to it's neutral or deneutral format
-     *
-     * @return string
-     */
-    protected static function _cleanKey( $key, $opposite = true )
-    {
-        if ( $key == ( $_cleaned = Inflector::neutralize( $key ) ) )
-        {
-            if ( false !== $opposite )
-            {
-                return Inflector::deneutralize( $key, true );
-            }
-        }
-
-        return $_cleaned;
     }
 
     /**
@@ -528,5 +528,149 @@ class Option
         }
 
         return $data;
+    }
+
+    /**
+     * @return boolean
+     */
+    public static function isNeutralizeKeys()
+    {
+        return self::$_neutralizeKeys;
+    }
+
+    /**
+     * @param boolean $neutralizeKeys
+     */
+    public static function setNeutralizeKeys( $neutralizeKeys )
+    {
+        self::$_neutralizeKeys = $neutralizeKeys;
+    }
+
+    /**
+     * @return boolean
+     */
+    public static function isEmptyStringEqualsNull()
+    {
+        return self::$_emptyStringEqualsNull;
+    }
+
+    /**
+     * @param boolean $emptyStringEqualsNull
+     */
+    public static function setEmptyStringEqualsNull( $emptyStringEqualsNull )
+    {
+        self::$_emptyStringEqualsNull = $emptyStringEqualsNull;
+    }
+
+    /**
+     * Converts key to a neutral format if not already...
+     *
+     * @param string $key
+     * @param bool   $opposite If true, the key is switched back to it's neutral or non-neutral format
+     *
+     * @return string
+     */
+    protected static function _cleanKey( $key, $opposite = true )
+    {
+        if ( !static::$_neutralizeKeys )
+        {
+            $_cleaned = $key;
+        }
+        elseif ( $key == ( $_cleaned = Inflector::neutralize( $key ) ) )
+        {
+            if ( $opposite )
+            {
+                return Inflector::deneutralize( $key, true );
+            }
+        }
+
+        return $_cleaned;
+    }
+
+    /**
+     * @param mixed $value
+     * @param bool  $emptyStringIsNull If true, empty() values will always return as NULL
+     *
+     * @return mixed
+     */
+    protected static function _emptified( $value, $emptyStringIsNull = false )
+    {
+        return
+            ( ( $emptyStringIsNull || static::$_emptyStringEqualsNull ) && is_string( $value ) && empty( $value ) )
+                ? null
+                : $value;
+    }
+
+    /**
+     * @param object       $object
+     * @param string|array $property
+     *
+     * @return bool
+     */
+    public static function property_exists( $object, $property )
+    {
+        if ( !is_array( $property ) )
+        {
+            $property = array($property);
+        }
+
+        foreach ( $property as $_property )
+        {
+            if ( property_exists( $object, $_property ) )
+            {
+                return $_property;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param string|array       $key
+     * @param array|\ArrayAccess $array
+     * @param bool               $useIsset If true, use isset instead of array_key_exists
+     *
+     * @return bool
+     */
+    protected static function array_key_exists( $key, $array, $useIsset = false )
+    {
+        if ( !is_array( $key ) )
+        {
+            $key = array($key);
+        }
+
+        foreach ( $key as $_key )
+        {
+            if ( ( $useIsset && isset( $array[$_key] ) ) || array_key_exists( $_key, $array ) )
+            {
+                return $_key;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param object       $object
+     * @param string|array $method
+     *
+     * @return bool|string
+     */
+    protected static function method_exists( $object, $method )
+    {
+        if ( !is_array( $method ) )
+        {
+            $method = array($method);
+        }
+
+        foreach ( $method as $_method )
+        {
+            if ( method_exists( $object, $_method ) )
+            {
+                return $_method;
+            }
+        }
+
+        return false;
     }
 }
