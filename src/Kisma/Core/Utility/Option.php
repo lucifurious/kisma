@@ -26,47 +26,24 @@ namespace Kisma\Core\Utility;
  */
 class Option
 {
-    //*************************************************************************
-    //* Methods
-    //*************************************************************************
+    //******************************************************************************
+    //* Members
+    //******************************************************************************
 
     /**
-     * @param array  $options
-     * @param string $key
-     *
-     * @return bool
+     * @type bool If true, all keys will be neutralized before accessed.
+     *            Neutralization will convert camel-cased or dashed keys to lowercase
+     *            underscore separation.
      */
-    public static function contains( $options = array(), $key )
-    {
-        $_key = static::_cleanKey( $key );
-
-        //	Check both the raw and cooked keys
-        return
-            ( is_array( $options ) && ( isset( $options[$key] ) || isset( $options[$_key] ) ) ) ||
-            ( is_object( $options ) && ( property_exists( $options, $key ) || property_exists( $options, $_key ) ) );
-    }
-
+    protected static $_neutralizeKeys = false;
     /**
-     * @param array   $options
-     * @param array   $keys
-     * @param mixed   $defaultValue
-     * @param boolean $unsetValue        If true, the $key will be removed from $options after retrieval
-     * @param bool    $emptyStringIsNull If true, empty() values will always return as NULL
-     *
-     * @return array
+     * @type bool If true, string values retrieved that are empty() return null instead of an empty string
      */
-    public static function getMany( &$options = array(), $keys, $defaultValue = null, $unsetValue = false, $emptyStringIsNull = false )
-    {
-        $_results = array();
-        $_keys = static::collapse( $keys, $defaultValue );
+    protected static $_emptyStringEqualsNull = false;
 
-        foreach ( $_keys as $_key )
-        {
-            $_results[$_key] = static::get( $options, $_key, $defaultValue, $unsetValue, $emptyStringIsNull );
-        }
-
-        return $_results;
-    }
+    //*************************************************************************
+    //* Get Methods
+    //*************************************************************************
 
     /**
      * Retrieves an option from the given array.
@@ -75,9 +52,10 @@ class Option
      * Can optionally delete $key from $options.
      *
      * @param array|\ArrayAccess|object $options           An array or object from which to get $key's value
-     * @param string                    $key               The array index or property to retrieve from $options
+     * @param string|array              $key               The array index or property to retrieve from $options
      * @param mixed                     $defaultValue      The value to return if $key is not found
-     * @param boolean                   $unsetValue        If true, the $key will be removed from $options after retrieval
+     * @param boolean                   $unsetValue        If true, the $key will be removed from $options after
+     *                                                     retrieval
      * @param bool                      $emptyStringIsNull If true, empty() values will always return as NULL
      *
      * @return mixed
@@ -85,75 +63,43 @@ class Option
     public static function get( &$options = array(), $key, $defaultValue = null, $unsetValue = false, $emptyStringIsNull = false )
     {
         //	Get many?
-        if ( is_array( $key ) )
+        if ( is_array( $key ) || $key instanceof \Traversable )
         {
-            return static::getMany( $options, $key, $defaultValue, $unsetValue );
+            return static::getMany( $options, $key, $defaultValue, $unsetValue, $emptyStringIsNull );
         }
 
-        $_originalKey = $key;
-
-        //	Set the default value
-        $_newValue = $defaultValue;
-
-        //	Now a deeper search
-        $key = static::_cleanKey( $key );
-
-        //	Get array value if it exists
-        if ( is_array( $options ) || $options instanceof \ArrayAccess )
+        switch ( gettype( $options ) )
         {
-            //	Check for the original key too
-            if ( !isset( $options[$key] ) && isset( $options[$_originalKey] ) )
-            {
-                $key = $_originalKey;
-            }
+            case $options instanceof \ArrayAccess:
+            case 'array':
+                return static::_arrayGet( $options, $key, $defaultValue, $unsetValue, $emptyStringIsNull );
 
-            if ( isset( $options[$key] ) )
-            {
-                $_newValue = $options[$key];
-
-                if ( false !== $unsetValue )
-                {
-                    unset( $options[$key] );
-                }
-
-                return $emptyStringIsNull && empty( $_newValue ) ? null : $_newValue;
-            }
+            case 'object':
+                return static::_objectGet( $options, $key, $defaultValue, $unsetValue, $emptyStringIsNull );
         }
 
-        if ( is_object( $options ) )
+        return static::_emptified( $defaultValue, $emptyStringIsNull );
+    }
+
+    /**
+     * @param array              $options
+     * @param array|\Traversable $keys              Array of keys to get
+     * @param mixed              $defaultValue
+     * @param boolean            $unsetValue        If true, the $key will be removed from $options after retrieval
+     * @param bool               $emptyStringIsNull If true, empty() values will always return as NULL
+     *
+     * @return mixed[]
+     */
+    public static function getMany( &$options = array(), $keys, $defaultValue = null, $unsetValue = false, $emptyStringIsNull = false )
+    {
+        $_results = array();
+
+        foreach ( $keys as $_key )
         {
-            if ( !property_exists( $options, $key ) && property_exists( $options, $_originalKey ) )
-            {
-                $key = $_originalKey;
-            }
-
-            if ( isset( $options->{$key} ) )
-            {
-                $_newValue = $options->{$key};
-
-                if ( false !== $unsetValue )
-                {
-                    unset( $options->{$key} );
-                }
-
-                return $emptyStringIsNull && empty( $_newValue ) ? null : $_newValue;
-            }
-            else if ( method_exists( $options, 'get' . $key ) )
-            {
-                $_getter = 'get' . Inflector::deneutralize( $key );
-                $_setter = 'set' . Inflector::deneutralize( $key );
-
-                $_newValue = $options->{$_getter}();
-
-                if ( false !== $unsetValue && method_exists( $options, $_setter ) )
-                {
-                    $options->{$_setter}( null );
-                }
-            }
+            $_results[$_key] = static::get( $options, $_key, $defaultValue, $unsetValue, $emptyStringIsNull );
         }
 
-        //	Return the default...
-        return $emptyStringIsNull && empty( $_newValue ) ? null : $_newValue;
+        return $_results;
     }
 
     /**
@@ -161,16 +107,18 @@ class Option
      * @param string                    $key
      * @param string                    $subKey
      * @param mixed                     $defaultValue      Only applies to target value
-     * @param boolean                   $unsetValue        If true, the $key will be removed from $options after retrieval
+     * @param boolean                   $unsetValue        If true, the $key will be removed from $options after
+     *                                                     retrieval
      * @param bool                      $emptyStringIsNull If true, empty() values will always return as NULL
      *
      * @return mixed
      */
     public static function getDeep( &$options = array(), $key, $subKey, $defaultValue = null, $unsetValue = false, $emptyStringIsNull = false )
     {
-        $_deep = static::get( $options, $key, array(), $unsetValue, $emptyStringIsNull );
+        $_value =
+            static::get( $options, $key, $defaultValue, $unsetValue, $emptyStringIsNull );
 
-        return static::get( $_deep, $subKey, $defaultValue, $unsetValue, $emptyStringIsNull );
+        return static::get( $_value, $subKey, $defaultValue, $unsetValue, $emptyStringIsNull );
     }
 
     /**
@@ -184,7 +132,7 @@ class Option
      * @param boolean                   $defaultValue Defaults to false
      * @param boolean                   $unsetValue   If true, the $key will be removed from $options after retrieval
      *
-     * @return mixed
+     * @return bool Guaranteed boolean true or false
      */
     public static function getBool( &$options = array(), $key, $defaultValue = false, $unsetValue = false )
     {
@@ -192,169 +140,358 @@ class Option
     }
 
     /**
-     * Adds a value to a property array
+     * Retrieves a value from an array. $defaultValue is returned if $key is not found. Can optionally delete $key from
+     * $options.
      *
-     * @param array  $source
-     * @param string $key
-     * @param string $subKey
-     * @param mixed  $value
+     * @param array|\ArrayAccess $options           An array from which to get $key's value
+     * @param string             $key               The array key to retrieve from $options
+     * @param mixed              $defaultValue      The value to return if $key is not found
+     * @param boolean            $unsetValue        If true, the $key will be removed from $options after retrieval
+     * @param bool               $emptyStringIsNull If true, empty() values will always return as NULL
+     * @param bool               $cleanedKey        Set to true if you're passing in a cleaned key
      *
-     * @return array The new array
+     * @return mixed
      */
-    public static function addTo( &$source, $key, $subKey, $value = null )
+    protected static function _arrayGet( &$options = array(), $key, $defaultValue = null, $unsetValue = false, $emptyStringIsNull = false, $cleanedKey = false )
     {
-        $_target = static::clean( static::get( $source, $key, array() ) );
-        static::set( $_target, $subKey, $value );
-        static::set( $source, $key, $_target );
+        $_key = $cleanedKey ? $key : static::_cleanKey( $key );
+        $_value = $defaultValue;
 
-        return $_target;
-    }
-
-    /**
-     * Removes a value from a property array
-     *
-     * @param array  $source
-     * @param string $key
-     * @param string $subKey
-     *
-     * @return mixed The original value of the removed key
-     */
-    public static function removeFrom( &$source, $key, $subKey )
-    {
-        $_target = static::clean( static::get( $source, $key, array() ) );
-        $_result = static::remove( $_target, $subKey );
-        static::set( $source, $key, $_target );
-
-        return $_result;
-    }
-
-    /**
-     * @param array $target
-     * @param array $data Array of key => value pairs to set
-     *
-     * @return bool
-     */
-    public static function setMany( &$target = array(), $data )
-    {
-        foreach ( Option::clean( $data ) as $_key => $_value )
+        if ( array_key_exists( $_key, $options ) )
         {
-            static::set( $target, $_key, $_value );
+            $_value = $options[$_key];
+            $unsetValue && static::remove( $options, $_key, true );
         }
 
-        return true;
+        return static::_emptified( $_value, $emptyStringIsNull );
+    }
+
+    /**
+     * @param object  $options           An object from which to get $key's value
+     * @param string  $key               The array index or property to retrieve from $options
+     * @param mixed   $defaultValue      The value to return if $key is not found
+     * @param boolean $unsetValue        If true, the $key will be removed from $options after retrieval
+     * @param bool    $emptyStringIsNull If true, empty() values will always return as NULL
+     * @param bool    $cleanedKey        Set to true if you're passing in a cleaned key
+     *
+     * @return mixed
+     */
+    protected static function _objectGet( &$options, $key, $defaultValue = null, $unsetValue = false, $emptyStringIsNull = false, $cleanedKey = false )
+    {
+        $_key = $cleanedKey ? $key : static::_cleanKey( $key );
+
+        if ( property_exists( $options, $_key ) )
+        {
+            try
+            {
+                $_value = $options->{$_key};
+                $unsetValue && static::_objectRemove( $options, $_key, true );
+
+                return static::_emptified( $_value, $emptyStringIsNull );
+            }
+            catch ( \Exception $_ex )
+            {
+                //  Ignored
+            }
+        }
+
+        //  If we didn't have direct access, try and use a getter/setter
+        if ( method_exists( $options, 'get' . $_key ) || method_exists( $options, 'is' . $_key ) )
+        {
+            $_type = method_exists( $options, 'is' . $_key ) ? 'is' : 'get';
+
+            try
+            {
+                $_value = $options->{$_type . $_key}();
+                $unsetValue && static::_objectRemove( $options, $_key, true, true );
+
+                return static::_emptified( $_value, $emptyStringIsNull );
+            }
+            catch ( \Exception $_ex )
+            {
+                //  Ignored
+            }
+        }
+
+        return static::_emptified( $defaultValue );
+    }
+
+    //******************************************************************************
+    //* Set Methods
+    //******************************************************************************
+
+    /**
+     * Sets a single $key to $value
+     *
+     * @param array|\ArrayAccess|object $options           The target array/object of the operation
+     * @param string|array              $key               The array key or property name to set
+     * @param mixed                     $value             The value to set
+     * @param bool                      $emptyStringIsNull If true, empty() values will always be set as NULL.
+     *
+     * @return bool[]|bool False if the value could not be set. True otherwise. If $key is an array, array of bool is
+     *                     returned indexed by $key.
+     */
+    public static function set( &$options = array(), $key, $value = null, $emptyStringIsNull = false )
+    {
+        //	Get many?
+        if ( is_array( $key ) || $key instanceof \Traversable )
+        {
+            return static::setMany( $options, $key, $emptyStringIsNull );
+        }
+
+        switch ( gettype( $options ) )
+        {
+            case $options instanceof \ArrayAccess:
+            case 'array':
+                return static::_arraySet( $options, $key, $value, $emptyStringIsNull );
+
+            case 'object':
+                return static::_objectSet( $options, $key, $value, $emptyStringIsNull );
+        }
+
+        return false;
+    }
+
+    /**
+     * @param array|object|\ArrayAccess $target            Target in which to set $data
+     * @param array |\Traversable       $data              Array of $key => $value pairs to set
+     * @param bool                      $emptyStringIsNull If true, empty() values will always return as NULL
+     *
+     * @return bool[]
+     */
+    public static function setMany( &$target, $data, $emptyStringIsNull = false )
+    {
+        $_results = array();
+
+        foreach ( $data as $_key => $_value )
+        {
+            $_results[$_key] = static::set( $target, $_key, $_value, $emptyStringIsNull );
+        }
+
+        return $_results;
     }
 
     /**
      * Sets an value in the given array at key.
      *
-     * @param array|\ArrayAccess|object $options           The array or object from which to set $key's $value
-     * @param string|array              $key               The array index or property to set
-     * @param mixed                     $value             The value to set
-     * @param bool                      $emptyStringIsNull If true, empty() values will always be set as NULL
+     * @param array|\ArrayAccess $target            The target array of set
+     * @param string|array       $key               The key to set
+     * @param mixed              $value             The value to set
+     * @param bool               $emptyStringIsNull If true, empty() values will always be set as NULL.
+     * @param bool               $cleanedKey        Set to true if you're passing in a cleaned key
      *
-     * @return array|string
+     * @return bool True if key existed before operation, false otherwise
      */
-    public static function set( &$options = array(), $key, $value = null, $emptyStringIsNull = false )
+    protected static function _arraySet( &$target = array(), $key, $value = null, $emptyStringIsNull = false, $cleanedKey = false )
     {
-        if ( is_array( $key ) )
-        {
-            return static::setMany( $options, $key );
-        }
+        $_key = $cleanedKey ? $key : static::_cleanKey( $key );
+        $_exists = array_key_exists( $_key, $target );
 
-        $_options = static::collapse( $key, $value );
+        $target[$_key] = static::_emptified( $value, $emptyStringIsNull );
 
-        foreach ( $_options as $_key => $_value )
-        {
-            $_cleanKey = static::_cleanKey( $_key );
-
-            if ( is_array( $options ) )
-            {
-                //	Check for the original key too
-                if ( !array_key_exists( $_key, $options ) && array_key_exists( $_cleanKey, $options ) )
-                {
-                    $_key = $_cleanKey;
-                }
-
-                $options[$_key] = $emptyStringIsNull && empty( $_value ) ? null : $_value;
-
-                continue;
-            }
-
-            if ( is_object( $options ) )
-            {
-                $_setter = 'set' . Inflector::deneutralize( $_key );
-
-                //	Prefer setter, if one...
-                if ( method_exists( $options, $_setter ) )
-                {
-                    $options->{$_setter}( $emptyStringIsNull && empty( $_value ) ? null : $_value );
-                }
-                else
-                {
-                    if ( !property_exists( $options, $_key ) && property_exists( $options, $_cleanKey ) )
-                    {
-                        $_key = $_cleanKey;
-                    }
-
-                    //	Set it verbatim
-                    $options->{$_key} = $emptyStringIsNull && empty( $_value ) ? null : $_value;
-                }
-            }
-        }
+        return $_exists;
     }
 
     /**
-     * Unsets an option in the given array
+     * Sets property in an object directly or via setter
      *
-     * @param array  $options
-     * @param string $key
+     * @param array|object $options           The target object
+     * @param string       $key               The array index or property to set
+     * @param mixed        $value             The value to set
+     * @param bool         $emptyStringIsNull If true, empty() values will always be set as NULL.
+     * @param bool         $cleanedKey        Set to true if you're passing in a cleaned key
      *
-     * @return mixed
+     * @return bool True if property was able to be set, false otherwise
      */
-    public static function remove( &$options = array(), $key )
+    protected static function _objectSet( &$options = array(), $key, $value = null, $emptyStringIsNull = false, $cleanedKey = false )
     {
-        $_originalValue = null;
+        $_key = $cleanedKey ? $key : static::_cleanKey( $key );
 
-        if ( static::contains( $options, $key ) )
+        if ( property_exists( $options, $_key ) )
         {
-            $_cleanedKey = static::_cleanKey( $key );
-
-            if ( is_array( $options ) )
+            try
             {
-                if ( !isset( $options[$key] ) && isset( $options[$_cleanedKey] ) )
-                {
-                    $key = $_cleanedKey;
-                }
+                $options->{$_key} = static::_emptified( $value, $emptyStringIsNull );
 
-                if ( isset( $options[$key] ) )
-                {
-                    $_originalValue = $options[$key];
-                    unset( $options[$key] );
-                }
+                return true;
             }
-            else
+            catch ( \Exception $_ex )
             {
-                if ( !isset( $options->{$key} ) && isset( $options->{$_cleanedKey} ) )
-                {
-                    $key = $_cleanedKey;
-                }
-
-                if ( isset( $options->{$key} ) )
-                {
-                    $_originalValue = $options->{$key};
-                }
-
-                unset( $options->{$key} );
+                //  Ignored
             }
         }
 
-        return $_originalValue;
+        //  If we didn't have direct access, try and use a getter/setter
+        if ( method_exists( $options, 'set' . $_key ) )
+        {
+            try
+            {
+                call_user_func(
+                    array($options, 'set' . $_key),
+                    static::_emptified( $value, $emptyStringIsNull )
+                );
+
+                return true;
+            }
+            catch ( \Exception $_ex )
+            {
+                //  Ignored
+            }
+        }
+
+        return false;
+    }
+
+    //******************************************************************************
+    //* Remove Methods
+    //******************************************************************************
+
+    /**
+     * Unsets an option in the given array/object
+     *
+     * @param array|object $options
+     * @param string       $key
+     * @param bool         $cleanedKey Set to true if you're passing in a cleaned key
+     *
+     * @return bool True if $key was found and removed.
+     */
+    public static function remove( &$options = array(), $key, $cleanedKey = false )
+    {
+        //	Get many?
+        if ( is_array( $key ) || $key instanceof \Traversable )
+        {
+            return static::removeMany( $options, $key );
+        }
+
+        $_key = $cleanedKey ? $key : static::_cleanKey( $key );
+
+        switch ( gettype( $options ) )
+        {
+            case $options instanceof \ArrayAccess:
+            case 'array':
+                return static::_arrayRemove( $options, $_key, true );
+
+            case 'object':
+                return static::_objectRemove( $options, $key, true );
+        }
+
+        return false;
+    }
+
+    /**
+     * @param array|object|\ArrayAccess $target Target from which to remove keys
+     * @param array|\Traversable        $keys   Array of keys to remove
+     *
+     * @return bool[]
+     */
+    public static function removeMany( &$target, $keys )
+    {
+        $_results = array();
+
+        foreach ( $keys as $_key )
+        {
+            $_results[$_key] = static::remove( $target, $_key );
+        }
+
+        return $_results;
+    }
+
+    /**
+     * @param array|\ArrayAccess $array
+     * @param string             $key
+     * @param bool               $cleanedKey Set to true if you're passing in a cleaned key
+     *
+     * @return bool
+     */
+    protected static function _arrayRemove( &$array, $key, $cleanedKey = false )
+    {
+        $_key = $cleanedKey ? $key : static::_cleanKey( $key );
+
+        if ( array_key_exists( $_key, $array ) )
+        {
+            unset( $array[$_key] );
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param object $object
+     * @param string $key
+     * @param bool   $cleanedKey Set to true if you're passing in a cleaned key
+     * @param bool   $viaSetter  If true, assume a setter exists
+     *
+     * @return bool
+     */
+    protected static function _objectRemove( &$object, $key, $cleanedKey = false, $viaSetter = false )
+    {
+        $_key = $cleanedKey ? $key : static::_cleanKey( $key );
+
+        if ( $viaSetter || method_exists( $object, 'set' . $_key ) )
+        {
+            try
+            {
+                //  Hide set failures with @
+                @call_user_func( array($object, 'set' . $_key), null );
+
+                return true;
+            }
+            catch ( \Exception $_ex )
+            {
+                //  Ignored
+            }
+        }
+
+        try
+        {
+            //  Try and unset the value directly
+            @$_result = function ( &$object, $_key )
+            {
+                unset( $object->{$_key} );
+            };
+
+            return true;
+        }
+        catch ( \Exception $_ex )
+        {
+            //  set to null if possible
+            try
+            {
+                $object->{$_key} = null;
+            }
+            catch ( \Exception $_ex )
+            {
+                //  Ignored
+            }
+        }
+
+        return false;
+    }
+
+    //******************************************************************************
+    //* Utility Methods
+    //******************************************************************************
+
+    /**
+     * @param array  $options
+     * @param string $key
+     * @param bool   $cleanedKey Set to true if you're passing in a cleaned key
+     *
+     * @return bool
+     */
+    public static function contains( $options = array(), $key, $cleanedKey = false )
+    {
+        $_key = $cleanedKey ? $key : static::_cleanKey( $key );
+
+        return
+            ( is_array( $options ) && array_key_exists( $_key, $options ) ) ||
+            ( is_object( $options ) && property_exists( $options, $_key ) );
     }
 
     /**
      * Ensures the argument passed in is actually an array with optional iteration callback
-     *
-     * @static
      *
      * @param array             $array
      * @param callable|\Closure $callback
@@ -365,7 +502,7 @@ class Option
     {
         $_result = ( empty( $array ) ? array() : ( !is_array( $array ) ? array($array) : $array ) );
 
-        if ( null === $callback || !is_callable( $callback ) )
+        if ( !is_callable( $callback ) )
         {
             return $_result;
         }
@@ -381,9 +518,7 @@ class Option
     }
 
     /**
-     * Converts $key and $value into array($key => $value) if $key is not already an array.
-     *
-     * @static
+     * If $key is NOT an array, converts the arguments $key and $value to array($key => $value).
      *
      * @param string|array $key
      * @param mixed        $value
@@ -392,11 +527,10 @@ class Option
      */
     public static function collapse( $key, $value = null )
     {
-        return ( is_array( $key ) && null === $value )
-            ? $key
-            : array(
-                $key => $value
-            );
+        return
+            ( is_array( $key ) && null === $value )
+                ? $key
+                : array($key => $value);
     }
 
     /**
@@ -438,7 +572,7 @@ class Option
      */
     public static function server( $key, $defaultValue = null, $unsetValue = false )
     {
-        return static::get( $_SERVER, $key, $defaultValue, $unsetValue );
+        return isset( $_SERVER ) ? static::get( $_SERVER, $key, $defaultValue, $unsetValue ) : $defaultValue;
     }
 
     /**
@@ -452,53 +586,41 @@ class Option
      */
     public static function request( $key, $defaultValue = null, $unsetValue = false )
     {
-        return static::get( $_REQUEST, $key, $defaultValue, $unsetValue );
+        return isset( $_REQUEST ) ? static::get( $_REQUEST, $key, $defaultValue, $unsetValue ) : $defaultValue;
     }
 
     /**
-     * Sets a value within an array only if the value is not set (SetIfNotSet=SINS).
-     * You can pass in an array of key value pairs and do many at once.
+     * Sets a value within an object or array, only if the value is not set (SetIfNotSet=SINS).
+     * You may pass in an array of key value pairs to do many at once.
      *
-     * @param \stdClass|array $options
-     * @param string          $key
-     * @param mixed           $value
+     * @param object|array $options
+     * @param string|array $key
+     * @param mixed        $value
+     *
+     * @return bool[]|bool
      */
-    public static function sins( &$options = array(), $key, $value = null )
+    public static function sins( &$options, $key, $value = null )
     {
+        $_singleton = false;
+
         //	Accept an array as input or single KVP
         if ( !is_array( $key ) )
         {
             $key = array($key => $value);
+            $_singleton = true;
         }
+
+        $_results = array();
 
         foreach ( $key as $_key => $_value )
         {
             if ( !static::contains( $options, $_key ) )
             {
-                static::set( $options, $_key, $_value );
-            }
-        }
-    }
-
-    /**
-     * Converts key to a neutral format if not already...
-     *
-     * @param string $key
-     * @param bool   $opposite If true, the key is switched back to it's neutral or deneutral format
-     *
-     * @return string
-     */
-    protected static function _cleanKey( $key, $opposite = true )
-    {
-        if ( $key == ( $_cleaned = Inflector::neutralize( $key ) ) )
-        {
-            if ( false !== $opposite )
-            {
-                return Inflector::deneutralize( $key, true );
+                $_results[$_key] = static::set( $options, $_key, $_value );
             }
         }
 
-        return $_cleaned;
+        return $_singleton ? current( $_results ) : $_results;
     }
 
     /**
@@ -529,4 +651,85 @@ class Option
 
         return $data;
     }
+
+    //******************************************************************************
+    //* Private Methods
+    //******************************************************************************
+
+    /**
+     * Converts key to a neutral format if not already...
+     *
+     * @param string $key
+     * @param bool   $opposite If true, the key is switched back to it's neutral or non-neutral format
+     *
+     * @return string
+     */
+    protected static function _cleanKey( $key, $opposite = true )
+    {
+        if ( !static::$_neutralizeKeys )
+        {
+            return $key;
+        }
+
+        if ( $key == ( $_cleaned = Inflector::neutralize( $key ) ) )
+        {
+            if ( false !== $opposite )
+            {
+                return Inflector::deneutralize( $key, true );
+            }
+        }
+
+        return $_cleaned;
+    }
+
+    /**
+     * @param mixed $value
+     * @param bool  $emptyStringIsNull If true, empty() values will always return as NULL
+     *
+     * @return mixed
+     */
+    protected static function _emptified( $value, $emptyStringIsNull = false )
+    {
+        return
+            ( ( $emptyStringIsNull || static::$_emptyStringEqualsNull ) && is_string( $value ) && empty( $value ) )
+                ? null
+                : $value;
+    }
+
+    //******************************************************************************
+    //* Static Getters/Setters
+    //******************************************************************************
+
+    /**
+     * @return boolean
+     */
+    public static function getEmptyStringEqualsNull()
+    {
+        return static::$_emptyStringEqualsNull;
+    }
+
+    /**
+     * @param boolean $emptyStringEqualsNull
+     */
+    public static function setEmptyStringEqualsNull( $emptyStringEqualsNull )
+    {
+        static::$_emptyStringEqualsNull = $emptyStringEqualsNull;
+    }
+
+    /**
+     * @return boolean
+     */
+    public static function getNeutralizeKeys()
+    {
+        return static::$_neutralizeKeys;
+    }
+
+    /**
+     * @param boolean $neutralizeKeys
+     */
+    public static function setNeutralizeKeys( $neutralizeKeys )
+    {
+        static::$_neutralizeKeys = $neutralizeKeys;
+    }
+
 }
