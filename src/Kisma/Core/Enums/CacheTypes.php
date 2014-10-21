@@ -49,6 +49,10 @@ class CacheTypes extends SeedEnum
     /**
      * @var string
      */
+    const JSON_FILE = 'JsonFile';
+    /**
+     * @var string
+     */
     const MEMCACHE = 'Memcache';
     /**
      * @var string
