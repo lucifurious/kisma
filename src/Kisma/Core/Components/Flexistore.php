@@ -79,7 +79,10 @@ class Flexistore
             throw new \InvalidArgumentException( 'The $type "' . $type . '" is not valid.' );
         }
 
-        $_class = static::STORE_NAMESPACE . $type . 'Cache';
+        $_class =
+            CacheTypes::JSON_FILE == $type
+                ? __NAMESPACE__ . '\\' . $type . 'Cache'
+                : static::STORE_NAMESPACE . $type . 'Cache';
 
         if ( !class_exists( $_class ) || null === ( $_mirror = new \ReflectionClass( $_class ) ) )
         {
@@ -91,14 +94,18 @@ class Flexistore
 
         $_arguments = Option::get( $settings, 'arguments' );
 
+        //  Instantiate the proper store class
         $this->_store =
-            $_mirror->getConstructor() ? ( $_mirror->newInstanceArgs( $_arguments ?: $this->_getCacheTypeArguments( $type ) ) )
+            $_mirror->getConstructor()
+                ? ( $_mirror->newInstanceArgs( $_arguments ?: $this->_getCacheTypeArguments( $type ) ) )
                 : $_mirror->newInstance();
 
-        if ( null !== ( $_namespace = Option::get( $settings, 'namespace' ) ) )
-        {
-            $this->_store->setNamespace( $_namespace );
-        }
+        //  Always set a namespace otherwise things get wonky
+        $this->_store->setNamespace(
+            isset( $settings['namespace'] )
+                ? $settings['namespace']
+                : null
+        );
 
         if ( $init )
         {
@@ -116,6 +123,7 @@ class Flexistore
         switch ( $type )
         {
             case CacheTypes::FILE_SYSTEM:
+            case CacheTypes::JSON_FILE:
             case CacheTypes::PHP_FILE:
                 $_directory = $this->_findCachePath();
 
@@ -209,26 +217,15 @@ class Flexistore
      */
     public static function createFileStore( $path = null, $extension = self::DEFAULT_CACHE_EXTENSION, $namespace = null )
     {
-        $_path = $path ?: static::_getUniqueTempPath();
-
-        return new Flexistore( CacheTypes::FILE_SYSTEM, array('namespace' => $namespace, 'arguments' => array($_path, $extension)) );
-    }
-
-    /**
-     * @param string $prefix
-     *
-     * @return string
-     */
-    protected static function _getUniqueTempPath( $prefix = '.flexistore' )
-    {
-        //  Get a unique temp directory
-        do
-        {
-            $_path = sys_get_temp_dir() . '/' . $prefix . '/kisma-' . \Kisma::KISMA_VERSION;
-        }
-        while ( is_dir( $_path ) );
-
-        return $_path;
+        return new Flexistore(
+            CacheTypes::JSON_FILE, array(
+                'namespace' => $namespace,
+                'arguments' => array(
+                    $path ?: static::_findCachePath(),
+                    $extension
+                )
+            )
+        );
     }
 
     /**
@@ -435,12 +432,14 @@ class Flexistore
 
         //  Build a list of potential paths
         $_paths = array(
+            //  defaults to /tmp/.kisma/cache
+            sys_get_temp_dir() . $_cachePath,
             //  /path/to/kisma/cache... user set
             getenv( 'KISMA_CACHE_PATH' ),
-            //  ~/.kisma/cache (linux $HOME)
-            getenv( 'HOME' ) . $_cachePath,
             //  /path/to/kisma/.cache
             dirname( __DIR__ ) . DIRECTORY_SEPARATOR . '.cache',
+            //  ~/.kisma/cache (linux $HOME)
+            getenv( 'HOME' ) . $_cachePath,
         );
 
         //  ~/.kisma/cache (Windows $HOME) if posix_*
@@ -448,14 +447,11 @@ class Flexistore
         {
             $_user = posix_getpwuid( posix_getuid() );
 
-            if ( $_user && isset( $_user['dir'] ) )
+            if ( $_user && isset( $_user['dir'] ) && !in_array( $_user['dir'] . $_cachePath, $_paths ) )
             {
                 $_paths[] = $_user['dir'] . $_cachePath;
             }
         }
-
-        //  defaults to /tmp/.kisma/cache
-        $_paths[] = sys_get_temp_dir() . $_cachePath;
 
         foreach ( $_paths as $_path )
         {
