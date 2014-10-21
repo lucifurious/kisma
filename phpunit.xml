@@ -1,19 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit backupGlobals="false"
-		 backupStaticAttributes="false"
-		 colors="true"
-		 convertErrorsToExceptions="true"
-		 convertNoticesToExceptions="true"
-		 convertWarningsToExceptions="true"
-		 processIsolation="false"
-		 stopOnFailure="false"
-		 syntaxCheck="false"
-		 bootstrap="./tests/bootstrap.php">
-	<testsuites>
-		<testsuite name="Release">
-			<directory suffix="Test.php">./tests/src</directory>
-		</testsuite>
-	</testsuites>
+<phpunit bootstrap="./tests/bootstrap.php" verbose="true">
+	<php>
+		<ini name="memory_limit" value="2048M" />
+	</php>
+
+	<testsuite name="Release">
+		<directory>./tests/src</directory>
+		<exclude>./vendor</exclude>
+	</testsuite>
 
 	<filter>
 		<blacklist>
@@ -22,9 +16,9 @@
 	</filter>
 
 	<logging>
-		<log type="coverage-html" target="./build/coverage" charset="UTF-8" yui="true" highlight="true" lowUpperBound="35" highLowerBound="70" />
-		<log type="coverage-clover" target="./build/log/clover.xml" />
-		<log type="coverage-php" target="./build/log/coverage.serialized" />
-		<log type="junit" target="./build/log/junit.xml" logIncompleteSkipped="true" />
+		<log type="coverage-html" target="./build/report" charset="UTF-8" highlight="true" lowUpperBound="35" highLowerBound="70" />
+		<log type="coverage-clover" target="./build/coverage.xml" />
+		<log type="coverage-php" target="./build/coverage.serialized" />
+		<log type="junit" target="./build/logfile.xml" logIncompleteSkipped="true" />
 	</logging>
 </phpunit>

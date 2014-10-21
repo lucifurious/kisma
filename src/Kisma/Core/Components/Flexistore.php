@@ -26,6 +26,7 @@ use Doctrine\Common\Cache\MemcachedCache;
 use Doctrine\Common\Cache\RedisCache;
 use Doctrine\Common\Cache\XcacheCache;
 use Kisma\Core\Enums\CacheTypes;
+use Kisma\Core\Utility\FileSystem;
 use Kisma\Core\Utility\Option;
 
 /**
@@ -116,11 +117,12 @@ class Flexistore
         {
             case CacheTypes::FILE_SYSTEM:
             case CacheTypes::PHP_FILE:
-                do
+                $_directory = $this->_findCachePath();
+
+                if ( !is_dir( $_directory ) )
                 {
-                    $_directory = sys_get_temp_dir() . '/kisma-' . uniqid();
+                    @mkdir( $_directory, 0777, true );
                 }
-                while ( is_dir( $_directory ) );
 
                 return array($_directory, static::DEFAULT_CACHE_EXTENSION);
         }
@@ -138,8 +140,6 @@ class Flexistore
         {
             case CacheTypes::MEMCACHE:
             case CacheTypes::MEMCACHED:
-                $_memcacheAvailable = false;
-
                 if ( CacheTypes::MEMCACHE == $type && ( !class_exists( '\\Memcache', false ) || !extension_loaded( 'memcache' ) ) )
                 {
                     throw new \RuntimeException( 'Memcache support is not available.' );
@@ -407,6 +407,8 @@ class Flexistore
             //  Pass the buck...
             return call_user_func_array( array($this->_store, $name), $arguments );
         }
+
+        throw new \BadMethodCallException( 'The method "' . $name . '" is invalid.' );
     }
 
     /**
@@ -418,6 +420,62 @@ class Flexistore
     {
         //  No obscuring done but allows for children to obscure automatically
         return $key;
+    }
+
+    /**
+     * Determine the Kisma cache location (user home dir) in a cross-platform manner
+     *
+     * @param string $marker The cache tree marker. Defaults to /.kisma/cache
+     *
+     * @return string|bool FALSE if no cache path can be located
+     */
+    protected static function _findCachePath( $marker = null )
+    {
+        $_cachePath = $marker ?: DIRECTORY_SEPARATOR . '.kisma' . DIRECTORY_SEPARATOR . 'cache';
+
+        //  Build a list of potential paths
+        $_paths = array(
+            //  /path/to/kisma/cache... user set
+            getenv( 'KISMA_CACHE_PATH' ),
+            //  ~/.kisma/cache (linux $HOME)
+            getenv( 'HOME' ) . $_cachePath,
+            //  /path/to/kisma/.cache
+            dirname( __DIR__ ) . DIRECTORY_SEPARATOR . '.cache',
+        );
+
+        //  ~/.kisma/cache (Windows $HOME) if posix_*
+        if ( function_exists( 'posix_getpwuid' ) && function_exists( 'posix_getuid' ) )
+        {
+            $_user = posix_getpwuid( posix_getuid() );
+
+            if ( $_user && isset( $_user['dir'] ) )
+            {
+                $_paths[] = $_user['dir'] . $_cachePath;
+            }
+        }
+
+        //  defaults to /tmp/.kisma/cache
+        $_paths[] = sys_get_temp_dir() . $_cachePath;
+
+        foreach ( $_paths as $_path )
+        {
+            if ( !empty( $_path ) )
+            {
+                if ( FileSystem::ensurePath( $_path ) )
+                {
+                    break;
+                }
+
+                $_path = false;
+            }
+        }
+
+        if ( empty( $_path ) )
+        {
+            return false;
+        }
+
+        return $_path;
     }
 
 }
