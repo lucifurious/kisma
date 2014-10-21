@@ -106,7 +106,7 @@ class JsonFileCache extends FilesystemCache
             return false;
         }
 
-        if ( false === ( $_stored = json_decode( $_json, true ) ) || JSON_ERROR_NONE != json_last_error() )
+        if ( false === ( $_stored = json_decode( $_json, true ) ) || JSON_ERROR_NONE != json_last_error() || !is_array( $_stored ) )
         {
             return false;
         }
