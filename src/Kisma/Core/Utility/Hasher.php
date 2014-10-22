@@ -496,25 +496,28 @@ class Hasher extends Seed implements UtilityLike, HashSeed, HashType
      */
     public static function encryptString( $text, $salt, $urlEncode = false )
     {
-        $_value = trim(
-            \base64_encode(
-                \mcrypt_encrypt(
-                    MCRYPT_RIJNDAEL_256,
-                    sha1( $salt, true ),
-                    $text,
-                    MCRYPT_MODE_ECB,
-                    \mcrypt_create_iv(
-                        \mcrypt_get_iv_size( MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB ),
-                        MCRYPT_RAND
-                    )
-                )
-            )
-        );
+        if ( version_compare( PHP_VERSION, '5.6.0', '>=' ) )
+        {
+            //  Align key on hex boundaries and use CBC mode
+            $_key = pack( 'H*', sha1( $salt, true ) );
+            $_iv = mcrypt_create_iv( mcrypt_get_iv_size( MCRYPT_RIJNDAEL_256, MCRYPT_MODE_CBC ), MCRYPT_RAND );
+            $_salted = $_iv . mcrypt_encrypt( MCRYPT_RIJNDAEL_256, $_key, $text, MCRYPT_MODE_CBC, $_iv );
+        }
+        else
+        {
+            $_key = sha1( $salt, true );
+            $_iv = mcrypt_create_iv( mcrypt_get_iv_size( MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB ), MCRYPT_RAND );
+            $_salted = mcrypt_encrypt( MCRYPT_RIJNDAEL_256, $_key, $text, MCRYPT_MODE_ECB, $_iv );
+        }
+
+        //  Encrypted value, base64 encode...
+        $_value = base64_encode( $_salted );
 
         return $urlEncode ? urlencode( $_value ) : $_value;
     }
 
-    /**     * Simple string decryption using the $salt as a key
+    /**
+     * Simple string decryption using the $salt as a key
      *
      * @param string  $text
      * @param string  $salt
@@ -524,14 +527,26 @@ class Hasher extends Seed implements UtilityLike, HashSeed, HashType
      */
     public static function decryptString( $text, $salt, $urlDecode = false )
     {
-        return trim(
+        if ( version_compare( PHP_VERSION, '5.6.0', '>=' ) )
+        {
+            //  Align key on hex boundaries
+            $_key = pack( 'H*', sha1( $salt, true ) );
+
+            $_salted = base64_decode( $urlDecode ? urldecode( $text ) : $text );
+            $_ivSize = mcrypt_get_iv_size( MCRYPT_RIJNDAEL_256, MCRYPT_MODE_CBC );
+            $_iv = substr( $_salted, 0, $_ivSize );
+            $_salted = substr( $_salted, $_ivSize );
+
+            return mcrypt_decrypt( MCRYPT_RIJNDAEL_256, $_key, $_salted, MCRYPT_MODE_CBC, $_iv );
+        }
+
+        return
             \mcrypt_decrypt(
                 MCRYPT_RIJNDAEL_256,
                 sha1( $salt, true ),
                 \base64_decode( $urlDecode ? urldecode( $text ) : $text ),
                 MCRYPT_MODE_ECB,
                 \mcrypt_create_iv( \mcrypt_get_iv_size( MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB ), MCRYPT_RAND )
-            )
-        );
+            );
     }
 }
