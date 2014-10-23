@@ -52,7 +52,7 @@ class Flexistore
     /**
      * @type string The suffix for the cache files
      */
-    const DEFAULT_CACHE_EXTENSION = '.kisma';
+    const DEFAULT_CACHE_EXTENSION = '.cache';
 
     //*************************************************************************
     //	Members
@@ -88,7 +88,9 @@ class Flexistore
         {
             if ( !class_exists( $type . 'Cache' ) || null === ( $_mirror = new \ReflectionClass( $type . 'Cache' ) ) )
             {
-                throw new \InvalidArgumentException( 'Associated driver for type "' . $type . '" not found. Looking for "' . $_class . '"' );
+                throw new \InvalidArgumentException(
+                    'Associated driver for type "' . $type . '" not found. Looking for "' . $_class . '"'
+                );
             }
         }
 
@@ -148,12 +150,16 @@ class Flexistore
         {
             case CacheTypes::MEMCACHE:
             case CacheTypes::MEMCACHED:
-                if ( CacheTypes::MEMCACHE == $type && ( !class_exists( '\\Memcache', false ) || !extension_loaded( 'memcache' ) ) )
+                if ( CacheTypes::MEMCACHE == $type &&
+                    ( !class_exists( '\\Memcache', false ) || !extension_loaded( 'memcache' ) )
+                )
                 {
                     throw new \RuntimeException( 'Memcache support is not available.' );
                 }
 
-                if ( CacheTypes::MEMCACHED == $type && ( !class_exists( '\\Memcached', false ) || !extension_loaded( 'memcached' ) ) )
+                if ( CacheTypes::MEMCACHED == $type &&
+                    ( !class_exists( '\\Memcached', false ) || !extension_loaded( 'memcached' ) )
+                )
                 {
                     throw new \RuntimeException( 'Memcached support is not available.' );
                 }
@@ -218,10 +224,11 @@ class Flexistore
     public static function createFileStore( $path = null, $extension = self::DEFAULT_CACHE_EXTENSION, $namespace = null )
     {
         return new Flexistore(
-            CacheTypes::JSON_FILE, array(
+            CacheTypes::FILE_SYSTEM,
+            array(
                 'namespace' => $namespace,
                 'arguments' => array(
-                    $path ?: static::_findCachePath(),
+                    $path ?: static::_findCachePath( '.' . trim( $namespace, '.' ) ),
                     $extension
                 )
             )
@@ -348,12 +355,14 @@ class Flexistore
     /**
      * Puts data into the cache.
      *
-     * $id can be specified as an array of key-value pairs: array( 'alpha' => 'xyz', 'beta' => 'qrs', 'gamma' => 'lmo', ... )
+     * $id can be specified as an array of key-value pairs: array( 'alpha' => 'xyz', 'beta' => 'qrs', 'gamma' => 'lmo',
+     * ... )
      *
      *
      * @param string|array $id       The cache id or array of key-value pairs
      * @param mixed        $data     The cache entry/data.
-     * @param int          $lifeTime The cache lifetime. Sets a specific lifetime for this cache entry. Defaults to 0, or "never expire"
+     * @param int          $lifeTime The cache lifetime. Sets a specific lifetime for this cache entry. Defaults to 0,
+     *                               or "never expire"
      *
      * @return boolean|boolean[] TRUE if the entry was successfully stored in the cache, FALSE otherwise.
      */
@@ -428,7 +437,7 @@ class Flexistore
      */
     protected static function _findCachePath( $marker = null )
     {
-        $_cachePath = $marker ?: DIRECTORY_SEPARATOR . '.kisma' . DIRECTORY_SEPARATOR . 'cache';
+        $_cachePath = DIRECTORY_SEPARATOR . ltrim( $marker ?: '.flexistore', DIRECTORY_SEPARATOR );
 
         //  Build a list of potential paths
         $_paths = array(
