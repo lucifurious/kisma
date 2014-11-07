@@ -20,9 +20,9 @@
  */
 namespace Kisma\Core\Utility;
 
+use Kisma\Core\Components\PaddedLineFormatter;
 use Kisma\Core\Enums\CoreSettings;
 use Kisma\Core\Enums\LoggingLevels;
-use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\ChromePHPHandler;
 use Monolog\Handler\FirePHPHandler;
 use Monolog\Handler\StreamHandler;
@@ -384,7 +384,7 @@ class Log
         if ( !$handlers )
         {
             $_handler = new StreamHandler( static::$_defaultLog );
-            $_handler->setFormatter( new LineFormatter( null, null, true ) );
+            $_handler->setFormatter( new PaddedLineFormatter( null, null, true, true ) );
 
             $handlers = array($_handler);
         }
@@ -592,16 +592,16 @@ class Log
         );
 
         return str_ireplace(
-            array(
-                '%%level%%',
-                '%%date%%',
-                '%%time%%',
-                '%%message%%',
-                '%%extra%%',
-            ),
-            $_replacements,
-            static::$_logFormat
-        ) . ( $newline ? PHP_EOL : null );
+                   array(
+                       '%%level%%',
+                       '%%date%%',
+                       '%%time%%',
+                       '%%message%%',
+                       '%%extra%%',
+                   ),
+                   $_replacements,
+                   static::$_logFormat
+               ) . ( $newline ? PHP_EOL : null );
     }
 
     /**
