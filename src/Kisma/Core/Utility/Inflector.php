@@ -114,7 +114,7 @@ class Inflector implements UtilityLike
      */
     public static function untag( $tag )
     {
-        return self::neutralize( $tag );
+        return static::neutralize( $tag );
     }
 
     /**
@@ -126,7 +126,7 @@ class Inflector implements UtilityLike
      */
     public static function display( $item )
     {
-        return self::camelize(
+        return static::camelize(
             str_replace(
                 array('_', '.', '\\', '/'),
                 ' ',
@@ -154,7 +154,7 @@ class Inflector implements UtilityLike
             return $item;
         }
 
-        return self::camelize(
+        return static::camelize(
             str_replace(
                 array('_', '.', $delimiter),
                 ' ',
@@ -187,10 +187,10 @@ class Inflector implements UtilityLike
     {
         if ( false !== $isKey )
         {
-            return self::neutralize( $tag, $strip );
+            return static::neutralize( $tag, $strip );
         }
 
-        $_tag = self::deneutralize( $tag );
+        $_tag = static::deneutralize( $tag );
 
         return $_tag;
     }
@@ -216,8 +216,10 @@ class Inflector implements UtilityLike
      *
      * @return string
      */
-    public static function camelize( $string, $separator = '_', $preserveWhiteSpace = false, $isKey = false )
+    public static function camelize( $string, $separator = null, $preserveWhiteSpace = false, $isKey = false )
     {
+        empty( $separator ) && $separator = array('_', '-');
+
         $_newString = ucwords( str_replace( $separator, ' ', $string ) );
 
         if ( false !== $isKey )
