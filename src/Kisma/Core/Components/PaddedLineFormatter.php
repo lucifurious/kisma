@@ -38,7 +38,7 @@ class PaddedLineFormatter extends LineFormatter
     /**
      * @type string
      */
-    const SIMPLE_FORMAT = "[%datetime%][%level_name%] %message% %context% %extra%\n";
+    const SIMPLE_FORMAT = "[%datetime%][%channel%][%level_name%] %message% %context% %extra%\n";
 
     //******************************************************************************
     //* Methods
@@ -52,7 +52,7 @@ class PaddedLineFormatter extends LineFormatter
         if ( isset( $record['level_name'] ) )
         {
             //  Pad the level name so the log lines are event
-            $record['level_name'] = str_pad( $record['level_name'], static::MAX_LEVEL_LENGTH - strlen( $record['level_name'] ), ' ' );
+            $record['level_name'] = str_pad( $record['level_name'], static::MAX_LEVEL_LENGTH, ' ' );
         }
 
         return parent::format( $record );
