@@ -592,16 +592,16 @@ class Log
         );
 
         return str_ireplace(
-                   array(
-                       '%%level%%',
-                       '%%date%%',
-                       '%%time%%',
-                       '%%message%%',
-                       '%%extra%%',
-                   ),
-                   $_replacements,
-                   static::$_logFormat
-               ) . ( $newline ? PHP_EOL : null );
+            array(
+                '%%level%%',
+                '%%date%%',
+                '%%time%%',
+                '%%message%%',
+                '%%extra%%',
+            ),
+            $_replacements,
+            static::$_logFormat
+        ) . ( $newline ? PHP_EOL : null );
     }
 
     /**
