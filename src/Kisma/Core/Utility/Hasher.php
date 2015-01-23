@@ -496,16 +496,21 @@ class Hasher extends Seed implements UtilityLike, HashSeed, HashType
      */
     public static function encryptString( $text, $salt, $urlEncode = false )
     {
+        $_key = sha1( $salt, true );
+
+        // PHP v5.6+ no longer pads strings with nulls for optimal length.
+        // This replicates the missing feature.
         if ( version_compare( PHP_VERSION, '5.6.0', '>=' ) )
         {
-            return $text;
+            // sha1 hashes are always 20 characters. 24 is required.
+            $_key .= "\0\0\0\0";
         }
 
         $_value = trim(
             \base64_encode(
                 \mcrypt_encrypt(
                     MCRYPT_RIJNDAEL_256,
-                    sha1( $salt, true ),
+                    $_key,
                     $text,
                     MCRYPT_MODE_ECB,
                     \mcrypt_create_iv(
@@ -530,15 +535,20 @@ class Hasher extends Seed implements UtilityLike, HashSeed, HashType
      */
     public static function decryptString( $text, $salt, $urlDecode = false )
     {
+        $_key = sha1( $salt, true );
+
+        // PHP v5.6+ no longer pads strings with nulls for optimal length.
+        // This replicates the missing feature.
         if ( version_compare( PHP_VERSION, '5.6.0', '>=' ) )
         {
-            return $text;
+            // sha1 hashes are always 20 characters. 24 is required.
+            $_key .= "\0\0\0\0";
         }
 
         return trim(
             \mcrypt_decrypt(
                 MCRYPT_RIJNDAEL_256,
-                sha1( $salt, true ),
+                $_key,
                 \base64_decode( $urlDecode ? urldecode( $text ) : $text ),
                 MCRYPT_MODE_ECB,
                 \mcrypt_create_iv( \mcrypt_get_iv_size( MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB ), MCRYPT_RAND )
