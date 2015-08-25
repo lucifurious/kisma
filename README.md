@@ -1,6 +1,6 @@
 ![Kisma](https://github.com/lucifurious/kisma/raw/master/assets/logo-kisma.png)
 
-## Kisma&trade;: PHP Utility Belt v0.2.76
+## Kisma&trade;: PHP Utility Belt v0.2.77
 [![Latest Stable Version](https://poser.pugx.org/kisma/kisma/v/stable.svg)](https://packagist.org/packages/kisma/kisma) [![Total Downloads](https://poser.pugx.org/kisma/kisma/downloads.svg)](https://packagist.org/packages/kisma/kisma) [![Latest Unstable Version](https://poser.pugx.org/kisma/kisma/v/unstable.svg)](https://packagist.org/packages/kisma/kisma) [![License](https://poser.pugx.org/kisma/kisma/license.svg)](https://packagist.org/packages/kisma/kisma)
 
 Thanks for checking out *Kisma*!
