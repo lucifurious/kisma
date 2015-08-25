@@ -84,6 +84,10 @@ class Curl extends HttpMethod
      * @var bool If true, auto-decoded response is returned as an array
      */
     protected static $_decodeToArray = false;
+    /**
+     * @var bool If true (default), PUTs are transferred via CURL's INFILE method. Otherwise, data is PUT via POSTFIELDS. Always JSON encoded
+     */
+    public static $putAsFile = false;
 
     //*************************************************************************
     //* Methods
@@ -272,15 +276,23 @@ class Curl extends HttpMethod
                 break;
 
             case static::PUT:
-                $_payload = json_encode( !empty( $payload ) ? $payload : array() );
+                if (static::$putAsFile)
+                {
+                    $_payload = json_encode(!empty($payload) ? $payload : []);
 
-                $_tmpFile = tmpfile();
-                fwrite( $_tmpFile, $_payload );
-                rewind( $_tmpFile );
+                    $_tmpFile = tmpfile();
+                    fwrite($_tmpFile, $_payload);
+                    rewind($_tmpFile);
 
-                $_curlOptions[CURLOPT_PUT] = true;
-                $_curlOptions[CURLOPT_INFILE] = $_tmpFile;
-                $_curlOptions[CURLOPT_INFILESIZE] = mb_strlen( $_payload );
+                    $_curlOptions[CURLOPT_PUT] = true;
+                    $_curlOptions[CURLOPT_INFILE] = $_tmpFile;
+                    $_curlOptions[CURLOPT_INFILESIZE] = mb_strlen($_payload);
+                }
+                else
+                {
+                    $_curlOptions[CURLOPT_CUSTOMREQUEST] = static::PUT;
+                    $_curlOptions[CURLOPT_POSTFIELDS] = $payload;
+                }
                 break;
 
             case static::POST:
